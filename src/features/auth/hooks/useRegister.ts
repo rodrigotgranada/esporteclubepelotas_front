@@ -83,30 +83,28 @@ export const useRegister = () => {
   const onSubmit = async (data: RegisterForm) => {
     setErrorMsg('');
     try {
+      // Remove confirmPassword from payload and convert Date
+      const { confirmPassword, ...restData } = data;
+      
       const payload = {
-        ...data,
+        ...restData,
+        birthDate: new Date(data.birthDate).toISOString(),
         // Garante que se houver 1 telefone/endereço, ele é principal
         phones: data.phones.map((p) => ({ ...p, isPrimary: data.phones.length === 1 ? true : p.isPrimary })),
         addresses: data.addresses.map((a) => ({ ...a, isPrimary: data.addresses.length === 1 ? true : a.isPrimary })),
       };
 
-      // 1. Cadastra o usuário no banco (sem a foto)
-      await authRepository.register(payload as unknown as RegisterForm);
+      const formData = new FormData();
+      formData.append('data', JSON.stringify(payload));
 
-      // 2. Faz o login automático para resgatar o JWT token
-      const loginResponse = await authRepository.login({ email: data.email, password: data.password });
-      setAuth(loginResponse.accessToken, loginResponse.user);
-
-      // 3. Se houver foto, envia ela usando o token (agora o backend sabe o ID)
       if (avatarBlob) {
-        try {
-          await authRepository.uploadAvatar(avatarBlob);
-        } catch (uploadError) {
-          console.error('Falha ao enviar foto de perfil', uploadError);
-          // Não vamos travar o fluxo se apenas a foto falhar
-        }
+        formData.append('avatar', avatarBlob, 'avatar.jpg');
       }
 
+      // Envia os dados e a foto juntos
+      await authRepository.register(formData);
+
+      // Redirecionamento ficará por conta do componente que consome o success/email
       setSuccess(true);
     } catch (error: unknown) {
       const err = error as { response?: { data?: { message?: string } } };

@@ -1,58 +1,64 @@
 'use client';
 
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { Loader2, ArrowRight } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Loader2, ArrowRight, ShieldCheck } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
-import { AUTH_TEXTS } from '../../constants';
-import { loginSchema, LoginForm } from '../../schemas';
 import { authRepository } from '../../repositories';
 
 import { LayoutContainer } from '@/shared/ui/components/LayoutContainer';
 import { Title } from '@/shared/ui/components/Title';
 import { Text } from '@/shared/ui/components/Text';
 import { Form } from '@/shared/ui/components/Form';
-import { EmailInput } from '@/shared/ui/components/EmailInput';
-import { PasswordInput } from '@/shared/ui/components/PasswordInput';
 import { Button } from '@/shared/ui/components/Button';
+import { Input } from '@/shared/ui/components/Input';
 
-export const LoginFeature = () => {
+export const VerifyEmailFeature = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const setAuth = useAuthStore((state) => state.setAuth);
+  
+  const [email, setEmail] = useState('');
+  const [code, setCode] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<LoginForm>({
-    resolver: zodResolver(loginSchema),
-  });
+  useEffect(() => {
+    const emailParam = searchParams.get('email');
+    if (emailParam) {
+      setEmail(emailParam);
+    }
+  }, [searchParams]);
 
-  const onSubmit = async (data: LoginForm) => {
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (code.length !== 6) {
+      setErrorMsg('O código deve conter 6 dígitos.');
+      return;
+    }
+    if (!email) {
+      setErrorMsg('O e-mail é obrigatório. Por favor, volte ao login.');
+      return;
+    }
+
+    setIsSubmitting(true);
     setErrorMsg('');
     try {
-      const response = await authRepository.login(data);
+      const response = await authRepository.verifyEmail({ email, code });
       const { accessToken, user } = response;
       setAuth(accessToken, user);
       router.push('/dashboard');
     } catch (error: unknown) {
-      const err = error as { response?: { status?: number, data?: { message?: string, email?: string } } };
-      
-      // Captura o erro customizado PENDING_VERIFICATION enviado pelo AuthService
-      if (err.response?.status === 401 && err.response?.data?.message === 'PENDING_VERIFICATION') {
-        router.push(`/verify-email?email=${encodeURIComponent(err.response.data.email || data.email)}`);
-        return;
-      }
-
-      if (err.response?.status === 401) {
-        setErrorMsg('E-mail ou senha incorretos.');
+      const err = error as { response?: { status?: number, data?: { message?: string } } };
+      if (err.response?.data?.message === 'Invalid confirmation code') {
+        setErrorMsg('Código inválido. Verifique o e-mail enviado.');
+      } else if (err.response?.data?.message === 'User is already verified') {
+        setErrorMsg('Este usuário já foi verificado. Faça login normalmente.');
       } else {
-        setErrorMsg('Ocorreu um erro ao fazer login. Tente novamente.');
+        setErrorMsg('Ocorreu um erro ao validar o código. Tente novamente.');
       }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -64,10 +70,10 @@ export const LoginFeature = () => {
         
         <LayoutContainer className="z-20 text-center px-12">
           <Title level="h1" className="text-5xl font-black text-yellow-400 mb-6 tracking-tighter">
-            {AUTH_TEXTS.REGISTER_BRANDING_TITLE}
+            E.C. Pelotas
           </Title>
           <Text className="text-xl text-gray-300 max-w-md mx-auto font-light leading-relaxed">
-            {AUTH_TEXTS.LOGIN_WELCOME_TEXT}
+            Estamos quase lá! Verifique sua identidade para liberar o seu acesso exclusivo.
           </Text>
         </LayoutContainer>
       </LayoutContainer>
@@ -76,16 +82,20 @@ export const LoginFeature = () => {
         <LayoutContainer className="w-full max-w-md">
           <LayoutContainer className="lg:hidden mb-10 text-center">
             <Title level="h1" className="text-3xl font-black text-yellow-400">
-              {AUTH_TEXTS.REGISTER_BRANDING_TITLE}
+              E.C. Pelotas
             </Title>
           </LayoutContainer>
 
           <LayoutContainer className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl">
+            <LayoutContainer className="w-16 h-16 bg-blue-500/20 text-blue-400 rounded-2xl flex items-center justify-center mb-6">
+              <ShieldCheck size={32} />
+            </LayoutContainer>
+            
             <Title level="h2" className="text-3xl font-bold mb-2">
-              {AUTH_TEXTS.LOGIN_TITLE}
+              Verifique seu e-mail
             </Title>
             <Text className="text-gray-400 mb-8">
-              {AUTH_TEXTS.LOGIN_SUBTITLE}
+              Enviamos um código de 6 dígitos para <strong className="text-white">{email || 'seu e-mail'}</strong>. Digite-o abaixo para confirmar.
             </Text>
 
             {errorMsg && (
@@ -94,48 +104,34 @@ export const LoginFeature = () => {
               </LayoutContainer>
             )}
 
-            <Form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-              <EmailInput
-                label={AUTH_TEXTS.LOGIN_EMAIL_LABEL}
-                placeholder={AUTH_TEXTS.LOGIN_EMAIL_PLACEHOLDER}
-                {...register('email')}
-                error={errors.email?.message}
+            <Form onSubmit={onSubmit} className="space-y-6">
+              <Input
+                label="Código de Confirmação"
+                placeholder="000000"
+                value={code}
+                onChange={(e) => setCode(e.target.value.replace(/\D/g, '').substring(0, 6))}
+                className="text-center text-2xl tracking-[0.5em] font-bold"
+                required
               />
-
-              <PasswordInput
-                label={AUTH_TEXTS.LOGIN_PASSWORD_LABEL}
-                placeholder={AUTH_TEXTS.LOGIN_PASSWORD_PLACEHOLDER}
-                {...register('password')}
-                error={errors.password?.message}
-              />
-
-              <LayoutContainer className="flex items-center justify-end">
-                <a href="#" className="text-sm text-yellow-400 hover:text-yellow-300 transition-colors">
-                  {AUTH_TEXTS.LOGIN_FORGOT_PASSWORD}
-                </a>
-              </LayoutContainer>
 
               <Button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || code.length !== 6}
                 className="w-full flex items-center justify-center gap-2 bg-yellow-400 hover:bg-yellow-500 text-blue-950 font-bold py-3.5 px-4 rounded-xl transition-all disabled:opacity-70 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? (
                   <Loader2 size={20} className="animate-spin" />
                 ) : (
                   <>
-                    {AUTH_TEXTS.LOGIN_SUBMIT_BUTTON}
+                    Confirmar Conta
                     <ArrowRight size={18} />
                   </>
                 )}
               </Button>
             </Form>
-
+            
             <LayoutContainer className="mt-8 text-center text-sm text-gray-400">
-              {AUTH_TEXTS.LOGIN_NO_ACCOUNT}{' '}
-              <Link href="/register" className="text-yellow-400 hover:text-yellow-300 font-semibold transition-colors">
-                {AUTH_TEXTS.LOGIN_REGISTER_LINK}
-              </Link>
+              Não recebeu? <button type="button" className="text-yellow-400 hover:text-yellow-300 transition-colors cursor-not-allowed">Reenviar código</button>
             </LayoutContainer>
           </LayoutContainer>
         </LayoutContainer>

@@ -1,7 +1,8 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Loader2, ArrowRight, ArrowLeft, CheckCircle2, User, Phone, MapPin, Lock } from 'lucide-react';
+import { Loader2, ArrowRight, ArrowLeft, CheckCircle2, User, Phone, MapPin, Lock, Mail } from 'lucide-react';
 import { useRegister } from '../../hooks';
 import { AUTH_TEXTS } from '../../constants';
 import { Stepper, StepItem } from '@/shared/ui/components/Stepper';
@@ -23,6 +24,7 @@ const STEPS: StepItem[] = [
 ];
 
 export const RegisterFeature = () => {
+  const router = useRouter();
   const {
     form,
     phonesArray,
@@ -45,12 +47,20 @@ export const RegisterFeature = () => {
     return (
       <LayoutContainer className="min-h-screen w-full flex items-center justify-center bg-[#111111] text-white p-4">
         <LayoutContainer className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-12 text-center max-w-md w-full shadow-2xl">
-          <LayoutContainer className="w-20 h-20 bg-green-500/20 text-green-400 rounded-full flex items-center justify-center mx-auto mb-6">
-            <CheckCircle2 size={40} />
+          <LayoutContainer className="w-20 h-20 bg-yellow-500/20 text-yellow-400 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Mail size={40} />
           </LayoutContainer>
-          <Title level="h2" className="text-3xl font-bold mb-4">{AUTH_TEXTS.REGISTER_SUCCESS_TITLE}</Title>
-          <Text className="text-gray-400 mb-8">{AUTH_TEXTS.REGISTER_SUCCESS_SUBTITLE}</Text>
-          <Text className="text-sm text-yellow-400 animate-pulse">{AUTH_TEXTS.REGISTER_SUCCESS_REDIRECTING}</Text>
+          <Title level="h2" className="text-3xl font-bold mb-4">Verifique seu e-mail!</Title>
+          <Text className="text-gray-400 mb-8">
+            Enviamos um código de confirmação de 6 dígitos para o e-mail cadastrado.
+          </Text>
+          <Button 
+            onClick={() => router.push(`/verify-email?email=${encodeURIComponent(form.getValues('email'))}`)}
+            className="w-full flex items-center justify-center gap-2 bg-yellow-400 hover:bg-yellow-500 text-blue-950 font-bold py-3.5 px-4 rounded-xl transition-all"
+          >
+            Inserir Código
+            <ArrowRight size={18} />
+          </Button>
         </LayoutContainer>
       </LayoutContainer>
     );

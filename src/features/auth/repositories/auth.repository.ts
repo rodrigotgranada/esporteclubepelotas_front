@@ -7,23 +7,15 @@ export const authRepository = {
     return response.data;
   },
   
-  register: async (data: RegisterForm) => {
-    // Remove confirmPassword from payload and convert Date
-    const { confirmPassword, ...restData } = data;
-    const payload = {
-      ...restData,
-      birthDate: new Date(data.birthDate).toISOString(),
-    };
-    const response = await api.post('/users/register', payload);
+  register: async (formData: FormData) => {
+    // Agora o registro envia o FormData completo que contem 'data' (JSON) e 'avatar' (Blob)
+    const response = await api.post('/users/register', formData);
     return response.data;
   },
 
-  async uploadAvatar(file: Blob): Promise<string> {
-    const formData = new FormData();
-    formData.append('file', file, 'avatar.jpg');
-    
-    const response = await api.put('/users/me/avatar', formData);
-    return response.data.url;
+  verifyEmail: async (data: { email: string; code: string }) => {
+    const response = await api.post('/auth/verify', data);
+    return response.data;
   },
 
   fetchViaCEP: async (zipCode: string) => {
