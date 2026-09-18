@@ -18,6 +18,14 @@ export const authRepository = {
     return response.data;
   },
 
+  async uploadAvatar(file: Blob): Promise<string> {
+    const formData = new FormData();
+    formData.append('file', file, 'avatar.jpg');
+    
+    const response = await api.put('/users/me/avatar', formData);
+    return response.data.url;
+  },
+
   fetchViaCEP: async (zipCode: string) => {
     const cleanZip = zipCode.replace(/\D/g, '');
     if (cleanZip.length === 8) {

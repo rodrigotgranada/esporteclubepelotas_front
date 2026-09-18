@@ -19,7 +19,7 @@ export const registerSchema = z.object({
       isWhatsapp: z.boolean(),
       isPrimary: z.boolean(),
     })
-  ).min(1),
+  ).min(1, 'Adicione pelo menos um telefone'),
   addresses: z.array(
     z.object({
       zipCode: z.string().min(8, 'CEP inválido'),
@@ -31,7 +31,7 @@ export const registerSchema = z.object({
       state: z.string().min(2, 'Estado inválido'),
       isPrimary: z.boolean(),
     })
-  ).min(1),
+  ).min(1, 'Adicione pelo menos um endereço'),
   password: z.string().min(6, 'A senha deve ter no mínimo 6 caracteres'),
   confirmPassword: z.string().min(6, 'A senha deve ter no mínimo 6 caracteres'),
 }).refine((data) => data.password === data.confirmPassword, {

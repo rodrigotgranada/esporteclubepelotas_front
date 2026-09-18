@@ -1,17 +1,21 @@
-import { User, Phone, MapPin, Lock, CheckCircle2 } from 'lucide-react';
-import { AUTH_TEXTS } from '../../constants';
+import React from 'react';
+import { CheckCircle2, LucideIcon } from 'lucide-react';
 
-export const STEPS = [
-  { id: 1, title: AUTH_TEXTS.REGISTER_STEP_1_TITLE, icon: User },
-  { id: 2, title: AUTH_TEXTS.REGISTER_STEP_2_TITLE, icon: Phone },
-  { id: 3, title: AUTH_TEXTS.REGISTER_STEP_3_TITLE, icon: MapPin },
-  { id: 4, title: AUTH_TEXTS.REGISTER_STEP_4_TITLE, icon: Lock },
-];
+export interface StepItem {
+  id: number;
+  title: string;
+  icon: LucideIcon;
+}
 
-export const Stepper = ({ currentStep }: { currentStep: number }) => {
+interface StepperProps {
+  currentStep: number;
+  steps: StepItem[];
+}
+
+export const Stepper = ({ currentStep, steps }: StepperProps) => {
   return (
     <div className="z-20 relative space-y-8">
-      {STEPS.map((step) => {
+      {steps.map((step) => {
         const Icon = step.icon;
         const isActive = currentStep === step.id;
         const isCompleted = currentStep > step.id;

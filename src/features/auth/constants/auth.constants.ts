@@ -9,6 +9,7 @@ export const AUTH_TEXTS = {
   LOGIN_SUBMIT_BUTTON: 'Acessar Portal',
   LOGIN_NO_ACCOUNT: 'Não tem uma conta?',
   LOGIN_REGISTER_LINK: 'Cadastre-se',
+  LOGIN_WELCOME_TEXT: 'Bem-vindo ao portal oficial. Acesso exclusivo para sócios, torcedores e administração.',
 
   REGISTER_TITLE: 'Cadastro de Torcedor',
   REGISTER_SUBTITLE: 'Preencha as informações abaixo para prosseguir.',
