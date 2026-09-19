@@ -18,6 +18,26 @@ export const authRepository = {
     return response.data;
   },
 
+  resendCode: async (email: string) => {
+    const response = await api.post('/auth/resend-code', { email });
+    return response.data;
+  },
+
+  forgotPassword: async (cpf: string) => {
+    const response = await api.post('/auth/forgot-password', { cpf });
+    return response.data;
+  },
+
+  resetPassword: async (data: { token: string; newPassword: string }) => {
+    const response = await api.post('/auth/reset-password', data);
+    return response.data;
+  },
+
+  checkAvailability: async (type: 'email' | 'cpf', value: string) => {
+    const response = await api.post('/users/check-availability', { type, value });
+    return response.data;
+  },
+
   fetchViaCEP: async (zipCode: string) => {
     const cleanZip = zipCode.replace(/\D/g, '');
     if (cleanZip.length === 8) {

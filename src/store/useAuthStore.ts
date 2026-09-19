@@ -13,7 +13,9 @@ export interface User {
 interface AuthState {
   token: string | null;
   user: User | null;
+  pendingVerificationEmail: string | null;
   setAuth: (token: string, user: User) => void;
+  setPendingVerificationEmail: (email: string | null) => void;
   logout: () => void;
 }
 
@@ -22,8 +24,10 @@ export const useAuthStore = create<AuthState>()(
     (set) => ({
       token: null,
       user: null,
-      setAuth: (token, user) => set({ token, user }),
-      logout: () => set({ token: null, user: null }),
+      pendingVerificationEmail: null,
+      setAuth: (token, user) => set({ token, user, pendingVerificationEmail: null }),
+      setPendingVerificationEmail: (email) => set({ pendingVerificationEmail: email }),
+      logout: () => set({ token: null, user: null, pendingVerificationEmail: null }),
     }),
     {
       name: 'auth-storage',

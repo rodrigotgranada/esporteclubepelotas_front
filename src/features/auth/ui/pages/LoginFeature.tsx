@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
@@ -10,48 +9,65 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { AUTH_TEXTS } from '../../constants';
 import { loginSchema, LoginForm } from '../../schemas';
 import { authRepository } from '../../repositories';
+import { Toast } from '@/shared/ui/components/Toast';
 
 import { LayoutContainer } from '@/shared/ui/components/LayoutContainer';
 import { Title } from '@/shared/ui/components/Title';
 import { Text } from '@/shared/ui/components/Text';
 import { Form } from '@/shared/ui/components/Form';
-import { EmailInput } from '@/shared/ui/components/EmailInput';
+import { MaskedInput } from '@/shared/ui/components/MaskedInput';
 import { PasswordInput } from '@/shared/ui/components/PasswordInput';
 import { Button } from '@/shared/ui/components/Button';
+
+function setPendingVerificationCookie(email: string) {
+  if (typeof window !== 'undefined') {
+    window.document.cookie = `pendingVerificationEmail=${encodeURIComponent(email)}; path=/; max-age=3600; samesite=strict`;
+  }
+}
 
 export const LoginFeature = () => {
   const router = useRouter();
   const setAuth = useAuthStore((state) => state.setAuth);
-  const [errorMsg, setErrorMsg] = useState('');
+  const setPendingVerificationEmail = useAuthStore((state) => state.setPendingVerificationEmail);
 
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
   });
 
   const onSubmit = async (data: LoginForm) => {
-    setErrorMsg('');
     try {
       const response = await authRepository.login(data);
       const { accessToken, user } = response;
       setAuth(accessToken, user);
+      Toast.success('Login realizado com sucesso!');
       router.push('/dashboard');
     } catch (error: unknown) {
       const err = error as { response?: { status?: number, data?: { message?: string, email?: string } } };
       
       // Captura o erro customizado PENDING_VERIFICATION enviado pelo AuthService
       if (err.response?.status === 401 && err.response?.data?.message === 'PENDING_VERIFICATION') {
-        router.push(`/verify-email?email=${encodeURIComponent(err.response.data.email || data.email)}`);
+        const pendingEmail = err.response.data.email;
+        if (pendingEmail) {
+          setPendingVerificationEmail(pendingEmail);
+          setPendingVerificationCookie(pendingEmail);
+        }
+        
+        router.push('/verify-email');
         return;
       }
 
       if (err.response?.status === 401) {
-        setErrorMsg('E-mail ou senha incorretos.');
+        Toast.error('CPF ou senha incorretos.');
+      } else if (err.response?.status === 400 && err.response?.data?.message) {
+        // Erros de bloqueio (ex: "Conta temporariamente bloqueada...")
+        Toast.error(err.response.data.message as string);
       } else {
-        setErrorMsg('Ocorreu um erro ao fazer login. Tente novamente.');
+        Toast.error('Ocorreu um erro ao fazer login. Tente novamente.');
       }
     }
   };
@@ -88,18 +104,17 @@ export const LoginFeature = () => {
               {AUTH_TEXTS.LOGIN_SUBTITLE}
             </Text>
 
-            {errorMsg && (
-              <LayoutContainer className="bg-red-500/20 border border-red-500/50 text-red-200 px-4 py-3 rounded-xl mb-6 text-sm">
-                {errorMsg}
-              </LayoutContainer>
-            )}
-
             <Form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-              <EmailInput
-                label={AUTH_TEXTS.LOGIN_EMAIL_LABEL}
-                placeholder={AUTH_TEXTS.LOGIN_EMAIL_PLACEHOLDER}
-                {...register('email')}
-                error={errors.email?.message}
+              <MaskedInput
+                label="CPF"
+                mask="999.999.999-99"
+                placeholder="000.000.000-00"
+                {...register('cpf')}
+                onChange={(e) => {
+                  register('cpf').onChange(e);
+                  setValue('cpf', e.target.value.replace(/\D/g, ''), { shouldValidate: true });
+                }}
+                error={errors.cpf?.message}
               />
 
               <PasswordInput
@@ -110,9 +125,9 @@ export const LoginFeature = () => {
               />
 
               <LayoutContainer className="flex items-center justify-end">
-                <a href="#" className="text-sm text-yellow-400 hover:text-yellow-300 transition-colors">
+                <Link href="/forgot-password" className="text-sm text-yellow-400 hover:text-yellow-300 transition-colors">
                   {AUTH_TEXTS.LOGIN_FORGOT_PASSWORD}
-                </a>
+                </Link>
               </LayoutContainer>
 
               <Button

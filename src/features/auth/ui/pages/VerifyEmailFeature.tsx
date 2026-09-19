@@ -1,9 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { Loader2, ArrowRight, ShieldCheck } from 'lucide-react';
+import { AUTH_TEXTS } from '../../constants';
 import { useAuthStore } from '@/store/useAuthStore';
+import { Toast } from '@/shared/ui/components/Toast';
 import { authRepository } from '../../repositories';
 
 import { LayoutContainer } from '@/shared/ui/components/LayoutContainer';
@@ -13,52 +15,105 @@ import { Form } from '@/shared/ui/components/Form';
 import { Button } from '@/shared/ui/components/Button';
 import { Input } from '@/shared/ui/components/Input';
 
+function clearPendingVerificationCookie() {
+  if (typeof window !== 'undefined') {
+    window.document.cookie = 'pendingVerificationEmail=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+  }
+}
+
+function maskEmail(email: string) {
+  if (!email) return '';
+  const [user, domain] = email.split('@');
+  if (!domain) return email;
+  if (user.length <= 3) return `${user[0]}***@${domain}`;
+  return `${user.substring(0, 3)}***@${domain}`;
+}
+
 export const VerifyEmailFeature = () => {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const setAuth = useAuthStore((state) => state.setAuth);
+  const pendingVerificationEmail = useAuthStore((state) => state.pendingVerificationEmail);
   
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
-  const [errorMsg, setErrorMsg] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isResending, setIsResending] = useState(false);
 
   useEffect(() => {
-    const emailParam = searchParams.get('email');
-    if (emailParam) {
-      setEmail(emailParam);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // O Next.js Middleware já garante que só entramos aqui se o cookie existir.
+    // O Zustand pode perder estado num F5, então pegamos do cookie como fallback se necessário,
+    // mas por agora o Zustand hidratado ou a navegação do router seguram a onda.
+    if (pendingVerificationEmail) {
+      // eslint-disable-next-line
+      setEmail(pendingVerificationEmail);
+    } else if (typeof window !== 'undefined') {
+      // Tenta ler do cookie caso o Zustand tenha perdido estado num reload
+      const match = window.document.cookie.match(new RegExp('(^| )pendingVerificationEmail=([^;]+)'));
+      if (match) {
+        setEmail(decodeURIComponent(match[2]));
+      }
     }
-  }, [searchParams]);
+  }, [pendingVerificationEmail]);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (code.length !== 6) {
-      setErrorMsg('O código deve conter 6 dígitos.');
+      Toast.warning('O código deve conter 6 dígitos.');
       return;
     }
     if (!email) {
-      setErrorMsg('O e-mail é obrigatório. Por favor, volte ao login.');
+      Toast.error('O e-mail é obrigatório. Por favor, volte ao login.');
       return;
     }
 
     setIsSubmitting(true);
-    setErrorMsg('');
     try {
       const response = await authRepository.verifyEmail({ email, code });
       const { accessToken, user } = response;
+      
+      // Limpa o cookie e o estado
+      clearPendingVerificationCookie();
       setAuth(accessToken, user);
+      
+      Toast.success('E-mail verificado com sucesso!');
       router.push('/dashboard');
     } catch (error: unknown) {
       const err = error as { response?: { status?: number, data?: { message?: string } } };
-      if (err.response?.data?.message === 'Invalid confirmation code') {
-        setErrorMsg('Código inválido. Verifique o e-mail enviado.');
+      if (err.response?.data?.message === 'Invalid confirmation code' || err.response?.data?.message === 'Invalid or expired confirmation code') {
+        Toast.error('Código inválido ou expirado. Verifique o e-mail enviado.');
       } else if (err.response?.data?.message === 'User is already verified') {
-        setErrorMsg('Este usuário já foi verificado. Faça login normalmente.');
+        Toast.warning('Este usuário já foi verificado. Faça login normalmente.');
+      } else if (err.response?.status === 400 && err.response?.data?.message) {
+        // Erros de bloqueio do backend
+        Toast.error(err.response.data.message as string);
       } else {
-        setErrorMsg('Ocorreu um erro ao validar o código. Tente novamente.');
+        Toast.error('Ocorreu um erro ao validar o código. Tente novamente.');
       }
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleResendCode = async () => {
+    if (!email) {
+      Toast.error('O e-mail é obrigatório. Por favor, volte ao login.');
+      return;
+    }
+
+    setIsResending(true);
+    try {
+      await authRepository.resendCode(email);
+      Toast.success('Um novo código foi enviado para o seu e-mail!');
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      if (err.response?.data?.message === 'User is already verified') {
+        Toast.warning('Este usuário já foi verificado. Faça login normalmente.');
+      } else {
+        Toast.error('Ocorreu um erro ao reenviar o código. Tente novamente.');
+      }
+    } finally {
+      setIsResending(false);
     }
   };
 
@@ -70,10 +125,10 @@ export const VerifyEmailFeature = () => {
         
         <LayoutContainer className="z-20 text-center px-12">
           <Title level="h1" className="text-5xl font-black text-yellow-400 mb-6 tracking-tighter">
-            E.C. Pelotas
+            {AUTH_TEXTS.VERIFY_EMAIL_HERO_TITLE}
           </Title>
           <Text className="text-xl text-gray-300 max-w-md mx-auto font-light leading-relaxed">
-            Estamos quase lá! Verifique sua identidade para liberar o seu acesso exclusivo.
+            {AUTH_TEXTS.VERIFY_EMAIL_HERO_SUBTITLE}
           </Text>
         </LayoutContainer>
       </LayoutContainer>
@@ -82,7 +137,7 @@ export const VerifyEmailFeature = () => {
         <LayoutContainer className="w-full max-w-md">
           <LayoutContainer className="lg:hidden mb-10 text-center">
             <Title level="h1" className="text-3xl font-black text-yellow-400">
-              E.C. Pelotas
+              {AUTH_TEXTS.VERIFY_EMAIL_HERO_TITLE}
             </Title>
           </LayoutContainer>
 
@@ -92,22 +147,16 @@ export const VerifyEmailFeature = () => {
             </LayoutContainer>
             
             <Title level="h2" className="text-3xl font-bold mb-2">
-              Verifique seu e-mail
+              {AUTH_TEXTS.VERIFY_EMAIL_TITLE}
             </Title>
             <Text className="text-gray-400 mb-8">
-              Enviamos um código de 6 dígitos para <strong className="text-white">{email || 'seu e-mail'}</strong>. Digite-o abaixo para confirmar.
+              {AUTH_TEXTS.VERIFY_EMAIL_SUBTITLE_PART_1} <strong className="text-white">{maskEmail(email) || 'seu e-mail'}</strong>{AUTH_TEXTS.VERIFY_EMAIL_SUBTITLE_PART_2}
             </Text>
-
-            {errorMsg && (
-              <LayoutContainer className="bg-red-500/20 border border-red-500/50 text-red-200 px-4 py-3 rounded-xl mb-6 text-sm">
-                {errorMsg}
-              </LayoutContainer>
-            )}
 
             <Form onSubmit={onSubmit} className="space-y-6">
               <Input
-                label="Código de Confirmação"
-                placeholder="000000"
+                label={AUTH_TEXTS.VERIFY_EMAIL_CODE_LABEL}
+                placeholder={AUTH_TEXTS.VERIFY_EMAIL_CODE_PLACEHOLDER}
                 value={code}
                 onChange={(e) => setCode(e.target.value.replace(/\D/g, '').substring(0, 6))}
                 className="text-center text-2xl tracking-[0.5em] font-bold"
@@ -123,7 +172,7 @@ export const VerifyEmailFeature = () => {
                   <Loader2 size={20} className="animate-spin" />
                 ) : (
                   <>
-                    Confirmar Conta
+                    {AUTH_TEXTS.VERIFY_EMAIL_SUBMIT_BUTTON}
                     <ArrowRight size={18} />
                   </>
                 )}
@@ -131,7 +180,15 @@ export const VerifyEmailFeature = () => {
             </Form>
             
             <LayoutContainer className="mt-8 text-center text-sm text-gray-400">
-              Não recebeu? <button type="button" className="text-yellow-400 hover:text-yellow-300 transition-colors cursor-not-allowed">Reenviar código</button>
+              {AUTH_TEXTS.VERIFY_EMAIL_NOT_RECEIVED}
+              <button 
+                type="button" 
+                onClick={handleResendCode}
+                disabled={isResending}
+                className="text-yellow-400 hover:text-yellow-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isResending ? AUTH_TEXTS.VERIFY_EMAIL_RESENDING_BUTTON : AUTH_TEXTS.VERIFY_EMAIL_RESEND_BUTTON}
+              </button>
             </LayoutContainer>
           </LayoutContainer>
         </LayoutContainer>

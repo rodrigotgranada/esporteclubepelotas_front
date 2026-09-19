@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const loginSchema = z.object({
-  email: z.string().email('E-mail inválido'),
+  cpf: z.string().min(11, 'CPF inválido'),
   password: z.string().min(6, 'A senha deve ter no mínimo 6 caracteres'),
 });
 
@@ -40,3 +40,19 @@ export const registerSchema = z.object({
 });
 
 export type RegisterForm = z.infer<typeof registerSchema>;
+
+export const forgotPasswordSchema = z.object({
+  cpf: z.string().min(11, 'CPF inválido'),
+});
+
+export type ForgotPasswordForm = z.infer<typeof forgotPasswordSchema>;
+
+export const resetPasswordSchema = z.object({
+  password: z.string().min(6, 'A senha deve ter no mínimo 6 caracteres'),
+  confirmPassword: z.string().min(6, 'A senha deve ter no mínimo 6 caracteres'),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "As senhas não coincidem",
+  path: ["confirmPassword"],
+});
+
+export type ResetPasswordForm = z.infer<typeof resetPasswordSchema>;

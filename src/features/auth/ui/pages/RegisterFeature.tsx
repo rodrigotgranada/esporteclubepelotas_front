@@ -30,7 +30,6 @@ export const RegisterFeature = () => {
     phonesArray,
     addressesArray,
     currentStep,
-    errorMsg,
     success,
     setAvatarBlob,
     fetchAddress,
@@ -50,15 +49,15 @@ export const RegisterFeature = () => {
           <LayoutContainer className="w-20 h-20 bg-yellow-500/20 text-yellow-400 rounded-full flex items-center justify-center mx-auto mb-6">
             <Mail size={40} />
           </LayoutContainer>
-          <Title level="h2" className="text-3xl font-bold mb-4">Verifique seu e-mail!</Title>
+          <Title level="h2" className="text-3xl font-bold mb-4">{AUTH_TEXTS.REGISTER_SUCCESS_TITLE}</Title>
           <Text className="text-gray-400 mb-8">
-            Enviamos um código de confirmação de 6 dígitos para o e-mail cadastrado.
+            {AUTH_TEXTS.REGISTER_SUCCESS_SUBTITLE}
           </Text>
           <Button 
-            onClick={() => router.push(`/verify-email?email=${encodeURIComponent(form.getValues('email'))}`)}
+            onClick={() => router.push('/login')}
             className="w-full flex items-center justify-center gap-2 bg-yellow-400 hover:bg-yellow-500 text-blue-950 font-bold py-3.5 px-4 rounded-xl transition-all"
           >
-            Inserir Código
+            {AUTH_TEXTS.REGISTER_LOGIN_LINK}
             <ArrowRight size={18} />
           </Button>
         </LayoutContainer>
@@ -90,12 +89,6 @@ export const RegisterFeature = () => {
           <LayoutContainer className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 sm:p-10 shadow-2xl">
             <Title level="h2" className="text-3xl font-bold mb-2">{STEPS[currentStep - 1].title}</Title>
             <Text className="text-gray-400 mb-8">{AUTH_TEXTS.REGISTER_SUBTITLE}</Text>
-
-            {errorMsg && (
-              <LayoutContainer className="bg-red-500/20 border border-red-500/50 text-red-200 px-4 py-3 rounded-xl mb-6 text-sm">
-                {errorMsg}
-              </LayoutContainer>
-            )}
 
             <Form onSubmit={onSubmit} className="space-y-6">
               

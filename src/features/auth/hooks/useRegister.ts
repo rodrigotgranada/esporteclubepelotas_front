@@ -3,12 +3,10 @@ import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { registerSchema, RegisterForm } from '../schemas';
 import { authRepository } from '../repositories';
-import { useAuthStore } from '@/store/useAuthStore';
+import { Toast } from '@/shared/ui/components/Toast';
 
 export const useRegister = () => {
-  const setAuth = useAuthStore((state) => state.setAuth);
   const [currentStep, setCurrentStep] = useState(1);
-  const [errorMsg, setErrorMsg] = useState('');
   const [success, setSuccess] = useState(false);
   const [avatarBlob, setAvatarBlob] = useState<Blob | null>(null);
 
@@ -73,15 +71,32 @@ export const useRegister = () => {
     if (currentStep === 3) fieldsToValidate = ['addresses'];
 
     const isStepValid = await form.trigger(fieldsToValidate);
-    if (isStepValid) {
-      setCurrentStep((prev) => prev + 1);
+    if (!isStepValid) return;
+
+    if (currentStep === 1) {
+      try {
+        await authRepository.checkAvailability('cpf', form.getValues('cpf'));
+      } catch (err) {
+        form.setError('cpf', { type: 'manual', message: 'CPF já está em uso' });
+        return;
+      }
     }
+
+    if (currentStep === 2) {
+      try {
+        await authRepository.checkAvailability('email', form.getValues('email'));
+      } catch (err) {
+        form.setError('email', { type: 'manual', message: 'E-mail já está em uso' });
+        return;
+      }
+    }
+
+    setCurrentStep((prev) => prev + 1);
   };
 
   const prevStep = () => setCurrentStep((prev) => prev - 1);
 
   const onSubmit = async (data: RegisterForm) => {
-    setErrorMsg('');
     try {
       // Remove confirmPassword from payload and convert Date
       const { confirmPassword, ...restData } = data;
@@ -105,10 +120,11 @@ export const useRegister = () => {
       await authRepository.register(formData);
 
       // Redirecionamento ficará por conta do componente que consome o success/email
+      Toast.success('Conta criada com sucesso!');
       setSuccess(true);
     } catch (error: unknown) {
       const err = error as { response?: { data?: { message?: string } } };
-      setErrorMsg(err.response?.data?.message || 'Ocorreu um erro ao realizar o cadastro.');
+      Toast.error(err.response?.data?.message || 'Ocorreu um erro ao realizar o cadastro.');
     }
   };
 
@@ -117,7 +133,6 @@ export const useRegister = () => {
     phonesArray,
     addressesArray,
     currentStep,
-    errorMsg,
     success,
     avatarBlob,
     setAvatarBlob,
