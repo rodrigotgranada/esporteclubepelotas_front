@@ -40,8 +40,9 @@ export const LoginFeature = () => {
   });
 
   const onSubmit = async (data: LoginForm) => {
+    const cleanCpf = data.cpf.replace(/\D/g, '');
     try {
-      const response = await authRepository.login(data);
+      const response = await authRepository.login({ ...data, cpf: cleanCpf });
       const { accessToken, user } = response;
       setAuth(accessToken, user);
       Toast.success('Login realizado com sucesso!');
@@ -107,13 +108,9 @@ export const LoginFeature = () => {
             <Form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <MaskedInput
                 label="CPF"
-                mask="999.999.999-99"
+                mask="000.000.000-00"
                 placeholder="000.000.000-00"
                 {...register('cpf')}
-                onChange={(e) => {
-                  register('cpf').onChange(e);
-                  setValue('cpf', e.target.value.replace(/\D/g, ''), { shouldValidate: true });
-                }}
                 error={errors.cpf?.message}
               />
 

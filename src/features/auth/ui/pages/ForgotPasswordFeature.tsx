@@ -41,8 +41,9 @@ export const ForgotPasswordFeature = () => {
   });
 
   const onSubmit = async (data: ForgotPasswordForm) => {
+    const cleanCpf = data.cpf.replace(/\D/g, '');
     try {
-      const response = await authRepository.forgotPassword(data.cpf);
+      const response = await authRepository.forgotPassword(cleanCpf);
       if (response.email) {
         setMaskedEmailOutput(maskEmail(response.email));
       }
@@ -122,13 +123,9 @@ export const ForgotPasswordFeature = () => {
                   <Form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                     <MaskedInput
                       label={AUTH_TEXTS.FORGOT_PASSWORD_CPF_LABEL}
-                      mask="999.999.999-99"
+                      mask="000.000.000-00"
                       placeholder={AUTH_TEXTS.FORGOT_PASSWORD_CPF_PLACEHOLDER}
                       {...register('cpf')}
-                      onChange={(e) => {
-                        register('cpf').onChange(e);
-                        setValue('cpf', e.target.value.replace(/\D/g, ''), { shouldValidate: true });
-                      }}
                       error={errors.cpf?.message}
                     />
 

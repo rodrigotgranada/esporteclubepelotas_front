@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const loginSchema = z.object({
-  cpf: z.string().min(11, 'CPF inválido'),
+  cpf: z.string().regex(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/, 'CPF inválido'),
   password: z.string().min(6, 'A senha deve ter no mínimo 6 caracteres'),
 });
 
@@ -42,7 +42,7 @@ export const registerSchema = z.object({
 export type RegisterForm = z.infer<typeof registerSchema>;
 
 export const forgotPasswordSchema = z.object({
-  cpf: z.string().min(11, 'CPF inválido'),
+  cpf: z.string().regex(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/, 'CPF inválido'),
 });
 
 export type ForgotPasswordForm = z.infer<typeof forgotPasswordSchema>;

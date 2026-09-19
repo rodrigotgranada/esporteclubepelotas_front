@@ -75,7 +75,8 @@ export const useRegister = () => {
 
     if (currentStep === 1) {
       try {
-        await authRepository.checkAvailability('cpf', form.getValues('cpf'));
+        const cleanCpf = form.getValues('cpf').replace(/\D/g, '');
+        await authRepository.checkAvailability('cpf', cleanCpf);
       } catch (err) {
         form.setError('cpf', { type: 'manual', message: 'CPF já está em uso' });
         return;
@@ -103,6 +104,7 @@ export const useRegister = () => {
       
       const payload = {
         ...restData,
+        cpf: restData.cpf.replace(/\D/g, ''),
         birthDate: new Date(data.birthDate).toISOString(),
         // Garante que se houver 1 telefone/endereço, ele é principal
         phones: data.phones.map((p) => ({ ...p, isPrimary: data.phones.length === 1 ? true : p.isPrimary })),
