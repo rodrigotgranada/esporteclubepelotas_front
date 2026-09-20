@@ -1,10 +1,10 @@
 import { UseFormReturn } from 'react-hook-form';
 import { RegisterForm } from '../../schemas';
 import { AUTH_TEXTS } from '../../constants';
-import { LayoutContainer } from '@/shared/ui/components/LayoutContainer';
-import { Input } from '@/shared/ui/components/Input';
-import { MaskedInput } from '@/shared/ui/components/MaskedInput';
-import { ImageCropper } from '@/shared/ui/components/ImageCropper';
+import { LayoutContainer  } from '@/shared/ui/components';
+import { Input  } from '@/shared/ui/components';
+import { CpfInput  } from '@/shared/ui/components';
+import { ImageCropper  } from '@/shared/ui/components';
 
 export interface RegisterStep1Props {
   form: UseFormReturn<RegisterForm>;
@@ -27,7 +27,7 @@ export const RegisterStep1 = ({ form, setAvatarBlob }: RegisterStep1Props) => {
         <Input label={AUTH_TEXTS.REGISTER_LAST_NAME_LABEL} placeholder="Silva" {...register('lastName')} error={errors.lastName?.message} />
       </LayoutContainer>
       <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-        <MaskedInput label={AUTH_TEXTS.REGISTER_CPF_LABEL} mask="000.000.000-00" placeholder="000.000.000-00" {...register('cpf')} error={errors.cpf?.message} />
+        <CpfInput label={AUTH_TEXTS.REGISTER_CPF_LABEL} {...register('cpf')} error={errors.cpf?.message} />
         <Input label={AUTH_TEXTS.REGISTER_BIRTH_DATE_LABEL} type="date" className="[color-scheme:dark]" {...register('birthDate')} error={errors.birthDate?.message} />
       </LayoutContainer>
     </LayoutContainer>

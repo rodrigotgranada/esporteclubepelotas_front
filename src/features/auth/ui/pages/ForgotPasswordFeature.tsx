@@ -9,14 +9,14 @@ import { Loader2, ArrowRight, ArrowLeft, MailCheck } from 'lucide-react';
 import { AUTH_TEXTS } from '../../constants';
 import { forgotPasswordSchema, ForgotPasswordForm } from '../../schemas';
 import { authRepository } from '../../repositories';
-import { Toast } from '@/shared/ui/components/Toast';
+import { Toast  } from '@/shared/ui/components';
 
-import { LayoutContainer } from '@/shared/ui/components/LayoutContainer';
-import { Title } from '@/shared/ui/components/Title';
-import { Text } from '@/shared/ui/components/Text';
-import { Form } from '@/shared/ui/components/Form';
-import { MaskedInput } from '@/shared/ui/components/MaskedInput';
-import { Button } from '@/shared/ui/components/Button';
+import { LayoutContainer  } from '@/shared/ui/components';
+import { Title  } from '@/shared/ui/components';
+import { Text  } from '@/shared/ui/components';
+import { Form } from '@/shared/ui/components';
+import { CpfInput } from '@/shared/ui/components';
+import { Button } from '@/shared/ui/components';
 
 function maskEmail(email: string) {
   if (!email) return '';
@@ -121,10 +121,8 @@ export const ForgotPasswordFeature = () => {
                   </Text>
 
                   <Form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                    <MaskedInput
+                    <CpfInput
                       label={AUTH_TEXTS.FORGOT_PASSWORD_CPF_LABEL}
-                      mask="000.000.000-00"
-                      placeholder={AUTH_TEXTS.FORGOT_PASSWORD_CPF_PLACEHOLDER}
                       {...register('cpf')}
                       error={errors.cpf?.message}
                     />

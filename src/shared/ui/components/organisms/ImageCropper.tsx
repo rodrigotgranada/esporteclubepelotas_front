@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useCallback } from 'react';
 import Cropper from 'react-easy-crop';
 import { Camera, Trash2, Edit2, X, Check } from 'lucide-react';

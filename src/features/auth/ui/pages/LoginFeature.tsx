@@ -9,15 +9,15 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { AUTH_TEXTS } from '../../constants';
 import { loginSchema, LoginForm } from '../../schemas';
 import { authRepository } from '../../repositories';
-import { Toast } from '@/shared/ui/components/Toast';
+import { Toast  } from '@/shared/ui/components';
 
-import { LayoutContainer } from '@/shared/ui/components/LayoutContainer';
-import { Title } from '@/shared/ui/components/Title';
-import { Text } from '@/shared/ui/components/Text';
-import { Form } from '@/shared/ui/components/Form';
-import { MaskedInput } from '@/shared/ui/components/MaskedInput';
-import { PasswordInput } from '@/shared/ui/components/PasswordInput';
-import { Button } from '@/shared/ui/components/Button';
+import { LayoutContainer  } from '@/shared/ui/components';
+import { Title  } from '@/shared/ui/components';
+import { Text  } from '@/shared/ui/components';
+import { Form  } from '@/shared/ui/components';
+import { CpfInput  } from '@/shared/ui/components';
+import { PasswordInput  } from '@/shared/ui/components';
+import { Button  } from '@/shared/ui/components';
 
 function setPendingVerificationCookie(email: string) {
   if (typeof window !== 'undefined') {
@@ -106,10 +106,7 @@ export const LoginFeature = () => {
             </Text>
 
             <Form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-              <MaskedInput
-                label="CPF"
-                mask="000.000.000-00"
-                placeholder="000.000.000-00"
+              <CpfInput
                 {...register('cpf')}
                 error={errors.cpf?.message}
               />

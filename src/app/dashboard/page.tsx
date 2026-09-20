@@ -1,5 +1,5 @@
-import { LayoutContainer } from '@/shared/ui/components/LayoutContainer';
-import { Title } from '@/shared/ui/components/Title';
+import { LayoutContainer  } from '@/shared/ui/components';
+import { Title  } from '@/shared/ui/components';
 
 export default function DashboardPage() {
   return (

@@ -5,15 +5,15 @@ import { useRouter } from 'next/navigation';
 import { Loader2, ArrowRight, ShieldCheck } from 'lucide-react';
 import { AUTH_TEXTS } from '../../constants';
 import { useAuthStore } from '@/store/useAuthStore';
-import { Toast } from '@/shared/ui/components/Toast';
+import { Toast  } from '@/shared/ui/components';
 import { authRepository } from '../../repositories';
 
-import { LayoutContainer } from '@/shared/ui/components/LayoutContainer';
-import { Title } from '@/shared/ui/components/Title';
-import { Text } from '@/shared/ui/components/Text';
-import { Form } from '@/shared/ui/components/Form';
-import { Button } from '@/shared/ui/components/Button';
-import { Input } from '@/shared/ui/components/Input';
+import { LayoutContainer  } from '@/shared/ui/components';
+import { Title  } from '@/shared/ui/components';
+import { Text  } from '@/shared/ui/components';
+import { Form  } from '@/shared/ui/components';
+import { Button  } from '@/shared/ui/components';
+import { Input  } from '@/shared/ui/components';
 
 function clearPendingVerificationCookie() {
   if (typeof window !== 'undefined') {

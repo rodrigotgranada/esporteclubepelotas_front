@@ -1,8 +1,8 @@
 import { UseFormReturn } from 'react-hook-form';
 import { RegisterForm } from '../../schemas';
 import { AUTH_TEXTS } from '../../constants';
-import { LayoutContainer } from '@/shared/ui/components/LayoutContainer';
-import { PasswordInput } from '@/shared/ui/components/PasswordInput';
+import { LayoutContainer  } from '@/shared/ui/components';
+import { PasswordInput  } from '@/shared/ui/components';
 
 export interface RegisterStep4Props {
   form: UseFormReturn<RegisterForm>;

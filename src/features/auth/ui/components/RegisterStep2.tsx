@@ -2,12 +2,12 @@ import { UseFormReturn, UseFieldArrayReturn } from 'react-hook-form';
 import { Plus, Trash2 } from 'lucide-react';
 import { RegisterForm } from '../../schemas';
 import { AUTH_TEXTS } from '../../constants';
-import { LayoutContainer } from '@/shared/ui/components/LayoutContainer';
-import { Title } from '@/shared/ui/components/Title';
-import { Text } from '@/shared/ui/components/Text';
-import { Button } from '@/shared/ui/components/Button';
-import { EmailInput } from '@/shared/ui/components/EmailInput';
-import { MaskedInput } from '@/shared/ui/components/MaskedInput';
+import { LayoutContainer  } from '@/shared/ui/components';
+import { Title  } from '@/shared/ui/components';
+import { Text  } from '@/shared/ui/components';
+import { Button  } from '@/shared/ui/components';
+import { EmailInput  } from '@/shared/ui/components';
+import { MaskedInput  } from '@/shared/ui/components';
 
 export interface RegisterStep2Props {
   form: UseFormReturn<RegisterForm>;

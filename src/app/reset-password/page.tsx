@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { ResetPasswordFeature } from '@/features/auth/ui/pages/ResetPasswordFeature';
-import { LayoutContainer } from '@/shared/ui/components/LayoutContainer';
+import { LayoutContainer  } from '@/shared/ui/components';
 
 export default function ResetPasswordPage() {
   return (

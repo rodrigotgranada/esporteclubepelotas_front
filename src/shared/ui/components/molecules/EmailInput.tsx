@@ -1,7 +1,8 @@
 import React, { forwardRef } from 'react';
 import { Mail } from 'lucide-react';
+import { Input, InputProps } from '../atoms/Input';
 
-export interface EmailInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+export interface EmailInputProps extends InputProps {
   label?: string;
   error?: string;
 }

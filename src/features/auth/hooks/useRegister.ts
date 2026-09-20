@@ -3,7 +3,7 @@ import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { registerSchema, RegisterForm } from '../schemas';
 import { authRepository } from '../repositories';
-import { Toast } from '@/shared/ui/components/Toast';
+import { Toast  } from '@/shared/ui/components';
 
 export const useRegister = () => {
   const [currentStep, setCurrentStep] = useState(1);

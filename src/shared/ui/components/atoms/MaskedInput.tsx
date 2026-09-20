@@ -1,7 +1,9 @@
+'use client';
+
 import React, { forwardRef } from 'react';
 import { IMaskInput } from 'react-imask';
 
-interface MaskedInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+export interface MaskedInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
   mask: string;

@@ -8,14 +8,14 @@ import { Loader2, ArrowRight } from 'lucide-react';
 import { AUTH_TEXTS } from '../../constants';
 import { resetPasswordSchema, ResetPasswordForm } from '../../schemas';
 import { authRepository } from '../../repositories';
-import { Toast } from '@/shared/ui/components/Toast';
+import { Toast  } from '@/shared/ui/components';
 
-import { LayoutContainer } from '@/shared/ui/components/LayoutContainer';
-import { Title } from '@/shared/ui/components/Title';
-import { Text } from '@/shared/ui/components/Text';
-import { Form } from '@/shared/ui/components/Form';
-import { PasswordInput } from '@/shared/ui/components/PasswordInput';
-import { Button } from '@/shared/ui/components/Button';
+import { LayoutContainer  } from '@/shared/ui/components';
+import { Title  } from '@/shared/ui/components';
+import { Text  } from '@/shared/ui/components';
+import { Form  } from '@/shared/ui/components';
+import { PasswordInput  } from '@/shared/ui/components';
+import { Button  } from '@/shared/ui/components';
 
 export const ResetPasswordFeature = () => {
   const router = useRouter();
