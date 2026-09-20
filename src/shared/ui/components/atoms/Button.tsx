@@ -12,7 +12,7 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 
 const variantStyles: Record<ButtonVariant, string> = {
   primary: 'bg-yellow-400 hover:bg-yellow-500 text-blue-950 shadow-[0_0_20px_rgba(250,204,21,0.2)]',
-  danger: 'bg-red-500 hover:bg-red-600 text-white shadow-[0_0_20px_rgba(239,68,68,0.2)]',
+  danger: 'bg-yellow-600 hover:bg-yellow-700 text-white shadow-[0_0_20px_rgba(202,138,4,0.2)]',
   outline: 'bg-transparent border border-white/20 text-white hover:bg-white/10',
   ghost: 'bg-transparent text-gray-400 hover:text-white hover:bg-white/5',
   custom: '', // Para manter compatibilidade com classes completamente customizadas antigas

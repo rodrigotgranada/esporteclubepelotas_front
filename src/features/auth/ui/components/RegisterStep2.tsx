@@ -33,7 +33,7 @@ export const RegisterStep2 = ({ form, phonesArray, removePhone }: RegisterStep2P
         {phonesArray.fields.map((field, index) => (
           <LayoutContainer key={field.id} className="p-4 bg-black/30 rounded-xl border border-white/5 space-y-3 relative">
             {phonesArray.fields.length > 1 && (
-              <Button onClick={() => removePhone(index)} className="absolute top-3 right-3 text-gray-500 hover:text-red-400">
+              <Button onClick={() => removePhone(index)} className="absolute top-3 right-3 text-gray-500 hover:text-yellow-500">
                 <Trash2 size={16} />
               </Button>
             )}

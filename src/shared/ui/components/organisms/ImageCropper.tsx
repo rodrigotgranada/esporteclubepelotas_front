@@ -106,7 +106,7 @@ export const ImageCropper: React.FC<ImageCropperProps> = ({ onCropSave, onImageR
                 <Edit2 className="w-5 h-5" />
                 <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
               </label>
-              <button type="button" onClick={handleRemove} className="text-white hover:text-red-500 transition-colors">
+              <button type="button" onClick={handleRemove} className="text-white hover:text-yellow-500 transition-colors">
                 <Trash2 className="w-5 h-5" />
               </button>
             </div>

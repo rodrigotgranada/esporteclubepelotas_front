@@ -21,11 +21,11 @@ export const EmailInput = forwardRef<HTMLInputElement, EmailInputProps>(
             type="email"
             ref={ref}
             className={`w-full pl-11 pr-4 py-3 bg-black/50 border rounded-xl focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all outline-none text-white placeholder-gray-600 ${
-              error ? 'border-red-500 focus:ring-red-500' : 'border-white/10'
+              error ? 'border-yellow-500 focus:ring-yellow-500' : 'border-white/10'
             } ${className}`}
           />
         </div>
-        {error && <span className="text-red-400 text-xs mt-1 block">{error}</span>}
+        {error && <span className="text-yellow-500 text-xs mt-1 block">{error}</span>}
       </div>
     );
   }

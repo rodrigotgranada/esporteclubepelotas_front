@@ -31,7 +31,7 @@ export const RegisterStep3 = ({ form, addressesArray, fetchAddress, removeAddres
       {addressesArray.fields.map((field, index) => (
         <LayoutContainer key={field.id} className="p-4 bg-black/30 rounded-xl border border-white/5 space-y-4 relative">
           {addressesArray.fields.length > 1 && (
-            <Button onClick={() => removeAddress(index)} className="absolute top-3 right-3 text-gray-500 hover:text-red-400">
+            <Button onClick={() => removeAddress(index)} className="absolute top-3 right-3 text-gray-500 hover:text-yellow-500">
               <Trash2 size={16} />
             </Button>
           )}

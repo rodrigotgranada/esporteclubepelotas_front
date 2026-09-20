@@ -45,8 +45,8 @@ export const Toast = {
       t={t} 
       title={title} 
       message={message} 
-      icon={<XCircle className="h-6 w-6 text-red-500" />}
-      borderColor="border-red-500/30"
+      icon={<XCircle className="h-6 w-6 text-yellow-500" />}
+      borderColor="border-yellow-500/30"
     />
   )),
   warning: (title: string, message?: string) => toast.custom((t) => (
