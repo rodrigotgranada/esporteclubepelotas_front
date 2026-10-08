@@ -30,7 +30,7 @@ const sizeStyles: Record<ButtonSize, string> = {
 };
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ children, className = '', variant = 'custom', size = 'none', fullWidth = false, leftIcon, rightIcon, isLoading = false, type = 'button', disabled, ...props }, ref) => {
+  ({ children, className = '', variant = 'primary', size = 'md', fullWidth = false, leftIcon, rightIcon, isLoading = false, type = 'button', disabled, ...props }, ref) => {
     
     const baseStyles = variant !== 'custom' 
       ? 'flex items-center justify-center gap-2 rounded-xl transition-all cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed' 
