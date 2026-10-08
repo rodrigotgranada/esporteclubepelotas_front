@@ -2,6 +2,7 @@ import React from 'react';
 import { Drawer, Input, Button, LayoutContainer, Form, Text } from '@/shared/ui/components';
 import { useRoleAdminDrawer } from '../../../hooks/useRoleAdminDrawer';
 import { ROLE_ADMIN_DRAWER_TEXTS } from './RoleAdminDrawer.constants';
+import { useSystemModulesStore } from '@/store/useSystemModulesStore';
 
 interface RoleAdminDrawerProps {
   isOpen: boolean;
@@ -12,6 +13,7 @@ interface RoleAdminDrawerProps {
 
 export const RoleAdminDrawer = ({ isOpen, onClose, role, onSaveSuccess }: RoleAdminDrawerProps) => {
   const { formData, isLoading, updateField, handleTogglePermission, handleSubmit } = useRoleAdminDrawer(role, onSaveSuccess);
+  const { modules } = useSystemModulesStore();
   const isImmutable = role?.isImmutable;
 
   return (
@@ -57,25 +59,36 @@ export const RoleAdminDrawer = ({ isOpen, onClose, role, onSaveSuccess }: RoleAd
               </LayoutContainer>
             )}
 
-            <LayoutContainer className="space-y-3">
-              {ROLE_ADMIN_DRAWER_TEXTS.AVAILABLE_PERMISSIONS.map(perm => {
-                const isChecked = formData.permissions.includes(perm.key) || ((role?.name || role) === 'OWNER');
+            <LayoutContainer className="space-y-4">
+              {[...ROLE_ADMIN_DRAWER_TEXTS.CORE_MODULES, ...modules].map(mod => {
+                const moduleName = mod.name;
+                const moduleSlug = mod.slug;
+                
                 return (
-                  <LayoutContainer key={perm.key} className={`flex items-start gap-3 p-3 rounded-xl border ${isChecked ? 'bg-surface border-border' : 'bg-background border-border/50'}`}>
-                    <input 
-                      type="checkbox" 
-                      id={perm.key}
-                      checked={isChecked}
-                      onChange={() => handleTogglePermission(perm.key)}
-                      disabled={(isImmutable && (role?.name || role) === 'OWNER') || isLoading}
-                      className="mt-1 accent-primary"
-                    />
-                    <LayoutContainer>
-                      <label htmlFor={perm.key} className="text-sm font-bold text-text-primary cursor-pointer">{perm.module} ({perm.key})</label>
-                      <Text className="text-xs text-text-secondary mt-1">{perm.description}</Text>
+                  <LayoutContainer key={moduleSlug} className="bg-surface border border-border/50 rounded-xl p-4">
+                    <Text className="text-sm font-bold text-text-primary mb-3">{moduleName}</Text>
+                    <LayoutContainer className="flex flex-wrap gap-4">
+                      {ROLE_ADMIN_DRAWER_TEXTS.CRUD_ACTIONS.map(action => {
+                        const permKey = `${moduleSlug}.${action.action}`;
+                        const isChecked = formData.permissions.includes(permKey) || ((role?.name || role) === 'OWNER');
+                        
+                        return (
+                          <label key={permKey} className="flex items-center gap-2 cursor-pointer">
+                            <input 
+                              type="checkbox" 
+                              id={permKey}
+                              checked={isChecked}
+                              onChange={() => handleTogglePermission(permKey)}
+                              disabled={(isImmutable && (role?.name || role) === 'OWNER') || isLoading}
+                              className="accent-primary"
+                            />
+                            <Text className="text-xs text-text-secondary">{action.label}</Text>
+                          </label>
+                        );
+                      })}
                     </LayoutContainer>
                   </LayoutContainer>
-                )
+                );
               })}
             </LayoutContainer>
           </LayoutContainer>

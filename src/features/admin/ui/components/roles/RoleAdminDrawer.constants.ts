@@ -16,10 +16,16 @@ export const ROLE_ADMIN_DRAWER_TEXTS = {
     SUCCESS_CREATE: 'Cargo criado com sucesso!',
     ERROR_SAVE: 'Erro ao salvar cargo',
   },
-  AVAILABLE_PERMISSIONS: [
-    { module: 'Usuários', key: 'users.manage', description: 'Gestão completa (listar, criar, editar, excluir)' },
-    { module: 'Cargos', key: 'roles.manage', description: 'Gestão completa (listar, criar, editar, excluir)' },
-    { module: 'Módulos', key: 'modules.manage', description: 'Ligar e desligar módulos do sistema' },
-    { module: 'Matérias', key: 'news.manage', description: 'Gestão completa (publicar, editar, excluir)' },
+  CORE_MODULES: [
+    { slug: 'roles', name: 'Cargos e Permissões' },
+    { slug: 'modules', name: 'Módulos do Sistema' },
+    { slug: 'settings', name: 'Configurações Globais' },
+    { slug: 'themes', name: 'Gestão de Temas' },
+  ],
+  CRUD_ACTIONS: [
+    { action: 'read', label: 'Ler' },
+    { action: 'create', label: 'Criar' },
+    { action: 'update', label: 'Editar' },
+    { action: 'delete', label: 'Excluir' },
   ]
 };
