@@ -3,6 +3,7 @@ import { LayoutContainer, Text, Button, Table, TableHeader, TableRow, TableHead,
 import { useThemesSettingsTab } from '../../../../hooks/settings/useThemesSettingsTab';
 import { ThemeAdminDrawer } from './ThemeAdminDrawer';
 import { ThemePreviewPanel } from './ThemePreviewPanel';
+import { ThemeMobileCard } from './ThemeMobileCard';
 import { SETTINGS_TEXTS } from '../../../../constants/settings.constants';
 
 export const ThemesSettingsTab = () => {
@@ -24,8 +25,33 @@ export const ThemesSettingsTab = () => {
       </LayoutContainer>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-        <LayoutContainer className="lg:col-span-2">
-          <Table>
+        <LayoutContainer className="lg:col-span-2 w-full min-w-0">
+          {/* Mobile/Tablet View */}
+          <LayoutContainer className="flex flex-col gap-4 lg:hidden mb-6">
+            {themes.map((theme, index) => {
+              const rowKey = typeof theme._id === 'string' ? theme._id : (theme._id as any)?.$oid || index;
+              return (
+                <ThemeMobileCard 
+                  key={rowKey} 
+                  theme={theme} 
+                  previewTheme={previewTheme} 
+                  setPreviewTheme={setPreviewTheme} 
+                  handleActivate={handleActivate} 
+                  handleOpenDrawer={handleOpenDrawer} 
+                />
+              );
+            })}
+            {themes.length === 0 && (
+              <LayoutContainer className="bg-surface border border-border rounded-xl p-8 text-center text-text-secondary">
+                {SETTINGS_TEXTS.THEMES.EMPTY_LIST}
+              </LayoutContainer>
+            )}
+          </LayoutContainer>
+
+          {/* Desktop View */}
+          <LayoutContainer className="hidden lg:block w-full min-w-0 bg-surface border border-border rounded-2xl overflow-hidden">
+            <LayoutContainer className="overflow-x-auto w-full">
+              <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>{SETTINGS_TEXTS.THEMES.TABLE_COL_NAME}</TableHead>
@@ -112,6 +138,8 @@ export const ThemesSettingsTab = () => {
               )}
             </TableBody>
           </Table>
+            </LayoutContainer>
+          </LayoutContainer>
         </LayoutContainer>
 
         <LayoutContainer className="lg:col-span-1 h-[600px] sticky top-6">

@@ -3,6 +3,7 @@
 import React from 'react';
 import { LayoutContainer, Title, Text, Button, Table, TableHeader, TableRow, TableHead, TableBody, TableCell, Badge, Spinner } from '@/shared/ui/components';
 import { ShieldAlert, CheckCircle } from 'lucide-react';
+import { ModuleMobileCard } from '../../components/modules/ModuleMobileCard';
 import { useSystemModulesList } from '../../../hooks/useSystemModulesList';
 import { SYSTEM_MODULES_FEATURE_TEXTS } from './SystemModulesFeature.constants';
 
@@ -15,8 +16,27 @@ export const SystemModulesFeature = () => {
         <Text className="text-text-secondary mt-1">{SYSTEM_MODULES_FEATURE_TEXTS.SUBTITLE}</Text>
       </LayoutContainer>
 
-      <LayoutContainer className="bg-surface border border-border rounded-2xl overflow-hidden mt-6">
-        <LayoutContainer className="overflow-x-auto">
+      <LayoutContainer className="mt-6 flex flex-col gap-4 w-full min-w-0">
+        {/* Mobile/Tablet View */}
+        <LayoutContainer className="flex flex-col gap-4 lg:hidden">
+          {modules.map((mod, index) => {
+            let uniqueKey = mod.slug || mod.key || mod.name || `module-${index}`;
+            if (typeof mod._id === 'string') uniqueKey = mod._id;
+            else if (mod._id && typeof mod._id.toString === 'function' && mod._id.toString() !== '[object Object]') uniqueKey = mod._id.toString();
+            return <ModuleMobileCard key={uniqueKey} mod={mod} onToggleStatus={handleToggleStatus} />;
+          })}
+          {isLoading ? (
+            <Spinner text="Carregando módulos..." className="bg-surface border border-border rounded-xl" />
+          ) : modules.length === 0 && (
+            <LayoutContainer className="bg-surface border border-border rounded-xl p-8 text-center text-text-secondary">
+              {SYSTEM_MODULES_FEATURE_TEXTS.EMPTY_STATE}
+            </LayoutContainer>
+          )}
+        </LayoutContainer>
+
+        {/* Desktop View */}
+        <LayoutContainer className="hidden lg:block w-full min-w-0 bg-surface border border-border rounded-2xl overflow-hidden">
+          <LayoutContainer className="overflow-x-auto w-full">
           <Table>
             <TableHeader>
               <TableRow>
@@ -75,6 +95,7 @@ export const SystemModulesFeature = () => {
             </TableBody>
           </Table>
         </LayoutContainer>
+      </LayoutContainer>
       </LayoutContainer>
     </LayoutContainer>
   );

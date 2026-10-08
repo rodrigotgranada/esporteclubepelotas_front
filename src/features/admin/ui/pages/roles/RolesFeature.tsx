@@ -4,6 +4,7 @@ import React from 'react';
 import { LayoutContainer, Title, Text, Button, Table, TableHeader, TableRow, TableHead, TableBody, TableCell, Badge, Spinner } from '@/shared/ui/components';
 import { Shield, Plus, Edit2 } from 'lucide-react';
 import { RoleAdminDrawer } from '../../components/roles/RoleAdminDrawer';
+import { RoleMobileCard } from '../../components/roles/RoleMobileCard';
 import { useRolesList } from '../../../hooks/useRolesList';
 import { ROLES_FEATURE_TEXTS } from './RolesFeature.constants';
 
@@ -31,8 +32,27 @@ export const RolesFeature = () => {
         </Button>
       </LayoutContainer>
 
-      <LayoutContainer className="bg-surface border border-border rounded-2xl overflow-hidden mt-6">
-        <LayoutContainer className="overflow-x-auto">
+      <LayoutContainer className="mt-6 flex flex-col gap-4 w-full min-w-0">
+        {/* Mobile/Tablet View */}
+        <LayoutContainer className="flex flex-col gap-4 lg:hidden">
+          {roles.map((role, index) => {
+            let roleKey = role.name || `role-${index}`;
+            if (typeof role._id === 'string') roleKey = role._id;
+            else if (role._id && typeof role._id.toString === 'function' && role._id.toString() !== '[object Object]') roleKey = role._id.toString();
+            return <RoleMobileCard key={roleKey} role={role} onEditRole={handleEditRole} />;
+          })}
+          {isLoading ? (
+            <Spinner text="Carregando cargos..." className="bg-surface border border-border rounded-xl" />
+          ) : roles.length === 0 && (
+            <LayoutContainer className="bg-surface border border-border rounded-xl p-8 text-center text-text-secondary">
+              {ROLES_FEATURE_TEXTS.EMPTY_STATE}
+            </LayoutContainer>
+          )}
+        </LayoutContainer>
+
+        {/* Desktop View */}
+        <LayoutContainer className="hidden lg:block w-full min-w-0 bg-surface border border-border rounded-2xl overflow-hidden">
+          <LayoutContainer className="overflow-x-auto w-full">
           <Table>
             <TableHeader>
               <TableRow>
@@ -107,6 +127,7 @@ export const RolesFeature = () => {
             </TableBody>
           </Table>
         </LayoutContainer>
+      </LayoutContainer>
       </LayoutContainer>
 
       <RoleAdminDrawer 
