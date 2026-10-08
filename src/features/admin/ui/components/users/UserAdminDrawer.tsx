@@ -87,7 +87,7 @@ export const UserAdminDrawer = ({ isOpen, onClose, user, onSaveSuccess }: UserAd
                 <CpfInput label={USER_ADMIN_DRAWER_TEXTS.LABELS.CPF} value={formData.cpf || ''} onChange={e => updateField('cpf', e.target.value)} required />
                 <Input type="date" label={USER_ADMIN_DRAWER_TEXTS.LABELS.BIRTH_DATE} value={formData.birthDate || ''} onChange={e => updateField('birthDate', e.target.value)} required />
               </LayoutContainer>
-              <Input type="email" label={USER_ADMIN_DRAWER_TEXTS.LABELS.EMAIL} value={formData.email || ''} onChange={e => updateField('email', e.target.value)} required />
+              <Input type="email" label={USER_ADMIN_DRAWER_TEXTS.LABELS.EMAIL} value={formData.email || ''} onChange={e => updateField('email', e.target.value)} required disabled={!!user && currentUserRole !== 'OWNER'} />
             </Accordion>
 
             <Accordion title={USER_ADMIN_DRAWER_TEXTS.SECTIONS.PHONES}>

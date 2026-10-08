@@ -50,6 +50,51 @@ export const useUsersList = () => {
     }
   };
 
+  const handleExportCsv = async () => {
+    try {
+      toast.loading('Preparando exportação...', { id: 'export-csv' });
+      const params: any = { page: 1, limit: 9999, search };
+      if (roleFilter) params.role = roleFilter;
+      if (statusFilter && statusFilter !== 'ALL') params.status = statusFilter;
+      if (statusFilter === 'ALL') params.status = 'ALL';
+      
+      const res = await adminService.getUsers(params);
+      const csvRows = [];
+      const headers = ['ID', 'Nome', 'Sobrenome', 'Email', 'CPF', 'Nascimento', 'Status', 'Cargo'];
+      csvRows.push(headers.join(','));
+
+      res.data.forEach(u => {
+        const roleName = typeof u.role === 'string' ? u.role : (u.role?.name || '');
+        const birthDate = u.birthDate ? new Date(u.birthDate).toLocaleDateString() : '';
+        const values = [
+          u.id,
+          `"${u.firstName}"`,
+          `"${u.lastName}"`,
+          `"${u.email}"`,
+          `"${u.cpf}"`,
+          `"${birthDate}"`,
+          `"${u.status}"`,
+          `"${roleName}"`
+        ];
+        csvRows.push(values.join(','));
+      });
+
+      const csvString = csvRows.join('\n');
+      const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', `usuarios_export_${new Date().getTime()}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      toast.success('Download iniciado!', { id: 'export-csv' });
+    } catch (error) {
+      console.error(error);
+      toast.error('Erro ao exportar CSV', { id: 'export-csv' });
+    }
+  };
+
   return {
     users,
     total,
@@ -65,6 +110,7 @@ export const useUsersList = () => {
     totalPages,
     isLoading,
     handleToggleStatus,
-    loadUsers
+    loadUsers,
+    handleExportCsv
   };
 };

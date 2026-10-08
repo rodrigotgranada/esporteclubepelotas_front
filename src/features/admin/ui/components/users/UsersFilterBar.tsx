@@ -1,6 +1,6 @@
 import React from 'react';
 import { LayoutContainer, Button, Input, Select, Option } from '@/shared/ui/components';
-import { Search, Plus } from 'lucide-react';
+import { Search, Plus, FileDown } from 'lucide-react';
 import { ADMIN_TEXTS } from '../../../constants/admin.constants';
 
 interface UsersFilterBarProps {
@@ -11,6 +11,7 @@ interface UsersFilterBarProps {
   statusFilter: string;
   setStatusFilter: (value: string) => void;
   onAddUser: () => void;
+  onExport: () => void;
   availableRoles: any[];
 }
 
@@ -19,6 +20,7 @@ export const UsersFilterBar = ({
   roleFilter, setRoleFilter, 
   statusFilter, setStatusFilter, 
   onAddUser,
+  onExport,
   availableRoles
 }: UsersFilterBarProps) => {
   return (
@@ -73,11 +75,17 @@ export const UsersFilterBar = ({
         </LayoutContainer>
       </LayoutContainer>
 
-      {/* Action Button */}
-      <Button variant="primary" size="md" onClick={onAddUser} className="w-full xl:w-auto flex items-center justify-center gap-2 flex-shrink-0 h-[42px]">
-        <Plus size={18} />
-        {ADMIN_TEXTS.USER_DRAWER_TITLE_CREATE}
-      </Button>
+      {/* Action Buttons */}
+      <LayoutContainer className="flex flex-col sm:flex-row gap-3 w-full xl:w-auto">
+        <Button variant="outline" size="md" onClick={onExport} className="w-full sm:w-auto flex items-center justify-center gap-2 flex-shrink-0 h-[42px] border-secondary/30 text-secondary hover:bg-secondary/10">
+          <FileDown size={18} />
+          Exportar CSV
+        </Button>
+        <Button variant="primary" size="md" onClick={onAddUser} className="w-full sm:w-auto flex items-center justify-center gap-2 flex-shrink-0 h-[42px]">
+          <Plus size={18} />
+          {ADMIN_TEXTS.USER_DRAWER_TITLE_CREATE}
+        </Button>
+      </LayoutContainer>
     </LayoutContainer>
   );
 };

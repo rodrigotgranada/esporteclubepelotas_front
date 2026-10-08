@@ -30,7 +30,8 @@ export const UsersListFeature = () => {
     totalPages,
     isLoading,
     handleToggleStatus,
-    loadUsers
+    loadUsers,
+    handleExportCsv
   } = useUsersList();
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -95,6 +96,7 @@ export const UsersListFeature = () => {
         statusFilter={statusFilter}
         setStatusFilter={setStatusFilter}
         onAddUser={handleAddUser}
+        onExport={handleExportCsv}
         availableRoles={availableRoles}
       />
 
