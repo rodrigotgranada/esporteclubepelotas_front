@@ -31,7 +31,12 @@ export const UsersListFeature = () => {
     isLoading,
     handleToggleStatus,
     loadUsers,
-    handleExportCsv
+    handleExportCsv,
+    selectedUserIds,
+    toggleUserSelection,
+    selectAllUsers,
+    handleBulkUpdateStatus,
+    handleBulkUpdateRole
   } = useUsersList();
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -100,6 +105,48 @@ export const UsersListFeature = () => {
         availableRoles={availableRoles}
       />
 
+      {selectedUserIds.length > 0 && (
+        <LayoutContainer className="bg-primary/10 border border-primary/20 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 animate-in fade-in slide-in-from-top-2">
+          <Text className="font-bold text-primary">
+            {selectedUserIds.length} usuário(s) selecionado(s)
+          </Text>
+          <LayoutContainer className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+            <select
+              className="px-3 py-2 bg-surface border border-border rounded-lg text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+              onChange={(e) => {
+                if (e.target.value) {
+                  handleBulkUpdateRole(e.target.value);
+                  e.target.value = ''; // reset
+                }
+              }}
+              defaultValue=""
+            >
+              <option value="" disabled>Alterar Cargo para...</option>
+              {availableRoles.map(r => (
+                <option key={r._id || r.id} value={r._id || r.id}>{r.label || r.name}</option>
+              ))}
+            </select>
+            
+            <select
+              className="px-3 py-2 bg-surface border border-border rounded-lg text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+              onChange={(e) => {
+                if (e.target.value) {
+                  handleBulkUpdateStatus(e.target.value);
+                  e.target.value = ''; // reset
+                }
+              }}
+              defaultValue=""
+            >
+              <option value="" disabled>Alterar Status para...</option>
+              <option value="ACTIVE">ATIVO</option>
+              <option value="PENDING">PENDENTE</option>
+              <option value="BLOCKED">BLOQUEADO</option>
+              <option value="INACTIVE">INATIVO</option>
+            </select>
+          </LayoutContainer>
+        </LayoutContainer>
+      )}
+
       <UsersList
         users={users}
         onToggleStatus={confirmToggleStatus}
@@ -111,6 +158,9 @@ export const UsersListFeature = () => {
         setPage={setPage}
         currentUserRole={currentUserRole}
         isLoading={isLoading}
+        selectedUserIds={selectedUserIds}
+        toggleUserSelection={toggleUserSelection}
+        selectAllUsers={selectAllUsers}
       />
 
       <UserAdminDrawer

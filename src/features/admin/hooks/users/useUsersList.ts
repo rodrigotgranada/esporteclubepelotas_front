@@ -11,6 +11,7 @@ export const useUsersList = () => {
   const [roleFilter, setRoleFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('ACTIVE'); // default to ACTIVE as requested
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
   
   const limit = 10;
   const totalPages = Math.ceil(total / limit) || 1;
@@ -47,6 +48,48 @@ export const useUsersList = () => {
       loadUsers();
     } catch (error: any) {
       toast.error(error.response?.data?.message || ADMIN_TEXTS.TOAST_ERROR_GENERIC);
+    }
+  };
+
+  const toggleUserSelection = (userId: string) => {
+    setSelectedUserIds(prev => 
+      prev.includes(userId) ? prev.filter(id => id !== userId) : [...prev, userId]
+    );
+  };
+
+  const selectAllUsers = (selectAll: boolean) => {
+    if (selectAll) {
+      setSelectedUserIds(users.map(u => u.id));
+    } else {
+      setSelectedUserIds([]);
+    }
+  };
+
+  const handleBulkUpdateStatus = async (status: string) => {
+    try {
+      setIsLoading(true);
+      await Promise.all(selectedUserIds.map(id => adminService.updateUserStatus(id, status)));
+      toast.success(`Status atualizado para ${selectedUserIds.length} usuários.`);
+      setSelectedUserIds([]);
+      loadUsers();
+    } catch (error) {
+      toast.error('Erro ao atualizar status em massa.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleBulkUpdateRole = async (roleId: string) => {
+    try {
+      setIsLoading(true);
+      await Promise.all(selectedUserIds.map(id => adminService.updateUserRole(id, roleId)));
+      toast.success(`Cargo atualizado para ${selectedUserIds.length} usuários.`);
+      setSelectedUserIds([]);
+      loadUsers();
+    } catch (error) {
+      toast.error('Erro ao atualizar cargo em massa.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -109,6 +152,11 @@ export const useUsersList = () => {
     limit,
     totalPages,
     isLoading,
+    selectedUserIds,
+    toggleUserSelection,
+    selectAllUsers,
+    handleBulkUpdateStatus,
+    handleBulkUpdateRole,
     handleToggleStatus,
     loadUsers,
     handleExportCsv

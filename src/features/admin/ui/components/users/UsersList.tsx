@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutContainer, Text, Button, Table, TableHeader, TableRow, TableHead, TableBody, TableCell, Badge, Spinner } from '@/shared/ui/components';
+import { LayoutContainer, Text, Button, Table, TableHeader, TableRow, TableHead, TableBody, TableCell, Badge, Spinner, Checkbox } from '@/shared/ui/components';
 import { Shield, ShieldAlert, CheckCircle } from 'lucide-react';
 import Image from 'next/image';
 import { UserAdminData } from '@/features/admin/services/admin.service';
@@ -19,6 +19,9 @@ interface UsersListProps {
   setPage: (page: number | ((p: number) => number)) => void;
   currentUserRole: string;
   isLoading?: boolean;
+  selectedUserIds: string[];
+  toggleUserSelection: (id: string) => void;
+  selectAllUsers: (selectAll: boolean) => void;
 }
 
 export const UsersList = ({
@@ -31,7 +34,10 @@ export const UsersList = ({
   totalPages,
   setPage,
   currentUserRole,
-  isLoading
+  isLoading,
+  selectedUserIds,
+  toggleUserSelection,
+  selectAllUsers
 }: UsersListProps) => {
   return (
     <LayoutContainer className="mt-6 flex flex-col gap-4 w-full min-w-0">
@@ -61,6 +67,13 @@ export const UsersList = ({
           <Table className="min-w-[800px] w-full">
             <TableHeader>
               <TableRow>
+                <TableHead className="w-12">
+                  <Checkbox 
+                    label=""
+                    checked={users.length > 0 && selectedUserIds.length === users.length}
+                    onChange={(e) => selectAllUsers(e.target.checked)}
+                  />
+                </TableHead>
                 <TableHead>{ADMIN_TEXTS.USERS_TABLE_HEADER_USER}</TableHead>
                 <TableHead>{ADMIN_TEXTS.USERS_TABLE_HEADER_CPF}</TableHead>
                 <TableHead>{ADMIN_TEXTS.USERS_TABLE_HEADER_ROLE}</TableHead>
@@ -75,7 +88,14 @@ export const UsersList = ({
                 const roleLabel = roleObj?.label || USER_ROLE_MAP[roleName as keyof typeof USER_ROLE_MAP] || roleName;
                 const canEdit = currentUserRole === 'OWNER' || roleName !== 'OWNER';
                 return (
-                  <TableRow key={user.id} className={`${canEdit ? 'cursor-pointer' : 'opacity-70 cursor-not-allowed'}`} onClick={() => canEdit && onEditUser(user)}>
+                  <TableRow key={user.id} className={`${canEdit ? 'cursor-pointer' : 'opacity-70 cursor-not-allowed'} ${selectedUserIds.includes(user.id) ? 'bg-primary/5' : ''}`} onClick={() => canEdit && onEditUser(user)}>
+                    <TableCell onClick={(e) => e.stopPropagation()}>
+                      <Checkbox 
+                        label=""
+                        checked={selectedUserIds.includes(user.id)}
+                        onChange={() => toggleUserSelection(user.id)}
+                      />
+                    </TableCell>
                     <TableCell>
                       <LayoutContainer className="flex items-center gap-3">
                         <LayoutContainer className="w-10 h-10 rounded-full bg-surface overflow-hidden relative border border-border flex items-center justify-center text-primary font-bold text-sm">
@@ -136,13 +156,13 @@ export const UsersList = ({
               })}
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="py-12">
+                  <TableCell colSpan={6} className="py-12">
                     <Spinner text="Carregando usuários..." />
                   </TableCell>
                 </TableRow>
               ) : users.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center text-text-secondary py-12">{ADMIN_TEXTS.USERS_TABLE_EMPTY}</TableCell>
+                  <TableCell colSpan={6} className="text-center text-text-secondary py-12">{ADMIN_TEXTS.USERS_TABLE_EMPTY}</TableCell>
                 </TableRow>
               )}
             </TableBody>
