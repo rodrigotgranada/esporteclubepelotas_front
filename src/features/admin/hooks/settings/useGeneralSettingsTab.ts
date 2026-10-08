@@ -6,7 +6,7 @@ import { GENERAL_SETTINGS_TEXTS } from '../../ui/components/settings/general/Gen
 
 export const useGeneralSettingsTab = () => {
   const { settings, setSettings } = useSettingsStore();
-  const [loading, setLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [clubName, setClubName] = useState(settings?.clubName || 'Esporte Clube Pelotas');
   const [previewLogo, setPreviewLogo] = useState<string | null>(settings?.clubLogoUrl || null);
   const [fileToUpload, setFileToUpload] = useState<File | null>(null);
@@ -62,7 +62,7 @@ export const useGeneralSettingsTab = () => {
   };
 
   const handleSave = async () => {
-    setLoading(true);
+    setIsSaving(true);
     try {
       const data: any = { clubName, clubLogoGallery: gallery };
 
@@ -77,12 +77,13 @@ export const useGeneralSettingsTab = () => {
     } catch (err) {
       toast.error(GENERAL_SETTINGS_TEXTS.TOAST_ERROR);
     } finally {
-      setLoading(false);
+      setIsSaving(false);
     }
   };
 
   return {
-    loading,
+    isSaving,
+    isFetching: !settings,
     clubName,
     setClubName,
     previewLogo,

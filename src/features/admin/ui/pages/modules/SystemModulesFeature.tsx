@@ -61,7 +61,11 @@ export const SystemModulesFeature = () => {
                   </TableRow>
                 );
               })}
-              {modules.length === 0 && !isLoading && (
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center text-text-secondary py-12">Carregando módulos...</TableCell>
+                </TableRow>
+              ) : modules.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center text-text-secondary py-12">{SYSTEM_MODULES_FEATURE_TEXTS.EMPTY_STATE}</TableCell>
                 </TableRow>

@@ -18,6 +18,7 @@ interface UsersListProps {
   totalPages: number;
   setPage: (page: number | ((p: number) => number)) => void;
   currentUserRole: string;
+  isLoading?: boolean;
 }
 
 export const UsersList = ({
@@ -44,7 +45,11 @@ export const UsersList = ({
             currentUserRole={currentUserRole} 
           />
         ))}
-        {users.length === 0 && (
+        {isLoading ? (
+          <LayoutContainer className="bg-surface border border-border rounded-xl p-8 text-center text-text-secondary">
+            Carregando usuários...
+          </LayoutContainer>
+        ) : users.length === 0 && (
           <LayoutContainer className="bg-surface border border-border rounded-xl p-8 text-center text-text-secondary">
             {ADMIN_TEXTS.USERS_TABLE_EMPTY}
           </LayoutContainer>
@@ -130,7 +135,11 @@ export const UsersList = ({
                   </TableRow>
                 );
               })}
-              {users.length === 0 && (
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center text-text-secondary py-12">Carregando usuários...</TableCell>
+                </TableRow>
+              ) : users.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center text-text-secondary py-12">{ADMIN_TEXTS.USERS_TABLE_EMPTY}</TableCell>
                 </TableRow>

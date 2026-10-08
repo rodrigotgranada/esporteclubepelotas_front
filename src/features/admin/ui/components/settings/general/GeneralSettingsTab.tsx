@@ -8,7 +8,8 @@ import { useGeneralSettingsTab } from '@/features/admin/hooks/settings/useGenera
 
 export const GeneralSettingsTab = () => {
   const {
-    loading,
+    isSaving,
+    isFetching,
     clubName,
     setClubName,
     previewLogo,
@@ -26,11 +27,19 @@ export const GeneralSettingsTab = () => {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  if (isFetching) {
+    return (
+      <LayoutContainer className="animate-in fade-in duration-300 p-8 flex items-center justify-center">
+        <Text className="text-text-secondary">Carregando configurações...</Text>
+      </LayoutContainer>
+    );
+  }
+
   return (
     <LayoutContainer className="animate-in fade-in duration-300">
       <LayoutContainer className="flex items-center justify-between mb-8">
         <Title level="h2" className="text-xl font-bold text-text-primary">{GENERAL_SETTINGS_TEXTS.TITLE}</Title>
-        <Button variant="primary" size="sm" onClick={handleSave} isLoading={loading}>
+        <Button variant="primary" size="sm" onClick={handleSave} isLoading={isSaving}>
           {GENERAL_SETTINGS_TEXTS.BUTTON_SAVE}
         </Button>
       </LayoutContainer>

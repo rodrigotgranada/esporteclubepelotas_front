@@ -28,6 +28,7 @@ export const UsersListFeature = () => {
     setStatusFilter,
     limit,
     totalPages,
+    isLoading,
     handleToggleStatus,
     loadUsers
   } = useUsersList();
@@ -107,6 +108,7 @@ export const UsersListFeature = () => {
         totalPages={totalPages}
         setPage={setPage}
         currentUserRole={currentUserRole}
+        isLoading={isLoading}
       />
 
       <UserAdminDrawer

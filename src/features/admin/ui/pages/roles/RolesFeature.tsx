@@ -93,7 +93,11 @@ export const RolesFeature = () => {
                 </TableRow>
               );
             })}
-              {roles.length === 0 && !isLoading && (
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center text-text-secondary py-12">Carregando cargos...</TableCell>
+                </TableRow>
+              ) : roles.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center text-text-secondary py-12">{ROLES_FEATURE_TEXTS.EMPTY_STATE}</TableCell>
                 </TableRow>
