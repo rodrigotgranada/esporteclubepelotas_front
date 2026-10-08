@@ -30,7 +30,8 @@ export const UsersList = ({
   total,
   totalPages,
   setPage,
-  currentUserRole
+  currentUserRole,
+  isLoading
 }: UsersListProps) => {
   return (
     <LayoutContainer className="mt-6 flex flex-col gap-4 w-full min-w-0">
