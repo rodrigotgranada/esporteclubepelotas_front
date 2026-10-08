@@ -18,7 +18,7 @@ export const SystemModulesFeature = () => {
 
       <LayoutContainer className="mt-6 flex flex-col gap-4 w-full min-w-0">
         {/* Mobile/Tablet View */}
-        <LayoutContainer className="flex flex-col gap-4 lg:hidden">
+        <LayoutContainer className="flex flex-col gap-4 xl:hidden">
           {modules.map((mod, index) => {
             let uniqueKey = mod.slug || mod.key || mod.name || `module-${index}`;
             if (typeof mod._id === 'string') uniqueKey = mod._id;
@@ -35,9 +35,9 @@ export const SystemModulesFeature = () => {
         </LayoutContainer>
 
         {/* Desktop View */}
-        <LayoutContainer className="hidden lg:block w-full min-w-0 bg-surface border border-border rounded-2xl overflow-hidden">
+        <LayoutContainer className="hidden xl:block w-full min-w-0 bg-surface border border-border rounded-2xl overflow-hidden">
           <LayoutContainer className="overflow-x-auto w-full">
-          <Table>
+          <Table className="min-w-[800px] w-full">
             <TableHeader>
               <TableRow>
                 <TableHead>{SYSTEM_MODULES_FEATURE_TEXTS.TABLE_HEADERS.MODULE}</TableHead>

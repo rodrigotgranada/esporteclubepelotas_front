@@ -34,7 +34,7 @@ export const RolesFeature = () => {
 
       <LayoutContainer className="mt-6 flex flex-col gap-4 w-full min-w-0">
         {/* Mobile/Tablet View */}
-        <LayoutContainer className="flex flex-col gap-4 lg:hidden">
+        <LayoutContainer className="flex flex-col gap-4 xl:hidden">
           {roles.map((role, index) => {
             let roleKey = role.name || `role-${index}`;
             if (typeof role._id === 'string') roleKey = role._id;
@@ -51,9 +51,9 @@ export const RolesFeature = () => {
         </LayoutContainer>
 
         {/* Desktop View */}
-        <LayoutContainer className="hidden lg:block w-full min-w-0 bg-surface border border-border rounded-2xl overflow-hidden">
+        <LayoutContainer className="hidden xl:block w-full min-w-0 bg-surface border border-border rounded-2xl overflow-hidden">
           <LayoutContainer className="overflow-x-auto w-full">
-          <Table>
+          <Table className="min-w-[800px] w-full">
             <TableHeader>
               <TableRow>
                 <TableHead>{ROLES_FEATURE_TEXTS.TABLE_HEADERS.ROLE}</TableHead>

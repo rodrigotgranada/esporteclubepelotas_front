@@ -24,10 +24,10 @@ export const ThemesSettingsTab = () => {
         </Button>
       </LayoutContainer>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-        <LayoutContainer className="lg:col-span-2 w-full min-w-0">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 items-start">
+        <LayoutContainer className="xl:col-span-2 w-full min-w-0">
           {/* Mobile/Tablet View */}
-          <LayoutContainer className="flex flex-col gap-4 lg:hidden mb-6">
+          <LayoutContainer className="flex flex-col gap-4 xl:hidden mb-6">
             {themes.map((theme, index) => {
               const rowKey = typeof theme._id === 'string' ? theme._id : (theme._id as any)?.$oid || index;
               return (
@@ -49,9 +49,9 @@ export const ThemesSettingsTab = () => {
           </LayoutContainer>
 
           {/* Desktop View */}
-          <LayoutContainer className="hidden lg:block w-full min-w-0 bg-surface border border-border rounded-2xl overflow-hidden">
+          <LayoutContainer className="hidden xl:block w-full min-w-0 bg-surface border border-border rounded-2xl overflow-hidden">
             <LayoutContainer className="overflow-x-auto w-full">
-              <Table>
+              <Table className="min-w-[800px] w-full">
             <TableHeader>
               <TableRow>
                 <TableHead>{SETTINGS_TEXTS.THEMES.TABLE_COL_NAME}</TableHead>
@@ -142,7 +142,7 @@ export const ThemesSettingsTab = () => {
           </LayoutContainer>
         </LayoutContainer>
 
-        <LayoutContainer className="lg:col-span-1 h-[600px] sticky top-6">
+        <LayoutContainer className="xl:col-span-1 h-[600px] sticky top-6">
           {previewTheme ? (
             <ThemePreviewPanel theme={previewTheme} />
           ) : (

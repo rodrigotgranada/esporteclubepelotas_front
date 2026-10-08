@@ -36,7 +36,7 @@ export const UsersList = ({
   return (
     <LayoutContainer className="mt-6 flex flex-col gap-4 w-full min-w-0">
       {/* Mobile/Tablet View: Cards */}
-      <LayoutContainer className="flex flex-col gap-4 lg:hidden">
+      <LayoutContainer className="flex flex-col gap-4 xl:hidden">
         {users.map(user => (
           <UserMobileCard 
             key={user.id} 
@@ -56,7 +56,7 @@ export const UsersList = ({
       </LayoutContainer>
 
       {/* Desktop View: Table */}
-      <LayoutContainer className="hidden lg:block w-full min-w-0 bg-surface border border-border rounded-2xl overflow-hidden">
+      <LayoutContainer className="hidden xl:block w-full min-w-0 bg-surface border border-border rounded-2xl overflow-hidden">
         <LayoutContainer className="overflow-x-auto w-full">
           <Table className="min-w-[800px] w-full">
             <TableHeader>
