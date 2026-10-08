@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useRef, useEffect } from 'react';
 import { ChevronDown, Check } from 'lucide-react';
 
@@ -17,8 +19,9 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
     
     React.Children.forEach(children, (child) => {
       if (React.isValidElement(child)) {
-        const childVal = child.props.value;
-        const childLabel = child.props.children;
+        const element = child as React.ReactElement<any>;
+        const childVal = element.props.value;
+        const childLabel = element.props.children;
         options.push({ value: childVal, label: childLabel });
         if (childVal === value) {
           selectedLabel = childLabel;
