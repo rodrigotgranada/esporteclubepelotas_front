@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { LayoutContainer, Title, Text, Button, Table, TableHeader, TableRow, TableHead, TableBody, TableCell, Badge } from '@/shared/ui/components';
+import { LayoutContainer, Title, Text, Button, Table, TableHeader, TableRow, TableHead, TableBody, TableCell, Badge, Spinner } from '@/shared/ui/components';
 import { ShieldAlert, CheckCircle } from 'lucide-react';
 import { useSystemModulesList } from '../../../hooks/useSystemModulesList';
 import { SYSTEM_MODULES_FEATURE_TEXTS } from './SystemModulesFeature.constants';
@@ -63,7 +63,9 @@ export const SystemModulesFeature = () => {
               })}
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center text-text-secondary py-12">Carregando módulos...</TableCell>
+                  <TableCell colSpan={5} className="py-12">
+                    <Spinner text="Carregando módulos..." />
+                  </TableCell>
                 </TableRow>
               ) : modules.length === 0 && (
                 <TableRow>

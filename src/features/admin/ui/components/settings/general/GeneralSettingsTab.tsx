@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { LayoutContainer, Title, Text, Button, Input, IconButton } from '@/shared/ui/components';
+import { LayoutContainer, Title, Text, Button, Input, IconButton, Spinner } from '@/shared/ui/components';
 import { Pencil, Plus } from 'lucide-react';
 import Image from 'next/image';
 import { CropModal } from '@/shared/ui/components/molecules/CropModal';
@@ -30,7 +30,7 @@ export const GeneralSettingsTab = () => {
   if (isFetching) {
     return (
       <LayoutContainer className="animate-in fade-in duration-300 p-8 flex items-center justify-center">
-        <Text className="text-text-secondary">Carregando configurações...</Text>
+        <Spinner text="Carregando configurações..." />
       </LayoutContainer>
     );
   }

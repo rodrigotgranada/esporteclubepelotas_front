@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { LayoutContainer, Title, Text, Button, Table, TableHeader, TableRow, TableHead, TableBody, TableCell, Badge } from '@/shared/ui/components';
+import { LayoutContainer, Title, Text, Button, Table, TableHeader, TableRow, TableHead, TableBody, TableCell, Badge, Spinner } from '@/shared/ui/components';
 import { Shield, Plus, Edit2 } from 'lucide-react';
 import { RoleAdminDrawer } from '../../components/roles/RoleAdminDrawer';
 import { useRolesList } from '../../../hooks/useRolesList';
@@ -95,7 +95,9 @@ export const RolesFeature = () => {
             })}
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center text-text-secondary py-12">Carregando cargos...</TableCell>
+                  <TableCell colSpan={5} className="py-12">
+                    <Spinner text="Carregando cargos..." />
+                  </TableCell>
                 </TableRow>
               ) : roles.length === 0 && (
                 <TableRow>

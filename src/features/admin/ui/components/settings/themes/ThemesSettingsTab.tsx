@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutContainer, Text, Button, Table, TableHeader, TableRow, TableHead, TableBody, TableCell, Badge } from '@/shared/ui/components';
+import { LayoutContainer, Text, Button, Table, TableHeader, TableRow, TableHead, TableBody, TableCell, Badge, Spinner } from '@/shared/ui/components';
 import { useThemesSettingsTab } from '../../../../hooks/settings/useThemesSettingsTab';
 import { ThemeAdminDrawer } from './ThemeAdminDrawer';
 import { ThemePreviewPanel } from './ThemePreviewPanel';
@@ -9,7 +9,7 @@ export const ThemesSettingsTab = () => {
   const { themes, isLoading, isDrawerOpen, themeToEdit, previewTheme, setPreviewTheme, handleActivate, handleOpenDrawer, handleCloseDrawer, handleSaveSuccess } = useThemesSettingsTab();
 
   if (isLoading) {
-    return <Text className="text-gray-400">{SETTINGS_TEXTS.THEMES.LOADING}</Text>;
+    return <Spinner text={SETTINGS_TEXTS.THEMES.LOADING} />;
   }
 
   return (

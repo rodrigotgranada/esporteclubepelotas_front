@@ -16,3 +16,4 @@ export * from './Select';
 export * from './Table';
 export * from './Option';
 export * from './ShieldPlaceholder';
+export * from './Spinner';

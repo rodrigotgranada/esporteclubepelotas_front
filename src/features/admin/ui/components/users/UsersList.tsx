@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutContainer, Text, Button, Table, TableHeader, TableRow, TableHead, TableBody, TableCell, Badge } from '@/shared/ui/components';
+import { LayoutContainer, Text, Button, Table, TableHeader, TableRow, TableHead, TableBody, TableCell, Badge, Spinner } from '@/shared/ui/components';
 import { Shield, ShieldAlert, CheckCircle } from 'lucide-react';
 import Image from 'next/image';
 import { UserAdminData } from '@/features/admin/services/admin.service';
@@ -47,9 +47,7 @@ export const UsersList = ({
           />
         ))}
         {isLoading ? (
-          <LayoutContainer className="bg-surface border border-border rounded-xl p-8 text-center text-text-secondary">
-            Carregando usuários...
-          </LayoutContainer>
+          <Spinner text="Carregando usuários..." className="bg-surface border border-border rounded-xl" />
         ) : users.length === 0 && (
           <LayoutContainer className="bg-surface border border-border rounded-xl p-8 text-center text-text-secondary">
             {ADMIN_TEXTS.USERS_TABLE_EMPTY}
@@ -138,7 +136,9 @@ export const UsersList = ({
               })}
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center text-text-secondary py-12">Carregando usuários...</TableCell>
+                  <TableCell colSpan={5} className="py-12">
+                    <Spinner text="Carregando usuários..." />
+                  </TableCell>
                 </TableRow>
               ) : users.length === 0 && (
                 <TableRow>
