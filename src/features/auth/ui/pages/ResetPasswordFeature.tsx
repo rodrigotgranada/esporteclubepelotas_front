@@ -1,62 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { Loader2, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { AUTH_TEXTS } from '../../constants';
-import { resetPasswordSchema, ResetPasswordForm } from '../../schemas';
-import { authRepository } from '../../repositories';
-import { Toast  } from '@/shared/ui/components';
+import { useResetPassword } from '../../hooks/useResetPassword';
 
-import { LayoutContainer  } from '@/shared/ui/components';
-import { Title  } from '@/shared/ui/components';
-import { Text  } from '@/shared/ui/components';
-import { Form  } from '@/shared/ui/components';
-import { PasswordInput  } from '@/shared/ui/components';
-import { Button  } from '@/shared/ui/components';
+import { LayoutContainer, Title, Text, Form, PasswordInput, Button } from '@/shared/ui/components';
 
 export const ResetPasswordFeature = () => {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const [token, setToken] = useState<string | null>(null);
-
-  useEffect(() => {
-    const t = searchParams.get('token');
-    if (t) {
-      setToken(t);
-    } else {
-      Toast.error('Token de recuperação não encontrado.');
-      router.push('/login');
-    }
-  }, [searchParams, router]);
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<ResetPasswordForm>({
-    resolver: zodResolver(resetPasswordSchema),
-  });
-
-  const onSubmit = async (data: ResetPasswordForm) => {
-    if (!token) return;
-
-    try {
-      await authRepository.resetPassword({ token, newPassword: data.password });
-      Toast.success('Senha redefinida com sucesso! Você já pode fazer login.');
-      router.push('/login');
-    } catch (error: unknown) {
-      const err = error as { response?: { status?: number, data?: { message?: string } } };
-      if (err.response?.status === 400 && err.response?.data?.message === 'Token de redefinição inválido ou expirado') {
-        Toast.error('Este link expirou ou é inválido. Solicite um novo envio.');
-        router.push('/forgot-password');
-      } else {
-        Toast.error('Ocorreu um erro ao redefinir a senha. Tente novamente.');
-      }
-    }
-  };
+  const { form, onSubmit, token } = useResetPassword();
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = form;
 
   if (!token) {
     return null; // ou um loader de tela cheia
@@ -111,17 +63,13 @@ export const ResetPasswordFeature = () => {
 
               <Button
                 type="submit"
-                disabled={isSubmitting}
-                className="w-full flex items-center justify-center gap-2 bg-yellow-400 hover:bg-yellow-500 text-blue-950 font-bold py-3.5 px-4 rounded-xl transition-all disabled:opacity-70 disabled:cursor-not-allowed"
+                variant="primary"
+                size="lg"
+                isLoading={isSubmitting}
+                rightIcon={<ArrowRight size={18} />}
+                className="w-full"
               >
-                {isSubmitting ? (
-                  <Loader2 size={20} className="animate-spin" />
-                ) : (
-                  <>
-                    {AUTH_TEXTS.RESET_PASSWORD_SUBMIT_BUTTON}
-                    <ArrowRight size={18} />
-                  </>
-                )}
+                {AUTH_TEXTS.RESET_PASSWORD_SUBMIT_BUTTON}
               </Button>
             </Form>
           </LayoutContainer>

@@ -1,0 +1,72 @@
+export const ADMIN_TEXTS = {
+  // Users List Feature
+  USERS_TITLE: 'Usuários',
+  USERS_SUBTITLE: 'Gerencie os cadastros e permissões da plataforma.',
+  USERS_SEARCH_PLACEHOLDER: 'Buscar por nome ou CPF...',
+  USERS_TABLE_HEADER_USER: 'Usuário',
+  USERS_TABLE_HEADER_CPF: 'CPF',
+  USERS_TABLE_HEADER_ROLE: 'Role',
+  USERS_TABLE_HEADER_STATUS: 'Status',
+  USERS_TABLE_HEADER_ACTIONS: 'Ações',
+  USERS_TABLE_EMPTY: 'Nenhum usuário encontrado.',
+  USERS_TABLE_EDIT: 'Editar',
+  USERS_PAGINATION_SHOWING: 'Mostrando',
+  USERS_PAGINATION_TO: 'a',
+  USERS_PAGINATION_OF: 'de',
+  USERS_PAGINATION_USERS: 'usuários',
+  USERS_PAGINATION_PREV: 'Anterior',
+  USERS_PAGINATION_NEXT: 'Próximo',
+  USERS_ACTION_UNBLOCK: 'Desbloquear',
+  USERS_ACTION_BLOCK: 'Bloquear',
+  USERS_CONFIRM_STATUS_CHANGE: 'Deseja realmente alterar o status para',
+  USERS_FILTER_ROLES_ALL: 'Todos os Níveis',
+  USERS_FILTER_STATUS_ALL: 'Todos os Status',
+  USERS_FILTER_STATUS_ACTIVE: 'Ativo',
+  USERS_FILTER_STATUS_PENDING: 'Pendente',
+  USERS_FILTER_STATUS_BLOCKED: 'Bloqueado',
+  USERS_FILTER_STATUS_INACTIVE: 'Inativo (Excluído)',
+
+  // User Form Drawer (CRUD)
+  USER_DRAWER_TITLE_CREATE: 'Novo Usuário',
+  USER_DRAWER_TITLE_EDIT: 'Editar Usuário',
+  USER_DRAWER_BUTTON_CANCEL: 'Cancelar',
+  USER_DRAWER_BUTTON_SAVE: 'Salvar',
+  USER_DRAWER_LABEL_FIRST_NAME: 'Nome',
+  USER_DRAWER_LABEL_LAST_NAME: 'Sobrenome',
+  USER_DRAWER_LABEL_EMAIL: 'E-mail',
+  USER_DRAWER_LABEL_CPF: 'CPF',
+  USER_DRAWER_LABEL_PHONE: 'Celular',
+  USER_DRAWER_LABEL_ROLE: 'Nível de Acesso (Role)',
+  USER_DRAWER_LABEL_STATUS: 'Status da Conta',
+  USER_DRAWER_LABEL_PASSWORD: 'Nova Senha',
+  USER_DRAWER_DESC_PASSWORD: 'Deixe em branco se não quiser alterar. O usuário poderá alterar depois no perfil.',
+
+  // Toast Messages
+  TOAST_USER_CREATED: 'Usuário criado com sucesso!',
+  TOAST_USER_UPDATED: 'Usuário atualizado com sucesso!',
+  TOAST_USER_STATUS_UPDATED: 'Status do usuário alterado com sucesso!',
+  TOAST_ERROR_GENERIC: 'Ocorreu um erro ao processar a requisição.',
+  TOAST_ERROR_PASSWORD_MISMATCH: 'As senhas não coincidem.',
+  TOAST_ERROR_NO_PHONE: 'Adicione ao menos um telefone.',
+  TOAST_ERROR_NO_ADDRESS: 'Adicione ao menos um endereço.',
+  TOAST_ERROR_NO_BIRTHDATE: 'A data de nascimento é obrigatória.',
+  TOAST_ERROR_NO_PASSWORD: 'A senha é obrigatória para novos usuários.',
+  TOAST_USER_DELETED: 'Usuário excluído com sucesso!',
+  TOAST_USER_RESEND_VERIFICATION: 'E-mail de verificação reenviado.',
+  TOAST_USER_PASSWORD_RESET: 'E-mail de redefinição de senha enviado.',
+};
+
+export const USER_STATUS_MAP: Record<string, string> = {
+  ACTIVE: 'Ativo',
+  PENDING: 'Pendente',
+  BLOCKED: 'Bloqueado',
+  INACTIVE: 'Inativo (Excluído)',
+};
+
+export const USER_ROLE_MAP: Record<string, string> = {
+  USER: 'Usuário',
+  SOCIETY: 'Sócio',
+  EDITOR: 'Editor',
+  ADMIN: 'Administrador',
+  OWNER: 'Proprietário',
+};

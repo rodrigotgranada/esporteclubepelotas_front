@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { registerSchema, RegisterForm } from '../schemas';
@@ -9,6 +9,7 @@ export const useRegister = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [success, setSuccess] = useState(false);
   const [avatarBlob, setAvatarBlob] = useState<Blob | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
 
   const form = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),
@@ -18,6 +19,38 @@ export const useRegister = () => {
       addresses: [{ zipCode: '', street: '', number: '', complement: '', neighborhood: '', city: '', state: '', isPrimary: true }],
     }
   });
+
+  useEffect(() => {
+    setIsMounted(true);
+    const savedStep = sessionStorage.getItem('register-form-step');
+    if (savedStep) {
+      setCurrentStep(parseInt(savedStep));
+    }
+
+    const savedData = sessionStorage.getItem('register-form-data');
+    if (savedData) {
+      const parsedData = JSON.parse(savedData);
+      Object.keys(parsedData).forEach((key) => {
+        form.setValue(key as any, parsedData[key]);
+      });
+    }
+  }, [form]);
+
+  // Watch step changes
+  useEffect(() => {
+    sessionStorage.setItem('register-form-step', currentStep.toString());
+  }, [currentStep]);
+
+  // Watch form changes
+  useEffect(() => {
+    const subscription = form.watch((value) => {
+      const dataToSave = { ...value };
+      delete dataToSave.password;
+      delete dataToSave.confirmPassword;
+      sessionStorage.setItem('register-form-data', JSON.stringify(dataToSave));
+    });
+    return () => subscription.unsubscribe();
+  }, [form]);
 
   const phonesArray = useFieldArray({ control: form.control, name: 'phones' });
   const addressesArray = useFieldArray({ control: form.control, name: 'addresses' });
@@ -121,6 +154,12 @@ export const useRegister = () => {
       // Envia os dados e a foto juntos
       await authRepository.register(formData);
 
+      // Limpa storage após sucesso
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('register-form-data');
+        sessionStorage.removeItem('register-form-step');
+      }
+
       // Redirecionamento ficará por conta do componente que consome o success/email
       Toast.success('Conta criada com sucesso!');
       setSuccess(true);
@@ -144,5 +183,6 @@ export const useRegister = () => {
     nextStep,
     prevStep,
     onSubmit: form.handleSubmit(onSubmit),
+    isMounted,
   };
 };

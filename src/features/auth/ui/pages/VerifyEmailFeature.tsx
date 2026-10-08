@@ -1,121 +1,21 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { Loader2, ArrowRight, ShieldCheck } from 'lucide-react';
+import { ArrowRight, ShieldCheck } from 'lucide-react';
 import { AUTH_TEXTS } from '../../constants';
-import { useAuthStore } from '@/store/useAuthStore';
-import { Toast  } from '@/shared/ui/components';
-import { authRepository } from '../../repositories';
+import { useVerifyEmail, maskEmail } from '../../hooks/useVerifyEmail';
 
-import { LayoutContainer  } from '@/shared/ui/components';
-import { Title  } from '@/shared/ui/components';
-import { Text  } from '@/shared/ui/components';
-import { Form  } from '@/shared/ui/components';
-import { Button  } from '@/shared/ui/components';
-import { Input  } from '@/shared/ui/components';
-
-function clearPendingVerificationCookie() {
-  if (typeof window !== 'undefined') {
-    window.document.cookie = 'pendingVerificationEmail=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
-  }
-}
-
-function maskEmail(email: string) {
-  if (!email) return '';
-  const [user, domain] = email.split('@');
-  if (!domain) return email;
-  if (user.length <= 3) return `${user[0]}***@${domain}`;
-  return `${user.substring(0, 3)}***@${domain}`;
-}
+import { LayoutContainer, Title, Text, Form, Button, Input } from '@/shared/ui/components';
 
 export const VerifyEmailFeature = () => {
-  const router = useRouter();
-  const setAuth = useAuthStore((state) => state.setAuth);
-  const pendingVerificationEmail = useAuthStore((state) => state.pendingVerificationEmail);
-  
-  const [email, setEmail] = useState('');
-  const [code, setCode] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isResending, setIsResending] = useState(false);
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    // O Next.js Middleware já garante que só entramos aqui se o cookie existir.
-    // O Zustand pode perder estado num F5, então pegamos do cookie como fallback se necessário,
-    // mas por agora o Zustand hidratado ou a navegação do router seguram a onda.
-    if (pendingVerificationEmail) {
-      // eslint-disable-next-line
-      setEmail(pendingVerificationEmail);
-    } else if (typeof window !== 'undefined') {
-      // Tenta ler do cookie caso o Zustand tenha perdido estado num reload
-      const match = window.document.cookie.match(new RegExp('(^| )pendingVerificationEmail=([^;]+)'));
-      if (match) {
-        setEmail(decodeURIComponent(match[2]));
-      }
-    }
-  }, [pendingVerificationEmail]);
-
-  const onSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (code.length !== 6) {
-      Toast.warning('O código deve conter 6 dígitos.');
-      return;
-    }
-    if (!email) {
-      Toast.error('O e-mail é obrigatório. Por favor, volte ao login.');
-      return;
-    }
-
-    setIsSubmitting(true);
-    try {
-      const response = await authRepository.verifyEmail({ email, code });
-      const { accessToken, user } = response;
-      
-      // Limpa o cookie e o estado
-      clearPendingVerificationCookie();
-      setAuth(accessToken, user);
-      
-      Toast.success('E-mail verificado com sucesso!');
-      router.push('/dashboard');
-    } catch (error: unknown) {
-      const err = error as { response?: { status?: number, data?: { message?: string } } };
-      if (err.response?.data?.message === 'Invalid confirmation code' || err.response?.data?.message === 'Invalid or expired confirmation code') {
-        Toast.error('Código inválido ou expirado. Verifique o e-mail enviado.');
-      } else if (err.response?.data?.message === 'User is already verified') {
-        Toast.warning('Este usuário já foi verificado. Faça login normalmente.');
-      } else if (err.response?.status === 400 && err.response?.data?.message) {
-        // Erros de bloqueio do backend
-        Toast.error(err.response.data.message as string);
-      } else {
-        Toast.error('Ocorreu um erro ao validar o código. Tente novamente.');
-      }
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleResendCode = async () => {
-    if (!email) {
-      Toast.error('O e-mail é obrigatório. Por favor, volte ao login.');
-      return;
-    }
-
-    setIsResending(true);
-    try {
-      await authRepository.resendCode(email);
-      Toast.success('Um novo código foi enviado para o seu e-mail!');
-    } catch (error: unknown) {
-      const err = error as { response?: { data?: { message?: string } } };
-      if (err.response?.data?.message === 'User is already verified') {
-        Toast.warning('Este usuário já foi verificado. Faça login normalmente.');
-      } else {
-        Toast.error('Ocorreu um erro ao reenviar o código. Tente novamente.');
-      }
-    } finally {
-      setIsResending(false);
-    }
-  };
+  const {
+    email,
+    code,
+    setCode,
+    isSubmitting,
+    isResending,
+    onSubmit,
+    handleResendCode,
+  } = useVerifyEmail();
 
   return (
     <LayoutContainer className="min-h-screen w-full flex bg-[#111111] text-white">
@@ -165,17 +65,14 @@ export const VerifyEmailFeature = () => {
 
               <Button
                 type="submit"
-                disabled={isSubmitting || code.length !== 6}
-                className="w-full flex items-center justify-center gap-2 bg-yellow-400 hover:bg-yellow-500 text-blue-950 font-bold py-3.5 px-4 rounded-xl transition-all disabled:opacity-70 disabled:cursor-not-allowed"
+                variant="primary"
+                size="lg"
+                disabled={code.length !== 6}
+                isLoading={isSubmitting}
+                rightIcon={<ArrowRight size={18} />}
+                className="w-full"
               >
-                {isSubmitting ? (
-                  <Loader2 size={20} className="animate-spin" />
-                ) : (
-                  <>
-                    {AUTH_TEXTS.VERIFY_EMAIL_SUBMIT_BUTTON}
-                    <ArrowRight size={18} />
-                  </>
-                )}
+                {AUTH_TEXTS.VERIFY_EMAIL_SUBMIT_BUTTON}
               </Button>
             </Form>
             

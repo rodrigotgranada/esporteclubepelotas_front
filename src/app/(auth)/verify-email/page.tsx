@@ -6,6 +6,12 @@ export const metadata: Metadata = {
   description: 'Verifique seu e-mail para acessar o portal.',
 };
 
+import { Suspense } from 'react';
+
 export default function VerifyEmailPage() {
-  return <VerifyEmailFeature />;
+  return (
+    <Suspense fallback={<div>Carregando...</div>}>
+      <VerifyEmailFeature />
+    </Suspense>
+  );
 }

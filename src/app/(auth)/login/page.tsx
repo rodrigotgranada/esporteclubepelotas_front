@@ -1,5 +1,10 @@
+import { Suspense } from 'react';
 import { LoginFeature } from '@/features/auth/ui';
 
 export default function LoginPage() {
-  return <LoginFeature />;
+  return (
+    <Suspense fallback={<div>Carregando...</div>}>
+      <LoginFeature />
+    </Suspense>
+  );
 }

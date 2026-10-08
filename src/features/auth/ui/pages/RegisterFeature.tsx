@@ -38,6 +38,7 @@ export const RegisterFeature = () => {
     nextStep,
     prevStep,
     onSubmit,
+    isMounted,
   } = useRegister();
 
   const { register, formState: { errors, isSubmitting } } = form;
@@ -54,11 +55,13 @@ export const RegisterFeature = () => {
             {AUTH_TEXTS.REGISTER_SUCCESS_SUBTITLE}
           </Text>
           <Button 
+            variant="primary"
+            size="lg"
+            rightIcon={<ArrowRight size={18} />}
             onClick={() => router.push('/login')}
-            className="w-full flex items-center justify-center gap-2 bg-yellow-400 hover:bg-yellow-500 text-blue-950 font-bold py-3.5 px-4 rounded-xl transition-all"
+            className="w-full"
           >
             {AUTH_TEXTS.REGISTER_LOGIN_LINK}
-            <ArrowRight size={18} />
           </Button>
         </LayoutContainer>
       </LayoutContainer>
@@ -71,12 +74,16 @@ export const RegisterFeature = () => {
         <LayoutContainer className="absolute inset-0 bg-gradient-to-br from-blue-900 to-black opacity-90 z-10" />
         <LayoutContainer className="absolute inset-0 bg-[url('/hero-bg.jpg')] bg-cover bg-center mix-blend-overlay z-0 opacity-40" />
         
-        <LayoutContainer className="z-20 relative">
-          <Title level="h1" className="text-3xl font-black text-yellow-400 mb-2 tracking-tighter">{AUTH_TEXTS.REGISTER_BRANDING_TITLE}</Title>
-          <Text className="text-gray-300 font-light">{AUTH_TEXTS.REGISTER_TITLE}</Text>
+        <LayoutContainer className="z-20">
+          <Title level="h1" className="text-4xl font-black mb-2 text-white">
+            {AUTH_TEXTS.REGISTER_BRANDING_TITLE}
+          </Title>
+          <Text className="text-blue-200">Plataforma Oficial</Text>
         </LayoutContainer>
 
-        <Stepper currentStep={currentStep} steps={STEPS} />
+        {isMounted && (
+          <Stepper currentStep={currentStep} steps={STEPS} />
+        )}
       </LayoutContainer>
 
       <LayoutContainer className="w-full lg:w-2/3 flex items-center justify-center p-6 sm:p-12 overflow-y-auto">
@@ -86,57 +93,51 @@ export const RegisterFeature = () => {
             <Text className="text-gray-400 text-sm mt-1">Passo {currentStep} de 4: {STEPS[currentStep - 1].title}</Text>
           </LayoutContainer>
 
-          <LayoutContainer className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 sm:p-10 shadow-2xl">
-            <Title level="h2" className="text-3xl font-bold mb-2">{STEPS[currentStep - 1].title}</Title>
+          <LayoutContainer className="max-w-md w-full">
+            <Title level="h2" className="text-3xl font-bold mb-2 text-white">{AUTH_TEXTS.REGISTER_TITLE}</Title>
             <Text className="text-gray-400 mb-8">{AUTH_TEXTS.REGISTER_SUBTITLE}</Text>
 
-            <Form onSubmit={onSubmit} className="space-y-6">
-              
-              {currentStep === 1 && (
-                <RegisterStep1 form={form} setAvatarBlob={setAvatarBlob} />
-              )}
+            {isMounted ? (
+              <LayoutContainer className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
+                <Form onSubmit={onSubmit}>
+                  {currentStep === 1 && <RegisterStep1 form={form} setAvatarBlob={setAvatarBlob} />}
+                  {currentStep === 2 && <RegisterStep2 form={form} phonesArray={phonesArray} removePhone={(idx) => phonesArray.remove(idx)} />}
+                  {currentStep === 3 && <RegisterStep3 form={form} addressesArray={addressesArray} fetchAddress={fetchAddress} removeAddress={(idx) => addressesArray.remove(idx)} />}
+                  {currentStep === 4 && <RegisterStep4 form={form} />}
 
-              {currentStep === 2 && (
-                <RegisterStep2 form={form} phonesArray={phonesArray} removePhone={removePhone} />
-              )}
+                  <LayoutContainer className="flex items-center justify-between pt-6 border-t border-white/10 mt-8">
+                    {currentStep > 1 ? (
+                      <Button variant="ghost" size="md" leftIcon={<ArrowLeft size={18} />} onClick={prevStep}>
+                        {AUTH_TEXTS.REGISTER_BUTTON_PREV}
+                      </Button>
+                    ) : (
+                      <LayoutContainer />
+                    )}
 
-              {currentStep === 3 && (
-                <RegisterStep3 form={form} addressesArray={addressesArray} fetchAddress={fetchAddress} removeAddress={removeAddress} />
-              )}
+                    {currentStep < 4 ? (
+                      <Button variant="secondary" size="md" rightIcon={<ArrowRight size={18} />} onClick={nextStep}>
+                        {AUTH_TEXTS.REGISTER_BUTTON_NEXT}
+                      </Button>
+                    ) : (
+                      <Button type="submit" variant="primary" size="md" isLoading={isSubmitting}>
+                        {AUTH_TEXTS.REGISTER_BUTTON_SUBMIT}
+                      </Button>
+                    )}
+                  </LayoutContainer>
+                </Form>
 
-              {currentStep === 4 && (
-                <RegisterStep4 form={form} />
-              )}
-
-              <LayoutContainer className="flex items-center justify-between pt-6 border-t border-white/10 mt-8">
-                {currentStep > 1 ? (
-                  <Button onClick={prevStep} className="flex items-center gap-2 text-gray-400 hover:text-white px-4 py-3 transition-colors">
-                    <ArrowLeft size={18} />
-                    {AUTH_TEXTS.REGISTER_BUTTON_PREV}
-                  </Button>
-                ) : (
-                  <LayoutContainer />
-                )}
-
-                {currentStep < 4 ? (
-                  <Button onClick={nextStep} className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-bold py-3 px-8 rounded-xl transition-all">
-                    {AUTH_TEXTS.REGISTER_BUTTON_NEXT}
-                    <ArrowRight size={18} />
-                  </Button>
-                ) : (
-                  <Button type="submit" disabled={isSubmitting} className="flex items-center gap-2 bg-yellow-400 hover:bg-yellow-500 text-blue-950 font-bold py-3 px-8 rounded-xl transition-all disabled:opacity-70 disabled:cursor-not-allowed shadow-[0_0_20px_rgba(250,204,21,0.2)]">
-                    {isSubmitting ? <Loader2 size={20} className="animate-spin" /> : AUTH_TEXTS.REGISTER_BUTTON_SUBMIT}
-                  </Button>
-                )}
+                <LayoutContainer className="mt-8 text-center text-sm text-gray-400">
+                  {AUTH_TEXTS.REGISTER_ALREADY_HAVE_ACCOUNT}{' '}
+                  <Link href="/login" className="text-yellow-400 hover:text-yellow-300 font-semibold transition-colors">
+                    {AUTH_TEXTS.REGISTER_LOGIN_LINK}
+                  </Link>
+                </LayoutContainer>
               </LayoutContainer>
-            </Form>
-
-            <LayoutContainer className="mt-8 text-center text-sm text-gray-400">
-              {AUTH_TEXTS.REGISTER_ALREADY_HAVE_ACCOUNT}{' '}
-              <Link href="/login" className="text-yellow-400 hover:text-yellow-300 font-semibold transition-colors">
-                {AUTH_TEXTS.REGISTER_LOGIN_LINK}
-              </Link>
-            </LayoutContainer>
+            ) : (
+              <LayoutContainer className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl relative overflow-hidden flex justify-center items-center h-64">
+                <Loader2 size={32} className="animate-spin text-yellow-400" />
+              </LayoutContainer>
+            )}
           </LayoutContainer>
         </LayoutContainer>
       </LayoutContainer>

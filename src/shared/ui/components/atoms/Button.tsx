@@ -1,21 +1,25 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
+import { Loader2 } from 'lucide-react';
 
-export type ButtonVariant = 'primary' | 'danger' | 'ghost' | 'outline' | 'custom';
+export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'custom';
 export type ButtonSize = 'sm' | 'md' | 'lg' | 'none';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   variant?: ButtonVariant;
   size?: ButtonSize;
   fullWidth?: boolean;
+  leftIcon?: ReactNode;
+  rightIcon?: ReactNode;
+  isLoading?: boolean;
 }
 
 const variantStyles: Record<ButtonVariant, string> = {
-  primary: 'bg-yellow-400 hover:bg-yellow-500 text-blue-950 shadow-[0_0_20px_rgba(250,204,21,0.2)]',
-  danger: 'bg-yellow-600 hover:bg-yellow-700 text-white shadow-[0_0_20px_rgba(202,138,4,0.2)]',
-  outline: 'bg-transparent border border-white/20 text-white hover:bg-white/10',
-  ghost: 'bg-transparent text-gray-400 hover:text-white hover:bg-white/5',
-  custom: '', // Para manter compatibilidade com classes completamente customizadas antigas
+  primary: 'bg-primary hover:opacity-90 text-background font-bold border-none shadow-md',
+  secondary: 'bg-button-secondary hover:brightness-110 text-text-primary border border-border',
+  outline: 'bg-transparent border border-border text-text-primary hover:bg-surface',
+  ghost: 'bg-transparent text-text-secondary hover:text-text-primary hover:bg-surface',
+  custom: '',
 };
 
 const sizeStyles: Record<ButtonSize, string> = {
@@ -26,10 +30,10 @@ const sizeStyles: Record<ButtonSize, string> = {
 };
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ children, className = '', variant = 'custom', size = 'none', fullWidth = false, type = 'button', ...props }, ref) => {
+  ({ children, className = '', variant = 'custom', size = 'none', fullWidth = false, leftIcon, rightIcon, isLoading = false, type = 'button', disabled, ...props }, ref) => {
     
     const baseStyles = variant !== 'custom' 
-      ? 'flex items-center justify-center gap-2 rounded-xl transition-all disabled:opacity-70 disabled:cursor-not-allowed' 
+      ? 'flex items-center justify-center gap-2 rounded-xl transition-all cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed' 
       : '';
       
     const widthStyle = fullWidth ? 'w-full' : '';
@@ -38,10 +42,14 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       <button 
         ref={ref} 
         type={type} 
+        disabled={disabled || isLoading}
         className={`${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${widthStyle} ${className}`.trim()} 
         {...props}
       >
+        {isLoading && <Loader2 size={18} className="animate-spin" />}
+        {!isLoading && leftIcon}
         {children}
+        {!isLoading && rightIcon}
       </button>
     );
   }
