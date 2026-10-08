@@ -1,10 +1,9 @@
 export const SETTINGS_TEXTS = {
   TITLE: 'Configurações',
   SUBTITLE: 'Gerencie as configurações gerais e a aparência da plataforma.',
-  TAB_GENERAL: 'Geral',
+  TAB_LOGO: 'Logo e Identidade',
   TAB_THEME: 'Temas (Aparência)',
-  GENERAL_DESC: 'Configurações gerais do sistema em breve.',
-  THEME_DESC: 'Configuração de cores e modos (Claro/Escuro) em breve.',
+  TAB_SOCIAL: 'Redes Sociais',
   THEMES: {
     LOADING: 'Carregando temas...',
     LIST_DESC: 'Gerencie as paletas de cores do sistema. Apenas um tema pode estar ativo por vez.',

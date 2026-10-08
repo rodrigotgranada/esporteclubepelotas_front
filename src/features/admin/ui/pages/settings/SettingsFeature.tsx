@@ -6,9 +6,10 @@ import { SETTINGS_TEXTS } from '../../../constants/settings.constants';
 import { ThemesSettingsTab } from '../../components/settings/themes/ThemesSettingsTab';
 
 import { GeneralSettingsTab } from '../../components/settings/general/GeneralSettingsTab';
+import { SocialSettingsTab } from '../../components/settings/social/SocialSettingsTab';
 
 export const SettingsFeature = () => {
-  const [defaultTab, setDefaultTab] = useState<string>('GENERAL');
+  const [defaultTab, setDefaultTab] = useState<string>('LOGO');
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -32,8 +33,8 @@ export const SettingsFeature = () => {
 
   const tabs: TabItem[] = [
     {
-      id: 'GENERAL',
-      label: SETTINGS_TEXTS.TAB_GENERAL,
+      id: 'LOGO',
+      label: SETTINGS_TEXTS.TAB_LOGO,
       content: (
         <LayoutContainer>
           <GeneralSettingsTab />
@@ -46,6 +47,15 @@ export const SettingsFeature = () => {
       content: (
         <LayoutContainer>
           <ThemesSettingsTab />
+        </LayoutContainer>
+      )
+    },
+    {
+      id: 'SOCIAL',
+      label: SETTINGS_TEXTS.TAB_SOCIAL,
+      content: (
+        <LayoutContainer>
+          <SocialSettingsTab />
         </LayoutContainer>
       )
     }

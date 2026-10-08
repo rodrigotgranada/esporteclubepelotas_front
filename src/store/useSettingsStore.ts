@@ -4,6 +4,12 @@ export interface Settings {
   clubLogoUrl: string | null;
   clubLogoGallery?: string[];
   clubName: string;
+  socialMedia?: {
+    instagram?: string;
+    facebook?: string;
+    x?: string;
+    youtube?: string;
+  };
 }
 
 interface SettingsState {
