@@ -43,6 +43,12 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
     root.style.setProperty('--color-drawer', palette.drawer);
     root.style.setProperty('--color-table', palette.table);
     root.style.setProperty('--color-button-secondary', palette.buttonSecondary);
+
+    const buttonPrimaryText = palette.buttonPrimaryText || (resolvedMode === 'light' ? (palette.secondary || '#1e3a8a') : '#000000');
+    const buttonSecondaryText = palette.buttonSecondaryText || '#ffffff';
+    root.style.setProperty('--color-button-primary-text', buttonPrimaryText);
+    root.style.setProperty('--color-button-secondary-text', buttonSecondaryText);
+
     root.style.setProperty('--color-text-primary', palette.textPrimary);
     root.style.setProperty('--color-text-secondary', palette.textSecondary);
     root.style.setProperty('--color-border', palette.border);
@@ -69,6 +75,17 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
       root.style.setProperty('--color-secondary', palette.secondary);
       root.style.setProperty('--color-background', palette.background);
       root.style.setProperty('--color-surface', palette.surface);
+      root.style.setProperty('--color-header', palette.header);
+      root.style.setProperty('--color-card', palette.card);
+      root.style.setProperty('--color-drawer', palette.drawer);
+      root.style.setProperty('--color-table', palette.table);
+      root.style.setProperty('--color-button-secondary', palette.buttonSecondary);
+
+      const buttonPrimaryText = palette.buttonPrimaryText || (resolvedMode === 'light' ? (palette.secondary || '#1e3a8a') : '#000000');
+      const buttonSecondaryText = palette.buttonSecondaryText || '#ffffff';
+      root.style.setProperty('--color-button-primary-text', buttonPrimaryText);
+      root.style.setProperty('--color-button-secondary-text', buttonSecondaryText);
+
       root.style.setProperty('--color-text-primary', palette.textPrimary);
       root.style.setProperty('--color-text-secondary', palette.textSecondary);
       root.style.setProperty('--color-border', palette.border);

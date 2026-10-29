@@ -166,7 +166,7 @@ export const CropModal = ({
               onClick={() => setCropMode('round')}
               className={`text-xs px-2.5 py-1 flex items-center gap-1.5 rounded-lg transition-colors ${
                 cropMode === 'round' 
-                  ? 'bg-primary text-black font-bold shadow-sm' 
+                  ? 'bg-primary text-button-primary-text font-bold shadow-sm' 
                   : 'text-text-secondary hover:text-text-primary'
               }`}
             >
@@ -178,7 +178,7 @@ export const CropModal = ({
               onClick={() => setCropMode('rect')}
               className={`text-xs px-2.5 py-1 flex items-center gap-1.5 rounded-lg transition-colors ${
                 cropMode === 'rect' 
-                  ? 'bg-primary text-black font-bold shadow-sm' 
+                  ? 'bg-primary text-button-primary-text font-bold shadow-sm' 
                   : 'text-text-secondary hover:text-text-primary'
               }`}
             >
@@ -251,8 +251,8 @@ export const CropModal = ({
               size="sm"
               onClick={handleRemoveBg}
               isLoading={isRemovingBg}
-              leftIcon={<Wand2 className="w-4 h-4 text-purple-400" />}
-              className="hover:border-purple-500 hover:text-purple-300 transition-colors text-xs h-9"
+              leftIcon={<Wand2 className="w-4 h-4 text-white/90" />}
+              className="text-xs h-9 font-medium shadow-sm"
               title={CROP_MODAL_TEXTS.REMOVE_BACKGROUND}
             >
               {texts.removeBg || CROP_MODAL_TEXTS.REMOVE_BACKGROUND}

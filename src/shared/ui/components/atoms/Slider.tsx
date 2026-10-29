@@ -11,7 +11,7 @@ export const Slider = forwardRef<HTMLInputElement, SliderProps>(
         type="range"
         ref={ref}
         disabled={disabled}
-        className={`w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+        className={`w-full h-2 bg-neutral-200 dark:bg-neutral-700 border border-border/50 rounded-lg appearance-none cursor-pointer accent-primary disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
         {...props}
       />
     );

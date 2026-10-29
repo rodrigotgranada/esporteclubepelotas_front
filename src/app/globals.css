@@ -11,6 +11,8 @@
   --color-drawer: var(--color-drawer);
   --color-table: var(--color-table);
   --color-button-secondary: var(--color-button-secondary);
+  --color-button-primary-text: var(--color-button-primary-text);
+  --color-button-secondary-text: var(--color-button-secondary-text);
 
   --color-text-primary: var(--color-text-primary);
   --color-text-secondary: var(--color-text-secondary);
@@ -33,6 +35,8 @@
   --color-drawer: #ffffff;
   --color-table: #ffffff;
   --color-button-secondary: #1e3a8a;
+  --color-button-primary-text: #1e3a8a;
+  --color-button-secondary-text: #ffffff;
 
   --color-text-primary: #111827;
   --color-text-secondary: #4b5563;
@@ -53,6 +57,8 @@
   --color-drawer: #111111;
   --color-table: #111111;
   --color-button-secondary: #1e3a8a;
+  --color-button-primary-text: #000000;
+  --color-button-secondary-text: #ffffff;
 
   --color-text-primary: #ffffff;
   --color-text-secondary: #9ca3af;
@@ -74,6 +80,8 @@
     --color-drawer: #111111;
     --color-table: #111111;
     --color-button-secondary: #1e3a8a;
+    --color-button-primary-text: #000000;
+    --color-button-secondary-text: #ffffff;
 
     --color-text-primary: #ffffff;
     --color-text-secondary: #9ca3af;
@@ -108,4 +116,8 @@ select:-webkit-autofill {
   -webkit-text-fill-color: var(--color-text-primary);
   -webkit-box-shadow: 0 0 0px 1000px var(--color-surface) inset;
   transition: background-color 5000s ease-in-out 0s;
+}
+
+input[type="range"] {
+  accent-color: var(--color-primary);
 }

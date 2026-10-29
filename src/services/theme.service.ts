@@ -10,6 +10,8 @@ export interface ThemePalette {
   drawer: string;
   table: string;
   buttonSecondary: string;
+  buttonPrimaryText?: string;
+  buttonSecondaryText?: string;
   textPrimary: string;
   textSecondary: string;
   border: string;
