@@ -23,6 +23,10 @@ export interface ThemeDocument {
   name: string;
   isActive: boolean;
   isDefault: boolean;
+  isCampaign?: boolean;
+  campaignColor?: string;
+  startDate?: string | Date;
+  endDate?: string | Date;
   light: ThemePalette;
   dark: ThemePalette;
 }
@@ -52,7 +56,11 @@ export const themeService = {
     await api.post(`/themes/${id}/activate`);
   },
 
+  deactivateTheme: async (id: string): Promise<void> => {
+    await api.post(`/themes/${id}/deactivate`);
+  },
+
   deleteTheme: async (id: string): Promise<void> => {
     await api.delete(`/themes/${id}`);
-  }
+  },
 };

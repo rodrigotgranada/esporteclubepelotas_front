@@ -1,5 +1,6 @@
 export * from './Button';
 export * from './Input';
+export * from './ColorInput';
 export * from './MaskedInput';
 export * from './Title';
 export * from './Text';
