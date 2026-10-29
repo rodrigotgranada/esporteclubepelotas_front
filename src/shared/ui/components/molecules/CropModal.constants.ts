@@ -12,3 +12,4 @@ export const CROP_MODAL_TEXTS = {
   TOAST_BG_ERROR: 'Não foi possível remover o fundo automaticamente.',
   TOAST_ERROR_ORIGINAL: 'Erro ao carregar a imagem original.',
 };
+

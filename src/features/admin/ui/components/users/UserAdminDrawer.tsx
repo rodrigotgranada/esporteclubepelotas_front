@@ -1,14 +1,12 @@
-import React, { useRef, useState } from 'react';
-import { Drawer, Input, PasswordInput, Button, LayoutContainer, Form, Text, Accordion, PhoneInput, CpfInput, Select, Option, Checkbox, IconButton } from '@/shared/ui/components';
+import React from 'react';
+import { Drawer, Input, PasswordInput, Button, LayoutContainer, Form, Text, Accordion, PhoneInput, CpfInput, Select, Option, Checkbox, IconButton, ImageCropper } from '@/shared/ui/components';
 import { ConfirmModal } from '@/shared/ui/components/molecules/ConfirmModal';
-import { CropModal } from '@/shared/ui/components/molecules/CropModal';
 import { UserAdminData } from '@/features/admin/services/admin.service';
 import { useUserAdminDrawer } from '../../../hooks/users/useUserAdminDrawer';
 import { useAuthStore } from '@/store/useAuthStore';
 import { ADMIN_TEXTS, USER_STATUS_MAP } from '../../../constants/admin.constants';
 import { USER_ADMIN_DRAWER_TEXTS } from './UserAdminDrawer.constants';
-import { Camera, Plus, Trash2 } from 'lucide-react';
-import Image from 'next/image';
+import { Plus, Trash2 } from 'lucide-react';
 
 interface UserAdminDrawerProps {
   isOpen: boolean;
@@ -31,36 +29,6 @@ export const UserAdminDrawer = ({ isOpen, onClose, user, onSaveSuccess }: UserAd
     availableRoles
   } = useUserAdminDrawer(user, onClose, onSaveSuccess);
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
-  const [isCropModalOpen, setIsCropModalOpen] = useState(false);
-
-  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      const reader = new FileReader();
-      reader.onload = () => {
-        setCropImageSrc(reader.result?.toString() || '');
-        setIsCropModalOpen(true);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleCropSave = (croppedBlob: Blob) => {
-    const file = new File([croppedBlob], 'avatar.png', { type: croppedBlob.type || 'image/png' });
-    setAvatarFile(file);
-    setIsCropModalOpen(false);
-    setCropImageSrc(null);
-    if (fileInputRef.current) fileInputRef.current.value = '';
-  };
-
-  const getAvatarPreview = () => {
-    if (avatarFile) return URL.createObjectURL(avatarFile);
-    if (user?.avatarUrl) return user.avatarUrl;
-    return null;
-  };
-
   const handleFormSubmitClick = (e: React.FormEvent) => {
     e.preventDefault();
     setConfirmModal({ isOpen: true, type: 'save' });
@@ -81,35 +49,16 @@ export const UserAdminDrawer = ({ isOpen, onClose, user, onSaveSuccess }: UserAd
 
             <Accordion title={USER_ADMIN_DRAWER_TEXTS.SECTIONS.PERSONAL_DATA} defaultOpen={true}>
               <LayoutContainer className="flex flex-col items-center mb-6">
-                <LayoutContainer 
-                  onClick={() => fileInputRef.current?.click()} 
-                  className="cursor-pointer relative w-24 h-24 rounded-full bg-surface-hover border-2 border-dashed border-border hover:border-primary flex items-center justify-center overflow-hidden transition-colors group shadow-md"
-                >
-                  {getAvatarPreview() ? (
-                    <Image 
-                      src={getAvatarPreview() as string} 
-                      alt="Avatar" 
-                      fill 
-                      sizes="96px" 
-                      className="object-cover" 
-                      unoptimized 
-                    />
-                  ) : (
-                    <Camera className="text-text-secondary group-hover:text-primary transition-colors" size={28} />
-                  )}
-                  <LayoutContainer className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center transition-opacity">
-                    <Camera className="text-white mb-1" size={18} />
-                    <Text className="text-[11px] font-bold text-white text-center leading-tight">
-                      {user ? USER_ADMIN_DRAWER_TEXTS.LABELS.CHANGE_PHOTO : USER_ADMIN_DRAWER_TEXTS.LABELS.UPLOAD}
-                    </Text>
-                  </LayoutContainer>
-                </LayoutContainer>
-                <input 
-                  type="file" 
-                  ref={fileInputRef} 
-                  className="hidden" 
-                  accept="image/*" 
-                  onChange={handleAvatarChange} 
+                <ImageCropper
+                  initialImage={avatarFile ? URL.createObjectURL(avatarFile) : (user?.avatarUrl || null)}
+                  onCropSave={(blob) => {
+                    const file = new File([blob], 'avatar.png', { type: blob.type || 'image/png' });
+                    setAvatarFile(file);
+                  }}
+                  onImageRemove={() => {
+                    setAvatarFile(null);
+                    updateField('avatarUrl', '');
+                  }}
                 />
                 <Text className="text-xs text-text-secondary mt-2">
                   {user ? USER_ADMIN_DRAWER_TEXTS.LABELS.CLICK_TO_CHANGE_PHOTO : USER_ADMIN_DRAWER_TEXTS.LABELS.UPLOAD_PHOTO_HINT}
@@ -265,17 +214,6 @@ export const UserAdminDrawer = ({ isOpen, onClose, user, onSaveSuccess }: UserAd
           </LayoutContainer>
         </Form>
       </Drawer>
-
-      <CropModal
-        isOpen={isCropModalOpen}
-        imageSrc={cropImageSrc || ''}
-        onClose={() => {
-          setIsCropModalOpen(false);
-          setCropImageSrc(null);
-          if (fileInputRef.current) fileInputRef.current.value = '';
-        }}
-        onCropSave={handleCropSave}
-      />
 
       <ConfirmModal
         isOpen={confirmModal.isOpen}
