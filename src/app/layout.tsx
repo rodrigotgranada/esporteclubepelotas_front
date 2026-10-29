@@ -4,6 +4,7 @@ import { Toaster } from 'react-hot-toast';
 import "./globals.css";
 import { ThemeProvider } from '@/shared/ui/providers/ThemeProvider';
 import { SettingsProvider } from '@/shared/ui/providers/SettingsProvider';
+import { EnvironmentBadge } from '@/shared/ui/components';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -56,6 +57,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ThemeProvider>
           <SettingsProvider>
             {children}
+            <EnvironmentBadge />
             <Toaster position="top-right" />
           </SettingsProvider>
         </ThemeProvider>

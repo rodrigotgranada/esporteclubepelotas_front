@@ -12,3 +12,4 @@ export * from './CropModal';
 export * from './Accordion';
 export * from './Tabs';
 export * from './ThemeToggle';
+export * from './EnvironmentBadge';
