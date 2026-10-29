@@ -9,6 +9,7 @@ export * from './Toast';
 export * from './ConfirmModal';
 export * from './Drawer';
 export * from './CropModal';
+export * from './CropModal.constants';
 export * from './Accordion';
 export * from './Tabs';
 export * from './ThemeToggle';

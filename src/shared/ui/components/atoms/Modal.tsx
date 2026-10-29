@@ -1,5 +1,6 @@
 "use client";
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { LayoutContainer } from './LayoutContainer';
 import { X } from 'lucide-react';
 
@@ -8,10 +9,22 @@ export interface ModalProps {
   onClose: () => void;
   children: React.ReactNode;
   className?: string;
+  showCloseButton?: boolean;
 }
 
-export const Modal = ({ isOpen, onClose, children, className = '' }: ModalProps) => {
+export const Modal = ({ 
+  isOpen, 
+  onClose, 
+  children, 
+  className = '',
+  showCloseButton = true 
+}: ModalProps) => {
   const modalRef = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -29,10 +42,10 @@ export const Modal = ({ isOpen, onClose, children, className = '' }: ModalProps)
     };
   }, [isOpen, onClose]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+  return createPortal(
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
       <div 
         className="absolute inset-0" 
         onClick={onClose}
@@ -42,15 +55,18 @@ export const Modal = ({ isOpen, onClose, children, className = '' }: ModalProps)
         ref={modalRef}
         className={`relative bg-drawer border border-border rounded-2xl shadow-2xl p-6 w-full max-w-md animate-in zoom-in-95 duration-200 ${className}`}
       >
-        <button 
-          onClick={onClose}
-          className="absolute top-4 right-4 text-text-secondary hover:text-text-primary transition-colors"
-          aria-label="Fechar modal"
-        >
-          <X size={20} />
-        </button>
+        {showCloseButton && (
+          <button 
+            onClick={onClose}
+            className="absolute top-4 right-4 text-text-secondary hover:text-text-primary transition-colors z-20 p-1 rounded-lg hover:bg-surface"
+            aria-label="Fechar modal"
+          >
+            <X size={20} />
+          </button>
+        )}
         {children}
       </LayoutContainer>
-    </div>
+    </div>,
+    document.body
   );
 };

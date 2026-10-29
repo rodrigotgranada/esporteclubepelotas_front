@@ -1,10 +1,11 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { Drawer, Input, PasswordInput, Button, LayoutContainer, Form, Text, Accordion, PhoneInput, CpfInput, Select, Option, Checkbox, IconButton } from '@/shared/ui/components';
 import { ConfirmModal } from '@/shared/ui/components/molecules/ConfirmModal';
+import { CropModal } from '@/shared/ui/components/molecules/CropModal';
 import { UserAdminData } from '@/features/admin/services/admin.service';
 import { useUserAdminDrawer } from '../../../hooks/users/useUserAdminDrawer';
 import { useAuthStore } from '@/store/useAuthStore';
-import { ADMIN_TEXTS, USER_STATUS_MAP, USER_ROLE_MAP } from '../../../constants/admin.constants';
+import { ADMIN_TEXTS, USER_STATUS_MAP } from '../../../constants/admin.constants';
 import { USER_ADMIN_DRAWER_TEXTS } from './UserAdminDrawer.constants';
 import { Camera, Plus, Trash2 } from 'lucide-react';
 import Image from 'next/image';
@@ -31,11 +32,27 @@ export const UserAdminDrawer = ({ isOpen, onClose, user, onSaveSuccess }: UserAd
   } = useUserAdminDrawer(user, onClose, onSaveSuccess);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
+  const [isCropModalOpen, setIsCropModalOpen] = useState(false);
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setAvatarFile(e.target.files[0]);
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      reader.onload = () => {
+        setCropImageSrc(reader.result?.toString() || '');
+        setIsCropModalOpen(true);
+      };
+      reader.readAsDataURL(file);
     }
+  };
+
+  const handleCropSave = (croppedBlob: Blob) => {
+    const file = new File([croppedBlob], 'avatar.png', { type: croppedBlob.type || 'image/png' });
+    setAvatarFile(file);
+    setIsCropModalOpen(false);
+    setCropImageSrc(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const getAvatarPreview = () => {
@@ -248,6 +265,17 @@ export const UserAdminDrawer = ({ isOpen, onClose, user, onSaveSuccess }: UserAd
           </LayoutContainer>
         </Form>
       </Drawer>
+
+      <CropModal
+        isOpen={isCropModalOpen}
+        imageSrc={cropImageSrc || ''}
+        onClose={() => {
+          setIsCropModalOpen(false);
+          setCropImageSrc(null);
+          if (fileInputRef.current) fileInputRef.current.value = '';
+        }}
+        onCropSave={handleCropSave}
+      />
 
       <ConfirmModal
         isOpen={confirmModal.isOpen}
