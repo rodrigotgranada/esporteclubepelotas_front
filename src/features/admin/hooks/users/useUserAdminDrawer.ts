@@ -6,12 +6,22 @@ import { ADMIN_TEXTS } from '../../constants/admin.constants';
 const extractRoleId = (role: any): string => {
   if (!role) return '';
   if (typeof role === 'string') return role;
-  if (role._id) {
-    if (typeof role._id === 'string') return role._id;
-    if (typeof role._id === 'object' && role._id.toString) return role._id.toString();
+  if (typeof role === 'object') {
+    if (role._id) {
+      if (typeof role._id === 'string') return role._id;
+      if (typeof role._id === 'object' && role._id.toString) {
+        const str = role._id.toString();
+        if (str && str !== '[object Object]') return str;
+      }
+    }
+    if (role.name && typeof role.name === 'string') return role.name;
+    if (role.id && typeof role.id === 'string') return role.id;
+    if (role.toString) {
+      const str = role.toString();
+      if (str && str !== '[object Object]') return str;
+    }
   }
-  if (role.name) return role.name;
-  return role.toString ? role.toString() : '';
+  return '';
 };
 
 export const useUserAdminDrawer = (user: UserAdminData | null, onClose: () => void, onSaveSuccess: () => void) => {
@@ -132,64 +142,124 @@ export const useUserAdminDrawer = (user: UserAdminData | null, onClose: () => vo
     setIsLoading(true);
 
     try {
-      if (formData.password && formData.password !== formData.confirmPassword) {
-        throw new Error(ADMIN_TEXTS.TOAST_ERROR_PASSWORD_MISMATCH);
-      }
+      if (user) {
+        // Edit mode (PATCH semantics: only send modified fields)
+        const partialData: Record<string, any> = {};
 
-      const dataToSave: any = { ...formData };
-      delete dataToSave.confirmPassword;
-      
-      if (!user && !dataToSave.password) {
-        throw new Error(ADMIN_TEXTS.TOAST_ERROR_NO_PASSWORD);
-      }
-      
-      if (!dataToSave.password) {
-        delete dataToSave.password;
-      }
-      
-      if (!dataToSave.phones || dataToSave.phones.length === 0) throw new Error(ADMIN_TEXTS.TOAST_ERROR_NO_PHONE);
-      if (!dataToSave.addresses || dataToSave.addresses.length === 0) throw new Error(ADMIN_TEXTS.TOAST_ERROR_NO_ADDRESS);
-      if (!dataToSave.birthDate) throw new Error(ADMIN_TEXTS.TOAST_ERROR_NO_BIRTHDATE);
-      
-      if (dataToSave.birthDate) {
+        // 1. Avatar update
+        if (avatarFile) {
+          await adminService.updateUserAvatar(user.id, avatarFile);
+        } else if (formData.avatarUrl === '' && user.avatarUrl) {
+          partialData.avatarUrl = '';
+        }
+
+        // 2. Personal fields
+        if (formData.firstName !== undefined && formData.firstName !== user.firstName) {
+          partialData.firstName = formData.firstName;
+        }
+        if (formData.lastName !== undefined && formData.lastName !== user.lastName) {
+          partialData.lastName = formData.lastName;
+        }
+        if (formData.email !== undefined && formData.email !== user.email) {
+          partialData.email = formData.email;
+        }
+        if (formData.status !== undefined && formData.status !== user.status) {
+          partialData.status = formData.status;
+        }
+        if (formData.birthDate) {
+          const userBirth = user.birthDate ? new Date(user.birthDate).toISOString().split('T')[0] : '';
+          const formBirth = formData.birthDate.split('T')[0];
+          if (formBirth !== userBirth) {
+            partialData.birthDate = new Date(formData.birthDate).toISOString();
+          }
+        }
+        if (formData.password) {
+          if (formData.password !== formData.confirmPassword) {
+            throw new Error(ADMIN_TEXTS.TOAST_ERROR_PASSWORD_MISMATCH);
+          }
+          partialData.password = formData.password;
+        }
+
+        // 3. Role
+        const originalRoleId = extractRoleId(user.role);
+        const formRoleId = extractRoleId(formData.role);
+        if (formRoleId && formRoleId !== originalRoleId) {
+          partialData.role = formRoleId;
+        }
+
+        // 4. Phones
+        const cleanPhone = (p: any) => ({
+          number: (p.number || '').replace(/\D/g, ''),
+          isWhatsapp: !!p.isWhatsapp,
+          isPrimary: !!p.isPrimary,
+        });
+        const originalPhones = (user.phones || []).map(cleanPhone);
+        const formPhones = (formData.phones || []).map(cleanPhone);
+        if (JSON.stringify(originalPhones) !== JSON.stringify(formPhones)) {
+          if (formPhones.length === 0) throw new Error(ADMIN_TEXTS.TOAST_ERROR_NO_PHONE);
+          partialData.phones = formPhones;
+        }
+
+        // 5. Addresses
+        const cleanAddress = (a: any) => ({
+          zipCode: a.zipCode || '',
+          street: a.street || '',
+          number: a.number || '',
+          complement: a.complement || '',
+          neighborhood: a.neighborhood || '',
+          city: a.city || '',
+          state: a.state || '',
+          isPrimary: !!a.isPrimary,
+        });
+        const originalAddresses = (user.addresses || []).map(cleanAddress);
+        const formAddresses = (formData.addresses || []).map(cleanAddress);
+        if (JSON.stringify(originalAddresses) !== JSON.stringify(formAddresses)) {
+          if (formAddresses.length === 0) throw new Error(ADMIN_TEXTS.TOAST_ERROR_NO_ADDRESS);
+          partialData.addresses = formAddresses;
+        }
+
+        // Only call updateUser if there are actual field changes
+        if (Object.keys(partialData).length > 0) {
+          await adminService.updateUser(user.id, partialData);
+        }
+
+        toast.success(ADMIN_TEXTS.TOAST_USER_UPDATED);
+      } else {
+        // Create Mode (requires all mandatory fields)
+        if (formData.password && formData.password !== formData.confirmPassword) {
+          throw new Error(ADMIN_TEXTS.TOAST_ERROR_PASSWORD_MISMATCH);
+        }
+
+        const dataToSave: any = { ...formData };
+        delete dataToSave.confirmPassword;
+
+        if (!dataToSave.password) {
+          throw new Error(ADMIN_TEXTS.TOAST_ERROR_NO_PASSWORD);
+        }
+        if (!dataToSave.phones || dataToSave.phones.length === 0) throw new Error(ADMIN_TEXTS.TOAST_ERROR_NO_PHONE);
+        if (!dataToSave.addresses || dataToSave.addresses.length === 0) throw new Error(ADMIN_TEXTS.TOAST_ERROR_NO_ADDRESS);
+        if (!dataToSave.birthDate) throw new Error(ADMIN_TEXTS.TOAST_ERROR_NO_BIRTHDATE);
+
         dataToSave.birthDate = new Date(dataToSave.birthDate).toISOString();
-      }
+        dataToSave.role = extractRoleId(dataToSave.role) || roles.find((r: any) => r.name === 'USER')?._id;
 
-      if (dataToSave.role) {
-        dataToSave.role = extractRoleId(dataToSave.role);
-      }
-
-      if (dataToSave.phones && Array.isArray(dataToSave.phones)) {
         dataToSave.phones = dataToSave.phones.map((p: any) => ({
-          number: p.number,
+          number: (p.number || '').replace(/\D/g, ''),
           isWhatsapp: !!p.isWhatsapp,
           isPrimary: !!p.isPrimary,
         }));
-      }
 
-      if (dataToSave.addresses && Array.isArray(dataToSave.addresses)) {
         dataToSave.addresses = dataToSave.addresses.map((a: any) => ({
-          zipCode: a.zipCode,
-          street: a.street,
-          number: a.number,
+          zipCode: a.zipCode || '',
+          street: a.street || '',
+          number: a.number || '',
           complement: a.complement || '',
-          neighborhood: a.neighborhood,
-          city: a.city,
-          state: a.state,
+          neighborhood: a.neighborhood || '',
+          city: a.city || '',
+          state: a.state || '',
           isPrimary: !!a.isPrimary,
         }));
-      }
 
-      if (user) {
-        // Edit mode
-        if (avatarFile) {
-          const avatarRes = await adminService.updateUserAvatar(user.id, avatarFile);
-          dataToSave.avatarUrl = avatarRes.url;
-        }
-        await adminService.updateUser(user.id, dataToSave);
-        toast.success(ADMIN_TEXTS.TOAST_USER_UPDATED);
-      } else {
-        // Create Mode
         await adminService.createUser(dataToSave, avatarFile || undefined);
         toast.success(ADMIN_TEXTS.TOAST_USER_CREATED);
       }
