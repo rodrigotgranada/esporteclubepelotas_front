@@ -63,28 +63,48 @@ export const UserAdminDrawer = ({ isOpen, onClose, user, onSaveSuccess }: UserAd
           <LayoutContainer className="flex-1 space-y-4 overflow-y-auto pr-2 custom-scrollbar">
 
             <Accordion title={USER_ADMIN_DRAWER_TEXTS.SECTIONS.PERSONAL_DATA} defaultOpen={true}>
-              {!user && (
-                <LayoutContainer className="flex flex-col items-center mb-6">
-                  <LayoutContainer onClick={() => fileInputRef.current?.click()} className="cursor-pointer relative w-24 h-24 rounded-full bg-black/40 border-2 border-dashed border-white/20 hover:border-yellow-400 flex items-center justify-center overflow-hidden transition-colors group">
-                    {getAvatarPreview() ? (
-                      <Image src={getAvatarPreview() as string} alt="Avatar" fill sizes="96px" className="object-cover" />
-                    ) : (
-                      <Camera className="text-gray-400 group-hover:text-yellow-400" size={24} />
-                    )}
-                    <LayoutContainer className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                      <Text className="text-xs font-bold text-white">{USER_ADMIN_DRAWER_TEXTS.LABELS.UPLOAD}</Text>
-                    </LayoutContainer>
+              <LayoutContainer className="flex flex-col items-center mb-6">
+                <LayoutContainer 
+                  onClick={() => fileInputRef.current?.click()} 
+                  className="cursor-pointer relative w-24 h-24 rounded-full bg-surface-hover border-2 border-dashed border-border hover:border-primary flex items-center justify-center overflow-hidden transition-colors group shadow-md"
+                >
+                  {getAvatarPreview() ? (
+                    <Image 
+                      src={getAvatarPreview() as string} 
+                      alt="Avatar" 
+                      fill 
+                      sizes="96px" 
+                      className="object-cover" 
+                      unoptimized 
+                    />
+                  ) : (
+                    <Camera className="text-text-secondary group-hover:text-primary transition-colors" size={28} />
+                  )}
+                  <LayoutContainer className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center transition-opacity">
+                    <Camera className="text-white mb-1" size={18} />
+                    <Text className="text-[11px] font-bold text-white text-center leading-tight">
+                      {user ? USER_ADMIN_DRAWER_TEXTS.LABELS.CHANGE_PHOTO : USER_ADMIN_DRAWER_TEXTS.LABELS.UPLOAD}
+                    </Text>
                   </LayoutContainer>
-                  <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleAvatarChange} />
                 </LayoutContainer>
-              )}
+                <input 
+                  type="file" 
+                  ref={fileInputRef} 
+                  className="hidden" 
+                  accept="image/*" 
+                  onChange={handleAvatarChange} 
+                />
+                <Text className="text-xs text-text-secondary mt-2">
+                  {user ? USER_ADMIN_DRAWER_TEXTS.LABELS.CLICK_TO_CHANGE_PHOTO : USER_ADMIN_DRAWER_TEXTS.LABELS.UPLOAD_PHOTO_HINT}
+                </Text>
+              </LayoutContainer>
 
               <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                 <Input label={USER_ADMIN_DRAWER_TEXTS.LABELS.FIRST_NAME} value={formData.firstName || ''} onChange={e => updateField('firstName', e.target.value)} required />
                 <Input label={USER_ADMIN_DRAWER_TEXTS.LABELS.LAST_NAME} value={formData.lastName || ''} onChange={e => updateField('lastName', e.target.value)} required />
               </LayoutContainer>
               <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                <CpfInput label={USER_ADMIN_DRAWER_TEXTS.LABELS.CPF} value={formData.cpf || ''} onChange={e => updateField('cpf', e.target.value)} required />
+                <CpfInput label={USER_ADMIN_DRAWER_TEXTS.LABELS.CPF} value={formData.cpf || ''} onChange={e => updateField('cpf', e.target.value)} required disabled={!!user} />
                 <Input type="date" label={USER_ADMIN_DRAWER_TEXTS.LABELS.BIRTH_DATE} value={formData.birthDate || ''} onChange={e => updateField('birthDate', e.target.value)} required />
               </LayoutContainer>
               <Input type="email" label={USER_ADMIN_DRAWER_TEXTS.LABELS.EMAIL} value={formData.email || ''} onChange={e => updateField('email', e.target.value)} required disabled={!!user && currentUserRole !== 'OWNER'} />
@@ -101,59 +121,60 @@ export const UserAdminDrawer = ({ isOpen, onClose, user, onSaveSuccess }: UserAd
                   </LayoutContainer>
                 </LayoutContainer>
               ))}
-              <Button type="button" variant="outline" size="sm" onClick={addPhone} className="w-full flex items-center justify-center gap-2 text-primary border-primary/30 hover:bg-primary/10">
-                <Plus size={16} /> {USER_ADMIN_DRAWER_TEXTS.BUTTONS.ADD_PHONE}
+              <Button type="button" variant="outline" size="sm" onClick={addPhone} className="w-full flex items-center justify-center gap-2 border-secondary/30 text-secondary hover:bg-secondary/10">
+                <Plus size={16} />
+                {USER_ADMIN_DRAWER_TEXTS.BUTTONS.ADD_PHONE}
               </Button>
             </Accordion>
 
             <Accordion title={USER_ADMIN_DRAWER_TEXTS.SECTIONS.ADDRESSES}>
-              {formData.addresses?.map((addr, idx) => (
-                <LayoutContainer key={idx} className="bg-surface p-4 rounded-xl mb-4 relative border border-border">
+              {formData.addresses?.map((address, idx) => (
+                <LayoutContainer key={idx} className="bg-surface p-4 rounded-xl mb-4 relative border border-border space-y-3">
                   <IconButton icon={<Trash2 size={18} />} variant="ghost" onClick={() => removeAddress(idx)} className="absolute top-2 right-2 text-text-secondary hover:text-error" />
-                  <LayoutContainer className="grid grid-cols-2 gap-4 mb-3 mt-4">
-                    <Input label={USER_ADMIN_DRAWER_TEXTS.LABELS.ZIP_CODE} value={addr.zipCode} onChange={e => updateAddress(idx, 'zipCode', e.target.value)} required />
-                    <Input label={USER_ADMIN_DRAWER_TEXTS.LABELS.CITY} value={addr.city} onChange={e => updateAddress(idx, 'city', e.target.value)} required />
+                  <LayoutContainer className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <Input label={USER_ADMIN_DRAWER_TEXTS.LABELS.ZIP_CODE} value={address.zipCode} onChange={e => updateAddress(idx, 'zipCode', e.target.value)} required />
+                    <Input label={USER_ADMIN_DRAWER_TEXTS.LABELS.CITY} value={address.city} onChange={e => updateAddress(idx, 'city', e.target.value)} required />
+                    <Input label={USER_ADMIN_DRAWER_TEXTS.LABELS.STATE} value={address.state} onChange={e => updateAddress(idx, 'state', e.target.value)} required />
                   </LayoutContainer>
-                  <LayoutContainer className="grid grid-cols-12 gap-4 mb-3">
-                    <LayoutContainer className="col-span-8"><Input label={USER_ADMIN_DRAWER_TEXTS.LABELS.STREET} value={addr.street} onChange={e => updateAddress(idx, 'street', e.target.value)} required /></LayoutContainer>
-                    <LayoutContainer className="col-span-4"><Input label={USER_ADMIN_DRAWER_TEXTS.LABELS.NUMBER} value={addr.number} onChange={e => updateAddress(idx, 'number', e.target.value)} required /></LayoutContainer>
+                  <LayoutContainer className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <Input label={USER_ADMIN_DRAWER_TEXTS.LABELS.STREET} value={address.street} onChange={e => updateAddress(idx, 'street', e.target.value)} required className="sm:col-span-2" />
+                    <Input label={USER_ADMIN_DRAWER_TEXTS.LABELS.NUMBER} value={address.number} onChange={e => updateAddress(idx, 'number', e.target.value)} required />
                   </LayoutContainer>
-                  <LayoutContainer className="grid grid-cols-12 gap-4 mb-3">
-                    <LayoutContainer className="col-span-6"><Input label={USER_ADMIN_DRAWER_TEXTS.LABELS.NEIGHBORHOOD} value={addr.neighborhood} onChange={e => updateAddress(idx, 'neighborhood', e.target.value)} required /></LayoutContainer>
-                    <LayoutContainer className="col-span-6"><Input label={USER_ADMIN_DRAWER_TEXTS.LABELS.COMPLEMENT} value={addr.complement || ''} onChange={e => updateAddress(idx, 'complement', e.target.value)} /></LayoutContainer>
+                  <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <Input label={USER_ADMIN_DRAWER_TEXTS.LABELS.NEIGHBORHOOD} value={address.neighborhood} onChange={e => updateAddress(idx, 'neighborhood', e.target.value)} required />
+                    <Input label={USER_ADMIN_DRAWER_TEXTS.LABELS.COMPLEMENT} value={address.complement || ''} onChange={e => updateAddress(idx, 'complement', e.target.value)} />
                   </LayoutContainer>
-                  <LayoutContainer className="grid grid-cols-2 gap-4 mb-3">
-                    <Input label={USER_ADMIN_DRAWER_TEXTS.LABELS.STATE} value={addr.state} onChange={e => updateAddress(idx, 'state', e.target.value)} required maxLength={2} />
-                  </LayoutContainer>
-                  <LayoutContainer className="mt-2">
-                    <Checkbox label={USER_ADMIN_DRAWER_TEXTS.LABELS.IS_PRIMARY_ADDRESS} checked={addr.isPrimary || false} onChange={e => updateAddress(idx, 'isPrimary', e.target.checked)} />
-                  </LayoutContainer>
+                  <Checkbox label={USER_ADMIN_DRAWER_TEXTS.LABELS.IS_PRIMARY_ADDRESS} checked={address.isPrimary || false} onChange={e => updateAddress(idx, 'isPrimary', e.target.checked)} />
                 </LayoutContainer>
               ))}
-              <Button type="button" variant="outline" size="sm" onClick={addAddress} className="w-full flex items-center justify-center gap-2 text-primary border-primary/30 hover:bg-primary/10">
-                <Plus size={16} /> {USER_ADMIN_DRAWER_TEXTS.BUTTONS.ADD_ADDRESS}
+              <Button type="button" variant="outline" size="sm" onClick={addAddress} className="w-full flex items-center justify-center gap-2 border-secondary/30 text-secondary hover:bg-secondary/10">
+                <Plus size={16} />
+                {USER_ADMIN_DRAWER_TEXTS.BUTTONS.ADD_ADDRESS}
               </Button>
             </Accordion>
 
             <Accordion title={USER_ADMIN_DRAWER_TEXTS.SECTIONS.ACCESS_STATUS}>
-              <LayoutContainer className="grid grid-cols-2 gap-4 mb-4">
+              <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                 <LayoutContainer>
                   <Select
                     label={USER_ADMIN_DRAWER_TEXTS.LABELS.ROLE}
                     value={formData.role || ''}
                     onChange={e => updateField('role', e.target.value)}
-                    disabled={currentUserRole !== 'OWNER' && (user?.role?.name || user?.role) === 'OWNER'}
+                    disabled={currentUserRole !== 'OWNER' && (formData.role === 'OWNER' || formData.role === availableRoles.find(r => r.name === 'OWNER')?._id)}
                   >
                     {availableRoles.map((r: any) => {
-                      const idStr = typeof r._id === 'string' ? r._id : String(r._id || r.id);
+                      const isOwnerRole = r.name === 'OWNER';
+                      const canAssign = currentUserRole === 'OWNER' || !isOwnerRole;
+                      if (!canAssign) return null;
                       return (
-                        <Option key={idStr} value={idStr}>
+                        <Option key={r._id || r.name} value={r._id || r.name}>
                           {r.label || r.name}
                         </Option>
                       );
                     })}
                   </Select>
                 </LayoutContainer>
+
                 <LayoutContainer>
                   <Select
                     label={USER_ADMIN_DRAWER_TEXTS.LABELS.STATUS}

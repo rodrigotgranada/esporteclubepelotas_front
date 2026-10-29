@@ -34,7 +34,7 @@ export const useUserAdminDrawer = (user: UserAdminData | null, onClose: () => vo
         lastName: user.lastName,
         email: user.email,
         cpf: user.cpf,
-        role: user.role?._id || user.role, // Handle both object and string for fallback
+        role: user.role?._id || user.role?.name || user.role,
         status: user.status,
         birthDate: user.birthDate ? new Date(user.birthDate).toISOString().split('T')[0] : '',
         phones: user.phones || [],
@@ -76,7 +76,6 @@ export const useUserAdminDrawer = (user: UserAdminData | null, onClose: () => vo
       const newPhones = [...(prev.phones || [])];
       newPhones[index] = { ...newPhones[index], [field]: value };
       
-      // Handle isPrimary logic
       if (field === 'isPrimary' && value === true) {
         newPhones.forEach((p, i) => { if (i !== index) p.isPrimary = false; });
       }
@@ -103,7 +102,6 @@ export const useUserAdminDrawer = (user: UserAdminData | null, onClose: () => vo
       const newAddresses = [...(prev.addresses || [])];
       newAddresses[index] = { ...newAddresses[index], [field]: value };
       
-      // Handle isPrimary logic
       if (field === 'isPrimary' && value === true) {
         newAddresses.forEach((a, i) => { if (i !== index) a.isPrimary = false; });
       }
@@ -138,19 +136,20 @@ export const useUserAdminDrawer = (user: UserAdminData | null, onClose: () => vo
         delete dataToSave.password;
       }
       
-      // Se não for edição e phones/addresses estiver vazio, vamos forçar array vazio ou erro (o DTO backend exige)
-      // Se não for edição e phones/addresses estiver vazio, vamos forçar array vazio ou erro (o DTO backend exige)
       if (!dataToSave.phones || dataToSave.phones.length === 0) throw new Error(ADMIN_TEXTS.TOAST_ERROR_NO_PHONE);
       if (!dataToSave.addresses || dataToSave.addresses.length === 0) throw new Error(ADMIN_TEXTS.TOAST_ERROR_NO_ADDRESS);
       if (!dataToSave.birthDate) throw new Error(ADMIN_TEXTS.TOAST_ERROR_NO_BIRTHDATE);
       
-      // Converte birthDate string para Date ISO para o backend
       if (dataToSave.birthDate) {
         dataToSave.birthDate = new Date(dataToSave.birthDate).toISOString();
       }
 
       if (user) {
-        // Edit mode (Backend currently patch admin uses standard fields, we need to handle arrays in backend too if we want to update them, but let's send them)
+        // Edit mode
+        if (avatarFile) {
+          const avatarRes = await adminService.updateUserAvatar(user.id, avatarFile);
+          dataToSave.avatarUrl = avatarRes.url;
+        }
         await adminService.updateUser(user.id, dataToSave);
         toast.success(ADMIN_TEXTS.TOAST_USER_UPDATED);
       } else {

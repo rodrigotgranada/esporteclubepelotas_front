@@ -46,13 +46,10 @@ export const UsersFilterBar = ({
               onChange={(e) => setRoleFilter(e.target.value)}
             >
               <Option value="">{ADMIN_TEXTS.USERS_FILTER_ROLES_ALL}</Option>
-              {availableRoles.map((r: any, index: number) => {
-                let roleId = r.name || `role-${index}`;
-                if (typeof r._id === 'string') roleId = r._id;
-                else if (r._id && typeof r._id.toString === 'function' && r._id.toString() !== '[object Object]') roleId = r._id.toString();
-
+              {availableRoles.map((r: any) => {
+                const roleValue = r.name || (typeof r._id === 'string' ? r._id : r.id);
                 return (
-                  <Option key={roleId} value={roleId}>
+                  <Option key={roleValue} value={roleValue}>
                     {r.label || r.name}
                   </Option>
                 );

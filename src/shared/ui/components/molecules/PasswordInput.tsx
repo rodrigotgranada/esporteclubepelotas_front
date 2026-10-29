@@ -2,7 +2,7 @@
 
 import React, { forwardRef, useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
-import { Input, InputProps } from '../atoms/Input';
+import { InputProps } from '../atoms/Input';
 
 interface PasswordInputProps extends InputProps {
   label?: string;
@@ -15,7 +15,9 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
 
     return (
       <div className="flex flex-col space-y-1 w-full">
-        {label && <label className="text-sm font-medium text-text-primary">{label}</label>}
+        {label && (
+          <label className="text-sm font-medium text-text-secondary">{label}</label>
+        )}
         <div className="relative">
           <input
             {...props}

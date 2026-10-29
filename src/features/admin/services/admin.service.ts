@@ -57,6 +57,17 @@ export const adminService = {
     return response.data;
   },
 
+  updateUserAvatar: async (id: string, file: File): Promise<{ url: string }> => {
+    const formData = new FormData();
+    formData.append('avatar', file);
+    const response = await api.post(`/users/admin/${id}/avatar`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  },
+
   softDeleteUser: async (id: string): Promise<void> => {
     await api.delete(`/users/admin/${id}`);
   },

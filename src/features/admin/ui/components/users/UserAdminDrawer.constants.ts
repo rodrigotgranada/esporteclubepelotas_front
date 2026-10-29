@@ -8,6 +8,9 @@ export const USER_ADMIN_DRAWER_TEXTS = {
   },
   LABELS: {
     UPLOAD: 'Upload',
+    CHANGE_PHOTO: 'Alterar Foto',
+    CLICK_TO_CHANGE_PHOTO: 'Clique na foto para alterar o avatar',
+    UPLOAD_PHOTO_HINT: 'Formatos aceitos: JPG, PNG',
     FIRST_NAME: 'Nome',
     LAST_NAME: 'Sobrenome',
     CPF: 'CPF',
