@@ -34,7 +34,7 @@ export const DashboardFeature = () => {
   const cards = [
     { title: DASHBOARD_FEATURE_TEXTS.CARDS.TOTAL_USERS, value: stats.total, icon: Users, color: 'text-blue-400', bg: 'bg-blue-400/10' },
     { title: DASHBOARD_FEATURE_TEXTS.CARDS.ACTIVE_USERS, value: stats.active, icon: UserCheck, color: 'text-green-400', bg: 'bg-green-400/10' },
-    { title: DASHBOARD_FEATURE_TEXTS.CARDS.BLOCKED, value: stats.blocked, icon: UserX, color: 'text-red-400', bg: 'bg-red-400/10' },
+    { title: DASHBOARD_FEATURE_TEXTS.CARDS.BLOCKED, value: stats.blocked, icon: UserX, color: 'text-error', bg: 'bg-error/10' },
     { title: DASHBOARD_FEATURE_TEXTS.CARDS.PENDING_EMAIL, value: stats.pending, icon: Activity, color: 'text-yellow-400', bg: 'bg-yellow-400/10' },
   ];
 

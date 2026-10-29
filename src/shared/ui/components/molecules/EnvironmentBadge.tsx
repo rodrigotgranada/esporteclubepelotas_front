@@ -66,7 +66,7 @@ export const EnvironmentBadge = () => {
       return 'bg-neutral-500/30 border-neutral-400/60 text-white animate-pulse';
     }
     if (status === 'error') {
-      return 'bg-red-500/35 border-red-400/80 text-white hover:bg-red-500/50';
+      return 'bg-orange-600/35 border-orange-500/80 text-white hover:bg-orange-600/50';
     }
     if (isProd) {
       return 'bg-emerald-500/35 border-emerald-400/80 text-white hover:bg-emerald-500/50';

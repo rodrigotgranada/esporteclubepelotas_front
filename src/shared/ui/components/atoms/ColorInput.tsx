@@ -40,3 +40,4 @@ export const ColorInput = forwardRef<HTMLInputElement, ColorInputProps>(
 );
 
 ColorInput.displayName = 'ColorInput';
+

@@ -41,21 +41,19 @@ export const ThemePreviewPanel = ({ previewTheme }: ThemePreviewPanelProps) => {
             onClick={() => setMode('light')}
             icon={<Sun size={16} />}
             variant="ghost"
-            className={`transition-colors h-8 w-8 ${
-              mode === 'light'
+            className={`transition-colors h-8 w-8 ${mode === 'light'
                 ? 'bg-surface text-text-primary shadow-sm'
                 : 'text-text-secondary hover:text-text-primary'
-            }`}
+              }`}
           />
           <IconButton
             onClick={() => setMode('dark')}
             icon={<Moon size={16} />}
             variant="ghost"
-            className={`transition-colors h-8 w-8 ${
-              mode === 'dark'
+            className={`transition-colors h-8 w-8 ${mode === 'dark'
                 ? 'bg-surface text-text-primary shadow-sm'
                 : 'text-text-secondary hover:text-text-primary'
-            }`}
+              }`}
           />
         </LayoutContainer>
       </LayoutContainer>

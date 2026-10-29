@@ -14,7 +14,7 @@ const variantStyles: Record<IconButtonVariant, string> = {
   primary: 'bg-yellow-500 text-blue-950 hover:bg-yellow-400',
   secondary: 'bg-white/10 text-white hover:text-yellow-400 hover:bg-white/20',
   ghost: 'bg-transparent text-gray-400 hover:text-white',
-  danger: 'bg-white/10 text-white hover:text-red-400 hover:bg-red-500/20',
+  danger: 'bg-white/10 text-white hover:text-error hover:bg-error/20',
 };
 
 const sizeStyles: Record<IconButtonSize, string> = {

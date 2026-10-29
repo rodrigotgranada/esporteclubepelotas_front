@@ -17,7 +17,7 @@ export const CAMPAIGN_PRESETS: CampaignPreset[] = [
   { name: 'Setembro Amarelo', color: '#eab308', month: 9, icon: '💛' },
   { name: 'Fevereiro Roxo', color: '#8b5cf6', month: 2, icon: '💜' },
   { name: 'Julho Verde', color: '#10b981', month: 7, icon: '💚' },
-  { name: 'Junho Vermelho', color: '#ef4444', month: 6, icon: '🩸' },
+  { name: 'Dezembro Laranja', color: '#ea580c', month: 12, icon: '🎗️' },
 ];
 
 export const useThemeAdminDrawer = (
@@ -46,7 +46,7 @@ export const useThemeAdminDrawer = (
     textSecondary: '#4b5563',
     border: '#e5e7eb',
     success: '#22c55e',
-    error: '#ef4444',
+    error: '#ea580c',
     warning: '#f59e0b',
   };
 
@@ -64,7 +64,7 @@ export const useThemeAdminDrawer = (
     textSecondary: '#9ca3af',
     border: '#374151',
     success: '#22c55e',
-    error: '#ef4444',
+    error: '#ea580c',
     warning: '#f59e0b',
   };
 

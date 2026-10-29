@@ -317,7 +317,7 @@ export const ThemeAdminDrawer = ({
                 type="button"
                 variant="outline"
                 size="md"
-                className="text-red-500 hover:bg-red-500/10 border-red-500/30"
+                className="text-error hover:bg-error/10 border-error/30"
                 onClick={() => setIsDeleteModalOpen(true)}
               >
                 {SETTINGS_TEXTS.THEMES.BTN_DELETE}

@@ -45,7 +45,7 @@ export const ChangePasswordDrawer = ({ isOpen, onClose, onSubmit, isLoading }: C
             required
           />
           {error && (
-            <Text className="text-red-500 text-sm">{error}</Text>
+            <Text className="text-error text-sm">{error}</Text>
           )}
         </LayoutContainer>
 
