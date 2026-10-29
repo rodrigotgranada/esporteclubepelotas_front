@@ -3,6 +3,17 @@ import { UserAdminData, adminService } from '@/features/admin/services/admin.ser
 import { toast } from 'react-hot-toast';
 import { ADMIN_TEXTS } from '../../constants/admin.constants';
 
+const extractRoleId = (role: any): string => {
+  if (!role) return '';
+  if (typeof role === 'string') return role;
+  if (role._id) {
+    if (typeof role._id === 'string') return role._id;
+    if (typeof role._id === 'object' && role._id.toString) return role._id.toString();
+  }
+  if (role.name) return role.name;
+  return role.toString ? role.toString() : '';
+};
+
 export const useUserAdminDrawer = (user: UserAdminData | null, onClose: () => void, onSaveSuccess: () => void) => {
   const [formData, setFormData] = useState<Partial<UserAdminData> & { password?: string, confirmPassword?: string }>({});
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
@@ -34,7 +45,7 @@ export const useUserAdminDrawer = (user: UserAdminData | null, onClose: () => vo
         lastName: user.lastName,
         email: user.email,
         cpf: user.cpf,
-        role: user.role?._id || user.role?.name || user.role,
+        role: extractRoleId(user.role),
         status: user.status,
         birthDate: user.birthDate ? new Date(user.birthDate).toISOString().split('T')[0] : '',
         phones: user.phones || [],
@@ -142,6 +153,31 @@ export const useUserAdminDrawer = (user: UserAdminData | null, onClose: () => vo
       
       if (dataToSave.birthDate) {
         dataToSave.birthDate = new Date(dataToSave.birthDate).toISOString();
+      }
+
+      if (dataToSave.role) {
+        dataToSave.role = extractRoleId(dataToSave.role);
+      }
+
+      if (dataToSave.phones && Array.isArray(dataToSave.phones)) {
+        dataToSave.phones = dataToSave.phones.map((p: any) => ({
+          number: p.number,
+          isWhatsapp: !!p.isWhatsapp,
+          isPrimary: !!p.isPrimary,
+        }));
+      }
+
+      if (dataToSave.addresses && Array.isArray(dataToSave.addresses)) {
+        dataToSave.addresses = dataToSave.addresses.map((a: any) => ({
+          zipCode: a.zipCode,
+          street: a.street,
+          number: a.number,
+          complement: a.complement || '',
+          neighborhood: a.neighborhood,
+          city: a.city,
+          state: a.state,
+          isPrimary: !!a.isPrimary,
+        }));
       }
 
       if (user) {
