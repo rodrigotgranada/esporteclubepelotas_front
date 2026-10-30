@@ -3,12 +3,23 @@ import { LayoutContainer, Title, Text, Button, Checkbox } from '@/shared/ui/comp
 import { Settings, Download, Bell, Smartphone } from 'lucide-react';
 import { User } from '@/store/useAuthStore';
 import { PROFILE_TEXTS } from '../../../constants';
+import { usePreferencesData } from '../../../hooks/usePreferencesData';
 
 interface Props {
   user: User;
 }
 
-export const PreferencesTab = ({ user }: Props) => {
+export const PreferencesTab = ({ user: _user }: Props) => {
+  const {
+    receiveNewsletter,
+    setReceiveNewsletter,
+    receiveSms,
+    setReceiveSms,
+    loading,
+    handleSavePreferences,
+    handleExportData,
+  } = usePreferencesData();
+
   return (
     <LayoutContainer className="animate-in fade-in duration-300 space-y-8">
       <LayoutContainer>
@@ -20,11 +31,14 @@ export const PreferencesTab = ({ user }: Props) => {
       </LayoutContainer>
 
       <LayoutContainer className="bg-surface border border-border rounded-xl p-6">
-        <Title level="h3" className="text-lg font-bold text-text-primary mb-4">{PROFILE_TEXTS.PREFERENCES_COMMS_TITLE}</Title>
+        <Title level="h3" className="text-lg font-bold text-text-primary mb-4">
+          {PROFILE_TEXTS.PREFERENCES_COMMS_TITLE}
+        </Title>
         
         <LayoutContainer className="space-y-4">
           <Checkbox 
-            defaultChecked
+            checked={receiveNewsletter}
+            onChange={(e) => setReceiveNewsletter(e.target.checked)}
             label={
               <Text as="span" className="text-text-primary font-medium flex items-center gap-2">
                 <Bell size={16} className="text-text-secondary group-hover:text-primary transition-colors" />
@@ -35,6 +49,8 @@ export const PreferencesTab = ({ user }: Props) => {
           />
 
           <Checkbox 
+            checked={receiveSms}
+            onChange={(e) => setReceiveSms(e.target.checked)}
             label={
               <Text as="span" className="text-text-primary font-medium flex items-center gap-2">
                 <Smartphone size={16} className="text-text-secondary group-hover:text-primary transition-colors" />
@@ -45,15 +61,30 @@ export const PreferencesTab = ({ user }: Props) => {
           />
         </LayoutContainer>
         
-        <Button variant="secondary" size="md" className="mt-6 px-6">{PROFILE_TEXTS.PREFERENCES_BUTTON_SAVE}</Button>
+        <Button
+          variant="secondary"
+          size="md"
+          className="mt-6 px-6"
+          onClick={handleSavePreferences}
+          isLoading={loading}
+        >
+          {PROFILE_TEXTS.PREFERENCES_BUTTON_SAVE}
+        </Button>
       </LayoutContainer>
 
       <LayoutContainer className="bg-secondary/10 border border-secondary/20 rounded-xl p-6 mt-8">
-        <Title level="h3" className="text-lg font-bold text-secondary mb-2">{PROFILE_TEXTS.PREFERENCES_PRIVACY_TITLE}</Title>
+        <Title level="h3" className="text-lg font-bold text-secondary mb-2">
+          {PROFILE_TEXTS.PREFERENCES_PRIVACY_TITLE}
+        </Title>
         <Text className="text-secondary/80 mb-6 text-sm">
           {PROFILE_TEXTS.PREFERENCES_PRIVACY_DESC}
         </Text>
-        <Button variant="outline" size="sm" className="border-secondary/50 text-secondary hover:bg-secondary/10 transition-colors">
+        <Button
+          variant="outline"
+          size="sm"
+          className="border-secondary/50 text-secondary hover:bg-secondary/10 transition-colors"
+          onClick={handleExportData}
+        >
           <Download size={16} /> {PROFILE_TEXTS.PREFERENCES_BUTTON_EXPORT}
         </Button>
       </LayoutContainer>

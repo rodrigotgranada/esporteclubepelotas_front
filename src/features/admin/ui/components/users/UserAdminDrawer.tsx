@@ -18,6 +18,7 @@ interface UserAdminDrawerProps {
 export const UserAdminDrawer = ({ isOpen, onClose, user, onSaveSuccess }: UserAdminDrawerProps) => {
   const { user: currentUser } = useAuthStore();
   const currentUserRole = currentUser?.role?.name || currentUser?.role || 'ADMIN';
+  const isSelf = !!(user && currentUser && (user.id === currentUser._id || user.id === (currentUser as any).id || (user as any)._id === currentUser._id));
 
   const {
     formData, updateField,
@@ -126,7 +127,7 @@ export const UserAdminDrawer = ({ isOpen, onClose, user, onSaveSuccess }: UserAd
                     label={USER_ADMIN_DRAWER_TEXTS.LABELS.ROLE}
                     value={formData.role || ''}
                     onChange={e => updateField('role', e.target.value)}
-                    disabled={currentUserRole !== 'OWNER' && (formData.role === 'OWNER' || formData.role === availableRoles.find(r => r.name === 'OWNER')?._id)}
+                    disabled={isSelf || (currentUserRole !== 'OWNER' && (formData.role === 'OWNER' || formData.role === availableRoles.find(r => r.name === 'OWNER')?._id))}
                   >
                     {availableRoles.map((r: any) => {
                       const isOwnerRole = r.name === 'OWNER';
@@ -139,6 +140,11 @@ export const UserAdminDrawer = ({ isOpen, onClose, user, onSaveSuccess }: UserAd
                       );
                     })}
                   </Select>
+                  {isSelf && (
+                    <Text className="text-xs text-text-secondary mt-1">
+                      {USER_ADMIN_DRAWER_TEXTS.LABELS.ROLE_SELF_DISABLED_HINT}
+                    </Text>
+                  )}
                 </LayoutContainer>
 
                 <LayoutContainer>
@@ -146,9 +152,12 @@ export const UserAdminDrawer = ({ isOpen, onClose, user, onSaveSuccess }: UserAd
                     label={USER_ADMIN_DRAWER_TEXTS.LABELS.STATUS}
                     value={formData.status || 'ACTIVE'}
                     onChange={e => updateField('status', e.target.value)}
+                    disabled={isSelf}
                   >
                     <Option value="ACTIVE">{USER_STATUS_MAP.ACTIVE}</Option>
+                    <Option value="PENDING">{USER_STATUS_MAP.PENDING}</Option>
                     <Option value="BLOCKED">{USER_STATUS_MAP.BLOCKED}</Option>
+                    <Option value="INACTIVE">{USER_STATUS_MAP.INACTIVE}</Option>
                   </Select>
                 </LayoutContainer>
               </LayoutContainer>
@@ -193,11 +202,17 @@ export const UserAdminDrawer = ({ isOpen, onClose, user, onSaveSuccess }: UserAd
                   <Button
                     type="button"
                     variant="outline"
-                    className="w-full border-error/50 text-error hover:bg-error/10"
-                    onClick={() => setConfirmModal({ isOpen: true, type: 'delete' })}
+                    className={`w-full ${isSelf ? 'opacity-50 cursor-not-allowed' : 'border-error/50 text-error hover:bg-error/10'}`}
+                    disabled={isSelf}
+                    onClick={() => !isSelf && setConfirmModal({ isOpen: true, type: 'delete' })}
                   >
                     {USER_ADMIN_DRAWER_TEXTS.BUTTONS.DELETE_USER}
                   </Button>
+                  {isSelf && (
+                    <Text className="text-xs text-text-secondary text-center">
+                      {USER_ADMIN_DRAWER_TEXTS.LABELS.DELETE_USER_SELF_DISABLED_HINT}
+                    </Text>
+                  )}
                 </LayoutContainer>
               </Accordion>
             )}

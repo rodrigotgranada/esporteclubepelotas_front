@@ -141,7 +141,18 @@ export const PROFILE_TEXTS = {
   CHANGE_PASSWORD_ERROR_MIN_LENGTH: 'A nova senha deve ter pelo menos 6 caracteres.',
   CHANGE_PASSWORD_BUTTON_SAVE: 'Salvar',
 
-  // Toast messages
+  // Toast and Feedback messages
+  TOAST_PERSONAL_SAVE_SUCCESS: 'Dados pessoais atualizados com sucesso!',
+  TOAST_PERSONAL_SAVE_ERROR: 'Falha ao salvar dados pessoais.',
+  TOAST_PERSONAL_PHOTO_SUCCESS: 'Foto de perfil atualizada com sucesso!',
+  TOAST_PERSONAL_PHOTO_DELETE_SUCCESS: 'Foto de perfil removida com sucesso!',
+  TOAST_ADDRESS_SAVE_SUCCESS: 'Endereço salvo com sucesso!',
+  TOAST_ADDRESS_SAVE_ERROR: 'Falha ao salvar endereço.',
+  TOAST_ADDRESS_DELETE_SUCCESS: 'Endereço excluído com sucesso!',
+  TOAST_ADDRESS_DELETE_ERROR: 'Falha ao excluir endereço.',
+  TOAST_PREFERENCES_SUCCESS: 'Preferências salvas com sucesso!',
+  TOAST_PREFERENCES_ERROR: 'Falha ao salvar preferências.',
+  TOAST_EXPORT_SUCCESS: 'Seus dados foram exportados com sucesso!',
   TOAST_REQUEST_CHANGE_SUCCESS: 'Solicitação enviada! Verifique a aba de Pendências.',
   TOAST_REQUEST_CHANGE_ERROR: 'Falha ao solicitar alteração.',
   TOAST_CONFIRM_CHANGE_EMAIL_SUCCESS: 'E-mail atualizado com sucesso!',

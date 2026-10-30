@@ -1,13 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { LayoutContainer, Title, Text, Button, Input, ConfirmModal, IconButton, DateText } from '@/shared/ui/components';
-import { User as UserIcon, Edit2, Check, Trash2, Plus, Pencil } from 'lucide-react';
+import { User as UserIcon, Edit2, Check, Trash2, Plus, Pencil, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import { PROFILE_TEXTS } from '../../../constants';
 import { usePersonalData } from '../../../hooks/usePersonalData';
 import { formatCPF } from '@/shared/utils/formatters';
 import { CropModal } from '@/shared/ui/components/molecules/CropModal';
-import { Loader2 } from 'lucide-react';
-import { useState, useEffect } from 'react';
 
 export const PersonalDataTab = () => {
   const {
@@ -69,13 +67,14 @@ export const PersonalDataTab = () => {
       <LayoutContainer className="flex flex-col md:flex-row gap-8 items-start">
         {/* Avatar Area */}
         <LayoutContainer className="flex-shrink-0 flex flex-col items-center">
-          <input 
-            type="file" 
-            ref={fileInputRef} 
-            onChange={handleFileChange} 
-            accept="image/png, image/jpeg, image/webp" 
-            className="hidden" 
-          />
+          <LayoutContainer className="hidden">
+            <Input 
+              type="file" 
+              ref={fileInputRef} 
+              onChange={handleFileChange} 
+              accept="image/png, image/jpeg, image/webp" 
+            />
+          </LayoutContainer>
           <LayoutContainer className={`w-32 h-32 rounded-full bg-surface border-4 border-primary overflow-hidden relative shadow-xl ${isEditing ? 'group' : ''}`}>
             {(loading || isImageLoading) && (
               <LayoutContainer className="absolute inset-0 z-10 bg-black/50 flex flex-col items-center justify-center text-white">

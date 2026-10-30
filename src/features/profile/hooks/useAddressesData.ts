@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useAuthStore, Address } from '@/store/useAuthStore';
 import { updateProfile } from '@/services/profile.service';
+import { toast } from 'react-hot-toast';
+import { PROFILE_TEXTS } from '../constants';
 
 export const useAddressesData = () => {
   const { user, updateUser } = useAuthStore();
@@ -47,8 +49,10 @@ export const useAddressesData = () => {
       const updatedUser = await updateProfile({ addresses });
       updateUser(updatedUser);
       handleCloseDrawer();
-    } catch (error) {
+      toast.success(PROFILE_TEXTS.TOAST_ADDRESS_SAVE_SUCCESS);
+    } catch (error: any) {
       console.error('Failed to save address:', error);
+      toast.error(error.response?.data?.message || PROFILE_TEXTS.TOAST_ADDRESS_SAVE_ERROR);
     } finally {
       setLoading(false);
     }
@@ -68,8 +72,10 @@ export const useAddressesData = () => {
 
       const updatedUser = await updateProfile({ addresses });
       updateUser(updatedUser);
-    } catch (error) {
+      toast.success(PROFILE_TEXTS.TOAST_ADDRESS_DELETE_SUCCESS);
+    } catch (error: any) {
       console.error('Failed to delete address:', error);
+      toast.error(error.response?.data?.message || PROFILE_TEXTS.TOAST_ADDRESS_DELETE_ERROR);
     } finally {
       setLoading(false);
     }

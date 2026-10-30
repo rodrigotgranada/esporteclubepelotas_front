@@ -1,6 +1,8 @@
 import { useState, useRef } from 'react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { updateProfile, updateAvatar } from '@/services/profile.service';
+import { toast } from 'react-hot-toast';
+import { PROFILE_TEXTS } from '../constants';
 
 export const usePersonalData = () => {
   const { user, updateUser } = useAuthStore();
@@ -42,8 +44,10 @@ export const usePersonalData = () => {
       setIsEditing(false);
       setPendingAvatarFile(null);
       setPendingAvatarPreview(null);
-    } catch (error) {
+      toast.success(PROFILE_TEXTS.TOAST_PERSONAL_SAVE_SUCCESS);
+    } catch (error: any) {
       console.error('Failed to update profile:', error);
+      toast.error(error.response?.data?.message || PROFILE_TEXTS.TOAST_PERSONAL_SAVE_ERROR);
     } finally {
       setLoading(false);
     }
@@ -101,8 +105,10 @@ export const usePersonalData = () => {
       updateUser({ avatarUrl: '' });
       setPendingAvatarFile(null);
       setPendingAvatarPreview(null);
-    } catch (error) {
+      toast.success(PROFILE_TEXTS.TOAST_PERSONAL_PHOTO_DELETE_SUCCESS);
+    } catch (error: any) {
       console.error('Failed to delete avatar:', error);
+      toast.error(error.response?.data?.message || PROFILE_TEXTS.TOAST_PERSONAL_SAVE_ERROR);
     } finally {
       setLoading(false);
       setIsConfirmModalOpen(false);

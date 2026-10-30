@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { UserAdminData, adminService } from '@/features/admin/services/admin.service';
 import { toast } from 'react-hot-toast';
 import { ADMIN_TEXTS } from '../../constants/admin.constants';
+import { fetchViaCEP, formatCEP } from '@/shared/utils';
 
 const extractRoleId = (role: any): string => {
   if (!role) return '';
@@ -118,7 +119,41 @@ export const useUserAdminDrawer = (user: UserAdminData | null, onClose: () => vo
     }));
   };
 
-  const updateAddress = (index: number, field: string, value: any) => {
+  const updateAddress = async (index: number, field: string, value: any) => {
+    if (field === 'zipCode' && typeof value === 'string') {
+      const formatted = formatCEP(value);
+      setFormData(prev => {
+        const newAddresses = [...(prev.addresses || [])];
+        newAddresses[index] = { ...newAddresses[index], zipCode: formatted };
+        return { ...prev, addresses: newAddresses };
+      });
+
+      const cleanZip = value.replace(/\D/g, '');
+      if (cleanZip.length === 8) {
+        try {
+          const cepData = await fetchViaCEP(cleanZip);
+          if (cepData) {
+            setFormData(prev => {
+              const newAddresses = [...(prev.addresses || [])];
+              if (!newAddresses[index]) return prev;
+              newAddresses[index] = {
+                ...newAddresses[index],
+                zipCode: formatted,
+                street: cepData.logradouro || newAddresses[index].street || '',
+                neighborhood: cepData.bairro || newAddresses[index].neighborhood || '',
+                city: cepData.localidade || newAddresses[index].city || '',
+                state: cepData.uf || newAddresses[index].state || '',
+              };
+              return { ...prev, addresses: newAddresses };
+            });
+          }
+        } catch (err) {
+          console.error('ViaCEP lookup failed:', err);
+        }
+      }
+      return;
+    }
+
     setFormData(prev => {
       const newAddresses = [...(prev.addresses || [])];
       newAddresses[index] = { ...newAddresses[index], [field]: value };

@@ -1,5 +1,6 @@
 import { api } from '@/services/api';
 import { LoginForm, RegisterForm } from '../schemas';
+import { fetchViaCEP } from '@/shared/utils/viacep';
 
 export const authRepository = {
   login: async (data: LoginForm) => {
@@ -39,11 +40,8 @@ export const authRepository = {
   },
 
   fetchViaCEP: async (zipCode: string) => {
-    const cleanZip = zipCode.replace(/\D/g, '');
-    if (cleanZip.length === 8) {
-      const res = await fetch(`https://viacep.com.br/ws/${cleanZip}/json/`);
-      return res.json();
-    }
-    throw new Error('Invalid Zip');
+    const data = await fetchViaCEP(zipCode);
+    if (!data) throw new Error('Invalid Zip');
+    return data;
   }
 };

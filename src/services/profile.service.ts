@@ -1,11 +1,17 @@
 import { api } from '@/services/api';
 import { User } from '@/store/useAuthStore';
 
-interface UpdateProfilePayload {
+export interface UpdateProfilePayload {
   firstName?: string;
   lastName?: string;
   avatarUrl?: string;
-  addresses?: any[]; // We can use Address[] but any[] is fine for now
+  birthDate?: string;
+  addresses?: any[];
+  preferences?: {
+    shirtSize?: string;
+    receiveNewsletter?: boolean;
+    receiveSms?: boolean;
+  };
 }
 
 export const updateProfile = async (data: UpdateProfilePayload): Promise<User> => {
