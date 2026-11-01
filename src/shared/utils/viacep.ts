@@ -21,3 +21,4 @@ export const fetchViaCEP = async (zipCode: string): Promise<ViaCepAddress | null
     return null;
   }
 };
+

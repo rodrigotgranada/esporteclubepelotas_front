@@ -3,7 +3,7 @@ import { LayoutContainer, Text, Button, Table, TableHeader, TableRow, TableHead,
 import { Shield, ShieldAlert, CheckCircle } from 'lucide-react';
 import Image from 'next/image';
 import { UserAdminData } from '@/features/admin/services/admin.service';
-import { ADMIN_TEXTS, USER_STATUS_MAP, USER_ROLE_MAP } from '../../../constants/admin.constants';
+import { ADMIN_TEXTS, USER_STATUS_MAP, USER_ROLE_MAP, canManageTargetUser } from '../../../constants/admin.constants';
 import { formatCPF } from '@/shared/utils/formatters';
 
 import { UserMobileCard } from './UserMobileCard';
@@ -86,7 +86,7 @@ export const UsersList = ({
                 const roleObj = typeof user.role === 'object' ? user.role : null;
                 const roleName = roleObj?.name || user.role;
                 const roleLabel = roleObj?.label || USER_ROLE_MAP[roleName as keyof typeof USER_ROLE_MAP] || roleName;
-                const canEdit = currentUserRole === 'OWNER' || roleName !== 'OWNER';
+                const canEdit = canManageTargetUser(currentUserRole, roleName);
                 return (
                   <TableRow key={user.id} className={`${canEdit ? 'cursor-pointer' : 'opacity-70 cursor-not-allowed'} ${selectedUserIds.includes(user.id) ? 'bg-primary/5' : ''}`} onClick={() => canEdit && onEditUser(user)}>
                     <TableCell onClick={(e) => e.stopPropagation()}>

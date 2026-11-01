@@ -66,7 +66,31 @@ export const USER_STATUS_MAP: Record<string, string> = {
 export const USER_ROLE_MAP: Record<string, string> = {
   USER: 'Usuário',
   SOCIETY: 'Sócio',
+  SOCIO: 'Sócio',
   EDITOR: 'Editor',
   ADMIN: 'Administrador',
   OWNER: 'Proprietário',
+};
+
+export const ROLE_HIERARCHY: Record<string, number> = {
+  OWNER: 100,
+  ADMIN: 80,
+  EDITOR: 50,
+  SOCIO: 20,
+  SOCIETY: 20,
+  USER: 10,
+};
+
+export const canManageTargetUser = (actorRole: string, targetRole: string): boolean => {
+  const upperActor = (actorRole || '').toUpperCase();
+  const upperTarget = (targetRole || '').toUpperCase();
+
+  if (upperActor === 'OWNER') return true;
+  if (upperTarget === 'OWNER') return false;
+
+  const actorLevel = ROLE_HIERARCHY[upperActor] || 0;
+  const targetLevel = ROLE_HIERARCHY[upperTarget] || 0;
+
+  // Um usuário menor NUNCA pode editar um usuário de nível superior
+  return actorLevel > targetLevel;
 };

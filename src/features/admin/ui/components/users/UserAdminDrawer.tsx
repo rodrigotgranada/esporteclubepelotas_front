@@ -4,7 +4,7 @@ import { ConfirmModal } from '@/shared/ui/components/molecules/ConfirmModal';
 import { UserAdminData } from '@/features/admin/services/admin.service';
 import { useUserAdminDrawer } from '../../../hooks/users/useUserAdminDrawer';
 import { useAuthStore } from '@/store/useAuthStore';
-import { ADMIN_TEXTS, USER_STATUS_MAP } from '../../../constants/admin.constants';
+import { ADMIN_TEXTS, USER_STATUS_MAP, ROLE_HIERARCHY } from '../../../constants/admin.constants';
 import { USER_ADMIN_DRAWER_TEXTS } from './UserAdminDrawer.constants';
 import { Plus, Trash2 } from 'lucide-react';
 
@@ -17,7 +17,7 @@ interface UserAdminDrawerProps {
 
 export const UserAdminDrawer = ({ isOpen, onClose, user, onSaveSuccess }: UserAdminDrawerProps) => {
   const { user: currentUser } = useAuthStore();
-  const currentUserRole = currentUser?.role?.name || currentUser?.role || 'ADMIN';
+  const currentUserRole: string = (typeof currentUser?.role === 'object' ? currentUser?.role?.name : currentUser?.role) || 'ADMIN';
   const isSelf = !!(user && currentUser && (user.id === currentUser._id || user.id === (currentUser as any).id || (user as any)._id === currentUser._id));
 
   const {
@@ -123,28 +123,44 @@ export const UserAdminDrawer = ({ isOpen, onClose, user, onSaveSuccess }: UserAd
             <Accordion title={USER_ADMIN_DRAWER_TEXTS.SECTIONS.ACCESS_STATUS}>
               <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                 <LayoutContainer>
-                  <Select
-                    label={USER_ADMIN_DRAWER_TEXTS.LABELS.ROLE}
-                    value={formData.role || ''}
-                    onChange={e => updateField('role', e.target.value)}
-                    disabled={isSelf || (currentUserRole !== 'OWNER' && (formData.role === 'OWNER' || formData.role === availableRoles.find(r => r.name === 'OWNER')?._id))}
-                  >
-                    {availableRoles.map((r: any) => {
-                      const isOwnerRole = r.name === 'OWNER';
-                      const canAssign = currentUserRole === 'OWNER' || !isOwnerRole;
-                      if (!canAssign) return null;
-                      return (
-                        <Option key={r._id || r.name} value={r._id || r.name}>
-                          {r.label || r.name}
-                        </Option>
-                      );
-                    })}
-                  </Select>
-                  {isSelf && (
-                    <Text className="text-xs text-text-secondary mt-1">
-                      {USER_ADMIN_DRAWER_TEXTS.LABELS.ROLE_SELF_DISABLED_HINT}
-                    </Text>
-                  )}
+                  {(() => {
+                    const actorLevel = ROLE_HIERARCHY[currentUserRole?.toUpperCase()] || 0;
+                    const targetRoleName = availableRoles.find(r => r._id === formData.role || r.name === formData.role)?.name || formData.role;
+                    const targetRoleLevel = ROLE_HIERARCHY[targetRoleName?.toUpperCase()] || 0;
+                    const canChangeRole = currentUserRole === 'OWNER' || (!user ? true : targetRoleLevel < actorLevel);
+
+                    return (
+                      <>
+                        <Select
+                          label={USER_ADMIN_DRAWER_TEXTS.LABELS.ROLE}
+                          value={formData.role || ''}
+                          onChange={e => updateField('role', e.target.value)}
+                          disabled={isSelf || !canChangeRole}
+                        >
+                          {availableRoles.map((r: any) => {
+                            const roleLevel = ROLE_HIERARCHY[r.name?.toUpperCase()] || 0;
+                            const canAssign = currentUserRole === 'OWNER' || roleLevel < actorLevel;
+                            if (!canAssign) return null;
+                            return (
+                              <Option key={r._id || r.name} value={r._id || r.name}>
+                                {r.label || r.name}
+                              </Option>
+                            );
+                          })}
+                        </Select>
+                        {isSelf && (
+                          <Text className="text-xs text-text-secondary mt-1">
+                            {USER_ADMIN_DRAWER_TEXTS.LABELS.ROLE_SELF_DISABLED_HINT}
+                          </Text>
+                        )}
+                        {!isSelf && !canChangeRole && (
+                          <Text className="text-xs text-text-secondary mt-1">
+                            Você não tem permissão para alterar o cargo deste usuário.
+                          </Text>
+                        )}
+                      </>
+                    );
+                  })()}
                 </LayoutContainer>
 
                 <LayoutContainer>
