@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { LayoutContainer, Title, Text, Button, PasswordInput, Form } from '@/shared/ui/components';
+import { LayoutContainer, Title, Text, Button, PasswordInput, Form, PasswordStrengthMeter } from '@/shared/ui/components';
 import { KeyRound, ShieldAlert, Check } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { updatePassword } from '@/services/profile.service';
@@ -111,6 +111,10 @@ export const ChangeTemporaryPasswordFeature = () => {
             onChange={(e) => setNewPassword(e.target.value)}
             required
           />
+
+          {newPassword && (
+            <PasswordStrengthMeter password={newPassword} />
+          )}
 
           <PasswordInput
             label={CHANGE_TEMPORARY_PASSWORD_TEXTS.LABEL_CONFIRM_PASSWORD}

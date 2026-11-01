@@ -1,12 +1,12 @@
 import React from 'react';
-import { Drawer, Input, PasswordInput, Button, LayoutContainer, Form, Text, Accordion, PhoneInput, CpfInput, Select, Option, Checkbox, IconButton, ImageCropper } from '@/shared/ui/components';
+import { Drawer, Input, PasswordInput, Button, LayoutContainer, Form, Text, Accordion, PhoneInput, CpfInput, Select, Option, Checkbox, IconButton, ImageCropper, PasswordStrengthMeter } from '@/shared/ui/components';
 import { ConfirmModal } from '@/shared/ui/components/molecules/ConfirmModal';
 import { UserAdminData } from '@/features/admin/services/admin.service';
 import { useUserAdminDrawer } from '../../../hooks/users/useUserAdminDrawer';
 import { useAuthStore } from '@/store/useAuthStore';
 import { ADMIN_TEXTS, USER_STATUS_MAP, ROLE_HIERARCHY } from '../../../constants/admin.constants';
 import { USER_ADMIN_DRAWER_TEXTS } from './UserAdminDrawer.constants';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, Sparkles, Copy } from 'lucide-react';
 
 interface UserAdminDrawerProps {
   isOpen: boolean;
@@ -26,6 +26,7 @@ export const UserAdminDrawer = ({ isOpen, onClose, user, onSaveSuccess }: UserAd
     addAddress, updateAddress, removeAddress,
     avatarFile, setAvatarFile,
     isLoading, handleSubmit,
+    handleGenerateTemporaryPassword, handleCopyPassword,
     confirmModal, setConfirmModal, executeConfirmedAction, getModalConfig,
     availableRoles
   } = useUserAdminDrawer(user, onClose, onSaveSuccess);
@@ -178,7 +179,37 @@ export const UserAdminDrawer = ({ isOpen, onClose, user, onSaveSuccess }: UserAd
                 </LayoutContainer>
               </LayoutContainer>
 
-              <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 mb-4">
+              <LayoutContainer className="flex items-center justify-between pt-3 pb-1 border-t border-border/40">
+                <Text className="text-xs font-bold text-text-secondary uppercase tracking-wider">
+                  {USER_ADMIN_DRAWER_TEXTS.LABELS.PASSWORD}
+                </Text>
+                <LayoutContainer className="flex items-center gap-2">
+                  {formData.password && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleCopyPassword}
+                      leftIcon={<Copy size={13} />}
+                      className="text-xs h-7 px-2.5 text-text-secondary hover:text-text-primary"
+                    >
+                      {USER_ADMIN_DRAWER_TEXTS.BUTTONS.COPY_PASSWORD}
+                    </Button>
+                  )}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleGenerateTemporaryPassword}
+                    leftIcon={<Sparkles size={13} className="text-primary" />}
+                    className="text-xs h-7 px-2.5 border-primary/30 text-text-primary hover:bg-primary/10"
+                  >
+                    {USER_ADMIN_DRAWER_TEXTS.BUTTONS.GENERATE_PASSWORD}
+                  </Button>
+                </LayoutContainer>
+              </LayoutContainer>
+
+              <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                 <PasswordInput
                   label={USER_ADMIN_DRAWER_TEXTS.LABELS.PASSWORD}
                   placeholder={user ? USER_ADMIN_DRAWER_TEXTS.LABELS.PASSWORD_PLACEHOLDER_EDIT : USER_ADMIN_DRAWER_TEXTS.LABELS.PASSWORD_PLACEHOLDER_CREATE}
@@ -193,6 +224,11 @@ export const UserAdminDrawer = ({ isOpen, onClose, user, onSaveSuccess }: UserAd
                   onChange={e => updateField('confirmPassword', e.target.value)}
                   required={!!formData.password}
                 />
+                {formData.password && (
+                  <LayoutContainer className="sm:col-span-2">
+                    <PasswordStrengthMeter password={formData.password} />
+                  </LayoutContainer>
+                )}
                 <LayoutContainer className="sm:col-span-2 pt-1">
                   <Checkbox
                     label={USER_ADMIN_DRAWER_TEXTS.LABELS.MUST_CHANGE_PASSWORD}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Drawer, PasswordInput, Button, LayoutContainer, Form, Text } from '@/shared/ui/components';
+import { Drawer, PasswordInput, Button, LayoutContainer, Form, Text, PasswordStrengthMeter } from '@/shared/ui/components';
 import { PROFILE_TEXTS } from '@/features/profile/constants';
 import { useChangePasswordDrawer } from '@/features/profile/hooks/useChangePasswordDrawer';
 
@@ -38,6 +38,9 @@ export const ChangePasswordDrawer = ({ isOpen, onClose, onSubmit, isLoading }: C
             onChange={(e) => setNewPassword(e.target.value)}
             required
           />
+          {newPassword && (
+            <PasswordStrengthMeter password={newPassword} />
+          )}
           <PasswordInput
             label={PROFILE_TEXTS.CHANGE_PASSWORD_LABEL_CONFIRM}
             value={confirmPassword}

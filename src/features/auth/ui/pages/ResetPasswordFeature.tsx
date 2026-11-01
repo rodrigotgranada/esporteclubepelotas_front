@@ -4,11 +4,12 @@ import { ArrowRight } from 'lucide-react';
 import { AUTH_TEXTS } from '../../constants';
 import { useResetPassword } from '../../hooks/useResetPassword';
 
-import { LayoutContainer, Title, Text, Form, PasswordInput, Button } from '@/shared/ui/components';
+import { LayoutContainer, Title, Text, Form, PasswordInput, Button, PasswordStrengthMeter } from '@/shared/ui/components';
 
 export const ResetPasswordFeature = () => {
   const { form, onSubmit, token } = useResetPassword();
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = form;
+  const { register, handleSubmit, watch, formState: { errors, isSubmitting } } = form;
+  const passwordValue = watch('password');
 
   if (!token) {
     return null; // ou um loader de tela cheia
@@ -53,6 +54,10 @@ export const ResetPasswordFeature = () => {
                 {...register('password')}
                 error={errors.password?.message}
               />
+
+              {passwordValue && (
+                <PasswordStrengthMeter password={passwordValue} />
+              )}
 
               <PasswordInput
                 label={AUTH_TEXTS.RESET_PASSWORD_CONFIRM_LABEL}

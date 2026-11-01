@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { UserAdminData, adminService } from '@/features/admin/services/admin.service';
 import { toast } from 'react-hot-toast';
 import { ADMIN_TEXTS } from '../../constants/admin.constants';
-import { fetchViaCEP, formatCEP } from '@/shared/utils';
+import { fetchViaCEP, formatCEP, generateTemporaryPassword } from '@/shared/utils';
+import { USER_ADMIN_DRAWER_TEXTS } from '../../ui/components/users/UserAdminDrawer.constants';
 
 const extractRoleId = (role: any): string => {
   if (!role) return '';
@@ -353,6 +354,27 @@ export const useUserAdminDrawer = (user: UserAdminData | null, onClose: () => vo
     }
   };
 
+  const handleGenerateTemporaryPassword = () => {
+    const generated = generateTemporaryPassword();
+    setFormData(prev => ({
+      ...prev,
+      password: generated,
+      confirmPassword: generated,
+      mustChangePassword: true,
+    }));
+    toast.success(USER_ADMIN_DRAWER_TEXTS.FEEDBACK.PASSWORD_GENERATED);
+  };
+
+  const handleCopyPassword = async () => {
+    if (!formData.password) return;
+    try {
+      await navigator.clipboard.writeText(formData.password);
+      toast.success(USER_ADMIN_DRAWER_TEXTS.FEEDBACK.PASSWORD_COPIED);
+    } catch {
+      toast.error(USER_ADMIN_DRAWER_TEXTS.FEEDBACK.PASSWORD_COPIED_FAILED);
+    }
+  };
+
   const executeConfirmedAction = async () => {
     switch (confirmModal.type) {
       case 'delete':
@@ -418,6 +440,8 @@ export const useUserAdminDrawer = (user: UserAdminData | null, onClose: () => vo
     handleSoftDelete,
     handleResendVerification,
     handleForcePasswordReset,
+    handleGenerateTemporaryPassword,
+    handleCopyPassword,
     confirmModal,
     setConfirmModal,
     executeConfirmedAction,

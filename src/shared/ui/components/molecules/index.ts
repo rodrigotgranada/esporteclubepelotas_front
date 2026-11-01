@@ -14,3 +14,5 @@ export * from './Accordion';
 export * from './Tabs';
 export * from './ThemeToggle';
 export * from './EnvironmentBadge';
+export * from './PasswordStrengthMeter';
+export * from './PasswordStrengthMeter.constants';

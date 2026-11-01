@@ -42,8 +42,15 @@ export const USER_ADMIN_DRAWER_TEXTS = {
   BUTTONS: {
     ADD_PHONE: 'Adicionar Telefone',
     ADD_ADDRESS: 'Adicionar Endereço',
+    GENERATE_PASSWORD: 'Gerar Senha Segura',
+    COPY_PASSWORD: 'Copiar Senha',
     RESEND_EMAIL: 'Reenviar Verificação de E-mail',
     RESET_PASSWORD: 'Enviar Link de Recuperação de Senha por E-mail',
     DELETE_USER: 'Excluir Usuário (Soft Delete)',
+  },
+  FEEDBACK: {
+    PASSWORD_GENERATED: 'Senha provisória gerada! A opção de troca obrigatória foi ativada.',
+    PASSWORD_COPIED: 'Senha copiada para a área de transferência!',
+    PASSWORD_COPIED_FAILED: 'Não foi possível copiar a senha automaticamente.',
   },
 };
