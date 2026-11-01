@@ -26,12 +26,16 @@ export const ProfileFeature = () => {
   }, []);
 
   useEffect(() => {
-    if (isMounted && !user) {
-      router.push('/login');
+    if (isMounted) {
+      if (!user) {
+        router.push('/login');
+      } else if (user.mustChangePassword) {
+        router.push('/change-temporary-password');
+      }
     }
   }, [user, router, isMounted]);
 
-  if (!isMounted || !user) {
+  if (!isMounted || !user || user.mustChangePassword) {
     return null;
   }
 

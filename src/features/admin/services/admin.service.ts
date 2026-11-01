@@ -15,6 +15,7 @@ export interface UserAdminData {
   phones?: any[];
   addresses?: any[];
   preferences?: any;
+  mustChangePassword?: boolean;
   createdAt?: string;
   updatedAt?: string;
 }

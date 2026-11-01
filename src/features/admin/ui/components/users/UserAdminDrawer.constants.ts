@@ -34,6 +34,8 @@ export const USER_ADMIN_DRAWER_TEXTS = {
     PASSWORD_PLACEHOLDER_CREATE: 'Senha inicial',
     CONFIRM_PASSWORD: 'Confirmar Senha',
     CONFIRM_PASSWORD_PLACEHOLDER: 'Repita a senha',
+    MUST_CHANGE_PASSWORD: 'Senha provisória (obrigar troca no próximo login)',
+    MUST_CHANGE_PASSWORD_HINT: 'Se marcado, o usuário será obrigado a cadastrar uma nova senha definitiva assim que fizer login.',
     ROLE_SELF_DISABLED_HINT: 'Você não pode alterar seu próprio nível de acesso pelo painel.',
     DELETE_USER_SELF_DISABLED_HINT: 'Não é possível excluir o próprio usuário logado pelo painel.',
   },

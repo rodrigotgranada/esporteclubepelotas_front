@@ -25,12 +25,14 @@ export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
       notFound();
     } else if (user.status === 'PENDING') {
       router.push('/verify-email');
+    } else if (user.mustChangePassword) {
+      router.push('/change-temporary-password');
     }
   }, [user, router, isMounted]);
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  if (!isMounted || !user || user.status === 'PENDING' || ((user.role?.name || user.role) !== 'ADMIN' && (user.role?.name || user.role) !== 'OWNER')) {
+  if (!isMounted || !user || user.status === 'PENDING' || user.mustChangePassword || ((user.role?.name || user.role) !== 'ADMIN' && (user.role?.name || user.role) !== 'OWNER')) {
     return null; // Prevent flicker and wait for auth checks
   }
 
@@ -48,9 +50,9 @@ export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
       
       <LayoutContainer className="flex-1 lg:ml-64 flex flex-col w-full min-w-0 transition-all duration-300">
         <Topbar onMenuClick={() => setIsMobileMenuOpen(true)} />
-        <LayoutContainer as="main" className="flex-1 p-4 sm:p-8 overflow-y-auto">
+        <main className="flex-1 p-6 lg:p-10 w-full min-w-0 overflow-hidden">
           {children}
-        </LayoutContainer>
+        </main>
       </LayoutContainer>
     </LayoutContainer>
   );

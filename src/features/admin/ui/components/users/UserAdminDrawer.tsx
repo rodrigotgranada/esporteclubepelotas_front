@@ -193,6 +193,16 @@ export const UserAdminDrawer = ({ isOpen, onClose, user, onSaveSuccess }: UserAd
                   onChange={e => updateField('confirmPassword', e.target.value)}
                   required={!!formData.password}
                 />
+                <LayoutContainer className="sm:col-span-2 pt-1">
+                  <Checkbox
+                    label={USER_ADMIN_DRAWER_TEXTS.LABELS.MUST_CHANGE_PASSWORD}
+                    checked={formData.mustChangePassword || false}
+                    onChange={e => updateField('mustChangePassword', e.target.checked)}
+                  />
+                  <Text className="text-xs text-text-secondary mt-1 pl-6">
+                    {USER_ADMIN_DRAWER_TEXTS.LABELS.MUST_CHANGE_PASSWORD_HINT}
+                  </Text>
+                </LayoutContainer>
               </LayoutContainer>
             </Accordion>
 

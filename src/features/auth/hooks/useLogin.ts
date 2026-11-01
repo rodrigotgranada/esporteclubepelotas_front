@@ -33,6 +33,8 @@ export const useLogin = () => {
           } else {
             router.push('/verify-email');
           }
+        } else if (user.mustChangePassword) {
+          router.push('/change-temporary-password');
         } else {
           const returnUrl = searchParams.get('returnUrl') || '/';
           router.push(returnUrl);

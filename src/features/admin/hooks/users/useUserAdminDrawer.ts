@@ -26,7 +26,7 @@ const extractRoleId = (role: any): string => {
 };
 
 export const useUserAdminDrawer = (user: UserAdminData | null, onClose: () => void, onSaveSuccess: () => void) => {
-  const [formData, setFormData] = useState<Partial<UserAdminData> & { password?: string, confirmPassword?: string }>({});
+  const [formData, setFormData] = useState<Partial<UserAdminData> & { password?: string, confirmPassword?: string, mustChangePassword?: boolean }>({});
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -63,6 +63,7 @@ export const useUserAdminDrawer = (user: UserAdminData | null, onClose: () => vo
         addresses: user.addresses || [],
         password: '',
         confirmPassword: '',
+        mustChangePassword: user.mustChangePassword ?? false,
       });
     } else {
       setFormData({
@@ -77,6 +78,7 @@ export const useUserAdminDrawer = (user: UserAdminData | null, onClose: () => vo
         addresses: [],
         password: '',
         confirmPassword: '',
+        mustChangePassword: false,
       });
     }
     setAvatarFile(null);
@@ -213,6 +215,9 @@ export const useUserAdminDrawer = (user: UserAdminData | null, onClose: () => vo
             throw new Error(ADMIN_TEXTS.TOAST_ERROR_PASSWORD_MISMATCH);
           }
           partialData.password = formData.password;
+          partialData.mustChangePassword = !!formData.mustChangePassword;
+        } else if (formData.mustChangePassword !== undefined && formData.mustChangePassword !== user.mustChangePassword) {
+          partialData.mustChangePassword = formData.mustChangePassword;
         }
 
         // 3. Role
@@ -267,6 +272,7 @@ export const useUserAdminDrawer = (user: UserAdminData | null, onClose: () => vo
 
         const dataToSave: any = { ...formData };
         delete dataToSave.confirmPassword;
+        dataToSave.mustChangePassword = !!formData.mustChangePassword;
 
         if (!dataToSave.password) {
           throw new Error(ADMIN_TEXTS.TOAST_ERROR_NO_PASSWORD);

@@ -28,6 +28,7 @@ export interface User {
   lastName: string;
   email: string;
   emailVerified?: boolean;
+  mustChangePassword?: boolean;
   role: { _id: string; name: string; label?: string; permissions: string[] };
   avatarUrl?: string;
   cpf: string;
