@@ -19,9 +19,12 @@ export const Topbar = ({ onMenuClick }: { onMenuClick?: () => void }) => {
     <LayoutContainer as="header" className="h-16 bg-header/80 backdrop-blur-md border-b border-border flex items-center justify-between px-4 sm:px-8 sticky top-0 z-10">
       <LayoutContainer className="flex items-center gap-4">
         {onMenuClick && (
-          <button className="lg:hidden text-text-primary focus:outline-none" onClick={onMenuClick}>
-            <Menu size={24} />
-          </button>
+          <IconButton 
+            icon={<Menu size={24} />} 
+            variant="ghost" 
+            className="lg:hidden text-text-primary" 
+            onClick={onMenuClick} 
+          />
         )}
         <Text className="text-text-secondary font-medium hidden sm:block">{TOPBAR_TEXTS.TITLE}</Text>
       </LayoutContainer>

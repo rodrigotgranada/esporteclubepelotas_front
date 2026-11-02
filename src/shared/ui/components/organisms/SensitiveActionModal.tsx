@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Modal, Title, Text, Button, LayoutContainer } from '../atoms';
 import { PasswordInput } from '../molecules';
 import { ShieldAlert, ArrowRight } from 'lucide-react';
-import { PROFILE_TEXTS } from '@/features/profile/constants';
+import { SENSITIVE_ACTION_MODAL_TEXTS } from './SensitiveActionModal.constants';
 
 export interface SensitiveActionModalProps {
   isOpen: boolean;
@@ -19,9 +19,9 @@ export const SensitiveActionModal = ({
   isOpen,
   onClose,
   onConfirm,
-  title = PROFILE_TEXTS.SENSITIVE_MODAL_TITLE_DEFAULT,
-  description = PROFILE_TEXTS.SENSITIVE_MODAL_DESC_DEFAULT,
-  confirmText = PROFILE_TEXTS.SENSITIVE_MODAL_BUTTON_CONFIRM,
+  title = SENSITIVE_ACTION_MODAL_TEXTS.TITLE_DEFAULT,
+  description = SENSITIVE_ACTION_MODAL_TEXTS.DESC_DEFAULT,
+  confirmText = SENSITIVE_ACTION_MODAL_TEXTS.BUTTON_CONFIRM,
   isLoading = false
 }: SensitiveActionModalProps) => {
   const [password, setPassword] = useState('');
@@ -29,15 +29,15 @@ export const SensitiveActionModal = ({
 
   const handleConfirm = async () => {
     if (!password) {
-      setError('A senha é obrigatória.');
+      setError(SENSITIVE_ACTION_MODAL_TEXTS.ERROR_PASSWORD_REQUIRED);
       return;
     }
     setError(undefined);
     try {
       await onConfirm(password);
-      setPassword(''); // clear after success
+      setPassword('');
     } catch (err: any) {
-      setError(err.message || 'Senha incorreta.');
+      setError(err.message || SENSITIVE_ACTION_MODAL_TEXTS.ERROR_INCORRECT_PASSWORD);
     }
   };
 
@@ -48,24 +48,24 @@ export const SensitiveActionModal = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} className="border-yellow-500/20 bg-gradient-to-b from-[#1a1a1a] to-[#0a0a0a]">
+    <Modal isOpen={isOpen} onClose={handleClose} className="border-primary/20 bg-surface">
       <LayoutContainer className="flex flex-col items-center text-center pt-6">
-        <div className="mb-6 bg-gradient-to-br from-yellow-500/20 to-yellow-500/5 text-yellow-400 p-5 rounded-full border border-yellow-500/20 shadow-inner">
+        <LayoutContainer className="mb-6 bg-primary/10 text-primary p-5 rounded-full border border-primary/20 shadow-inner">
           <ShieldAlert size={36} className="drop-shadow-md" />
-        </div>
+        </LayoutContainer>
         
-        <Title level="h3" className="text-2xl font-black text-white mb-3 tracking-tight">
+        <Title level="h3" className="text-2xl font-black text-text-primary mb-3 tracking-tight">
           {title}
         </Title>
         
-        <Text className="text-gray-400 mb-8 px-2 text-sm leading-relaxed">
+        <Text className="text-text-secondary mb-8 px-2 text-sm leading-relaxed">
           {description}
         </Text>
 
         <LayoutContainer className="w-full text-left mb-8">
           <PasswordInput
-            label={PROFILE_TEXTS.SENSITIVE_MODAL_PASSWORD_LABEL}
-            placeholder={PROFILE_TEXTS.SENSITIVE_MODAL_PASSWORD_PLACEHOLDER}
+            label={SENSITIVE_ACTION_MODAL_TEXTS.PASSWORD_LABEL}
+            placeholder={SENSITIVE_ACTION_MODAL_TEXTS.PASSWORD_PLACEHOLDER}
             value={password}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               setPassword(e.target.value);
@@ -83,7 +83,7 @@ export const SensitiveActionModal = ({
             onClick={handleClose}
             disabled={isLoading}
           >
-            {PROFILE_TEXTS.SENSITIVE_MODAL_BUTTON_CANCEL}
+            {SENSITIVE_ACTION_MODAL_TEXTS.BUTTON_CANCEL}
           </Button>
           <Button 
             variant="primary"

@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { LogOut, LucideIcon, X } from 'lucide-react';
-import { LayoutContainer, Text, Button, ShieldPlaceholder } from '@/shared/ui/components';
+import { LayoutContainer, Text, Button, ShieldPlaceholder, IconButton } from '@/shared/ui/components';
 import { useSidebar } from '../../hooks/useSidebar';
 import { SIDEBAR_TEXTS } from './Sidebar.constants';
 import { useSettingsStore } from '@/store/useSettingsStore';
@@ -30,9 +30,12 @@ export const Sidebar = ({ isMobileMenuOpen, setIsMobileMenuOpen }: { isMobileMen
           </Text>
         </LayoutContainer>
         {setIsMobileMenuOpen && (
-          <button className="lg:hidden text-text-secondary" onClick={() => setIsMobileMenuOpen(false)}>
-            <X size={20} />
-          </button>
+          <IconButton 
+            icon={<X size={20} />} 
+            variant="ghost" 
+            className="lg:hidden text-text-secondary" 
+            onClick={() => setIsMobileMenuOpen(false)} 
+          />
         )}
       </LayoutContainer>
 

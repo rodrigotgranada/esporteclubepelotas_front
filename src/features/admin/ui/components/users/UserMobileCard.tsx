@@ -37,7 +37,7 @@ export const UserMobileCard = ({ user, onEditUser, onToggleStatus, currentUserRo
             <LayoutContainer className="flex items-center gap-2">
               <Text className="text-base font-bold text-text-primary leading-none">{user.firstName} {user.lastName}</Text>
               {user.emailVerified ? (
-                <span title="E-mail Verificado"><CheckCircle size={14} className="text-success" /></span>
+                <Text as="span" title="E-mail Verificado"><CheckCircle size={14} className="text-success" /></Text>
               ) : (
                 <Badge variant="warning" size="sm">{USER_STATUS_MAP.PENDING.toUpperCase()}</Badge>
               )}

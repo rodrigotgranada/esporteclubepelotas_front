@@ -109,7 +109,7 @@ export const UsersList = ({
                           <LayoutContainer className="flex items-center gap-2">
                             <Text className="text-sm font-bold text-text-primary">{user.firstName} {user.lastName}</Text>
                             {user.emailVerified ? (
-                              <span title="E-mail Verificado"><CheckCircle size={14} className="text-success" /></span>
+                              <Text as="span" title="E-mail Verificado"><CheckCircle size={14} className="text-success" /></Text>
                             ) : (
                               <Badge variant="warning" size="sm">{USER_STATUS_MAP.PENDING.toUpperCase()}</Badge>
                             )}

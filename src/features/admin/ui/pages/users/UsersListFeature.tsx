@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { LayoutContainer, Title, Text } from '@/shared/ui/components';
+import { LayoutContainer, Title, Text, Select, Option } from '@/shared/ui/components';
 import { ConfirmModal } from '@/shared/ui/components/molecules/ConfirmModal';
 import { ADMIN_TEXTS } from '../../../constants/admin.constants';
 import { useUsersList } from '../../../hooks/users/useUsersList';
@@ -108,11 +108,11 @@ export const UsersListFeature = () => {
       {selectedUserIds.length > 0 && (
         <LayoutContainer className="bg-primary/10 border border-primary/20 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 animate-in fade-in slide-in-from-top-2">
           <Text className="font-bold text-primary">
-            {selectedUserIds.length} usuário(s) selecionado(s)
+            {ADMIN_TEXTS.USERS_BULK_SELECTED_COUNT(selectedUserIds.length)}
           </Text>
           <LayoutContainer className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-            <select
-              className="px-3 py-2 bg-surface border border-border rounded-lg text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+            <Select
+              className="text-sm"
               onChange={(e) => {
                 if (e.target.value) {
                   handleBulkUpdateRole(e.target.value);
@@ -121,14 +121,14 @@ export const UsersListFeature = () => {
               }}
               defaultValue=""
             >
-              <option value="" disabled>Alterar Cargo para...</option>
+              <Option value="" disabled>{ADMIN_TEXTS.USERS_BULK_CHANGE_ROLE_PLACEHOLDER}</Option>
               {availableRoles.map(r => (
-                <option key={r._id || r.id} value={r._id || r.id}>{r.label || r.name}</option>
+                <Option key={r._id || r.id} value={r._id || r.id}>{r.label || r.name}</Option>
               ))}
-            </select>
+            </Select>
             
-            <select
-              className="px-3 py-2 bg-surface border border-border rounded-lg text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+            <Select
+              className="text-sm"
               onChange={(e) => {
                 if (e.target.value) {
                   handleBulkUpdateStatus(e.target.value);
@@ -137,12 +137,12 @@ export const UsersListFeature = () => {
               }}
               defaultValue=""
             >
-              <option value="" disabled>Alterar Status para...</option>
-              <option value="ACTIVE">ATIVO</option>
-              <option value="PENDING">PENDENTE</option>
-              <option value="BLOCKED">BLOQUEADO</option>
-              <option value="INACTIVE">INATIVO</option>
-            </select>
+              <Option value="" disabled>{ADMIN_TEXTS.USERS_BULK_CHANGE_STATUS_PLACEHOLDER}</Option>
+              <Option value="ACTIVE">{ADMIN_TEXTS.USERS_FILTER_STATUS_ACTIVE}</Option>
+              <Option value="PENDING">{ADMIN_TEXTS.USERS_FILTER_STATUS_PENDING}</Option>
+              <Option value="BLOCKED">{ADMIN_TEXTS.USERS_FILTER_STATUS_BLOCKED}</Option>
+              <Option value="INACTIVE">{ADMIN_TEXTS.USERS_FILTER_STATUS_INACTIVE}</Option>
+            </Select>
           </LayoutContainer>
         </LayoutContainer>
       )}

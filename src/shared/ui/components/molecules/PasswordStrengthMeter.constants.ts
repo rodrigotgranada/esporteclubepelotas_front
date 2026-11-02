@@ -14,3 +14,4 @@ export const PASSWORD_STRENGTH_TEXTS = {
     SPECIAL: 'Pelo menos um símbolo (!@#$...)',
   },
 };
+

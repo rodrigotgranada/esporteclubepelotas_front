@@ -25,6 +25,9 @@ export const ADMIN_TEXTS = {
   USERS_FILTER_STATUS_PENDING: 'Pendente',
   USERS_FILTER_STATUS_BLOCKED: 'Bloqueado',
   USERS_FILTER_STATUS_INACTIVE: 'Inativo (Excluído)',
+  USERS_BULK_SELECTED_COUNT: (count: number) => `${count} usuário(s) selecionado(s)`,
+  USERS_BULK_CHANGE_ROLE_PLACEHOLDER: 'Alterar Cargo para...',
+  USERS_BULK_CHANGE_STATUS_PLACEHOLDER: 'Alterar Status para...',
 
   // User Form Drawer (CRUD)
   USER_DRAWER_TITLE_CREATE: 'Novo Usuário',

@@ -23,3 +23,4 @@ export const generateTemporaryPassword = (): string => {
 
   return `${randomPrefix}${randomSymbol}${randomDigits}${randomLetter1}${randomLetter2}`;
 };
+

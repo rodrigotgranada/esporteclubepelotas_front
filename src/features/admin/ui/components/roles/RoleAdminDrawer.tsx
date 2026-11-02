@@ -1,5 +1,5 @@
 import React from 'react';
-import { Drawer, Input, Button, LayoutContainer, Form, Text } from '@/shared/ui/components';
+import { Drawer, Input, Button, LayoutContainer, Form, Text, Checkbox } from '@/shared/ui/components';
 import { useRoleAdminDrawer } from '../../../hooks/useRoleAdminDrawer';
 import { ROLE_ADMIN_DRAWER_TEXTS } from './RoleAdminDrawer.constants';
 import { useSystemModulesStore } from '@/store/useSystemModulesStore';
@@ -73,17 +73,13 @@ export const RoleAdminDrawer = ({ isOpen, onClose, role, onSaveSuccess }: RoleAd
                         const isChecked = formData.permissions.includes(permKey) || ((role?.name || role) === 'OWNER');
                         
                         return (
-                          <label key={permKey} className="flex items-center gap-2 cursor-pointer">
-                            <input 
-                              type="checkbox" 
-                              id={permKey}
-                              checked={isChecked}
-                              onChange={() => handleTogglePermission(permKey)}
-                              disabled={(isImmutable && (role?.name || role) === 'OWNER') || isLoading}
-                              className="accent-primary"
-                            />
-                            <Text className="text-xs text-text-secondary">{action.label}</Text>
-                          </label>
+                          <Checkbox
+                            key={permKey}
+                            label={action.label}
+                            checked={isChecked}
+                            onChange={() => handleTogglePermission(permKey)}
+                            disabled={(isImmutable && (role?.name || role) === 'OWNER') || isLoading}
+                          />
                         );
                       })}
                     </LayoutContainer>
