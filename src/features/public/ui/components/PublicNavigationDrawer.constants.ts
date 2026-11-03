@@ -37,3 +37,4 @@ export const PUBLIC_DRAWER_TEXTS = {
   BTN_ADMIN: 'Painel Admin',
   COPYRIGHT: '© 2026 Esporte Clube Pelotas. Todos os direitos reservados.',
 };
+

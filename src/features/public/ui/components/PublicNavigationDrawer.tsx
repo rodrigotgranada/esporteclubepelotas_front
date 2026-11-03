@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useEffect, startTransition } from 'react';
+import React, { useEffect, useState, startTransition } from 'react';
+import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -79,6 +80,11 @@ export const PublicNavigationDrawer: React.FC<PublicNavigationDrawerProps> = ({
   const { user, logout } = useAuthStore();
   const { settings } = useSettingsStore();
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Close drawer on escape key
   useEffect(() => {
@@ -113,7 +119,7 @@ export const PublicNavigationDrawer: React.FC<PublicNavigationDrawerProps> = ({
     }, 100);
   };
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
 
   const clubName = settings?.clubName || 'Esporte Clube Pelotas';
   const socialLinks = settings?.socialLinks || [];
@@ -121,8 +127,8 @@ export const PublicNavigationDrawer: React.FC<PublicNavigationDrawerProps> = ({
   const contactEmails = settings?.contactEmails || [];
   const openingHours = settings?.openingHours || [];
 
-  return (
-    <LayoutContainer className="fixed inset-0 z-50 overflow-hidden">
+  return createPortal(
+    <LayoutContainer className="fixed inset-0 z-[9999] overflow-hidden">
       {/* Backdrop */}
       <LayoutContainer
         className="absolute inset-0 bg-black/60 backdrop-blur-xs transition-opacity animate-in fade-in duration-300"
@@ -130,8 +136,8 @@ export const PublicNavigationDrawer: React.FC<PublicNavigationDrawerProps> = ({
       />
 
       {/* Drawer Panel */}
-      <LayoutContainer className="absolute inset-y-0 right-0 max-w-full flex pl-10">
-        <LayoutContainer className="w-screen max-w-md bg-drawer border-l border-border shadow-2xl flex flex-col justify-between overflow-y-auto animate-in slide-in-from-right duration-300">
+      <LayoutContainer className="absolute inset-y-0 right-0 max-w-full flex">
+        <LayoutContainer className="w-screen max-w-md bg-drawer border-l border-border shadow-2xl flex flex-col justify-between h-full overflow-y-auto animate-in slide-in-from-right duration-300">
           {/* Top Header of Drawer */}
           <LayoutContainer className="p-6 pb-4 border-b border-border flex items-center justify-between sticky top-0 bg-drawer/95 backdrop-blur-md z-20">
             <Link
@@ -486,6 +492,8 @@ export const PublicNavigationDrawer: React.FC<PublicNavigationDrawerProps> = ({
           </LayoutContainer>
         </LayoutContainer>
       </LayoutContainer>
-    </LayoutContainer>
+    </LayoutContainer>,
+    document.body
   );
 };
+
