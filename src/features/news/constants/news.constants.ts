@@ -7,7 +7,7 @@ export const PUBLIC_NEWS_TEXTS = {
   READ_MORE: 'Ler Matéria Completa',
   FEATURED_BADGE: 'Em Destaque',
   SHARE_TITLE: 'Compartilhe esta notícia:',
-  BACK_TO_NEWS: '← Voltar para todas as notícias',
+  BACK_TO_NEWS: 'Voltar para todas as notícias',
   VIEWS: (count: number) => `${count} visualizações`,
   PUBLISHED_AT: (date: string) => `Publicado em ${date}`,
   AUTHOR_PREFIX: 'Por',
