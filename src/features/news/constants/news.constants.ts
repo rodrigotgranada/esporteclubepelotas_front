@@ -1,0 +1,18 @@
+export const PUBLIC_NEWS_TEXTS = {
+  PAGE_TITLE: 'Notícias do Lobo',
+  PAGE_SUBTITLE: 'Fique por dentro de tudo o que acontece no Esporte Clube Pelotas.',
+  SEARCH_PLACEHOLDER: 'Pesquisar notícias...',
+  CATEGORY_ALL: 'Todas as Notícias',
+  EMPTY_STATE: 'Nenhuma matéria encontrada para os filtros selecionados.',
+  READ_MORE: 'Ler Matéria Completa',
+  FEATURED_BADGE: 'Em Destaque',
+  SHARE_TITLE: 'Compartilhe esta notícia:',
+  BACK_TO_NEWS: '← Voltar para todas as notícias',
+  VIEWS: (count: number) => `${count} visualizações`,
+  PUBLISHED_AT: (date: string) => `Publicado em ${date}`,
+  AUTHOR_PREFIX: 'Por',
+  TAGS_TITLE: 'Tags relacionadas:',
+  RELATED_NEWS: 'Mais Notícias Recentes',
+  GALLERY_TITLE: 'Galeria de Fotos da Partida',
+  VIDEO_TITLE: 'Vídeo da Matéria',
+};

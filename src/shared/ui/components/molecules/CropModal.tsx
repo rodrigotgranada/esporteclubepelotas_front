@@ -59,6 +59,8 @@ export interface CropModalProps {
   onCropSave: (croppedBlob: Blob) => void;
   onUseOriginal?: () => void;
   isLoading?: boolean;
+  aspect?: number;
+  fixedShape?: 'round' | 'rect';
   texts?: {
     title?: string;
     zoom?: string;
@@ -78,11 +80,13 @@ export const CropModal = ({
   onCropSave, 
   onUseOriginal, 
   isLoading = false,
+  aspect,
+  fixedShape,
   texts = {}
 }: CropModalProps) => {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
-  const [cropMode, setCropMode] = useState<'round' | 'rect'>('round');
+  const [cropMode, setCropMode] = useState<'round' | 'rect'>(fixedShape || 'round');
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<{ x: number, y: number, width: number, height: number } | null>(null);
   const [currentImageSrc, setCurrentImageSrc] = useState(imageSrc);
   const [isRemovingBg, setIsRemovingBg] = useState(false);
@@ -91,7 +95,10 @@ export const CropModal = ({
     setCurrentImageSrc(imageSrc);
     setCrop({ x: 0, y: 0 });
     setZoom(1);
-  }, [imageSrc]);
+    if (fixedShape) {
+      setCropMode(fixedShape);
+    }
+  }, [imageSrc, fixedShape]);
 
   const onCropComplete = useCallback((_croppedArea: unknown, croppedAreaPixels: { x: number, y: number, width: number, height: number }) => {
     setCroppedAreaPixels(croppedAreaPixels);
@@ -158,34 +165,36 @@ export const CropModal = ({
           {texts.title || CROP_MODAL_TEXTS.TITLE}
         </Title>
 
-        {/* Mode Toggle: Circular vs Livre */}
+        {/* Mode Toggle: Circular vs Retangular/Livre */}
         <LayoutContainer className="flex items-center gap-2">
-          <LayoutContainer className="flex items-center gap-1 bg-background p-1 rounded-xl border border-border">
-            <button
-              type="button"
-              onClick={() => setCropMode('round')}
-              className={`text-xs px-2.5 py-1 flex items-center gap-1.5 rounded-lg transition-colors ${
-                cropMode === 'round' 
-                  ? 'bg-primary text-button-primary-text font-bold shadow-sm' 
-                  : 'text-text-secondary hover:text-text-primary'
-              }`}
-            >
-              <Circle size={13} />
-              {texts.modeCircular || CROP_MODAL_TEXTS.MODE_CIRCULAR}
-            </button>
-            <button
-              type="button"
-              onClick={() => setCropMode('rect')}
-              className={`text-xs px-2.5 py-1 flex items-center gap-1.5 rounded-lg transition-colors ${
-                cropMode === 'rect' 
-                  ? 'bg-primary text-button-primary-text font-bold shadow-sm' 
-                  : 'text-text-secondary hover:text-text-primary'
-              }`}
-            >
-              <Crop size={13} />
-              {texts.modeFree || CROP_MODAL_TEXTS.MODE_FREE}
-            </button>
-          </LayoutContainer>
+          {!fixedShape && (
+            <LayoutContainer className="flex items-center gap-1 bg-background p-1 rounded-xl border border-border">
+              <button
+                type="button"
+                onClick={() => setCropMode('round')}
+                className={`text-xs px-2.5 py-1 flex items-center gap-1.5 rounded-lg transition-colors ${
+                  cropMode === 'round' 
+                    ? 'bg-primary text-button-primary-text font-bold shadow-sm' 
+                    : 'text-text-secondary hover:text-text-primary'
+                }`}
+              >
+                <Circle size={13} />
+                {texts.modeCircular || CROP_MODAL_TEXTS.MODE_CIRCULAR}
+              </button>
+              <button
+                type="button"
+                onClick={() => setCropMode('rect')}
+                className={`text-xs px-2.5 py-1 flex items-center gap-1.5 rounded-lg transition-colors ${
+                  cropMode === 'rect' 
+                    ? 'bg-primary text-button-primary-text font-bold shadow-sm' 
+                    : 'text-text-secondary hover:text-text-primary'
+                }`}
+              >
+                <Crop size={13} />
+                {texts.modeFree || CROP_MODAL_TEXTS.MODE_FREE}
+              </button>
+            </LayoutContainer>
+          )}
 
           <button 
             type="button"
@@ -197,14 +206,14 @@ export const CropModal = ({
           </button>
         </LayoutContainer>
       </LayoutContainer>
-        
+
       {/* Cropper Viewport */}
       <LayoutContainer className="relative w-full h-80 bg-black/90">
         <Cropper
           image={currentImageSrc}
           crop={crop}
           zoom={zoom}
-          aspect={cropMode === 'round' ? 1 : undefined}
+          aspect={cropMode === 'round' ? 1 : (aspect || undefined)}
           cropShape={cropMode}
           showGrid={cropMode === 'rect'}
           onCropChange={setCrop}

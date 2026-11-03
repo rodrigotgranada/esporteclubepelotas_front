@@ -8,3 +8,4 @@ export const SENSITIVE_ACTION_MODAL_TEXTS = {
   ERROR_PASSWORD_REQUIRED: 'A senha é obrigatória.',
   ERROR_INCORRECT_PASSWORD: 'Senha incorreta.',
 };
+

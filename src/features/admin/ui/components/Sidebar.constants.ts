@@ -5,6 +5,7 @@ export const SIDEBAR_TEXTS = {
   NAV: {
     DASHBOARD: 'Dashboard',
     USERS: 'Usuários',
+    NEWS: 'Matérias',
     MODULES: 'Módulos do Sistema',
     ROLES: 'Cargos e Permissões',
     SETTINGS: 'Configurações',

@@ -11,6 +11,9 @@
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",
     "@imgly/background-removal": "^1.7.0",
+    "@tiptap/extension-placeholder": "^3.32.2",
+    "@tiptap/react": "^3.32.2",
+    "@tiptap/starter-kit": "^3.32.2",
     "axios": "^1.20.0",
     "date-fns": "^4.4.0",
     "firebase": "^12.19.0",

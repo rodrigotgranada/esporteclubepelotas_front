@@ -9,7 +9,7 @@ export interface DrawerProps {
   onClose: () => void;
   title?: string;
   children: React.ReactNode;
-  size?: 'sm' | 'md' | 'lg' | 'xl';
+  size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl';
 }
 
 export const Drawer = ({ isOpen, onClose, title, children, size = 'md' }: DrawerProps) => {
@@ -31,6 +31,8 @@ export const Drawer = ({ isOpen, onClose, title, children, size = 'md' }: Drawer
     md: 'md:max-w-md',
     lg: 'md:max-w-lg',
     xl: 'md:max-w-xl',
+    '2xl': 'md:max-w-3xl',
+    '3xl': 'md:max-w-5xl',
   };
 
   return (
@@ -46,15 +48,16 @@ export const Drawer = ({ isOpen, onClose, title, children, size = 'md' }: Drawer
         <LayoutContainer className="flex items-center justify-between p-6 border-b border-border">
           {title && <Title level="h3" className="text-xl font-bold text-text-primary m-0">{title}</Title>}
           <Button 
-            variant="ghost"
+            variant="ghost" 
             onClick={onClose}
-            className="flex items-center justify-center p-2 rounded-full"
-            aria-label="Close drawer"
+            className="p-1 h-auto text-text-secondary hover:text-text-primary"
+            aria-label="Close"
           >
             <X size={20} />
           </Button>
         </LayoutContainer>
-        <LayoutContainer className="p-6 flex-1 overflow-y-auto flex flex-col">
+
+        <LayoutContainer className="flex-1 overflow-y-auto p-6">
           {children}
         </LayoutContainer>
       </LayoutContainer>

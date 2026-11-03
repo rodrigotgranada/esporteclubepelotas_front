@@ -6,10 +6,13 @@ import { CropModal } from '../molecules/CropModal';
 import { LayoutContainer } from '../atoms/LayoutContainer';
 import { IMAGE_CROPPER_TEXTS } from './ImageCropper.constants';
 
-interface ImageCropperProps {
+export interface ImageCropperProps {
   onCropSave: (croppedImageBlob: Blob) => void;
   onImageRemove: () => void;
   initialImage?: string | null;
+  aspect?: number;
+  shape?: 'round' | 'rect';
+  placeholderLabel?: string;
   className?: string;
 }
 
@@ -17,6 +20,9 @@ export const ImageCropper: React.FC<ImageCropperProps> = ({
   onCropSave,
   onImageRemove,
   initialImage,
+  aspect = 1,
+  shape = 'round',
+  placeholderLabel,
   className = '',
 }) => {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
@@ -63,6 +69,10 @@ export const ImageCropper: React.FC<ImageCropperProps> = ({
     fileInputRef.current?.click();
   };
 
+  const containerClasses = shape === 'rect'
+    ? 'relative group w-full max-w-lg aspect-video rounded-xl overflow-hidden bg-surface border-2 border-dashed border-border flex items-center justify-center cursor-pointer transition-all hover:border-primary shadow-sm'
+    : 'relative group w-32 h-32 rounded-full overflow-hidden bg-surface border-2 border-dashed border-border flex items-center justify-center cursor-pointer transition-all hover:border-primary shadow-sm';
+
   return (
     <LayoutContainer className={`flex flex-col items-center justify-center space-y-4 ${className}`}>
       <input
@@ -75,7 +85,7 @@ export const ImageCropper: React.FC<ImageCropperProps> = ({
 
       <LayoutContainer
         onClick={handleOpenPicker}
-        className="relative group w-32 h-32 rounded-full overflow-hidden bg-surface border-2 border-dashed border-border flex items-center justify-center cursor-pointer transition-all hover:border-primary shadow-sm"
+        className={containerClasses}
       >
         {croppedImagePreview ? (
           <>
@@ -104,9 +114,11 @@ export const ImageCropper: React.FC<ImageCropperProps> = ({
             </LayoutContainer>
           </>
         ) : (
-          <LayoutContainer className="flex flex-col items-center justify-center w-full h-full text-text-secondary group-hover:text-primary transition-colors">
+          <LayoutContainer className="flex flex-col items-center justify-center w-full h-full text-text-secondary group-hover:text-primary transition-colors p-4 text-center">
             <Camera className="w-8 h-8 mb-1" />
-            <span className="text-xs font-medium uppercase tracking-wider">{IMAGE_CROPPER_TEXTS.ADD_PHOTO}</span>
+            <span className="text-xs font-medium uppercase tracking-wider">
+              {placeholderLabel || IMAGE_CROPPER_TEXTS.ADD_PHOTO}
+            </span>
           </LayoutContainer>
         )}
       </LayoutContainer>
@@ -114,6 +126,8 @@ export const ImageCropper: React.FC<ImageCropperProps> = ({
       <CropModal
         isOpen={isModalOpen}
         imageSrc={imageSrc || ''}
+        aspect={aspect}
+        fixedShape={shape}
         onClose={() => {
           setIsModalOpen(false);
           setImageSrc(null);
