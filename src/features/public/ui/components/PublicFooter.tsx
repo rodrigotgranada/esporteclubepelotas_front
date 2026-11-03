@@ -91,13 +91,28 @@ export const PublicFooter = () => {
     settings?.stadiumAddress || PUBLIC_FOOTER_TEXTS.STADIUM_ADDRESS_DEFAULT;
   const copyrightText =
     settings?.copyrightText || PUBLIC_FOOTER_TEXTS.COPYRIGHT_FALLBACK;
+
   const mapsEmbedUrl =
-    settings?.googleMapsEmbedUrl ||
-    'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3393.2081577457755!2d-52.338274023616654!3d-31.76483561175654!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9511b594bce376b5%3A0xeae06c624641dbef!2sEst%C3%A1dio%20Boca%20do%20Lobo%20-%20Pelotas!5e0!3m2!1spt-BR!2sbr!4v1714000000000!5m2!1spt-BR!2sbr';
+    settings?.googleMapsEmbedUrl || PUBLIC_FOOTER_TEXTS.DEFAULT_MAPS_EMBED_URL;
+  const mapsDirectUrl = PUBLIC_FOOTER_TEXTS.DEFAULT_MAPS_DIRECT_URL;
 
   const socialLinks = settings?.socialLinks || [];
   const contactPhones = settings?.contactPhones || [];
   const contactEmails = settings?.contactEmails || [];
+
+  // Opening Hours: use store or fallback
+  const openingHours =
+    settings?.openingHours && settings.openingHours.length > 0
+      ? settings.openingHours
+      : PUBLIC_FOOTER_TEXTS.DEFAULT_OPENING_HOURS;
+
+  // Navigation Links: use store or fallback, filtering out invisible links
+  const rawNavLinks =
+    settings?.footerNavigationLinks && settings.footerNavigationLinks.length > 0
+      ? settings.footerNavigationLinks
+      : PUBLIC_FOOTER_TEXTS.DEFAULT_NAV_LINKS;
+
+  const visibleNavLinks = rawNavLinks.filter((item) => item.isVisible !== false);
 
   return (
     <LayoutContainer
@@ -122,7 +137,10 @@ export const PublicFooter = () => {
                 <ShieldPlaceholder size={52} />
               )}
               <LayoutContainer className="flex flex-col">
-                <Title level="h3" className="text-xl font-black text-text-primary tracking-tight leading-tight group-hover:text-primary transition-colors">
+                <Title
+                  level="h3"
+                  className="text-xl font-black text-text-primary tracking-tight leading-tight group-hover:text-primary transition-colors"
+                >
                   {clubName}
                 </Title>
                 <Text className="text-xs font-semibold text-primary uppercase tracking-widest">
@@ -183,67 +201,70 @@ export const PublicFooter = () => {
             </LayoutContainer>
           </LayoutContainer>
 
-          {/* Column 2: Sitemap & Quick Navigation (lg:col-span-2) */}
+          {/* Column 2: Sitemap & Configurable Navigation (lg:col-span-2) */}
           <LayoutContainer className="lg:col-span-2 flex flex-col gap-4">
             <Title level="h4" className="text-sm font-bold text-text-primary uppercase tracking-wider">
               {PUBLIC_FOOTER_TEXTS.SECTION_SITEMAP_TITLE}
             </Title>
 
             <LayoutContainer className="flex flex-col gap-2.5 text-sm">
-              <Link
-                href="/"
-                className="inline-flex items-center gap-1.5 text-text-secondary hover:text-primary transition-colors font-medium"
-              >
-                <ChevronRight className="w-3.5 h-3.5 text-primary" />
-                {PUBLIC_FOOTER_TEXTS.NAV_HOME}
-              </Link>
-              <Link
-                href="/noticias"
-                className="inline-flex items-center gap-1.5 text-text-secondary hover:text-primary transition-colors font-medium"
-              >
-                <ChevronRight className="w-3.5 h-3.5 text-primary" />
-                {PUBLIC_FOOTER_TEXTS.NAV_NEWS}
-              </Link>
-              <Link
-                href="/socio"
-                className="inline-flex items-center gap-1.5 text-text-secondary hover:text-primary transition-colors font-medium"
-              >
-                <ChevronRight className="w-3.5 h-3.5 text-primary" />
-                {PUBLIC_FOOTER_TEXTS.NAV_MEMBERSHIP}
-              </Link>
-              <Link
-                href="/ingressos"
-                className="inline-flex items-center gap-1.5 text-text-secondary hover:text-primary transition-colors font-medium"
-              >
-                <ChevronRight className="w-3.5 h-3.5 text-primary" />
-                {PUBLIC_FOOTER_TEXTS.NAV_TICKETS}
-              </Link>
-              <Link
-                href="/profile"
-                className="inline-flex items-center gap-1.5 text-text-secondary hover:text-primary transition-colors font-medium"
-              >
-                <ChevronRight className="w-3.5 h-3.5 text-primary" />
-                {PUBLIC_FOOTER_TEXTS.NAV_PROFILE}
-              </Link>
-              <Link
-                href="/gestao"
-                className="inline-flex items-center gap-1.5 text-text-secondary hover:text-primary transition-colors font-medium"
-              >
-                <ChevronRight className="w-3.5 h-3.5 text-primary" />
-                {PUBLIC_FOOTER_TEXTS.NAV_ADMIN}
-              </Link>
+              {visibleNavLinks.length === 0 ? (
+                <Text className="text-xs text-text-secondary">
+                  {PUBLIC_FOOTER_TEXTS.NO_NAV_LINKS}
+                </Text>
+              ) : (
+                visibleNavLinks.map((item, idx) =>
+                  item.isExternal ? (
+                    <a
+                      key={idx}
+                      href={item.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-text-secondary hover:text-primary transition-colors font-medium"
+                    >
+                      <ChevronRight className="w-3.5 h-3.5 text-primary shrink-0" />
+                      <span>{item.label}</span>
+                    </a>
+                  ) : (
+                    <Link
+                      key={idx}
+                      href={item.url}
+                      className="inline-flex items-center gap-1.5 text-text-secondary hover:text-primary transition-colors font-medium"
+                    >
+                      <ChevronRight className="w-3.5 h-3.5 text-primary shrink-0" />
+                      <span>{item.label}</span>
+                    </Link>
+                  )
+                )
+              )}
             </LayoutContainer>
           </LayoutContainer>
 
-          {/* Column 3: Contacts & Support (lg:col-span-3) */}
+          {/* Column 3: Contacts & Operating Hours (lg:col-span-3) */}
           <LayoutContainer className="lg:col-span-3 flex flex-col gap-4">
             <Title level="h4" className="text-sm font-bold text-text-primary uppercase tracking-wider">
               {PUBLIC_FOOTER_TEXTS.SECTION_CONTACTS_TITLE}
             </Title>
 
-            <LayoutContainer className="flex items-center gap-2 text-xs text-text-secondary">
-              <Clock className="w-4 h-4 text-primary shrink-0" />
-              <span>{PUBLIC_FOOTER_TEXTS.SECTION_CONTACTS_HOURS}</span>
+            {/* Operating Hours per Department */}
+            <LayoutContainer className="flex flex-col gap-2 bg-background/60 border border-border/80 rounded-xl p-3">
+              <LayoutContainer className="flex items-center gap-1.5 text-xs text-primary font-bold">
+                <Clock className="w-3.5 h-3.5 shrink-0" />
+                <span>{PUBLIC_FOOTER_TEXTS.SECTION_HOURS_TITLE}</span>
+              </LayoutContainer>
+
+              <LayoutContainer className="flex flex-col gap-1.5 divide-y divide-border/40">
+                {openingHours.map((item, idx) => (
+                  <LayoutContainer key={idx} className="pt-1.5 first:pt-0 flex flex-col">
+                    <span className="font-bold text-text-primary text-[11px] leading-tight">
+                      {item.department}
+                    </span>
+                    <span className="text-text-secondary text-[11px] leading-snug">
+                      {item.schedule}
+                    </span>
+                  </LayoutContainer>
+                ))}
+              </LayoutContainer>
             </LayoutContainer>
 
             {/* Phones List */}
@@ -297,14 +318,14 @@ export const PublicFooter = () => {
             </LayoutContainer>
           </LayoutContainer>
 
-          {/* Column 4: Stadium Location & Interactive Google Map (lg:col-span-3) */}
+          {/* Column 4: Stadium Location & Clickable Google Map (lg:col-span-3) */}
           <LayoutContainer className="lg:col-span-3 flex flex-col gap-3">
             <LayoutContainer className="flex items-center justify-between">
               <Title level="h4" className="text-sm font-bold text-text-primary uppercase tracking-wider">
                 {stadiumName}
               </Title>
               <a
-                href="https://maps.google.com/?q=Est%C3%A1dio+Boca+do+Lobo+Pelotas"
+                href={mapsDirectUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 text-[11px] font-bold text-primary hover:underline"
@@ -319,20 +340,33 @@ export const PublicFooter = () => {
               <span>{stadiumAddress}</span>
             </LayoutContainer>
 
-            {/* Google Maps Interactive Iframe */}
-            <LayoutContainer className="w-full h-36 rounded-xl overflow-hidden border border-border bg-background shadow-xs relative mt-1">
+            {/* Google Maps Thumbnail with direct stadium link overlay */}
+            <a
+              href={mapsDirectUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full h-36 rounded-xl overflow-hidden border border-border bg-background shadow-xs relative mt-1 group cursor-pointer transition-all hover:border-primary/50"
+              title={`${stadiumName} - ${PUBLIC_FOOTER_TEXTS.CLICK_TO_OPEN_MAPS}`}
+            >
               <iframe
                 title={stadiumName}
                 src={mapsEmbedUrl}
                 width="100%"
                 height="100%"
-                style={{ border: 0 }}
-                allowFullScreen={false}
+                style={{ border: 0, pointerEvents: 'none' }}
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
-                className="w-full h-full opacity-90 hover:opacity-100 transition-opacity"
+                className="w-full h-full opacity-90 group-hover:opacity-100 transition-opacity"
               />
-            </LayoutContainer>
+
+              {/* Hover overlay hint */}
+              <LayoutContainer className="absolute inset-0 bg-black/10 group-hover:bg-black/30 transition-colors flex items-center justify-center">
+                <span className="opacity-0 group-hover:opacity-100 transition-all duration-200 bg-surface/95 backdrop-blur-xs text-text-primary px-3 py-1.5 rounded-lg text-xs font-bold shadow-md border border-border flex items-center gap-1.5 transform translate-y-1 group-hover:translate-y-0">
+                  <MapPin className="w-3.5 h-3.5 text-primary" />
+                  {PUBLIC_FOOTER_TEXTS.OPEN_IN_GOOGLE_MAPS}
+                </span>
+              </LayoutContainer>
+            </a>
 
             <Text className="text-[11px] text-text-secondary font-medium">
               {PUBLIC_FOOTER_TEXTS.STADIUM_CAPACITY}

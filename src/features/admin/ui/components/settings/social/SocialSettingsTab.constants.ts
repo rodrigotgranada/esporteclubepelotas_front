@@ -25,3 +25,4 @@ export const SOCIAL_SETTINGS_TEXTS = {
     LINKEDIN: 'LinkedIn',
   },
 };
+

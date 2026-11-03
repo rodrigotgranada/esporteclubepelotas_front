@@ -19,6 +19,18 @@ export interface ContactEmailItem {
   email: string;
 }
 
+export interface FooterNavigationItem {
+  label: string;
+  url: string;
+  isVisible?: boolean;
+  isExternal?: boolean;
+}
+
+export interface OpeningHourItem {
+  department: string;
+  schedule: string;
+}
+
 export interface Settings {
   clubLogoUrl: string | null;
   clubLogoGallery?: string[];
@@ -32,6 +44,8 @@ export interface Settings {
   socialLinks?: SocialLinkItem[];
   contactPhones?: ContactPhoneItem[];
   contactEmails?: ContactEmailItem[];
+  footerNavigationLinks?: FooterNavigationItem[];
+  openingHours?: OpeningHourItem[];
   stadiumName?: string;
   stadiumAddress?: string;
   googleMapsEmbedUrl?: string;
