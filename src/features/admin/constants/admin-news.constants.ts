@@ -52,6 +52,11 @@ export const ADMIN_NEWS_TEXTS = {
     LABEL_GALLERY: 'Galeria de Fotos da Matéria',
     LABEL_GALLERY_HINT: 'Adicione fotos adicionais da partida ou evento (JPG, PNG, WebP).',
     BUTTON_ADD_GALLERY_PHOTOS: 'Adicionar Fotos à Galeria',
+    GALLERY_CROP_TOOLTIP: 'Recortar e ajustar foto',
+    GALLERY_REMOVE_TOOLTIP: 'Remover foto da galeria',
+    GALLERY_EMPTY_TEXT: 'Nenhuma foto adicionada à galeria ainda.',
+    GALLERY_NEW_BADGE: 'Novo',
+    GALLERY_CROP_TITLE: 'Recortar Foto da Galeria',
     LABEL_CONTENT: 'Conteúdo da Notícia',
     LABEL_STATUS: 'Status de Publicação',
     LABEL_FEATURED: 'Destacar como Manchetão Principal na Capa',
@@ -94,7 +99,9 @@ export const ADMIN_NEWS_TEXTS = {
     SUCCESS_CATEGORY_CREATED: 'Categoria criada com sucesso!',
     SUCCESS_COVER_UPLOADED: 'Capa da matéria enviada com sucesso!',
     SUCCESS_GALLERY_UPLOADED: 'Fotos da galeria enviadas com sucesso!',
+    SUCCESS_GALLERY_PHOTO_CROPPED: 'Foto da galeria ajustada com sucesso!',
     ERROR_REQUIRED_FIELDS: 'Preencha todos os campos obrigatórios (Título, Categoria e Conteúdo).',
+    ERROR_IMAGE_LOAD: 'Não foi possível carregar a imagem informada.',
     ERROR_GENERIC: 'Ocorreu um erro ao processar a operação.',
   },
 
@@ -138,8 +145,10 @@ export const ADMIN_NEWS_TEXTS = {
     IMAGE_MODAL_UPLOAD_BTN: 'Escolher Foto do Computador',
     IMAGE_MODAL_URL_LABEL: 'Ou cole a URL da imagem:',
     IMAGE_MODAL_URL_PLACEHOLDER: 'https://exemplo.com/foto.jpg',
-    IMAGE_MODAL_INSERT_BTN: 'Inserir Imagem',
+    IMAGE_MODAL_INSERT_BTN: 'Avançar para Ajuste & Recorte',
     IMAGE_MODAL_CANCEL_BTN: 'Cancelar',
+    IMAGE_CROP_MODAL_TITLE: 'Recortar & Ajustar Foto do Conteúdo',
+    HINT_EDITOR_NOTION: 'Clique no (+) para inserir um novo bloco abaixo ou nos pontinhos (⋮⋮) para transformar a linha atual (Título, Subtítulo, Imagem, Citação, Lista).',
   },
 };
 

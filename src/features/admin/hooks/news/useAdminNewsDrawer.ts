@@ -33,6 +33,11 @@ export const useAdminNewsDrawer = (
   const [gallery, setGallery] = useState<string[]>([]);
   const [galleryFiles, setGalleryFiles] = useState<File[]>([]);
   const [galleryPreviews, setGalleryPreviews] = useState<string[]>([]);
+  const [galleryCropItem, setGalleryCropItem] = useState<{
+    type: 'new' | 'existing';
+    index: number;
+    src: string;
+  } | null>(null);
   const [content, setContent] = useState<Record<string, any>>({});
   const [youtubeVideoUrl, setYoutubeVideoUrl] = useState('');
   const [isFeatured, setIsFeatured] = useState(false);
@@ -68,6 +73,7 @@ export const useAdminNewsDrawer = (
     setGallery([]);
     setGalleryFiles([]);
     setGalleryPreviews([]);
+    setGalleryCropItem(null);
     setContent({});
     setYoutubeVideoUrl('');
     setIsFeatured(false);
@@ -149,8 +155,60 @@ export const useAdminNewsDrawer = (
     if (fileArray.length === 0) return;
 
     const newPreviews = fileArray.map((f) => URL.createObjectURL(f));
+    const startIndex = galleryFiles.length;
     setGalleryFiles((prev) => [...prev, ...fileArray]);
     setGalleryPreviews((prev) => [...prev, ...newPreviews]);
+
+    // If 1 photo is selected, open crop modal immediately for precision editing
+    if (fileArray.length === 1) {
+      setGalleryCropItem({
+        type: 'new',
+        index: startIndex,
+        src: newPreviews[0],
+      });
+    }
+  };
+
+  const handleOpenGalleryCrop = (type: 'new' | 'existing', index: number, src: string) => {
+    setGalleryCropItem({ type, index, src });
+  };
+
+  const handleCropGallerySave = (croppedBlob: Blob) => {
+    if (!galleryCropItem) return;
+
+    const newUrl = URL.createObjectURL(croppedBlob);
+    const fileName = `gallery-${Date.now()}.png`;
+    const newFile = new File([croppedBlob], fileName, {
+      type: croppedBlob.type || 'image/png',
+    });
+
+    if (galleryCropItem.type === 'new') {
+      const idx = galleryCropItem.index;
+      setGalleryFiles((prev) => {
+        const updated = [...prev];
+        updated[idx] = newFile;
+        return updated;
+      });
+      setGalleryPreviews((prev) => {
+        const updated = [...prev];
+        if (updated[idx]) URL.revokeObjectURL(updated[idx]);
+        updated[idx] = newUrl;
+        return updated;
+      });
+    } else {
+      // Existing photo: remove from saved URLs and add to new files queue ready to upload
+      const idx = galleryCropItem.index;
+      setGallery((prev) => prev.filter((_, i) => i !== idx));
+      setGalleryFiles((prev) => [...prev, newFile]);
+      setGalleryPreviews((prev) => [...prev, newUrl]);
+    }
+
+    setGalleryCropItem(null);
+    toast.success(ADMIN_NEWS_TEXTS.TOAST.SUCCESS_GALLERY_PHOTO_CROPPED);
+  };
+
+  const handleCropGalleryCancel = () => {
+    setGalleryCropItem(null);
   };
 
   const handleRemoveExistingGalleryPhoto = (urlToRemove: string) => {
@@ -282,7 +340,11 @@ export const useAdminNewsDrawer = (
     handleRemoveCover,
     gallery,
     galleryPreviews,
+    galleryCropItem,
     handleSelectGalleryFiles,
+    handleOpenGalleryCrop,
+    handleCropGallerySave,
+    handleCropGalleryCancel,
     handleRemoveExistingGalleryPhoto,
     handleRemoveNewGalleryPhoto,
     content,

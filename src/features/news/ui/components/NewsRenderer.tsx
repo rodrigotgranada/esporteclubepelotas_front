@@ -160,14 +160,14 @@ export const NewsRenderer: React.FC<NewsRendererProps> = ({ content, className =
         const caption = node.attrs?.title || alt;
         if (!src) return null;
         return (
-          <LayoutContainer key={index} className="my-6 flex flex-col gap-2">
-            <LayoutContainer className="relative w-full aspect-video rounded-2xl overflow-hidden bg-drawer border border-border shadow-xs">
+          <LayoutContainer key={index} className="my-6 flex flex-col gap-2 items-center">
+            <LayoutContainer className="relative w-full max-w-3xl aspect-video rounded-2xl overflow-hidden bg-drawer/50 border border-border shadow-xs flex items-center justify-center">
               <SafeImage
                 src={src}
                 alt={alt}
                 fill
                 sizes="(max-width: 1200px) 100vw, 896px"
-                className="object-cover"
+                className="object-contain"
               />
             </LayoutContainer>
             {caption && (
