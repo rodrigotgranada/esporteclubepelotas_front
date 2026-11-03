@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
-import ImageExtension from '@tiptap/extension-image';
+import { NewsCustomImageExtension } from './NewsCustomImageExtension';
 import {
   GripVertical,
   Plus,
@@ -62,7 +62,7 @@ export const NewsBlockEditor: React.FC<NewsBlockEditorProps> = ({
       Placeholder.configure({
         placeholder: texts.PLACEHOLDER,
       }),
-      ImageExtension.configure({
+      NewsCustomImageExtension.configure({
         inline: false,
         allowBase64: true,
       }),

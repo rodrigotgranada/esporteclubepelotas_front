@@ -232,3 +232,4 @@ export const NewsBlockFloatingMenu: React.FC<NewsBlockFloatingMenuProps> = ({
     </LayoutContainer>
   );
 };
+

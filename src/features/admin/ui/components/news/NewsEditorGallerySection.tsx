@@ -209,3 +209,4 @@ export const NewsEditorGallerySection: React.FC<NewsEditorGallerySectionProps> =
     </LayoutContainer>
   );
 };
+

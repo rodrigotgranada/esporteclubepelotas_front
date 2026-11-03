@@ -157,21 +157,40 @@ export const NewsRenderer: React.FC<NewsRendererProps> = ({ content, className =
       case 'image': {
         const src = node.attrs?.src;
         const alt = node.attrs?.alt || '';
-        const caption = node.attrs?.title || alt;
+        const caption = node.attrs?.caption || node.attrs?.title || alt;
+        const width = node.attrs?.width || '100%';
+        const align = node.attrs?.align || 'center';
+
+        const widthClass =
+          width === '25%'
+            ? 'max-w-xs'
+            : width === '50%'
+            ? 'max-w-md'
+            : width === '75%'
+            ? 'max-w-2xl'
+            : 'max-w-4xl';
+
+        const alignClass =
+          align === 'left'
+            ? 'self-start text-left'
+            : align === 'right'
+            ? 'self-end text-right'
+            : 'self-center text-center';
+
         if (!src) return null;
         return (
-          <LayoutContainer key={index} className="my-6 flex flex-col gap-2 items-center">
-            <LayoutContainer className="relative w-full max-w-3xl aspect-video rounded-2xl overflow-hidden bg-drawer/50 border border-border shadow-xs flex items-center justify-center">
+          <LayoutContainer key={index} className={`my-6 flex flex-col ${alignClass} w-full ${widthClass}`}>
+            <LayoutContainer className="relative w-full rounded-2xl overflow-hidden bg-drawer/30 border border-border shadow-xs">
               <SafeImage
                 src={src}
                 alt={alt}
-                fill
-                sizes="(max-width: 1200px) 100vw, 896px"
-                className="object-contain"
+                width={800}
+                height={500}
+                className="w-full h-auto max-h-[520px] object-contain rounded-2xl mx-auto"
               />
             </LayoutContainer>
             {caption && (
-              <Text className="text-xs text-text-secondary text-center italic">
+              <Text className="text-xs text-text-secondary italic mt-2 px-1">
                 {caption}
               </Text>
             )}

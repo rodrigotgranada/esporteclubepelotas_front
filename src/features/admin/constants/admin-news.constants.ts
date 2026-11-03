@@ -149,6 +149,15 @@ export const ADMIN_NEWS_TEXTS = {
     IMAGE_MODAL_CANCEL_BTN: 'Cancelar',
     IMAGE_CROP_MODAL_TITLE: 'Recortar & Ajustar Foto do Conteúdo',
     HINT_EDITOR_NOTION: 'Clique no (+) para inserir um novo bloco abaixo ou nos pontinhos (⋮⋮) para transformar a linha atual (Título, Subtítulo, Imagem, Citação, Lista).',
+    IMAGE_NODE_WIDTH_25: '25%',
+    IMAGE_NODE_WIDTH_50: '50%',
+    IMAGE_NODE_WIDTH_75: '75%',
+    IMAGE_NODE_WIDTH_100: '100%',
+    IMAGE_NODE_ALIGN_LEFT: 'Alinhar à esquerda',
+    IMAGE_NODE_ALIGN_CENTER: 'Centralizar',
+    IMAGE_NODE_ALIGN_RIGHT: 'Alinhar à direita',
+    IMAGE_NODE_DELETE: 'Excluir imagem',
+    IMAGE_NODE_CAPTION_PLACEHOLDER: 'Digite uma legenda para a foto (opcional)...',
   },
 };
 
