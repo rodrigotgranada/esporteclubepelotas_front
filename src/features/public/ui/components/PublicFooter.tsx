@@ -25,7 +25,6 @@ import {
   Phone,
   Mail,
   MapPin,
-  ExternalLink,
   Clock,
   ChevronRight,
   Shield,
@@ -320,20 +319,9 @@ export const PublicFooter = () => {
 
           {/* Column 4: Stadium Location & Clickable Google Map (lg:col-span-3) */}
           <LayoutContainer className="lg:col-span-3 flex flex-col gap-3">
-            <LayoutContainer className="flex items-center justify-between">
-              <Title level="h4" className="text-sm font-bold text-text-primary uppercase tracking-wider">
-                {stadiumName}
-              </Title>
-              <a
-                href={mapsDirectUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-[11px] font-bold text-primary hover:underline"
-              >
-                <span>{PUBLIC_FOOTER_TEXTS.OPEN_IN_GOOGLE_MAPS}</span>
-                <ExternalLink className="w-3 h-3" />
-              </a>
-            </LayoutContainer>
+            <Title level="h4" className="text-sm font-bold text-text-primary uppercase tracking-wider">
+              {stadiumName}
+            </Title>
 
             <LayoutContainer className="flex items-start gap-2 text-xs text-text-secondary leading-snug">
               <MapPin className="w-4 h-4 text-primary shrink-0 mt-0.5" />
