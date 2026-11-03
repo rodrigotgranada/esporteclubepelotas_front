@@ -4,6 +4,33 @@ import React, { useEffect, useState } from 'react';
 import { useThemeStore } from '@/store/useThemeStore';
 import { themeService, ThemeDocument, ThemePalette } from '@/services/theme.service';
 
+function getHeaderContrast(headerHex: string) {
+  if (!headerHex || !headerHex.startsWith('#')) {
+    return {
+      text: '#ffffff',
+      muted: 'rgba(255, 255, 255, 0.82)',
+      border: 'rgba(255, 255, 255, 0.15)',
+    };
+  }
+  const hex = headerHex.replace('#', '');
+  const r = parseInt(hex.substring(0, 2), 16) || 0;
+  const g = parseInt(hex.substring(2, 4), 16) || 0;
+  const b = parseInt(hex.substring(4, 6), 16) || 0;
+  const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+  if (yiq >= 155) {
+    return {
+      text: '#0f172a',
+      muted: '#475569',
+      border: 'rgba(0, 0, 0, 0.1)',
+    };
+  }
+  return {
+    text: '#ffffff',
+    muted: 'rgba(255, 255, 255, 0.85)',
+    border: 'rgba(255, 255, 255, 0.15)',
+  };
+}
+
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const { mode } = useThemeStore();
   const [activeTheme, setActiveTheme] = useState<ThemeDocument | null>(null);
@@ -39,6 +66,10 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
     root.style.setProperty('--color-background', palette.background);
     root.style.setProperty('--color-surface', palette.surface);
     root.style.setProperty('--color-header', palette.header);
+    const headerContrast = getHeaderContrast(palette.header);
+    root.style.setProperty('--color-header-text', headerContrast.text);
+    root.style.setProperty('--color-header-text-muted', headerContrast.muted);
+    root.style.setProperty('--color-header-border', headerContrast.border);
     root.style.setProperty('--color-card', palette.card);
     root.style.setProperty('--color-drawer', palette.drawer);
     root.style.setProperty('--color-table', palette.table);
@@ -76,6 +107,10 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
       root.style.setProperty('--color-background', palette.background);
       root.style.setProperty('--color-surface', palette.surface);
       root.style.setProperty('--color-header', palette.header);
+      const headerContrast = getHeaderContrast(palette.header);
+      root.style.setProperty('--color-header-text', headerContrast.text);
+      root.style.setProperty('--color-header-text-muted', headerContrast.muted);
+      root.style.setProperty('--color-header-border', headerContrast.border);
       root.style.setProperty('--color-card', palette.card);
       root.style.setProperty('--color-drawer', palette.drawer);
       root.style.setProperty('--color-table', palette.table);

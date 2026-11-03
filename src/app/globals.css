@@ -7,6 +7,9 @@
   --color-surface: var(--color-surface);
   
   --color-header: var(--color-header);
+  --color-header-text: var(--color-header-text);
+  --color-header-text-muted: var(--color-header-text-muted);
+  --color-header-border: var(--color-header-border);
   --color-card: var(--color-card);
   --color-drawer: var(--color-drawer);
   --color-table: var(--color-table);
@@ -31,6 +34,9 @@
   --color-surface: #ffffff;
   
   --color-header: #ffffff;
+  --color-header-text: #111827;
+  --color-header-text-muted: #4b5563;
+  --color-header-border: #e5e7eb;
   --color-card: #ffffff;
   --color-drawer: #ffffff;
   --color-table: #ffffff;
@@ -53,6 +59,9 @@
   --color-surface: #171717;
 
   --color-header: #111111;
+  --color-header-text: #ffffff;
+  --color-header-text-muted: #9ca3af;
+  --color-header-border: #374151;
   --color-card: #111111;
   --color-drawer: #111111;
   --color-table: #111111;
@@ -76,6 +85,9 @@
     --color-surface: #171717;
 
     --color-header: #111111;
+  --color-header-text: #ffffff;
+  --color-header-text-muted: #9ca3af;
+  --color-header-border: #374151;
     --color-card: #111111;
     --color-drawer: #111111;
     --color-table: #111111;
