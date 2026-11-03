@@ -3,10 +3,12 @@ export const PUBLIC_DRAWER_TEXTS = {
   SUBTITLE: 'O Lobo da Boca do Lobo • Fundado em 1908',
   CLOSE: 'Fechar menu',
   TAGLINE: 'Paixão áureo-cerúlea e tradição centenária',
+  BADGE_OFFICIAL: 'PORTAL OFICIAL • 1908',
 
   MEMBERSHIP_CARD_TITLE: 'Seja Sócio Áureo-Cerúleo',
-  MEMBERSHIP_CARD_DESC: 'Apoie o Pelotas, garanta entrada livre na Boca do Lobo e descontos na rede parceira.',
+  MEMBERSHIP_CARD_DESC: 'Apoie o Pelotas, garanta entrada livre na Boca do Lobo e descontos exclusivos.',
   MEMBERSHIP_CARD_BTN: 'Conhecer Planos de Sócio',
+  MEMBERSHIP_BADGE: 'SEJA SÓCIO LOBO',
 
   SECTION_FOOTBALL: 'Futebol & Temporada',
   LINK_SQUAD: 'Elenco Profissional',
@@ -23,18 +25,23 @@ export const PUBLIC_DRAWER_TEXTS = {
   SECTION_CLUB: 'O Clube & Memória',
   LINK_STADIUM: 'Estádio Boca do Lobo',
   LINK_STADIUM_DESC: 'História, localização e capacidade',
+  STADIUM_BADGE: 'Estádio Centenário',
   LINK_IDOLS: 'Galeria de Ídolos',
   LINK_HISTORY: 'Linha do Tempo',
 
   SECTION_CONTACTS: 'Atendimento & Secretaria',
+  HOURS_TITLE: 'Horários de Atendimento',
   SECTION_SOCIAL: 'Canais Oficiais',
 
-  THEME_TITLE: 'Modo de Exibição',
-  BTN_LOGIN: 'Entrar na Conta',
+  THEME_TITLE: 'Aparência',
+  BTN_LOGIN: 'Acessar Minha Conta',
   BTN_REGISTER: 'Cadastre-se',
-  BTN_LOGOUT: 'Sair',
+  NO_ACCOUNT_PROMPT: 'Ainda não é cadastrado?',
+  REGISTER_LINK: 'Crie sua conta aqui',
+  BTN_LOGOUT: 'Sair da Conta',
   BTN_PROFILE: 'Meu Perfil',
   BTN_ADMIN: 'Painel Admin',
-  COPYRIGHT: '© 2026 Esporte Clube Pelotas. Todos os direitos reservados.',
+  COPYRIGHT: '© 2026 Esporte Clube Pelotas • Tradição Centenária',
 };
+
 
