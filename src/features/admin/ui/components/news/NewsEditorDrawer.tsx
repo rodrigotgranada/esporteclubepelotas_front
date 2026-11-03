@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import {
   X,
   Plus,
@@ -9,6 +10,7 @@ import {
   Video,
   Send,
   Save,
+  Images,
 } from 'lucide-react';
 import {
   Drawer,
@@ -68,6 +70,11 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
     setCoverCaption,
     handleCropCover,
     handleRemoveCover,
+    gallery,
+    galleryPreviews,
+    handleSelectGalleryFiles,
+    handleRemoveExistingGalleryPhoto,
+    handleRemoveNewGalleryPhoto,
     content,
     setContent,
     youtubeVideoUrl,
@@ -202,7 +209,118 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
               </LayoutContainer>
             </LayoutContainer>
 
-            {/* 4. Resumo / SEO Preview */}
+            {/* 4. Galeria de Fotos da Matéria */}
+            <LayoutContainer className="flex flex-col gap-3 p-4 rounded-xl border border-border bg-surface shadow-xs">
+              <LayoutContainer className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <LayoutContainer className="flex flex-col">
+                  <Text as="span" className="text-xs font-semibold text-text-primary uppercase tracking-wider flex items-center gap-1.5">
+                    <Images className="w-4 h-4 text-primary" />
+                    {texts.LABEL_GALLERY}
+                    {(gallery.length > 0 || galleryPreviews.length > 0) && (
+                      <Badge variant="default" size="sm" className="text-[10px] py-0 px-1.5 font-bold">
+                        {gallery.length + galleryPreviews.length}
+                      </Badge>
+                    )}
+                  </Text>
+                  <Text as="span" className="text-[11px] text-text-secondary">
+                    {texts.LABEL_GALLERY_HINT}
+                  </Text>
+                </LayoutContainer>
+
+                <label className="cursor-pointer self-start sm:self-auto">
+                  <input
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files.length > 0) {
+                        handleSelectGalleryFiles(e.target.files);
+                        e.target.value = '';
+                      }
+                    }}
+                    className="hidden"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    leftIcon={<Plus className="w-3.5 h-3.5" />}
+                    className="text-xs pointer-events-none"
+                  >
+                    {texts.BUTTON_ADD_GALLERY_PHOTOS}
+                  </Button>
+                </label>
+              </LayoutContainer>
+
+              {/* Gallery Photos Grid (Saved + Previews) */}
+              {gallery.length > 0 || galleryPreviews.length > 0 ? (
+                <LayoutContainer className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
+                  {/* Salvas no banco */}
+                  {gallery.map((url, idx) => (
+                    <LayoutContainer
+                      key={`exist-${idx}`}
+                      className="relative aspect-square rounded-xl overflow-hidden border border-border group bg-drawer"
+                    >
+                      <Image
+                        src={url}
+                        alt={`Foto galeria ${idx + 1}`}
+                        fill
+                        sizes="(max-width: 640px) 50vw, 25vw"
+                        className="object-cover transition-transform group-hover:scale-105"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveExistingGalleryPhoto(url)}
+                        className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-black/70 hover:bg-error text-white flex items-center justify-center transition-colors cursor-pointer shadow-sm"
+                        title="Remover foto da galeria"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </LayoutContainer>
+                  ))}
+
+                  {/* Novas fotos na fila */}
+                  {galleryPreviews.map((previewUrl, idx) => (
+                    <LayoutContainer
+                      key={`preview-${idx}`}
+                      className="relative aspect-square rounded-xl overflow-hidden border-2 border-primary/50 group bg-drawer shadow-xs"
+                    >
+                      <Image
+                        src={previewUrl}
+                        alt={`Nova foto ${idx + 1}`}
+                        fill
+                        sizes="(max-width: 640px) 50vw, 25vw"
+                        className="object-cover"
+                      />
+                      <Badge
+                        variant="primary"
+                        size="sm"
+                        className="absolute bottom-1.5 left-1.5 text-[9px] py-0 px-1 font-bold shadow-xs"
+                      >
+                        Novo
+                      </Badge>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveNewGalleryPhoto(idx)}
+                        className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-black/70 hover:bg-error text-white flex items-center justify-center transition-colors cursor-pointer shadow-sm"
+                        title="Remover foto"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </LayoutContainer>
+                  ))}
+                </LayoutContainer>
+              ) : (
+                <LayoutContainer className="p-4 border border-dashed border-border rounded-xl text-center bg-background/40 flex flex-col items-center justify-center gap-1.5">
+                  <Images className="w-6 h-6 text-text-secondary/40" />
+                  <Text className="text-xs text-text-secondary">
+                    Nenhuma foto adicionada à galeria ainda.
+                  </Text>
+                </LayoutContainer>
+              )}
+            </LayoutContainer>
+
+            {/* 5. Resumo / SEO Preview */}
             <LayoutContainer className="flex flex-col gap-1.5">
               <Text as="span" className="text-xs font-semibold text-text-primary uppercase tracking-wider">
                 {texts.LABEL_SUMMARY}

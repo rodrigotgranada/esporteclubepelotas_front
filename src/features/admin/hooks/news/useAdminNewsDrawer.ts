@@ -30,6 +30,9 @@ export const useAdminNewsDrawer = (
   const [coverImage, setCoverImage] = useState<string | null>(null);
   const [coverFile, setCoverFile] = useState<Blob | null>(null);
   const [coverCaption, setCoverCaption] = useState('');
+  const [gallery, setGallery] = useState<string[]>([]);
+  const [galleryFiles, setGalleryFiles] = useState<File[]>([]);
+  const [galleryPreviews, setGalleryPreviews] = useState<string[]>([]);
   const [content, setContent] = useState<Record<string, any>>({});
   const [youtubeVideoUrl, setYoutubeVideoUrl] = useState('');
   const [isFeatured, setIsFeatured] = useState(false);
@@ -62,6 +65,9 @@ export const useAdminNewsDrawer = (
     setCoverImage(null);
     setCoverFile(null);
     setCoverCaption('');
+    setGallery([]);
+    setGalleryFiles([]);
+    setGalleryPreviews([]);
     setContent({});
     setYoutubeVideoUrl('');
     setIsFeatured(false);
@@ -88,6 +94,9 @@ export const useAdminNewsDrawer = (
             setCoverImage(art.coverImage || null);
             setCoverFile(null);
             setCoverCaption(art.coverCaption || '');
+            setGallery(art.gallery || []);
+            setGalleryFiles([]);
+            setGalleryPreviews([]);
             setContent(art.content || {});
             setYoutubeVideoUrl(art.youtubeVideoUrl || '');
             setIsFeatured(!!art.isFeatured);
@@ -135,6 +144,28 @@ export const useAdminNewsDrawer = (
     setCoverImage(null);
   };
 
+  const handleSelectGalleryFiles = (files: FileList | File[]) => {
+    const fileArray = Array.from(files).filter((f) => f.type.startsWith('image/'));
+    if (fileArray.length === 0) return;
+
+    const newPreviews = fileArray.map((f) => URL.createObjectURL(f));
+    setGalleryFiles((prev) => [...prev, ...fileArray]);
+    setGalleryPreviews((prev) => [...prev, ...newPreviews]);
+  };
+
+  const handleRemoveExistingGalleryPhoto = (urlToRemove: string) => {
+    setGallery((prev) => prev.filter((u) => u !== urlToRemove));
+  };
+
+  const handleRemoveNewGalleryPhoto = (indexToRemove: number) => {
+    setGalleryFiles((prev) => prev.filter((_, idx) => idx !== indexToRemove));
+    setGalleryPreviews((prev) => {
+      const targetUrl = prev[indexToRemove];
+      if (targetUrl) URL.revokeObjectURL(targetUrl);
+      return prev.filter((_, idx) => idx !== indexToRemove);
+    });
+  };
+
   const handleCategoryCreated = (newCat: NewsCategoryData) => {
     setCategories((prev) => [...prev, newCat]);
     setCategoryId(newCat._id || newCat.slug);
@@ -167,6 +198,7 @@ export const useAdminNewsDrawer = (
         tags,
         coverImage: coverImage || '',
         coverCaption: coverCaption.trim() || undefined,
+        gallery,
         content,
         youtubeVideoUrl: youtubeVideoUrl.trim() || undefined,
         isFeatured,
@@ -204,6 +236,16 @@ export const useAdminNewsDrawer = (
         }
       }
 
+      // If user uploaded new gallery photos, upload them
+      if (galleryFiles.length > 0 && savedArticleId) {
+        try {
+          await adminNewsService.uploadGallery(savedArticleId, galleryFiles);
+          toast.success(ADMIN_NEWS_TEXTS.TOAST.SUCCESS_GALLERY_UPLOADED);
+        } catch (galleryErr) {
+          console.error('Failed to upload gallery photos', galleryErr);
+        }
+      }
+
       onSuccess();
     } catch (err: any) {
       console.error(err);
@@ -238,6 +280,11 @@ export const useAdminNewsDrawer = (
     setCoverCaption,
     handleCropCover,
     handleRemoveCover,
+    gallery,
+    galleryPreviews,
+    handleSelectGalleryFiles,
+    handleRemoveExistingGalleryPhoto,
+    handleRemoveNewGalleryPhoto,
     content,
     setContent,
     youtubeVideoUrl,
