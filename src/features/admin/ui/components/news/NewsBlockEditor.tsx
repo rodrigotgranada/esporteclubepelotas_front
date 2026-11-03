@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
+import ImageExtension from '@tiptap/extension-image';
 import {
   GripVertical,
   Plus,
@@ -21,8 +22,12 @@ import {
   Undo2,
   Redo2,
   Sparkles,
+  Image as ImageIcon,
+  Upload,
+  Link as LinkIcon,
+  X,
 } from 'lucide-react';
-import { LayoutContainer, Text, Badge, IconButton } from '@/shared/ui/components';
+import { LayoutContainer, Text, IconButton, Button, Input } from '@/shared/ui/components';
 import { ADMIN_NEWS_TEXTS } from '../../../constants/admin-news.constants';
 
 export interface NewsBlockEditorProps {
@@ -41,11 +46,17 @@ export const NewsBlockEditor: React.FC<NewsBlockEditorProps> = ({
   const { EDITOR: texts } = ADMIN_NEWS_TEXTS;
   const editorWrapperRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Handle position tracking on left gutter
   const [handleTop, setHandleTop] = useState<number | null>(null);
   const [activeElement, setActiveElement] = useState<HTMLElement | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [menuMode, setMenuMode] = useState<'transform' | 'add_below'>('transform');
+
+  // Image insertion modal state
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const [imageUrlInput, setImageUrlInput] = useState('');
 
   const editor = useEditor({
     extensions: [
@@ -56,6 +67,10 @@ export const NewsBlockEditor: React.FC<NewsBlockEditorProps> = ({
       }),
       Placeholder.configure({
         placeholder: texts.PLACEHOLDER,
+      }),
+      ImageExtension.configure({
+        inline: false,
+        allowBase64: true,
       }),
     ],
     content: content && Object.keys(content).length > 0 ? content : undefined,
@@ -101,7 +116,6 @@ export const NewsBlockEditor: React.FC<NewsBlockEditorProps> = ({
     if (!editor || !editorWrapperRef.current) return;
 
     const target = e.target as HTMLElement;
-    // Walk up to find the direct child of .ProseMirror
     let element: HTMLElement | null = target;
     while (element && element.parentElement && !element.parentElement.classList.contains('ProseMirror')) {
       element = element.parentElement;
@@ -116,7 +130,7 @@ export const NewsBlockEditor: React.FC<NewsBlockEditorProps> = ({
     }
   };
 
-  // Focus and select the active block
+  // Focus the active block
   const focusActiveBlock = () => {
     if (!editor || !activeElement) return;
     try {
@@ -127,10 +141,17 @@ export const NewsBlockEditor: React.FC<NewsBlockEditorProps> = ({
     }
   };
 
-  // Transform block actions
+  // Apply block type (for either transform or adding below)
   const applyBlockType = (type: string, level?: 1 | 2 | 3) => {
     if (!editor) return;
-    focusActiveBlock();
+
+    if (menuMode === 'add_below') {
+      focusActiveBlock();
+      // Insert a new paragraph block right below
+      editor.chain().focus().insertContent({ type: 'paragraph' }).run();
+    } else {
+      focusActiveBlock();
+    }
 
     switch (type) {
       case 'paragraph':
@@ -153,18 +174,28 @@ export const NewsBlockEditor: React.FC<NewsBlockEditorProps> = ({
       case 'horizontalRule':
         editor.chain().focus().setHorizontalRule().run();
         break;
+      case 'image':
+        setIsMenuOpen(false);
+        setIsImageModalOpen(true);
+        return;
       default:
         break;
     }
     setIsMenuOpen(false);
   };
 
-  // Add block below
-  const handleAddBlockBelow = () => {
-    if (!editor) return;
+  // Click on (+) Button: Opens menu in "Adicionar abaixo" mode
+  const handleAddClick = () => {
     focusActiveBlock();
-    editor.chain().focus().insertContent({ type: 'paragraph' }).run();
+    setMenuMode('add_below');
     setIsMenuOpen(true);
+  };
+
+  // Click on (⋮⋮) Handle: Opens menu in "Transformar" mode
+  const handleGripClick = () => {
+    focusActiveBlock();
+    setMenuMode('transform');
+    setIsMenuOpen(!isMenuOpen);
   };
 
   // Delete active block
@@ -182,6 +213,30 @@ export const NewsBlockEditor: React.FC<NewsBlockEditorProps> = ({
     setIsMenuOpen(false);
   };
 
+  // Insert image via URL
+  const handleInsertImageUrl = () => {
+    if (!editor || !imageUrlInput.trim()) return;
+    editor.chain().focus().setImage({ src: imageUrlInput.trim() }).run();
+    setImageUrlInput('');
+    setIsImageModalOpen(false);
+  };
+
+  // Insert image via local file selection
+  const handleSelectLocalImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !editor) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        editor.chain().focus().setImage({ src: reader.result }).run();
+      }
+    };
+    reader.readAsDataURL(file);
+    setIsImageModalOpen(false);
+    e.target.value = '';
+  };
+
   if (!editor) {
     return null;
   }
@@ -190,6 +245,15 @@ export const NewsBlockEditor: React.FC<NewsBlockEditorProps> = ({
     <LayoutContainer
       className={`rounded-xl border border-border bg-surface transition-all focus-within:border-primary shadow-sm flex flex-col ${className}`}
     >
+      {/* Hidden File Input for Image Upload */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleSelectLocalImage}
+        className="hidden"
+      />
+
       {/* Top Format Bar */}
       {editable && (
         <LayoutContainer className="flex flex-wrap items-center justify-between gap-1 p-2 bg-drawer border-b border-border rounded-t-xl text-xs">
@@ -279,6 +343,17 @@ export const NewsBlockEditor: React.FC<NewsBlockEditorProps> = ({
               }
               icon={<List className="w-4 h-4" />}
             />
+            {/* Quick Image Button in Top Bar */}
+            <IconButton
+              type="button"
+              variant="ghost"
+              size="sm"
+              aria-label={texts.BLOCK_TYPE_IMAGE}
+              title={texts.BLOCK_TYPE_IMAGE}
+              onClick={() => setIsImageModalOpen(true)}
+              className="text-text-secondary hover:text-primary"
+              icon={<ImageIcon className="w-4 h-4" />}
+            />
           </LayoutContainer>
 
           <LayoutContainer className="flex items-center gap-1">
@@ -320,28 +395,29 @@ export const NewsBlockEditor: React.FC<NewsBlockEditorProps> = ({
             style={{ top: `${Math.max(8, handleTop + 4)}px` }}
             className="absolute left-2.5 z-40 flex items-center gap-0.5 select-none transition-all duration-150"
           >
-            {/* 1. Add Block (+) Button */}
+            {/* 1. Add Block (+) Button: Inserts new block below */}
             <button
               type="button"
-              onClick={handleAddBlockBelow}
+              onClick={handleAddClick}
               title={texts.BLOCK_ADD_TOOLTIP}
               aria-label={texts.BLOCK_ADD_TOOLTIP}
-              className="w-6 h-6 rounded-md hover:bg-drawer text-text-secondary hover:text-primary flex items-center justify-center transition-colors cursor-pointer"
+              className={`w-6 h-6 rounded-md flex items-center justify-center transition-colors cursor-pointer ${
+                isMenuOpen && menuMode === 'add_below'
+                  ? 'bg-primary text-black font-bold shadow-xs'
+                  : 'hover:bg-drawer text-text-secondary hover:text-primary'
+              }`}
             >
               <Plus className="w-3.5 h-3.5" />
             </button>
 
-            {/* 2. Drag / Option Handle (⋮⋮) */}
+            {/* 2. Drag / Option Handle (⋮⋮): Options for current line */}
             <button
               type="button"
-              onClick={() => {
-                focusActiveBlock();
-                setIsMenuOpen(!isMenuOpen);
-              }}
+              onClick={handleGripClick}
               title={texts.BLOCK_HANDLE_TOOLTIP}
               aria-label={texts.BLOCK_HANDLE_TOOLTIP}
               className={`w-6 h-6 rounded-md flex items-center justify-center transition-colors cursor-pointer ${
-                isMenuOpen
+                isMenuOpen && menuMode === 'transform'
                   ? 'bg-primary text-black font-bold shadow-xs'
                   : 'hover:bg-drawer text-text-secondary hover:text-text-primary'
               }`}
@@ -362,7 +438,7 @@ export const NewsBlockEditor: React.FC<NewsBlockEditorProps> = ({
                 } left-0 w-64 max-h-[340px] overflow-y-auto overscroll-contain rounded-xl border border-border bg-surface shadow-2xl p-2 flex flex-col gap-1 z-[60] animate-in fade-in zoom-in-95 duration-150`}
               >
                 <Text className="text-[10px] font-black uppercase tracking-wider text-text-secondary px-2 pt-1 pb-0.5">
-                  Transformar Bloco em:
+                  {menuMode === 'add_below' ? texts.MENU_HEADER_ADD : texts.MENU_HEADER_TRANSFORM}
                 </Text>
 
                 {/* Parágrafo */}
@@ -437,6 +513,25 @@ export const NewsBlockEditor: React.FC<NewsBlockEditorProps> = ({
                     </span>
                     <span className="text-[10px] text-text-secondary">
                       {texts.BLOCK_TYPE_H3_DESC}
+                    </span>
+                  </LayoutContainer>
+                </button>
+
+                {/* Imagem no Texto */}
+                <button
+                  type="button"
+                  onClick={() => applyBlockType('image')}
+                  className="w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg hover:bg-drawer text-left transition-colors cursor-pointer group"
+                >
+                  <LayoutContainer className="w-6 h-6 rounded-md bg-primary/10 text-primary flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                    <ImageIcon className="w-3.5 h-3.5" />
+                  </LayoutContainer>
+                  <LayoutContainer className="flex flex-col">
+                    <span className="text-xs font-bold text-text-primary">
+                      {texts.BLOCK_TYPE_IMAGE}
+                    </span>
+                    <span className="text-[10px] text-text-secondary">
+                      {texts.BLOCK_TYPE_IMAGE_DESC}
                     </span>
                   </LayoutContainer>
                 </button>
@@ -517,26 +612,20 @@ export const NewsBlockEditor: React.FC<NewsBlockEditorProps> = ({
                   </LayoutContainer>
                 </button>
 
-                {/* Ações do Bloco (Divisor, Add Abaixo, Excluir) */}
-                <LayoutContainer className="h-px bg-border my-1" />
-
-                <button
-                  type="button"
-                  onClick={handleAddBlockBelow}
-                  className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-drawer text-left transition-colors cursor-pointer text-xs font-semibold text-text-primary"
-                >
-                  <Plus className="w-3.5 h-3.5 text-primary" />
-                  <span>{texts.BLOCK_ACTION_ADD_BELOW}</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleDeleteBlock}
-                  className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-error/10 text-left transition-colors cursor-pointer text-xs font-semibold text-error"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                  <span>{texts.BLOCK_ACTION_DELETE}</span>
-                </button>
+                {/* Se estiver no modo Transformar, exibe a opção de excluir bloco */}
+                {menuMode === 'transform' && (
+                  <>
+                    <LayoutContainer className="h-px bg-border my-1" />
+                    <button
+                      type="button"
+                      onClick={handleDeleteBlock}
+                      className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-error/10 text-left transition-colors cursor-pointer text-xs font-semibold text-error"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>{texts.BLOCK_ACTION_DELETE}</span>
+                    </button>
+                  </>
+                )}
               </LayoutContainer>
             )}
           </LayoutContainer>
@@ -552,9 +641,84 @@ export const NewsBlockEditor: React.FC<NewsBlockEditorProps> = ({
       <LayoutContainer className="px-4 py-2 border-t border-border bg-drawer/50 rounded-b-xl flex items-center gap-2 text-[11px] text-text-secondary">
         <Sparkles className="w-3 h-3 text-primary shrink-0" />
         <span>
-          Passe o mouse na lateral da linha e clique nos pontinhos (<strong>⋮⋮</strong>) para transformar o bloco (Título, Subtítulo, Citação, Lista) ou no (<strong>+</strong>) para adicionar um novo bloco.
+          Clique no (<strong>+</strong>) para inserir um novo bloco abaixo ou nos pontinhos (<strong>⋮⋮</strong>) para transformar a linha atual (Título, Subtítulo, Imagem, Citação, Lista).
         </span>
       </LayoutContainer>
+
+      {/* Modal / Dialog to Insert Image into Text */}
+      {isImageModalOpen && (
+        <LayoutContainer className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+          <LayoutContainer className="w-full max-w-md rounded-2xl bg-surface border border-border shadow-2xl p-6 flex flex-col gap-4">
+            <LayoutContainer className="flex items-center justify-between pb-2 border-b border-border">
+              <Text className="text-sm font-bold text-text-primary flex items-center gap-2">
+                <ImageIcon className="w-4 h-4 text-primary" />
+                {texts.IMAGE_MODAL_TITLE}
+              </Text>
+              <button
+                type="button"
+                onClick={() => setIsImageModalOpen(false)}
+                className="w-7 h-7 rounded-full bg-drawer flex items-center justify-center text-text-secondary hover:text-text-primary cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </LayoutContainer>
+
+            {/* Option A: Upload from computer */}
+            <LayoutContainer className="flex flex-col gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full justify-center text-xs font-bold py-3"
+                leftIcon={<Upload className="w-4 h-4 text-primary" />}
+                onClick={() => fileInputRef.current?.click()}
+              >
+                {texts.IMAGE_MODAL_UPLOAD_BTN}
+              </Button>
+            </LayoutContainer>
+
+            <LayoutContainer className="flex items-center gap-3">
+              <LayoutContainer className="flex-1 h-px bg-border" />
+              <Text className="text-[11px] text-text-secondary uppercase">OU</Text>
+              <LayoutContainer className="flex-1 h-px bg-border" />
+            </LayoutContainer>
+
+            {/* Option B: Insert via URL */}
+            <LayoutContainer className="flex flex-col gap-2">
+              <Text className="text-xs font-semibold text-text-primary">
+                {texts.IMAGE_MODAL_URL_LABEL}
+              </Text>
+              <Input
+                type="url"
+                value={imageUrlInput}
+                onChange={(e) => setImageUrlInput(e.target.value)}
+                placeholder={texts.IMAGE_MODAL_URL_PLACEHOLDER}
+                className="text-xs"
+              />
+            </LayoutContainer>
+
+            <LayoutContainer className="flex items-center justify-end gap-2 pt-2 border-t border-border">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsImageModalOpen(false)}
+              >
+                {texts.IMAGE_MODAL_CANCEL_BTN}
+              </Button>
+              <Button
+                type="button"
+                variant="primary"
+                size="sm"
+                onClick={handleInsertImageUrl}
+                disabled={!imageUrlInput.trim()}
+                leftIcon={<LinkIcon className="w-3.5 h-3.5" />}
+              >
+                {texts.IMAGE_MODAL_INSERT_BTN}
+              </Button>
+            </LayoutContainer>
+          </LayoutContainer>
+        </LayoutContainer>
+      )}
     </LayoutContainer>
   );
 };

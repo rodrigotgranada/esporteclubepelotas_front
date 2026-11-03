@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { LayoutContainer, Title, Text } from '@/shared/ui/components';
+import { LayoutContainer, Title, Text, SafeImage } from '@/shared/ui/components';
 
 interface TiptapMark {
   type: string;
@@ -152,6 +152,31 @@ export const NewsRenderer: React.FC<NewsRendererProps> = ({ content, className =
 
       case 'horizontalRule': {
         return <LayoutContainer key={index} className="w-full h-px bg-border my-6" />;
+      }
+
+      case 'image': {
+        const src = node.attrs?.src;
+        const alt = node.attrs?.alt || '';
+        const caption = node.attrs?.title || alt;
+        if (!src) return null;
+        return (
+          <LayoutContainer key={index} className="my-6 flex flex-col gap-2">
+            <LayoutContainer className="relative w-full aspect-video rounded-2xl overflow-hidden bg-drawer border border-border shadow-xs">
+              <SafeImage
+                src={src}
+                alt={alt}
+                fill
+                sizes="(max-width: 1200px) 100vw, 896px"
+                className="object-cover"
+              />
+            </LayoutContainer>
+            {caption && (
+              <Text className="text-xs text-text-secondary text-center italic">
+                {caption}
+              </Text>
+            )}
+          </LayoutContainer>
+        );
       }
 
       default:
