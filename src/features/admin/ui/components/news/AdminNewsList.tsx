@@ -357,3 +357,4 @@ export const AdminNewsList: React.FC<AdminNewsListProps> = ({
     </LayoutContainer>
   );
 };
+

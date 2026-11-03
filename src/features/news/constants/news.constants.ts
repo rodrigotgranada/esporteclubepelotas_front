@@ -16,3 +16,4 @@ export const PUBLIC_NEWS_TEXTS = {
   GALLERY_TITLE: 'Galeria de Fotos da Partida',
   VIDEO_TITLE: 'Vídeo da Matéria',
 };
+

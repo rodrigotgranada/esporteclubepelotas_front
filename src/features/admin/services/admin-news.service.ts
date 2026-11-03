@@ -113,3 +113,4 @@ export const adminNewsService = {
     return response.data;
   },
 };
+

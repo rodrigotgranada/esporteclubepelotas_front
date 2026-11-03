@@ -251,3 +251,4 @@ export const NewsBlockEditor: React.FC<NewsBlockEditorProps> = ({
     </LayoutContainer>
   );
 };
+

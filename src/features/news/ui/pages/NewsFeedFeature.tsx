@@ -11,7 +11,7 @@ import {
 } from '@/shared/ui/components';
 import { PUBLIC_NEWS_TEXTS } from '../../constants/news.constants';
 import { useNewsFeed } from '../../hooks/useNewsFeed';
-import { NewsFeaturedHero } from '../components/NewsFeaturedHero';
+import { NewsBentoHero } from '../components/NewsBentoHero';
 import { NewsFilterBar } from '../components/NewsFilterBar';
 import { NewsCard } from '../components/NewsCard';
 
@@ -30,10 +30,7 @@ export const NewsFeedFeature: React.FC = () => {
     isLoading,
   } = useNewsFeed();
 
-  const primaryFeatured =
-    !selectedCategory && !search && featuredArticles.length > 0
-      ? featuredArticles[0]
-      : null;
+  const showBentoHero = !selectedCategory && !search && featuredArticles.length > 0;
 
   return (
     <LayoutContainer className="flex flex-col gap-8 py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
@@ -47,9 +44,9 @@ export const NewsFeedFeature: React.FC = () => {
         </Text>
       </LayoutContainer>
 
-      {/* Featured Hero (Manchetão) when not searching */}
-      {primaryFeatured && (
-        <NewsFeaturedHero article={primaryFeatured} />
+      {/* Featured Bento Hero Grid quando sem pesquisa */}
+      {showBentoHero && (
+        <NewsBentoHero articles={featuredArticles} />
       )}
 
       {/* Filter and Search Bar */}
@@ -116,3 +113,4 @@ export const NewsFeedFeature: React.FC = () => {
     </LayoutContainer>
   );
 };
+

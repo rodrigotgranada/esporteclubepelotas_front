@@ -7,8 +7,11 @@ export const HOME_FEATURE_TEXTS = {
   BUTTON_LOGIN: 'Já sou cadastrado',
   SECTION_MATCH_TITLE: 'Próximo Jogo',
   SECTION_MATCH_DESC: 'Em breve...',
-  SECTION_NEWS_TITLE: 'Notícias',
-  SECTION_NEWS_DESC: 'Acompanhe as novidades do Lobo.',
+  SECTION_NEWS_BADGE: 'Central de Notícias',
+  SECTION_NEWS_TITLE: 'Destaques & Notícias do Lobo',
+  SECTION_NEWS_SUBTITLE: 'Acompanhe em primeira mão os jogos, contratações e comunicados oficiais do clube.',
+  BUTTON_ALL_NEWS: 'Ver Todas as Notícias →',
+  LATEST_NEWS_TITLE: 'Mais Recentes do Portal',
   SECTION_STORE_TITLE: 'Loja do Lobo',
   SECTION_STORE_DESC: 'Produtos oficiais em breve.',
 };

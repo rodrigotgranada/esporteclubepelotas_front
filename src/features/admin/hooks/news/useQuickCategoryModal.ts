@@ -65,3 +65,4 @@ export const useQuickCategoryModal = (onCategoryCreated?: (category: NewsCategor
     handleSubmit,
   };
 };
+

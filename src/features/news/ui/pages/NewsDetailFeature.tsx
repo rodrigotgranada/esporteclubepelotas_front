@@ -11,6 +11,7 @@ import {
   Video,
   Image as ImageIcon,
   Check,
+  Clock,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import {
@@ -25,6 +26,7 @@ import { PUBLIC_NEWS_TEXTS } from '../../constants/news.constants';
 import { useNewsArticle } from '../../hooks/useNewsArticle';
 import { NewsRenderer } from '../components/NewsRenderer';
 import { NewsCard } from '../components/NewsCard';
+import { calculateReadingTime } from '../../utils/news.utils';
 
 export interface NewsDetailFeatureProps {
   slug: string;
@@ -152,6 +154,12 @@ export const NewsDetailFeature: React.FC<NewsDetailFeatureProps> = ({ slug }) =>
                 </LayoutContainer>
               </>
             )}
+
+            <Text as="span">•</Text>
+            <LayoutContainer className="flex items-center gap-1.5">
+              <Clock className="w-4 h-4 text-primary" />
+              <Text as="span">{calculateReadingTime(article)}</Text>
+            </LayoutContainer>
 
             {article.viewsCount !== undefined && (
               <>

@@ -165,3 +165,4 @@ export const NewsRenderer: React.FC<NewsRendererProps> = ({ content, className =
     </LayoutContainer>
   );
 };
+

@@ -19,3 +19,4 @@ export default async function NoticiaSlugPage({ params }: Props) {
   const { slug } = await params;
   return <NewsDetailFeature slug={slug} />;
 }
+

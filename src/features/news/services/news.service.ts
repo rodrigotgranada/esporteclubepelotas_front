@@ -31,3 +31,4 @@ export const newsService = {
     return response.data;
   },
 };
+

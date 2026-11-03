@@ -108,3 +108,4 @@ export const ADMIN_NEWS_TEXTS = {
     REDO: 'Refazer',
   },
 };
+

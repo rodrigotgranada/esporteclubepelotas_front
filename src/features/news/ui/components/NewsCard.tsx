@@ -2,9 +2,10 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Eye, Calendar, Sparkles } from 'lucide-react';
+import { Eye, Calendar, Sparkles, Clock, Video, Image as ImageIcon } from 'lucide-react';
 import { LayoutContainer, Title, Text, Badge } from '@/shared/ui/components';
 import { NewsArticleData } from '@/features/admin/services/admin-news.service';
+import { calculateReadingTime, formatNewsDate, getCategoryName } from '../../utils/news.utils';
 
 export interface NewsCardProps {
   article: NewsArticleData;
@@ -12,23 +13,15 @@ export interface NewsCardProps {
 }
 
 export const NewsCard: React.FC<NewsCardProps> = ({ article, className = '' }) => {
-  const categoryName =
-    typeof article.category === 'object' && article.category
-      ? article.category.name
-      : article.category || 'Geral';
+  const categoryName = getCategoryName(article.category);
 
   const authorName =
     typeof article.author === 'object' && article.author
       ? `${article.author.firstName || ''} ${article.author.lastName || ''}`.trim()
       : 'Redação';
 
-  const formattedDate = article.publishedAt
-    ? new Date(article.publishedAt).toLocaleDateString('pt-BR', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric',
-      })
-    : '';
+  const formattedDate = formatNewsDate(article.publishedAt);
+  const readingTime = calculateReadingTime(article);
 
   return (
     <Link
@@ -52,10 +45,24 @@ export const NewsCard: React.FC<NewsCardProps> = ({ article, className = '' }) =
           )}
 
           {/* Category Badge on top left of image */}
-          <LayoutContainer className="absolute top-3 left-3 z-10">
+          <LayoutContainer className="absolute top-3 left-3 z-10 flex items-center gap-1.5">
             <Badge variant="primary" size="sm" className="font-bold shadow-sm">
               {categoryName}
             </Badge>
+
+            {article.youtubeVideoUrl && (
+              <Badge variant="default" size="sm" className="bg-black/70 text-white border-white/20 backdrop-blur-xs flex items-center gap-1">
+                <Video className="w-3 h-3 text-primary" />
+                Vídeo
+              </Badge>
+            )}
+
+            {article.gallery && article.gallery.length > 0 && (
+              <Badge variant="default" size="sm" className="bg-black/70 text-white border-white/20 backdrop-blur-xs flex items-center gap-1">
+                <ImageIcon className="w-3 h-3 text-primary" />
+                Fotos
+              </Badge>
+            )}
           </LayoutContainer>
 
           {article.isFeatured && (
@@ -71,14 +78,22 @@ export const NewsCard: React.FC<NewsCardProps> = ({ article, className = '' }) =
         {/* Content Body */}
         <LayoutContainer className="flex-1 p-5 flex flex-col justify-between gap-3">
           <LayoutContainer className="flex flex-col gap-2">
-            {/* Date & Views */}
-            <LayoutContainer className="flex items-center gap-3 text-xs text-text-secondary">
+            {/* Date, Reading Time & Views */}
+            <LayoutContainer className="flex flex-wrap items-center gap-2 text-xs text-text-secondary">
               {formattedDate && (
                 <LayoutContainer className="flex items-center gap-1">
                   <Calendar className="w-3.5 h-3.5" />
                   <Text as="span">{formattedDate}</Text>
                 </LayoutContainer>
               )}
+
+              <Text as="span">•</Text>
+
+              <LayoutContainer className="flex items-center gap-1">
+                <Clock className="w-3.5 h-3.5" />
+                <Text as="span">{readingTime}</Text>
+              </LayoutContainer>
+
               {article.viewsCount !== undefined && (
                 <>
                   <Text as="span">•</Text>
