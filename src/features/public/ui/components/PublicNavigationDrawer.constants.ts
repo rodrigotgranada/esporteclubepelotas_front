@@ -10,30 +10,28 @@ export const PUBLIC_DRAWER_TEXTS = {
   MEMBERSHIP_CARD_BTN: 'Conhecer Planos de Sócio',
   MEMBERSHIP_BADGE: 'SEJA SÓCIO LOBO',
 
+  SECTION_NEWS: 'Comunicação & Notícias',
+  LINK_NEWS: 'Central de Notícias',
+  LINK_NEWS_DESC: 'Cobertura completa, notas e bastidores',
+
   SECTION_FOOTBALL: 'Futebol & Temporada',
   LINK_SQUAD: 'Elenco Profissional',
   LINK_YOUTH: 'Categorias de Base',
   LINK_MATCHES: 'Jogos & Campeonatos',
   BADGE_COMING_SOON: 'Em breve',
 
-  SECTION_NEWS: 'Comunicação & Notícias',
-  LINK_NEWS: 'Central de Notícias',
-  LINK_NEWS_DESC: 'Cobertura completa, notas e bastidores',
-  LINK_TICKETS: 'Ingressos e Partidas',
-  LINK_TICKETS_DESC: 'Garanta seu lugar na arquibancada',
-
   SECTION_CLUB: 'O Clube & Memória',
   LINK_STADIUM: 'Estádio Boca do Lobo',
-  LINK_STADIUM_DESC: 'História, localização e capacidade',
-  STADIUM_BADGE: 'Estádio Centenário',
+  LINK_STADIUM_DESC: 'História e patrimônio centenário',
+  STADIUM_BADGE: 'Centenário',
   LINK_IDOLS: 'Galeria de Ídolos',
   LINK_HISTORY: 'Linha do Tempo',
 
-  SECTION_CONTACTS: 'Atendimento & Secretaria',
-  HOURS_TITLE: 'Horários de Atendimento',
-  SECTION_SOCIAL: 'Canais Oficiais',
-
   THEME_TITLE: 'Aparência',
+  THEME_LIGHT: 'Modo Claro',
+  THEME_DARK: 'Modo Escuro',
+  THEME_SWITCH_ARIA: 'Alternar entre modo claro e escuro',
+
   BTN_LOGIN: 'Acessar Minha Conta',
   BTN_REGISTER: 'Cadastre-se',
   NO_ACCOUNT_PROMPT: 'Ainda não é cadastrado?',
@@ -43,5 +41,6 @@ export const PUBLIC_DRAWER_TEXTS = {
   BTN_ADMIN: 'Painel Admin',
   COPYRIGHT: '© 2026 Esporte Clube Pelotas • Tradição Centenária',
 };
+
 
 

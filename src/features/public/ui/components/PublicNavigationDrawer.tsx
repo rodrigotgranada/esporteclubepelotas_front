@@ -17,83 +17,21 @@ import {
   X,
   ChevronRight,
   Newspaper,
-  Ticket,
+  Shield,
   Trophy,
   History,
-  MapPin,
-  Clock,
-  Phone,
   Sparkles,
   User as UserIcon,
   Settings as SettingsIcon,
   LogOut,
   LogIn,
-  ExternalLink,
+  Sun,
+  Moon,
 } from 'lucide-react';
-import {
-  FaInstagram,
-  FaFacebookF,
-  FaXTwitter,
-  FaThreads,
-  FaYoutube,
-  FaTiktok,
-  FaLinkedinIn,
-  FaWhatsapp,
-} from 'react-icons/fa6';
-import { ThemeToggle } from '@/shared/ui/components/molecules/ThemeToggle';
 import { useAuthStore } from '@/store/useAuthStore';
-import { useSettingsStore, SocialPlatform } from '@/store/useSettingsStore';
+import { useSettingsStore } from '@/store/useSettingsStore';
+import { useThemeStore } from '@/store/useThemeStore';
 import { PUBLIC_DRAWER_TEXTS } from './PublicNavigationDrawer.constants';
-
-const PLATFORM_ICONS: Record<
-  SocialPlatform,
-  { icon: React.ElementType; color: string; hoverBg: string }
-> = {
-  instagram: {
-    icon: FaInstagram,
-    color: '#E1306C',
-    hoverBg: 'hover:border-[#E1306C]/50 hover:bg-[#E1306C]/10',
-  },
-  facebook: {
-    icon: FaFacebookF,
-    color: '#1877F2',
-    hoverBg: 'hover:border-[#1877F2]/50 hover:bg-[#1877F2]/10',
-  },
-  x: {
-    icon: FaXTwitter,
-    color: 'currentColor',
-    hoverBg: 'hover:border-primary/50 hover:bg-primary/10',
-  },
-  threads: {
-    icon: FaThreads,
-    color: 'currentColor',
-    hoverBg: 'hover:border-primary/50 hover:bg-primary/10',
-  },
-  youtube: {
-    icon: FaYoutube,
-    color: '#ea580c',
-    hoverBg: 'hover:border-[#ea580c]/50 hover:bg-[#ea580c]/10',
-  },
-  tiktok: {
-    icon: FaTiktok,
-    color: '#00f2fe',
-    hoverBg: 'hover:border-[#00f2fe]/50 hover:bg-[#00f2fe]/10',
-  },
-  linkedin: {
-    icon: FaLinkedinIn,
-    color: '#0A66C2',
-    hoverBg: 'hover:border-[#0A66C2]/50 hover:bg-[#0A66C2]/10',
-  },
-};
-
-const formatPhoneLink = (rawNumber: string, isWhatsapp?: boolean) => {
-  const digits = rawNumber.replace(/\D/g, '');
-  if (isWhatsapp) {
-    const fullNumber = digits.startsWith('55') ? digits : `55${digits}`;
-    return `https://wa.me/${fullNumber}`;
-  }
-  return `tel:${digits}`;
-};
 
 export interface PublicNavigationDrawerProps {
   isOpen: boolean;
@@ -106,12 +44,33 @@ export const PublicNavigationDrawer: React.FC<PublicNavigationDrawerProps> = ({
 }) => {
   const { user, logout } = useAuthStore();
   const { settings } = useSettingsStore();
+  const { mode, setMode } = useThemeStore();
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
+  const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Sync dark state for simple binary switch
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (mode === 'dark') {
+        setIsDark(true);
+      } else if (mode === 'light') {
+        setIsDark(false);
+      } else {
+        setIsDark(window.matchMedia('(prefers-color-scheme: dark)').matches);
+      }
+    }
+  }, [mode]);
+
+  const toggleTheme = () => {
+    const nextMode = isDark ? 'light' : 'dark';
+    setMode(nextMode);
+    setIsDark(!isDark);
+  };
 
   // Close drawer on escape key
   useEffect(() => {
@@ -149,9 +108,6 @@ export const PublicNavigationDrawer: React.FC<PublicNavigationDrawerProps> = ({
   if (!isOpen || !mounted) return null;
 
   const clubName = settings?.clubName || 'Esporte Clube Pelotas';
-  const socialLinks = settings?.socialLinks || [];
-  const contactPhones = settings?.contactPhones || [];
-  const openingHours = settings?.openingHours || [];
 
   return createPortal(
     <LayoutContainer className="fixed inset-0 z-[9999] overflow-hidden">
@@ -208,7 +164,7 @@ export const PublicNavigationDrawer: React.FC<PublicNavigationDrawerProps> = ({
 
           {/* Drawer Scrollable Content */}
           <LayoutContainer className="flex-1 p-5 sm:p-6 flex flex-col gap-6">
-            {/* Membership Highlight Card (Styled like an official Member Card) */}
+            {/* 1. Membership Highlight Card */}
             <LayoutContainer className="rounded-2xl p-5 bg-gradient-to-br from-secondary/15 via-surface to-primary/10 border border-primary/40 shadow-xs flex flex-col gap-3 relative overflow-hidden group">
               <LayoutContainer className="flex items-center justify-between">
                 <Badge variant="primary" size="sm" className="font-extrabold uppercase text-[10px] tracking-wider px-2 py-0.5 shadow-xs">
@@ -229,101 +185,105 @@ export const PublicNavigationDrawer: React.FC<PublicNavigationDrawerProps> = ({
               </Text>
 
               <Link href="/socio" onClick={onClose} className="pt-1">
-                <Button variant="primary" size="sm" className="w-full font-extrabold uppercase tracking-wide justify-between text-xs py-2 shadow-xs">
+                <Button variant="primary" size="sm" className="w-full font-extrabold uppercase tracking-wide justify-between text-xs py-2.5 shadow-xs">
                   <span>{PUBLIC_DRAWER_TEXTS.MEMBERSHIP_CARD_BTN}</span>
                   <ChevronRight className="w-4 h-4" />
                 </Button>
               </Link>
             </LayoutContainer>
 
-            {/* Navigation Section 1: Notícias & Ingressos */}
+            {/* 2. Navigation Section: Comunicação & Notícias */}
             <LayoutContainer className="flex flex-col gap-2">
               <Text className="text-[11px] font-extrabold text-text-secondary uppercase tracking-wider px-1">
                 {PUBLIC_DRAWER_TEXTS.SECTION_NEWS}
               </Text>
 
-              <LayoutContainer className="flex flex-col gap-2">
-                <Link
-                  href="/noticias"
-                  onClick={onClose}
-                  className="flex items-center justify-between p-3 rounded-xl bg-surface/70 hover:bg-surface border border-border/70 hover:border-primary/50 transition-all group"
-                >
-                  <LayoutContainer className="flex items-center gap-3">
-                    <LayoutContainer className="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:bg-primary group-hover:text-black transition-all">
-                      <Newspaper className="w-4 h-4" />
-                    </LayoutContainer>
-                    <LayoutContainer className="flex flex-col">
-                      <span className="text-sm font-bold text-text-primary group-hover:text-primary transition-colors">
-                        {PUBLIC_DRAWER_TEXTS.LINK_NEWS}
-                      </span>
-                      <span className="text-[11px] text-text-secondary">
-                        {PUBLIC_DRAWER_TEXTS.LINK_NEWS_DESC}
-                      </span>
-                    </LayoutContainer>
+              <Link
+                href="/noticias"
+                onClick={onClose}
+                className="flex items-center justify-between p-3.5 rounded-xl bg-surface/70 hover:bg-surface border border-border/70 hover:border-primary/50 transition-all group"
+              >
+                <LayoutContainer className="flex items-center gap-3">
+                  <LayoutContainer className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:bg-primary group-hover:text-black transition-all">
+                    <Newspaper className="w-5 h-5" />
                   </LayoutContainer>
-                  <ChevronRight className="w-4 h-4 text-text-secondary/60 group-hover:text-primary group-hover:translate-x-1 transition-all" />
-                </Link>
+                  <LayoutContainer className="flex flex-col">
+                    <span className="text-sm font-bold text-text-primary group-hover:text-primary transition-colors">
+                      {PUBLIC_DRAWER_TEXTS.LINK_NEWS}
+                    </span>
+                    <span className="text-xs text-text-secondary">
+                      {PUBLIC_DRAWER_TEXTS.LINK_NEWS_DESC}
+                    </span>
+                  </LayoutContainer>
+                </LayoutContainer>
+                <ChevronRight className="w-4 h-4 text-text-secondary/60 group-hover:text-primary group-hover:translate-x-1 transition-all" />
+              </Link>
+            </LayoutContainer>
 
-                <Link
-                  href="/ingressos"
-                  onClick={onClose}
-                  className="flex items-center justify-between p-3 rounded-xl bg-surface/70 hover:bg-surface border border-border/70 hover:border-primary/50 transition-all group"
-                >
-                  <LayoutContainer className="flex items-center gap-3">
-                    <LayoutContainer className="w-9 h-9 rounded-xl bg-secondary/15 text-secondary flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:bg-secondary group-hover:text-white transition-all">
-                      <Ticket className="w-4 h-4" />
-                    </LayoutContainer>
-                    <LayoutContainer className="flex flex-col">
-                      <span className="text-sm font-bold text-text-primary group-hover:text-primary transition-colors">
-                        {PUBLIC_DRAWER_TEXTS.LINK_TICKETS}
-                      </span>
-                      <span className="text-[11px] text-text-secondary">
-                        {PUBLIC_DRAWER_TEXTS.LINK_TICKETS_DESC}
-                      </span>
-                    </LayoutContainer>
+            {/* 3. Navigation Section: Futebol & Temporada */}
+            <LayoutContainer className="flex flex-col gap-2">
+              <Text className="text-[11px] font-extrabold text-text-secondary uppercase tracking-wider px-1">
+                {PUBLIC_DRAWER_TEXTS.SECTION_FOOTBALL}
+              </Text>
+
+              <LayoutContainer className="grid grid-cols-2 gap-2">
+                <LayoutContainer className="p-3.5 rounded-xl bg-surface/50 border border-border/70 flex flex-col gap-2 opacity-85 hover:opacity-100 transition-opacity">
+                  <LayoutContainer className="flex items-center justify-between">
+                    <Trophy className="w-4 h-4 text-primary" />
+                    <Badge variant="default" size="sm" className="text-[9px] py-0 px-1.5 font-medium">
+                      {PUBLIC_DRAWER_TEXTS.BADGE_COMING_SOON}
+                    </Badge>
                   </LayoutContainer>
-                  <ChevronRight className="w-4 h-4 text-text-secondary/60 group-hover:text-primary group-hover:translate-x-1 transition-all" />
-                </Link>
+                  <span className="text-xs font-bold text-text-primary">
+                    {PUBLIC_DRAWER_TEXTS.LINK_SQUAD}
+                  </span>
+                </LayoutContainer>
+
+                <LayoutContainer className="p-3.5 rounded-xl bg-surface/50 border border-border/70 flex flex-col gap-2 opacity-85 hover:opacity-100 transition-opacity">
+                  <LayoutContainer className="flex items-center justify-between">
+                    <Shield className="w-4 h-4 text-primary" />
+                    <Badge variant="default" size="sm" className="text-[9px] py-0 px-1.5 font-medium">
+                      {PUBLIC_DRAWER_TEXTS.BADGE_COMING_SOON}
+                    </Badge>
+                  </LayoutContainer>
+                  <span className="text-xs font-bold text-text-primary">
+                    {PUBLIC_DRAWER_TEXTS.LINK_YOUTH}
+                  </span>
+                </LayoutContainer>
               </LayoutContainer>
             </LayoutContainer>
 
-            {/* Navigation Section 2: O Clube & Estádio Boca do Lobo */}
+            {/* 4. Navigation Section: O Clube & Memória */}
             <LayoutContainer className="flex flex-col gap-2">
               <Text className="text-[11px] font-extrabold text-text-secondary uppercase tracking-wider px-1">
                 {PUBLIC_DRAWER_TEXTS.SECTION_CLUB}
               </Text>
 
               <LayoutContainer className="flex flex-col gap-2">
-                {/* Boca do Lobo Featured Link */}
-                <a
-                  href="https://maps.google.com/?q=Est%C3%A1dio+Boca+do+Lobo+Pelotas"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-between p-3 rounded-xl bg-surface/70 hover:bg-surface border border-border/70 hover:border-primary/50 transition-all group"
-                >
+                {/* Boca do Lobo Patrimônio */}
+                <LayoutContainer className="flex items-center justify-between p-3.5 rounded-xl bg-surface/70 border border-border/70">
                   <LayoutContainer className="flex items-center gap-3">
-                    <LayoutContainer className="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:bg-primary group-hover:text-black transition-all">
-                      <MapPin className="w-4 h-4" />
+                    <LayoutContainer className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                      <Shield className="w-5 h-5" />
                     </LayoutContainer>
                     <LayoutContainer className="flex flex-col">
                       <LayoutContainer className="flex items-center gap-2">
-                        <span className="text-sm font-bold text-text-primary group-hover:text-primary transition-colors">
+                        <span className="text-sm font-bold text-text-primary">
                           {PUBLIC_DRAWER_TEXTS.LINK_STADIUM}
                         </span>
-                        <Badge variant="default" size="sm" className="text-[9px] py-0 px-1 font-semibold">
+                        <Badge variant="default" size="sm" className="text-[9px] py-0 px-1.5 font-semibold">
                           {PUBLIC_DRAWER_TEXTS.STADIUM_BADGE}
                         </Badge>
                       </LayoutContainer>
-                      <span className="text-[11px] text-text-secondary">
+                      <span className="text-xs text-text-secondary">
                         {PUBLIC_DRAWER_TEXTS.LINK_STADIUM_DESC}
                       </span>
                     </LayoutContainer>
                   </LayoutContainer>
-                  <ExternalLink className="w-4 h-4 text-text-secondary/60 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
-                </a>
+                </LayoutContainer>
 
                 {/* Ídolos e Linha do Tempo Grid */}
-                <LayoutContainer className="grid grid-cols-2 gap-2 pt-0.5">
+                <LayoutContainer className="grid grid-cols-2 gap-2">
                   <LayoutContainer className="p-3 rounded-xl bg-surface/50 border border-border/60 flex items-center justify-between opacity-85 hover:opacity-100 transition-opacity">
                     <LayoutContainer className="flex items-center gap-2">
                       <Trophy className="w-3.5 h-3.5 text-primary" />
@@ -350,90 +310,9 @@ export const PublicNavigationDrawer: React.FC<PublicNavigationDrawerProps> = ({
                 </LayoutContainer>
               </LayoutContainer>
             </LayoutContainer>
-
-            {/* Navigation Section 3: Central de Atendimento & Horários */}
-            <LayoutContainer className="flex flex-col gap-2.5 pt-2 border-t border-border/60">
-              <Text className="text-[11px] font-extrabold text-text-secondary uppercase tracking-wider px-1">
-                {PUBLIC_DRAWER_TEXTS.SECTION_CONTACTS}
-              </Text>
-
-              {/* Operating Hours Card */}
-              {openingHours.length > 0 && (
-                <LayoutContainer className="bg-surface/60 border border-border/80 rounded-xl p-3.5 flex flex-col gap-2 text-xs">
-                  <LayoutContainer className="flex items-center gap-1.5 text-primary font-bold">
-                    <Clock className="w-3.5 h-3.5" />
-                    <span className="text-xs font-extrabold uppercase tracking-wide">
-                      {PUBLIC_DRAWER_TEXTS.HOURS_TITLE}
-                    </span>
-                  </LayoutContainer>
-                  <LayoutContainer className="flex flex-col gap-1.5 pt-0.5">
-                    {openingHours.map((h, i) => (
-                      <LayoutContainer key={i} className="flex flex-col text-[11px]">
-                        <span className="font-bold text-text-primary">{h.department}</span>
-                        <span className="text-text-secondary">{h.schedule}</span>
-                      </LayoutContainer>
-                    ))}
-                  </LayoutContainer>
-                </LayoutContainer>
-              )}
-
-              {/* Quick Contact Buttons */}
-              <LayoutContainer className="flex flex-wrap gap-2">
-                {contactPhones.slice(0, 2).map((phone, idx) => (
-                  <a
-                    key={idx}
-                    href={formatPhoneLink(phone.number, phone.isWhatsapp)}
-                    target={phone.isWhatsapp ? '_blank' : undefined}
-                    rel={phone.isWhatsapp ? 'noopener noreferrer' : undefined}
-                    className={`inline-flex items-center gap-2 px-3 py-2 rounded-xl border text-xs font-bold transition-all ${
-                      phone.isWhatsapp
-                        ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20'
-                        : 'border-border bg-surface text-text-primary hover:text-primary hover:border-primary/40'
-                    }`}
-                  >
-                    {phone.isWhatsapp ? (
-                      <FaWhatsapp className="w-3.5 h-3.5 text-emerald-500" />
-                    ) : (
-                      <Phone className="w-3.5 h-3.5 text-primary" />
-                    )}
-                    <span>{phone.label}</span>
-                  </a>
-                ))}
-              </LayoutContainer>
-            </LayoutContainer>
-
-            {/* Official Social Media Channels (Modern Icon Row) */}
-            {socialLinks.length > 0 && (
-              <LayoutContainer className="flex flex-col gap-2 pt-2 border-t border-border/60">
-                <Text className="text-[11px] font-extrabold text-text-secondary uppercase tracking-wider px-1">
-                  {PUBLIC_DRAWER_TEXTS.SECTION_SOCIAL}
-                </Text>
-                <LayoutContainer className="flex flex-wrap items-center gap-2">
-                  {socialLinks.map((s, idx) => {
-                    const cfg = PLATFORM_ICONS[s.platform] || PLATFORM_ICONS.instagram;
-                    const IconComp = cfg.icon;
-                    return (
-                      <a
-                        key={idx}
-                        href={s.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={`w-9 h-9 rounded-xl border border-border/80 bg-surface flex items-center justify-center text-text-secondary hover:scale-105 hover:shadow-xs transition-all ${cfg.hoverBg}`}
-                        title={s.label || s.platform}
-                      >
-                        <IconComp
-                          className="w-4 h-4"
-                          style={{ color: cfg.color === 'currentColor' ? undefined : cfg.color }}
-                        />
-                      </a>
-                    );
-                  })}
-                </LayoutContainer>
-              </LayoutContainer>
-            )}
           </LayoutContainer>
 
-          {/* Bottom Footer of Drawer (User Session / Auth + Theme) */}
+          {/* Bottom Footer of Drawer (User Session / Auth + Clean Light/Dark Switch) */}
           <LayoutContainer className="p-5 sm:p-6 border-t border-border/80 bg-surface/90 backdrop-blur-md flex flex-col gap-4 sticky bottom-0 z-20">
             {user ? (
               <LayoutContainer className="flex flex-col gap-3">
@@ -498,7 +377,7 @@ export const PublicNavigationDrawer: React.FC<PublicNavigationDrawerProps> = ({
                 </Button>
               </LayoutContainer>
             ) : (
-              <LayoutContainer className="flex flex-col gap-2.5">
+              <LayoutContainer className="flex flex-col gap-2">
                 <Link href="/login" onClick={onClose}>
                   <Button
                     variant="primary"
@@ -522,12 +401,34 @@ export const PublicNavigationDrawer: React.FC<PublicNavigationDrawerProps> = ({
               </LayoutContainer>
             )}
 
-            {/* Theme Toggle Bar */}
-            <LayoutContainer className="pt-2 border-t border-border flex items-center justify-between text-xs text-text-secondary">
-              <span className="font-bold text-text-primary text-xs uppercase tracking-wider">
-                {PUBLIC_DRAWER_TEXTS.THEME_TITLE}
-              </span>
-              <ThemeToggle />
+            {/* Simple Binary Light / Dark Switch */}
+            <LayoutContainer className="pt-2 border-t border-border flex items-center justify-between p-2.5 rounded-xl bg-surface/70 border border-border/80">
+              <LayoutContainer className="flex items-center gap-2.5">
+                <LayoutContainer className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                  {isDark ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
+                </LayoutContainer>
+                <Text className="text-xs font-bold text-text-primary">
+                  {isDark ? PUBLIC_DRAWER_TEXTS.THEME_DARK : PUBLIC_DRAWER_TEXTS.THEME_LIGHT}
+                </Text>
+              </LayoutContainer>
+
+              {/* Toggle Switch */}
+              <button
+                type="button"
+                role="switch"
+                aria-checked={isDark}
+                aria-label={PUBLIC_DRAWER_TEXTS.THEME_SWITCH_ARIA}
+                onClick={toggleTheme}
+                className="relative inline-flex h-7 w-13 shrink-0 cursor-pointer rounded-full border border-border bg-background transition-colors duration-200 focus:outline-none"
+              >
+                <span
+                  className={`pointer-events-none flex h-5 w-5 transform items-center justify-center rounded-full bg-primary text-black font-bold shadow-sm transition-transform duration-200 ease-in-out mt-0.5 ml-0.5 ${
+                    isDark ? 'translate-x-6' : 'translate-x-0'
+                  }`}
+                >
+                  {isDark ? <Moon className="w-3 h-3" /> : <Sun className="w-3 h-3" />}
+                </span>
+              </button>
             </LayoutContainer>
 
             <Text className="text-[10px] text-text-secondary text-center">
