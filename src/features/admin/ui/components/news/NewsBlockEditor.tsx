@@ -188,11 +188,11 @@ export const NewsBlockEditor: React.FC<NewsBlockEditorProps> = ({
 
   return (
     <LayoutContainer
-      className={`rounded-xl border border-border bg-surface overflow-hidden transition-all focus-within:border-primary shadow-sm flex flex-col ${className}`}
+      className={`rounded-xl border border-border bg-surface transition-all focus-within:border-primary shadow-sm flex flex-col ${className}`}
     >
       {/* Top Format Bar */}
       {editable && (
-        <LayoutContainer className="flex flex-wrap items-center justify-between gap-1 p-2 bg-drawer border-b border-border text-xs">
+        <LayoutContainer className="flex flex-wrap items-center justify-between gap-1 p-2 bg-drawer border-b border-border rounded-t-xl text-xs">
           <LayoutContainer className="flex items-center gap-1">
             <IconButton
               type="button"
@@ -318,7 +318,7 @@ export const NewsBlockEditor: React.FC<NewsBlockEditorProps> = ({
         {editable && handleTop !== null && (
           <LayoutContainer
             style={{ top: `${Math.max(8, handleTop + 4)}px` }}
-            className="absolute left-2.5 z-30 flex items-center gap-0.5 select-none transition-all duration-150"
+            className="absolute left-2.5 z-40 flex items-center gap-0.5 select-none transition-all duration-150"
           >
             {/* 1. Add Block (+) Button */}
             <button
@@ -353,7 +353,13 @@ export const NewsBlockEditor: React.FC<NewsBlockEditorProps> = ({
             {isMenuOpen && (
               <LayoutContainer
                 ref={menuRef}
-                className="absolute top-8 left-0 w-64 rounded-xl border border-border bg-surface shadow-2xl p-2 flex flex-col gap-1 z-50 animate-in fade-in zoom-in-95 duration-150"
+                className={`absolute ${
+                  handleTop !== null &&
+                  editorWrapperRef.current &&
+                  handleTop > Math.max(60, editorWrapperRef.current.clientHeight - 340)
+                    ? 'bottom-8'
+                    : 'top-8'
+                } left-0 w-64 max-h-[340px] overflow-y-auto overscroll-contain rounded-xl border border-border bg-surface shadow-2xl p-2 flex flex-col gap-1 z-[60] animate-in fade-in zoom-in-95 duration-150`}
               >
                 <Text className="text-[10px] font-black uppercase tracking-wider text-text-secondary px-2 pt-1 pb-0.5">
                   Transformar Bloco em:
@@ -543,7 +549,7 @@ export const NewsBlockEditor: React.FC<NewsBlockEditorProps> = ({
       </LayoutContainer>
 
       {/* Helpful Hint Bar at Bottom */}
-      <LayoutContainer className="px-4 py-2 border-t border-border bg-drawer/50 flex items-center gap-2 text-[11px] text-text-secondary">
+      <LayoutContainer className="px-4 py-2 border-t border-border bg-drawer/50 rounded-b-xl flex items-center gap-2 text-[11px] text-text-secondary">
         <Sparkles className="w-3 h-3 text-primary shrink-0" />
         <span>
           Passe o mouse na lateral da linha e clique nos pontinhos (<strong>⋮⋮</strong>) para transformar o bloco (Título, Subtítulo, Citação, Lista) ou no (<strong>+</strong>) para adicionar um novo bloco.
