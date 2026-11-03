@@ -135,8 +135,8 @@ export const AdminNewsList: React.FC<AdminNewsListProps> = ({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {news.map((item) => (
-                  <TableRow key={item._id || item.id}>
+                {news.map((item, idx) => (
+                  <TableRow key={item.slug || (typeof item._id === 'string' ? item._id : item.id) || `admin-table-${idx}`}>
                     {/* Cover Thumbnail */}
                     <TableCell>
                       <LayoutContainer className="w-16 h-10 rounded-md overflow-hidden bg-background border border-border relative">
@@ -242,9 +242,9 @@ export const AdminNewsList: React.FC<AdminNewsListProps> = ({
 
           {/* Mobile Cards */}
           <LayoutContainer className="flex flex-col gap-3 md:hidden">
-            {news.map((item) => (
+            {news.map((item, idx) => (
               <LayoutContainer
-                key={item._id || item.id}
+                key={item.slug || (typeof item._id === 'string' ? item._id : item.id) || `admin-card-${idx}`}
                 className="bg-surface p-4 rounded-xl border border-border shadow-xs flex flex-col gap-3"
               >
                 <LayoutContainer className="flex items-start gap-3">

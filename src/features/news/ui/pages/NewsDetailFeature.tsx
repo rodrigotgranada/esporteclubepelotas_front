@@ -280,8 +280,11 @@ export const NewsDetailFeature: React.FC<NewsDetailFeatureProps> = ({ slug }) =>
             {PUBLIC_NEWS_TEXTS.RELATED_NEWS}
           </Title>
           <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {relatedNews.map((rel) => (
-              <NewsCard key={rel._id || rel.id} article={rel} />
+            {relatedNews.map((rel, idx) => (
+              <NewsCard
+                key={rel.slug || (typeof rel._id === 'string' ? rel._id : rel.id) || `rel-${idx}`}
+                article={rel}
+              />
             ))}
           </LayoutContainer>
         </LayoutContainer>

@@ -8,3 +8,4 @@ export const NEWS_BENTO_HERO_TEXTS = {
   FALLBACK_CATEGORY: 'E.C. Pelotas',
   AUTHOR_PREFIX: 'Por',
 };
+

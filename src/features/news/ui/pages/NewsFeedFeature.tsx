@@ -74,8 +74,11 @@ export const NewsFeedFeature: React.FC = () => {
         </LayoutContainer>
       ) : (
         <LayoutContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {news.map((article) => (
-            <NewsCard key={article._id || article.id} article={article} />
+          {news.map((article, idx) => (
+            <NewsCard
+              key={article.slug || (typeof article._id === 'string' ? article._id : article.id) || `feed-${idx}`}
+              article={article}
+            />
           ))}
         </LayoutContainer>
       )}

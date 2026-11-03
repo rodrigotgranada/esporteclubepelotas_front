@@ -37,9 +37,9 @@ export const HomeFeature = () => {
         setFeaturedNews(featuredRes);
 
         // Remove duplicados que já aparecem no Hero
-        const featuredIds = new Set(featuredRes.map((f) => f._id || f.id));
+        const featuredSlugs = new Set(featuredRes.map((f) => f.slug));
         const filteredLatest = feedRes.data
-          .filter((a) => !featuredIds.has(a._id || a.id))
+          .filter((a) => !featuredSlugs.has(a.slug))
           .slice(0, 3);
 
         setLatestNews(filteredLatest);
@@ -143,8 +143,11 @@ export const HomeFeature = () => {
                 {HOME_FEATURE_TEXTS.LATEST_NEWS_TITLE}
               </Title>
               <LayoutContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {latestNews.map((article) => (
-                  <NewsCard key={article._id || article.id} article={article} />
+                {latestNews.map((article, idx) => (
+                  <NewsCard
+                    key={article.slug || (typeof article._id === 'string' ? article._id : article.id) || `latest-${idx}`}
+                    article={article}
+                  />
                 ))}
               </LayoutContainer>
             </LayoutContainer>

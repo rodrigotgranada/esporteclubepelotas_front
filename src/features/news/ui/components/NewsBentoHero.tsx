@@ -160,9 +160,9 @@ export const NewsBentoHero: React.FC<NewsBentoHeroProps> = ({
         {/* 2. Sub-Destaques Laterais Empilhados */}
         {hasSubArticles && (
           <LayoutContainer className="lg:col-span-5 xl:col-span-4 flex flex-col sm:flex-row lg:flex-col gap-4 sm:gap-6 justify-between">
-            {subArticles.map((subArticle) => (
+            {subArticles.map((subArticle, idx) => (
               <Link
-                key={subArticle._id || subArticle.id}
+                key={subArticle.slug || (typeof subArticle._id === 'string' ? subArticle._id : subArticle.id) || `sub-${idx}`}
                 href={`/noticias/${subArticle.slug}`}
                 className="group block focus:outline-none flex-1"
               >
@@ -249,3 +249,4 @@ export const NewsBentoHero: React.FC<NewsBentoHeroProps> = ({
     </LayoutContainer>
   );
 };
+
