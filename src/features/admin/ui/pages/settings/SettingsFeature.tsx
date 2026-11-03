@@ -4,9 +4,9 @@ import React, { useState, useEffect } from 'react';
 import { LayoutContainer, Text, Title, Tabs, TabItem } from '@/shared/ui/components';
 import { SETTINGS_TEXTS } from '../../../constants/settings.constants';
 import { ThemesSettingsTab } from '../../components/settings/themes/ThemesSettingsTab';
-
 import { GeneralSettingsTab } from '../../components/settings/general/GeneralSettingsTab';
 import { SocialSettingsTab } from '../../components/settings/social/SocialSettingsTab';
+import { ContactsSettingsTab } from '../../components/settings/contacts/ContactsSettingsTab';
 
 export const SettingsFeature = () => {
   const [defaultTab, setDefaultTab] = useState<string>('LOGO');
@@ -39,7 +39,7 @@ export const SettingsFeature = () => {
         <LayoutContainer>
           <GeneralSettingsTab />
         </LayoutContainer>
-      )
+      ),
     },
     {
       id: 'THEME',
@@ -48,7 +48,7 @@ export const SettingsFeature = () => {
         <LayoutContainer>
           <ThemesSettingsTab />
         </LayoutContainer>
-      )
+      ),
     },
     {
       id: 'SOCIAL',
@@ -57,8 +57,17 @@ export const SettingsFeature = () => {
         <LayoutContainer>
           <SocialSettingsTab />
         </LayoutContainer>
-      )
-    }
+      ),
+    },
+    {
+      id: 'CONTACTS',
+      label: SETTINGS_TEXTS.TAB_CONTACTS,
+      content: (
+        <LayoutContainer>
+          <ContactsSettingsTab />
+        </LayoutContainer>
+      ),
+    },
   ];
 
   if (!isMounted) return null;
@@ -66,7 +75,9 @@ export const SettingsFeature = () => {
   return (
     <LayoutContainer className="max-w-6xl mx-auto">
       <LayoutContainer className="mb-8">
-        <Title level="h1" className="text-3xl font-bold text-text-primary mb-2">{SETTINGS_TEXTS.TITLE}</Title>
+        <Title level="h1" className="text-3xl font-bold text-text-primary mb-2">
+          {SETTINGS_TEXTS.TITLE}
+        </Title>
         <Text className="text-text-secondary">{SETTINGS_TEXTS.SUBTITLE}</Text>
       </LayoutContainer>
 

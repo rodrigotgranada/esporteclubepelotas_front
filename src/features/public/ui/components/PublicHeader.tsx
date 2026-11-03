@@ -49,6 +49,7 @@ export const PublicHeader = () => {
         {/* Desktop Navigation */}
         <LayoutContainer className="hidden md:flex flex-1 justify-center gap-8">
           <Link href="/" className="text-sm font-bold text-text-secondary hover:text-primary transition-colors">{PUBLIC_HEADER_TEXTS.NAV_HOME}</Link>
+          <Link href="/noticias" className="text-sm font-bold text-text-secondary hover:text-primary transition-colors">{PUBLIC_HEADER_TEXTS.NAV_NEWS}</Link>
           <Link href="/socio" className="text-sm font-bold text-text-secondary hover:text-primary transition-colors">{PUBLIC_HEADER_TEXTS.NAV_MEMBERSHIP}</Link>
           <Link href="/ingressos" className="text-sm font-bold text-text-secondary hover:text-primary transition-colors">{PUBLIC_HEADER_TEXTS.NAV_TICKETS}</Link>
         </LayoutContainer>
@@ -119,6 +120,7 @@ export const PublicHeader = () => {
         <LayoutContainer className="md:hidden absolute top-20 left-0 w-full bg-surface border-b border-border shadow-2xl px-6 py-6 space-y-6 animate-in slide-in-from-top-2 duration-200 z-40">
           <LayoutContainer className="space-y-4">
             <Link href="/" className="block text-lg font-bold text-text-secondary hover:text-primary" onClick={() => setIsMenuOpen(false)}>{PUBLIC_HEADER_TEXTS.NAV_HOME}</Link>
+            <Link href="/noticias" className="block text-lg font-bold text-text-secondary hover:text-primary" onClick={() => setIsMenuOpen(false)}>{PUBLIC_HEADER_TEXTS.NAV_NEWS}</Link>
             <Link href="/socio" className="block text-lg font-bold text-text-secondary hover:text-primary" onClick={() => setIsMenuOpen(false)}>{PUBLIC_HEADER_TEXTS.NAV_MEMBERSHIP}</Link>
             <Link href="/ingressos" className="block text-lg font-bold text-text-secondary hover:text-primary" onClick={() => setIsMenuOpen(false)}>{PUBLIC_HEADER_TEXTS.NAV_TICKETS}</Link>
           </LayoutContainer>

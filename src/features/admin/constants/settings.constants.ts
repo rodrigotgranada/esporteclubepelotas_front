@@ -4,6 +4,7 @@ export const SETTINGS_TEXTS = {
   TAB_LOGO: 'Logo e Identidade',
   TAB_THEME: 'Temas (Aparência)',
   TAB_SOCIAL: 'Redes Sociais',
+  TAB_CONTACTS: 'Contatos & Estádio',
   THEMES: {
     LOADING: 'Carregando temas...',
     LIST_DESC: 'Gerencie as paletas de cores do sistema e campanhas sazonais com cálculo automático e agendamento.',

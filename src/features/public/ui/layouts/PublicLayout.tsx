@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { PublicHeader } from '../components/PublicHeader';
+import { PublicHeader, PublicFooter } from '../components';
 import { LayoutContainer } from '@/shared/ui/components';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useRouter } from 'next/navigation';
@@ -22,6 +22,7 @@ export const PublicLayout = ({ children }: { children: React.ReactNode }) => {
       <LayoutContainer as="main" className="flex-1">
         {children}
       </LayoutContainer>
+      <PublicFooter />
     </LayoutContainer>
   );
 };

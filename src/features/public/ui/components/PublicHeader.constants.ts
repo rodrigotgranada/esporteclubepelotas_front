@@ -2,6 +2,7 @@ export const PUBLIC_HEADER_TEXTS = {
   LOGO_SHORT: 'ECP',
   LOGO_FULL: 'Esporte Clube Pelotas',
   NAV_HOME: 'Início',
+  NAV_NEWS: 'Notícias',
   NAV_MEMBERSHIP: 'Seja Sócio',
   NAV_TICKETS: 'Ingressos',
   MENU_PROFILE: 'Meu Perfil',

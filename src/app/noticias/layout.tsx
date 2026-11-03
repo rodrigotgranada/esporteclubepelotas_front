@@ -8,3 +8,4 @@ export default function NoticiasLayout({
 }) {
   return <PublicLayout>{children}</PublicLayout>;
 }
+
