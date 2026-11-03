@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Sparkles, Calendar, Eye, ArrowRight } from 'lucide-react';
-import { LayoutContainer, Title, Text, Badge, Button } from '@/shared/ui/components';
+import { LayoutContainer, Title, Text, Badge, Button, SafeImage } from '@/shared/ui/components';
 import { NewsArticleData } from '@/features/admin/services/admin-news.service';
 import { PUBLIC_NEWS_TEXTS } from '../../constants/news.constants';
 
@@ -29,14 +29,14 @@ export const NewsFeaturedHero: React.FC<NewsFeaturedHeroProps> = ({ article }) =
     <Link href={`/noticias/${article.slug}`} className="group block focus:outline-none w-full">
       <LayoutContainer className="relative w-full min-h-[380px] sm:min-h-[460px] md:min-h-[520px] rounded-3xl overflow-hidden bg-drawer border border-border shadow-md flex flex-col justify-end p-6 sm:p-8 md:p-12">
         {/* Background Cover Image with Zoom Effect */}
-        {article.coverImage && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={article.coverImage}
-            alt={article.title}
-            className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-          />
-        )}
+        <SafeImage
+          src={article.coverImage}
+          alt={article.title}
+          fill
+          sizes="100vw"
+          priority
+          className="object-cover transition-transform duration-700 group-hover:scale-105"
+        />
 
         {/* Gradient Overlay for Readability */}
         <LayoutContainer className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/60 to-black/20" />

@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Eye, Calendar, Sparkles, Clock, Video, Image as ImageIcon } from 'lucide-react';
-import { LayoutContainer, Title, Text, Badge } from '@/shared/ui/components';
+import { LayoutContainer, Title, Text, Badge, SafeImage } from '@/shared/ui/components';
 import { NewsArticleData } from '@/features/admin/services/admin-news.service';
 import { calculateReadingTime, formatNewsDate, getCategoryName } from '../../utils/news.utils';
 
@@ -31,18 +31,13 @@ export const NewsCard: React.FC<NewsCardProps> = ({ article, className = '' }) =
       <LayoutContainer className="h-full flex flex-col rounded-2xl overflow-hidden bg-surface border border-border shadow-xs transition-all duration-300 group-hover:shadow-md group-hover:border-primary/50 group-hover:-translate-y-1">
         {/* 16:9 Image Container */}
         <LayoutContainer className="relative w-full aspect-video overflow-hidden bg-drawer">
-          {article.coverImage ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={article.coverImage}
-              alt={article.title}
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-            />
-          ) : (
-            <LayoutContainer className="w-full h-full flex items-center justify-center text-text-secondary text-xs">
-              E.C. Pelotas
-            </LayoutContainer>
-          )}
+          <SafeImage
+            src={article.coverImage}
+            alt={article.title}
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+          />
 
           {/* Category Badge on top left of image */}
           <LayoutContainer className="absolute top-3 left-3 z-10 flex items-center gap-1.5">

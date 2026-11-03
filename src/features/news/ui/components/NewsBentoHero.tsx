@@ -11,7 +11,7 @@ import {
   ArrowRight,
   Eye,
 } from 'lucide-react';
-import { LayoutContainer, Title, Text, Badge } from '@/shared/ui/components';
+import { LayoutContainer, Title, Text, Badge, SafeImage } from '@/shared/ui/components';
 import { NewsArticleData } from '@/features/admin/services/admin-news.service';
 import {
   calculateReadingTime,
@@ -54,14 +54,14 @@ export const NewsBentoHero: React.FC<NewsBentoHeroProps> = ({
           >
             <LayoutContainer className="relative w-full h-full min-h-[380px] sm:min-h-[440px] md:min-h-[500px] rounded-3xl overflow-hidden bg-drawer border border-border shadow-md flex flex-col justify-end p-6 sm:p-8 md:p-10 transition-all duration-300 hover:border-primary/50">
               {/* Background Cover Image with Zoom Effect */}
-              {mainArticle.coverImage && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={mainArticle.coverImage}
-                  alt={mainArticle.title}
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-              )}
+              <SafeImage
+                src={mainArticle.coverImage}
+                alt={mainArticle.title}
+                fill
+                sizes="(max-width: 1024px) 100vw, 65vw"
+                priority
+                className="object-cover transition-transform duration-700 group-hover:scale-105"
+              />
 
               {/* Gradient Overlay for Readability */}
               <LayoutContainer className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/60 to-black/25" />
@@ -168,14 +168,13 @@ export const NewsBentoHero: React.FC<NewsBentoHeroProps> = ({
               >
                 <LayoutContainer className="relative w-full h-full min-h-[220px] lg:min-h-[240px] rounded-3xl overflow-hidden bg-drawer border border-border shadow-xs flex flex-col justify-end p-5 transition-all duration-300 hover:border-primary/50">
                   {/* Background Cover Image */}
-                  {subArticle.coverImage && (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={subArticle.coverImage}
-                      alt={subArticle.title}
-                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                  )}
+                  <SafeImage
+                    src={subArticle.coverImage}
+                    alt={subArticle.title}
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 35vw"
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
 
                   {/* Gradient Overlay */}
                   <LayoutContainer className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/60 to-black/20" />

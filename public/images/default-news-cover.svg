@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" width="1200" height="675">
+  <defs>
+    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#050b14" />
+      <stop offset="50%" stop-color="#0a1628" />
+      <stop offset="100%" stop-color="#122543" />
+    </linearGradient>
+    <radialGradient id="gold-glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#eab308" stop-opacity="0.25" />
+      <stop offset="60%" stop-color="#ca8a04" stop-opacity="0.08" />
+      <stop offset="100%" stop-color="#0a1628" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient id="gold-border" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#facc15" />
+      <stop offset="50%" stop-color="#eab308" />
+      <stop offset="100%" stop-color="#a16207" />
+    </linearGradient>
+    <pattern id="lines" width="40" height="40" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="40" stroke="#ffffff" stroke-opacity="0.02" stroke-width="2" />
+    </pattern>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="675" fill="url(#bg-grad)" />
+  <rect width="1200" height="675" fill="url(#lines)" />
+
+  <!-- Stadium Glow -->
+  <circle cx="600" cy="300" r="450" fill="url(#gold-glow)" />
+
+  <!-- Subtle Pitch Lines in Bottom -->
+  <path d="M 0,550 Q 600,480 1200,550" fill="none" stroke="#eab308" stroke-opacity="0.12" stroke-width="2" />
+  <path d="M 0,600 Q 600,540 1200,600" fill="none" stroke="#eab308" stroke-opacity="0.08" stroke-width="1.5" />
+
+  <!-- Shield Shape (Pelotas) -->
+  <g transform="translate(600, 270)">
+    <!-- Outer Shield Glow -->
+    <path d="M 0,-100 L 70,-70 C 70,30 45,90 0,120 C -45,90 -70,30 -70,-70 Z" fill="#060d18" stroke="url(#gold-border)" stroke-width="5" filter="drop-shadow(0 15px 25px rgba(0,0,0,0.6))" />
+    <!-- Inner Shield Fill -->
+    <path d="M 0,-92 L 62,-65 C 62,25 38,78 0,105 C -38,78 -62,25 -62,-65 Z" fill="#0d1f3a" stroke="#facc15" stroke-opacity="0.3" stroke-width="1.5" />
+    
+    <!-- Diagonal Golden Sash -->
+    <clipPath id="shield-clip">
+      <path d="M 0,-92 L 62,-65 C 62,25 38,78 0,105 C -38,78 -62,25 -62,-65 Z" />
+    </clipPath>
+    <g clip-path="url(#shield-clip)">
+      <polygon points="-70,20 70,-40 70,-10 -70,50" fill="#eab308" fill-opacity="0.9" />
+      <polygon points="-70,25 70,-35 70,-30 -70,30" fill="#fef08a" fill-opacity="0.8" />
+    </g>
+
+    <!-- Monogram ECP -->
+    <text x="0" y="5" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="28" fill="#ffffff" text-anchor="middle" letter-spacing="2">ECP</text>
+    <!-- Foundation Year -->
+    <text x="0" y="45" font-family="system-ui, -apple-system, sans-serif" font-weight="800" font-size="13" fill="#facc15" text-anchor="middle" letter-spacing="3">1908</text>
+  </g>
+
+  <!-- Title & Subtitle -->
+  <text x="600" y="470" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="32" fill="#ffffff" text-anchor="middle" letter-spacing="4">ESPORTE CLUBE PELOTAS</text>
+  <text x="600" y="508" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="16" fill="#eab308" text-anchor="middle" letter-spacing="6">CENTRAL DE NOTÍCIAS • LOBO DA BOCA DO LOBO</text>
+</svg>

@@ -21,6 +21,7 @@ import {
   Badge,
   Button,
   Spinner,
+  SafeImage,
 } from '@/shared/ui/components';
 import { PUBLIC_NEWS_TEXTS } from '../../constants/news.constants';
 import { useNewsArticle } from '../../hooks/useNewsArticle';
@@ -189,23 +190,23 @@ export const NewsDetailFeature: React.FC<NewsDetailFeatureProps> = ({ slug }) =>
       </LayoutContainer>
 
       {/* Cover Image 16:9 & Caption */}
-      {article.coverImage && (
-        <LayoutContainer className="flex flex-col gap-2">
-          <LayoutContainer className="relative w-full aspect-video rounded-3xl overflow-hidden bg-drawer border border-border shadow-md">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={article.coverImage}
-              alt={article.title}
-              className="w-full h-full object-cover"
-            />
-          </LayoutContainer>
-          {article.coverCaption && (
-            <Text as="p" className="text-xs text-text-secondary text-center italic">
-              {article.coverCaption}
-            </Text>
-          )}
+      <LayoutContainer className="flex flex-col gap-2">
+        <LayoutContainer className="relative w-full aspect-video rounded-3xl overflow-hidden bg-drawer border border-border shadow-md">
+          <SafeImage
+            src={article.coverImage}
+            alt={article.title}
+            fill
+            priority
+            sizes="(max-width: 1200px) 100vw, 896px"
+            className="object-cover"
+          />
         </LayoutContainer>
-      )}
+        {article.coverCaption && (
+          <Text as="p" className="text-xs text-text-secondary text-center italic">
+            {article.coverCaption}
+          </Text>
+        )}
+      </LayoutContainer>
 
       {/* Main Content Body */}
       <LayoutContainer className="py-2">
