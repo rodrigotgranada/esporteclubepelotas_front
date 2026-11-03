@@ -94,6 +94,19 @@ export const adminNewsService = {
     return response.data;
   },
 
+  uploadContentImage: async (file: File | Blob): Promise<{ url: string }> => {
+    const formData = new FormData();
+    const uploadFile =
+      file instanceof File
+        ? file
+        : new File([file], `content-${Date.now()}.png`, { type: file.type || 'image/png' });
+    formData.append('image', uploadFile);
+    const response = await api.post('/news/admin/upload-image', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data;
+  },
+
   uploadGallery: async (id: string, files: File[]): Promise<{ urls: string[] }> => {
     const formData = new FormData();
     files.forEach(f => formData.append('gallery', f));

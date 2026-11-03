@@ -167,3 +167,4 @@ export const NewsImageNodeView: React.FC<NodeViewProps> = ({
     </NodeViewWrapper>
   );
 };
+

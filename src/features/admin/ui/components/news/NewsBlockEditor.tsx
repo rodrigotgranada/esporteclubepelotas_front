@@ -20,6 +20,8 @@ import {
   Image as ImageIcon,
 } from 'lucide-react';
 import { LayoutContainer, IconButton, CropModal } from '@/shared/ui/components';
+import toast from 'react-hot-toast';
+import { adminNewsService } from '../../../services/admin-news.service';
 import { ADMIN_NEWS_TEXTS } from '../../../constants/admin-news.constants';
 import { NewsBlockFloatingMenu } from './NewsBlockFloatingMenu';
 import { NewsImageInsertModal } from './NewsImageInsertModal';
@@ -213,24 +215,54 @@ export const NewsBlockEditor: React.FC<NewsBlockEditorProps> = ({
     setIsCropModalOpen(true);
   };
 
-  // When crop is confirmed, convert blob to DataURL and insert into editor
-  const handleCropSave = (croppedBlob: Blob) => {
+  // When crop is confirmed, upload image and insert public storage URL into editor
+  const handleCropSave = async (croppedBlob: Blob) => {
     if (!editor) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === 'string') {
-        editor.chain().focus().setImage({ src: reader.result }).run();
-      }
-    };
-    reader.readAsDataURL(croppedBlob);
-    setIsCropModalOpen(false);
-    setCropSourceImage(null);
+    const loadingToast = toast.loading('Processando e enviando imagem...');
+    try {
+      const { url } = await adminNewsService.uploadContentImage(croppedBlob);
+      editor.chain().focus().setImage({ src: url }).run();
+      toast.dismiss(loadingToast);
+      toast.success('Imagem inserida com sucesso!');
+    } catch (err) {
+      console.error('Failed to upload cropped image', err);
+      // Fallback: If upload fails (e.g. offline dev), fallback to data URL
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (typeof reader.result === 'string') {
+          editor.chain().focus().setImage({ src: reader.result }).run();
+        }
+      };
+      reader.readAsDataURL(croppedBlob);
+      toast.dismiss(loadingToast);
+    } finally {
+      setIsCropModalOpen(false);
+      setCropSourceImage(null);
+    }
   };
 
   // If user chooses to insert original image without crop
-  const handleUseOriginalImage = () => {
+  const handleUseOriginalImage = async () => {
     if (!editor || !cropSourceImage) return;
-    editor.chain().focus().setImage({ src: cropSourceImage }).run();
+
+    if (cropSourceImage.startsWith('data:') || cropSourceImage.startsWith('blob:')) {
+      const loadingToast = toast.loading('Processando e enviando imagem original...');
+      try {
+        const response = await fetch(cropSourceImage);
+        const blob = await response.blob();
+        const { url } = await adminNewsService.uploadContentImage(blob);
+        editor.chain().focus().setImage({ src: url }).run();
+        toast.dismiss(loadingToast);
+        toast.success('Imagem inserida com sucesso!');
+      } catch (err) {
+        console.error('Failed to upload original image', err);
+        editor.chain().focus().setImage({ src: cropSourceImage }).run();
+        toast.dismiss(loadingToast);
+      }
+    } else {
+      editor.chain().focus().setImage({ src: cropSourceImage }).run();
+    }
+
     setIsCropModalOpen(false);
     setCropSourceImage(null);
   };

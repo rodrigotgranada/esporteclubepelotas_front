@@ -45,3 +45,4 @@ export const NewsCustomImageExtension = Image.extend({
     return ReactNodeViewRenderer(NewsImageNodeView);
   },
 });
+
