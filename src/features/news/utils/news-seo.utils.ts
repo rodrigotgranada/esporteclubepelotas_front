@@ -67,3 +67,4 @@ export function buildNewsJsonLd(article: NewsArticleData, siteUrl: string) {
     },
   };
 }
+

@@ -4,20 +4,51 @@ import { createPortal } from 'react-dom';
 import { LayoutContainer } from './LayoutContainer';
 import { X } from 'lucide-react';
 
+export type ModalSize = 
+  | 'sm' 
+  | 'md' 
+  | 'lg' 
+  | 'xl' 
+  | '2xl' 
+  | '3xl' 
+  | '4xl' 
+  | '5xl' 
+  | '6xl' 
+  | '7xl' 
+  | 'full';
+
 export interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   children: React.ReactNode;
   className?: string;
   showCloseButton?: boolean;
+  size?: ModalSize;
+  noPadding?: boolean;
 }
+
+const SIZE_CLASSES: Record<ModalSize, string> = {
+  sm: 'max-w-sm',
+  md: 'max-w-md',
+  lg: 'max-w-lg',
+  xl: 'max-w-xl',
+  '2xl': 'max-w-2xl',
+  '3xl': 'max-w-3xl',
+  '4xl': 'max-w-4xl',
+  '5xl': 'max-w-5xl',
+  '6xl': 'max-w-6xl',
+  '7xl': 'max-w-7xl',
+  full: 'max-w-[96vw]',
+};
 
 export const Modal = ({ 
   isOpen, 
   onClose, 
   children, 
   className = '',
-  showCloseButton = true 
+  showCloseButton = true,
+  size = 'md',
+  noPadding = false,
 }: ModalProps) => {
   const modalRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
@@ -53,7 +84,9 @@ export const Modal = ({
       />
       <LayoutContainer 
         ref={modalRef}
-        className={`relative bg-drawer border border-border rounded-2xl shadow-2xl p-6 w-full max-w-md animate-in zoom-in-95 duration-200 ${className}`}
+        className={`relative bg-drawer border border-border rounded-2xl shadow-2xl w-full animate-in zoom-in-95 duration-200 ${
+          noPadding ? '' : 'p-6'
+        } ${SIZE_CLASSES[size] || 'max-w-md'} ${className}`}
       >
         {showCloseButton && (
           <button 

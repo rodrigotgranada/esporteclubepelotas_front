@@ -8,8 +8,11 @@ import {
   Calendar,
   User,
   Tag as TagIcon,
-  Video,
   Images,
+  ArrowLeft,
+  Wifi,
+  Battery,
+  Share2,
 } from 'lucide-react';
 import {
   Modal,
@@ -46,6 +49,8 @@ export interface NewsArticlePreviewModalProps {
   tags?: string[];
 }
 
+type PreviewMode = 'desktop' | 'mobile' | 'social';
+
 export const NewsArticlePreviewModal: React.FC<NewsArticlePreviewModalProps> = ({
   isOpen,
   onClose,
@@ -55,7 +60,7 @@ export const NewsArticlePreviewModal: React.FC<NewsArticlePreviewModalProps> = (
   slug,
   categoryName,
   authorName,
-  authorAvatar,
+  authorAvatar: _authorAvatar,
   reporterName,
   photographerName,
   publishedAt,
@@ -68,8 +73,7 @@ export const NewsArticlePreviewModal: React.FC<NewsArticlePreviewModalProps> = (
   tags = [],
 }) => {
   const { DRAWER: texts } = ADMIN_NEWS_TEXTS;
-  const [previewTab, setPreviewTab] = useState<'site' | 'social'>('site');
-  const [deviceMode, setDeviceMode] = useState<'desktop' | 'mobile'>('desktop');
+  const [activeMode, setActiveMode] = useState<PreviewMode>('desktop');
 
   if (!isOpen) return null;
 
@@ -95,106 +99,112 @@ export const NewsArticlePreviewModal: React.FC<NewsArticlePreviewModalProps> = (
         year: 'numeric',
       });
 
+  const authorDisplay = reporterName
+    ? `Por ${reporterName}`
+    : authorName || texts.PREVIEW_DEFAULT_REDACTION;
+
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
       showCloseButton={false}
-      className="!p-0 overflow-hidden bg-background border border-border max-w-5xl w-full h-[90vh] flex flex-col"
+      size="7xl"
+      noPadding={true}
+      className="overflow-hidden bg-background border border-border w-full h-[92vh] max-h-[92vh] flex flex-col shadow-2xl"
     >
-      {/* Top Bar with Device Switcher & Close Button */}
-      <LayoutContainer className="flex items-center justify-between px-6 py-3 border-b border-border bg-drawer shrink-0">
-        <LayoutContainer className="flex items-center gap-3">
-          <Badge variant="primary" size="sm" className="font-bold text-[10px] uppercase">
+      {/* Top Bar de Controle */}
+      <LayoutContainer className="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-border bg-drawer shrink-0 z-10 gap-3">
+        {/* Identificação Esquerda */}
+        <LayoutContainer className="flex items-center gap-3 shrink-0">
+          <Badge variant="primary" size="sm" className="font-bold text-[10px] uppercase tracking-wider">
             Preview
           </Badge>
-          <Text className="text-sm font-bold text-text-primary hidden sm:inline">
-            {texts.PREVIEW_TITLE}
-          </Text>
-        </LayoutContainer>
-
-        {/* View Switcher: Site vs Social */}
-        <LayoutContainer className="flex items-center gap-2">
-          <LayoutContainer className="flex items-center gap-1 bg-surface p-1 rounded-xl border border-border">
-            <button
-              type="button"
-              onClick={() => setPreviewTab('site')}
-              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                previewTab === 'site'
-                  ? 'bg-primary text-background shadow-xs'
-                  : 'text-text-secondary hover:text-text-primary'
-              }`}
-            >
-              {texts.PREVIEW_TAB_SITE}
-            </button>
-            <button
-              type="button"
-              onClick={() => setPreviewTab('social')}
-              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                previewTab === 'social'
-                  ? 'bg-primary text-background shadow-xs'
-                  : 'text-text-secondary hover:text-text-primary'
-              }`}
-            >
-              {texts.PREVIEW_TAB_SOCIAL}
-            </button>
+          <LayoutContainer className="hidden md:flex flex-col">
+            <Title level="h3" className="text-sm font-bold text-text-primary leading-tight">
+              {texts.PREVIEW_TITLE}
+            </Title>
+            <Text className="text-[11px] text-text-secondary">
+              {texts.PREVIEW_SUBTITLE}
+            </Text>
           </LayoutContainer>
-
-          {/* Device Switcher (Desktop vs Mobile) */}
-          {previewTab === 'site' && (
-            <LayoutContainer className="hidden sm:flex items-center gap-1 bg-surface p-1 rounded-xl border border-border">
-              <button
-                type="button"
-                onClick={() => setDeviceMode('desktop')}
-                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                  deviceMode === 'desktop'
-                    ? 'bg-primary text-background shadow-xs'
-                    : 'text-text-secondary hover:text-text-primary'
-                }`}
-              >
-                <Laptop className="w-3.5 h-3.5" />
-                <span>{texts.PREVIEW_MODE_DESKTOP}</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setDeviceMode('mobile')}
-                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                  deviceMode === 'mobile'
-                    ? 'bg-primary text-background shadow-xs'
-                    : 'text-text-secondary hover:text-text-primary'
-                }`}
-              >
-                <Smartphone className="w-3.5 h-3.5" />
-                <span>{texts.PREVIEW_MODE_MOBILE}</span>
-              </button>
-            </LayoutContainer>
-          )}
         </LayoutContainer>
 
-        <LayoutContainer className="flex items-center gap-2">
+        {/* Seletor Central Unificado de 3 Modos */}
+        <LayoutContainer className="flex items-center gap-1 bg-surface p-1 rounded-xl border border-border">
+          <Button
+            variant="custom"
+            size="none"
+            onClick={() => setActiveMode('desktop')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+              activeMode === 'desktop'
+                ? 'bg-primary text-background shadow-xs'
+                : 'text-text-secondary hover:text-text-primary'
+            }`}
+          >
+            <Laptop className="w-3.5 h-3.5" />
+            <Text as="span" className="hidden sm:inline">{texts.PREVIEW_TAB_DESKTOP}</Text>
+            <Text as="span" className="sm:hidden">{texts.PREVIEW_MODE_DESKTOP}</Text>
+          </Button>
+
+          <Button
+            variant="custom"
+            size="none"
+            onClick={() => setActiveMode('mobile')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+              activeMode === 'mobile'
+                ? 'bg-primary text-background shadow-xs'
+                : 'text-text-secondary hover:text-text-primary'
+            }`}
+          >
+            <Smartphone className="w-3.5 h-3.5" />
+            <Text as="span" className="hidden sm:inline">{texts.PREVIEW_TAB_MOBILE}</Text>
+            <Text as="span" className="sm:hidden">{texts.PREVIEW_MODE_MOBILE}</Text>
+          </Button>
+
+          <Button
+            variant="custom"
+            size="none"
+            onClick={() => setActiveMode('social')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+              activeMode === 'social'
+                ? 'bg-primary text-background shadow-xs'
+                : 'text-text-secondary hover:text-text-primary'
+            }`}
+          >
+            <Share2 className="w-3.5 h-3.5" />
+            <Text as="span">{texts.PREVIEW_TAB_SOCIAL}</Text>
+          </Button>
+        </LayoutContainer>
+
+        {/* Botões de Ação à Direita */}
+        <LayoutContainer className="flex items-center gap-2 shrink-0">
           <Button
             type="button"
             variant="ghost"
             size="sm"
             onClick={onClose}
-            className="text-xs font-semibold"
+            leftIcon={<ArrowLeft className="w-3.5 h-3.5" />}
+            className="text-xs font-semibold hidden sm:flex"
           >
             {texts.PREVIEW_CLOSE}
           </Button>
-          <button
+          <Button
             type="button"
+            variant="custom"
+            size="none"
             onClick={onClose}
-            className="w-8 h-8 rounded-lg bg-surface hover:bg-drawer text-text-secondary hover:text-text-primary flex items-center justify-center transition-colors cursor-pointer"
-            aria-label="Fechar"
+            className="w-8 h-8 rounded-lg bg-surface hover:bg-surface-hover text-text-secondary hover:text-text-primary flex items-center justify-center transition-colors border border-border"
+            aria-label={texts.PREVIEW_CLOSE}
           >
             <X className="w-4 h-4" />
-          </button>
+          </Button>
         </LayoutContainer>
       </LayoutContainer>
 
-      {/* Preview Viewport Container */}
-      <LayoutContainer className="flex-1 overflow-y-auto bg-drawer/30 p-4 sm:p-8 flex justify-center">
-        {previewTab === 'social' ? (
+      {/* Viewport Principal com Scroll Macio */}
+      <LayoutContainer className="flex-1 overflow-y-auto bg-black/40 p-4 sm:p-8">
+        {/* Modo 1: Redes Sociais & Google SEO */}
+        {activeMode === 'social' && (
           <NewsSocialPreview
             title={title}
             summary={summary}
@@ -203,144 +213,304 @@ export const NewsArticlePreviewModal: React.FC<NewsArticlePreviewModalProps> = (
             coverImage={coverImage}
             publishedAt={publishedAt}
           />
-        ) : (
-          <LayoutContainer
-            className={`transition-all duration-300 bg-surface rounded-2xl shadow-xl overflow-hidden border border-border flex flex-col ${
-              deviceMode === 'mobile'
-                ? 'w-[390px] border-4 border-neutral-800 rounded-[40px] shadow-2xl p-4 my-auto min-h-[700px]'
-                : 'w-full max-w-4xl p-6 sm:p-10'
-            }`}
-          >
-          {/* Header Metadata */}
-          <LayoutContainer className="flex flex-col gap-3 pb-6 border-b border-border/60">
-            {categoryName && (
-              <Badge variant="primary" size="sm" className="w-fit font-bold text-xs">
-                {categoryName}
-              </Badge>
-            )}
+        )}
 
-            <Title
-              level="h1"
-              className={`font-black text-text-primary tracking-tight leading-tight ${
-                deviceMode === 'mobile' ? 'text-2xl' : 'text-3xl sm:text-4xl'
-              }`}
-            >
-              {title || 'Título da matéria'}
-            </Title>
+        {/* Modo 2: Computador / Desktop (Largura Real do Portal de Notícias) */}
+        {activeMode === 'desktop' && (
+          <LayoutContainer className="w-full max-w-4xl mx-auto bg-surface border border-border/80 rounded-2xl shadow-xl p-6 sm:p-12 mb-12">
+            {/* Header da Notícia */}
+            <LayoutContainer className="flex flex-col gap-3 pb-6 border-b border-border/60">
+              {categoryName && (
+                <Badge variant="primary" size="sm" className="w-fit font-bold text-xs">
+                  {categoryName}
+                </Badge>
+              )}
 
-            {subtitle && (
-              <Text
-                as="p"
-                className={`text-text-secondary leading-relaxed ${
-                  deviceMode === 'mobile' ? 'text-sm' : 'text-lg'
-                }`}
+              <Title
+                level="h1"
+                className="font-black text-text-primary tracking-tight leading-tight text-3xl sm:text-4xl"
               >
-                {subtitle}
-              </Text>
-            )}
+                {title || texts.PREVIEW_EMPTY_TITLE}
+              </Title>
 
-            {/* Author & Date Bar */}
-            <LayoutContainer className="flex items-center gap-4 text-xs text-text-secondary pt-2">
-              <LayoutContainer className="flex items-center gap-1.5 font-medium">
-                <User className="w-3.5 h-3.5 text-primary" />
-                <span>{reporterName ? `Por ${reporterName}` : (authorName || 'Redação E.C. Pelotas')}</span>
-              </LayoutContainer>
-
-              <LayoutContainer className="flex items-center gap-1.5">
-                <Calendar className="w-3.5 h-3.5 text-primary" />
-                <span>{formattedDate}</span>
-              </LayoutContainer>
-            </LayoutContainer>
-          </LayoutContainer>
-
-          {/* Cover Image */}
-          {coverImage && (
-            <LayoutContainer className="my-6 flex flex-col gap-2">
-              <LayoutContainer className="relative w-full aspect-video rounded-2xl overflow-hidden bg-drawer border border-border shadow-md">
-                <SafeImage
-                  src={coverImage}
-                  alt={title}
-                  fill
-                  sizes={deviceMode === 'mobile' ? '360px' : '900px'}
-                  className="object-cover"
-                />
-              </LayoutContainer>
-              {(photographerName || coverCaption) && (
-                <Text className="text-xs text-text-secondary italic text-center">
-                  {photographerName && coverCaption
-                    ? `${coverCaption} (Foto: ${photographerName})`
-                    : photographerName
-                    ? `Foto: ${photographerName}`
-                    : coverCaption}
+              {subtitle && (
+                <Text
+                  as="p"
+                  className="text-text-secondary leading-relaxed text-lg"
+                >
+                  {subtitle}
                 </Text>
               )}
-            </LayoutContainer>
-          )}
 
-          {/* YouTube Video if provided */}
-          {embedUrl && (
-            <LayoutContainer className="my-6 rounded-2xl overflow-hidden aspect-video border border-border shadow-md">
-              <iframe
-                src={embedUrl}
-                title="Vídeo da Matéria"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                className="w-full h-full"
-              />
-            </LayoutContainer>
-          )}
+              {/* Barra de Autor e Data */}
+              <LayoutContainer className="flex items-center gap-5 text-xs text-text-secondary pt-2">
+                <LayoutContainer className="flex items-center gap-1.5 font-medium">
+                  <User className="w-3.5 h-3.5 text-primary" />
+                  <Text as="span">{authorDisplay}</Text>
+                </LayoutContainer>
 
-          {/* Rich Content Rendered via NewsRenderer */}
-          <LayoutContainer className="my-6">
-            <NewsRenderer content={content} />
-          </LayoutContainer>
-
-          {/* Photo Gallery if present */}
-          {allGalleryPhotos.length > 0 && (
-            <LayoutContainer className="my-8 flex flex-col gap-3 pt-6 border-t border-border">
-              <Text className="text-sm font-bold text-text-primary uppercase tracking-wider flex items-center gap-2">
-                <Images className="w-4 h-4 text-primary" />
-                Galeria de Fotos ({allGalleryPhotos.length})
-              </Text>
-              <LayoutContainer className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                {allGalleryPhotos.map((photoUrl, idx) => (
-                  <LayoutContainer
-                    key={idx}
-                    className="relative aspect-square rounded-xl overflow-hidden border border-border group bg-drawer shadow-xs"
-                  >
-                    <SafeImage
-                      src={photoUrl}
-                      alt={`Foto da galeria ${idx + 1}`}
-                      fill
-                      sizes="300px"
-                      className="object-cover transition-transform group-hover:scale-105"
-                    />
-                  </LayoutContainer>
-                ))}
+                <LayoutContainer className="flex items-center gap-1.5">
+                  <Calendar className="w-3.5 h-3.5 text-primary" />
+                  <Text as="span">{formattedDate}</Text>
+                </LayoutContainer>
               </LayoutContainer>
             </LayoutContainer>
-          )}
 
-          {/* Tags */}
-          {tags.length > 0 && (
-            <LayoutContainer className="mt-8 pt-6 border-t border-border flex flex-wrap items-center gap-2">
-              <TagIcon className="w-3.5 h-3.5 text-primary" />
-              {tags.map((tag, idx) => (
-                <Badge
-                  key={idx}
-                  variant="default"
-                  size="sm"
-                  className="text-xs bg-drawer text-text-secondary border border-border font-medium"
-                >
-                  #{tag.replace(/^#/, '')}
-                </Badge>
-              ))}
+            {/* Imagem de Capa */}
+            {coverImage && (
+              <LayoutContainer className="my-6 flex flex-col gap-2">
+                <LayoutContainer className="relative w-full aspect-video rounded-2xl overflow-hidden bg-drawer border border-border shadow-md">
+                  <SafeImage
+                    src={coverImage}
+                    alt={title || 'Capa'}
+                    fill
+                    sizes="900px"
+                    className="object-cover"
+                  />
+                </LayoutContainer>
+                {(photographerName || coverCaption) && (
+                  <Text className="text-xs text-text-secondary italic text-center">
+                    {photographerName && coverCaption
+                      ? `${coverCaption} (Foto: ${photographerName})`
+                      : photographerName
+                      ? `Foto: ${photographerName}`
+                      : coverCaption}
+                  </Text>
+                )}
+              </LayoutContainer>
+            )}
+
+            {/* Vídeo do YouTube se configurado */}
+            {embedUrl && (
+              <LayoutContainer className="my-6 rounded-2xl overflow-hidden aspect-video border border-border shadow-md">
+                <iframe
+                  src={embedUrl}
+                  title={texts.PREVIEW_VIDEO_TITLE}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="w-full h-full"
+                />
+              </LayoutContainer>
+            )}
+
+            {/* Conteúdo Rico Renderizado via NewsRenderer */}
+            <LayoutContainer className="my-6">
+              <NewsRenderer content={content} />
             </LayoutContainer>
-          )}
-        </LayoutContainer>
+
+            {/* Galeria de Fotos */}
+            {allGalleryPhotos.length > 0 && (
+              <LayoutContainer className="my-8 flex flex-col gap-3 pt-6 border-t border-border">
+                <Text className="text-sm font-bold text-text-primary uppercase tracking-wider flex items-center gap-2">
+                  <Images className="w-4 h-4 text-primary" />
+                  {texts.PREVIEW_GALLERY_TITLE(allGalleryPhotos.length)}
+                </Text>
+                <LayoutContainer className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {allGalleryPhotos.map((photoUrl, idx) => (
+                    <LayoutContainer
+                      key={idx}
+                      className="relative aspect-square rounded-xl overflow-hidden border border-border group bg-drawer shadow-xs"
+                    >
+                      <SafeImage
+                        src={photoUrl}
+                        alt={`Foto da galeria ${idx + 1}`}
+                        fill
+                        sizes="300px"
+                        className="object-cover transition-transform group-hover:scale-105"
+                      />
+                    </LayoutContainer>
+                  ))}
+                </LayoutContainer>
+              </LayoutContainer>
+            )}
+
+            {/* Tags da Matéria */}
+            {tags.length > 0 && (
+              <LayoutContainer className="mt-8 pt-6 border-t border-border flex flex-wrap items-center gap-2">
+                <TagIcon className="w-3.5 h-3.5 text-primary" />
+                {tags.map((tag, idx) => (
+                  <Badge
+                    key={idx}
+                    variant="default"
+                    size="sm"
+                    className="text-xs bg-drawer text-text-secondary border border-border font-medium"
+                  >
+                    #{tag.replace(/^#/, '')}
+                  </Badge>
+                ))}
+              </LayoutContainer>
+            )}
+          </LayoutContainer>
+        )}
+
+        {/* Modo 3: Celular / Mobile (Moldura de Smartphone 390px com scroll interno) */}
+        {activeMode === 'mobile' && (
+          <LayoutContainer className="flex flex-col items-center justify-start pb-8">
+            {/* Dica de usabilidade */}
+            <LayoutContainer className="mb-3 px-4 py-1.5 rounded-full bg-surface border border-border text-center">
+              <Text className="text-xs text-text-secondary">
+                {texts.PREVIEW_MOBILE_HINT}
+              </Text>
+            </LayoutContainer>
+
+            {/* Carcaça do Smartphone */}
+            <LayoutContainer className="relative w-[390px] max-w-full bg-neutral-950 border-[8px] border-neutral-800 rounded-[50px] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col shrink-0">
+              {/* Barra de Status */}
+              <LayoutContainer className="h-9 bg-neutral-950 flex items-center justify-between px-6 pt-1 select-none shrink-0 border-b border-neutral-900/50">
+                <Text className="text-[11px] font-bold text-neutral-400">19:08</Text>
+                <LayoutContainer className="w-20 h-4 bg-black rounded-full border border-neutral-800 flex items-center justify-center">
+                  <LayoutContainer className="w-2 h-2 bg-neutral-900 rounded-full ml-auto mr-1.5" />
+                </LayoutContainer>
+                <LayoutContainer className="flex items-center gap-1.5 text-neutral-400">
+                  <Wifi className="w-3 h-3" />
+                  <Battery className="w-3.5 h-3.5" />
+                </LayoutContainer>
+              </LayoutContainer>
+
+              {/* Barra de Navegação Fake do Portal Pelotas */}
+              <LayoutContainer className="px-4 py-2 bg-surface border-b border-border/60 flex items-center justify-between shrink-0">
+                <LayoutContainer className="flex items-center gap-2">
+                  <LayoutContainer className="w-5 h-5 rounded-full bg-primary flex items-center justify-center font-black text-[9px] text-background">
+                    P
+                  </LayoutContainer>
+                  <Text className="text-xs font-bold text-text-primary tracking-tight">E.C. Pelotas</Text>
+                </LayoutContainer>
+                <Text className="text-[10px] text-text-secondary bg-drawer px-2 py-0.5 rounded-full border border-border font-mono">
+                  ecpelotas.com.br
+                </Text>
+              </LayoutContainer>
+
+              {/* Área de Leitura Mobile com Scroll Suave Próprio */}
+              <LayoutContainer className="h-[620px] overflow-y-auto p-4 bg-surface flex flex-col">
+                {/* Categoria */}
+                {categoryName && (
+                  <Badge variant="primary" size="sm" className="w-fit font-bold text-[11px] mb-2">
+                    {categoryName}
+                  </Badge>
+                )}
+
+                {/* Título Mobile */}
+                <Title
+                  level="h1"
+                  className="font-black text-text-primary leading-snug tracking-tight text-xl mb-2"
+                >
+                  {title || texts.PREVIEW_EMPTY_TITLE}
+                </Title>
+
+                {/* Subtítulo Mobile */}
+                {subtitle && (
+                  <Text
+                    as="p"
+                    className="text-xs text-text-secondary leading-relaxed mb-3"
+                  >
+                    {subtitle}
+                  </Text>
+                )}
+
+                {/* Metadados Mobile */}
+                <LayoutContainer className="flex flex-col gap-1 text-[11px] text-text-secondary pb-3 mb-3 border-b border-border/60">
+                  <LayoutContainer className="flex items-center gap-1.5 font-medium">
+                    <User className="w-3 h-3 text-primary" />
+                    <Text as="span">{authorDisplay}</Text>
+                  </LayoutContainer>
+
+                  <LayoutContainer className="flex items-center gap-1.5">
+                    <Calendar className="w-3 h-3 text-primary" />
+                    <Text as="span">{formattedDate}</Text>
+                  </LayoutContainer>
+                </LayoutContainer>
+
+                {/* Capa Mobile */}
+                {coverImage && (
+                  <LayoutContainer className="mb-4 flex flex-col gap-1.5">
+                    <LayoutContainer className="relative w-full aspect-video rounded-xl overflow-hidden bg-drawer border border-border">
+                      <SafeImage
+                        src={coverImage}
+                        alt={title || 'Capa'}
+                        fill
+                        sizes="360px"
+                        className="object-cover"
+                      />
+                    </LayoutContainer>
+                    {(photographerName || coverCaption) && (
+                      <Text className="text-[10px] text-text-secondary italic text-center">
+                        {photographerName && coverCaption
+                          ? `${coverCaption} (${photographerName})`
+                          : photographerName || coverCaption}
+                      </Text>
+                    )}
+                  </LayoutContainer>
+                )}
+
+                {/* Vídeo Mobile */}
+                {embedUrl && (
+                  <LayoutContainer className="mb-4 rounded-xl overflow-hidden aspect-video border border-border">
+                    <iframe
+                      src={embedUrl}
+                      title={texts.PREVIEW_VIDEO_TITLE}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      className="w-full h-full"
+                    />
+                  </LayoutContainer>
+                )}
+
+                {/* Conteúdo Rico Mobile */}
+                <LayoutContainer className="mb-4 text-sm">
+                  <NewsRenderer content={content} />
+                </LayoutContainer>
+
+                {/* Galeria Mobile */}
+                {allGalleryPhotos.length > 0 && (
+                  <LayoutContainer className="my-4 flex flex-col gap-2 pt-4 border-t border-border">
+                    <Text className="text-xs font-bold text-text-primary uppercase tracking-wider flex items-center gap-1.5">
+                      <Images className="w-3.5 h-3.5 text-primary" />
+                      {texts.PREVIEW_GALLERY_TITLE(allGalleryPhotos.length)}
+                    </Text>
+                    <LayoutContainer className="grid grid-cols-2 gap-2">
+                      {allGalleryPhotos.map((photoUrl, idx) => (
+                        <LayoutContainer
+                          key={idx}
+                          className="relative aspect-square rounded-lg overflow-hidden border border-border bg-drawer"
+                        >
+                          <SafeImage
+                            src={photoUrl}
+                            alt={`Foto ${idx + 1}`}
+                            fill
+                            sizes="180px"
+                            className="object-cover"
+                          />
+                        </LayoutContainer>
+                      ))}
+                    </LayoutContainer>
+                  </LayoutContainer>
+                )}
+
+                {/* Tags Mobile */}
+                {tags.length > 0 && (
+                  <LayoutContainer className="mt-4 pt-4 border-t border-border flex flex-wrap gap-1.5 pb-6">
+                    {tags.map((tag, idx) => (
+                      <Badge
+                        key={idx}
+                        variant="default"
+                        size="sm"
+                        className="text-[10px] bg-drawer text-text-secondary border border-border"
+                      >
+                        #{tag.replace(/^#/, '')}
+                      </Badge>
+                    ))}
+                  </LayoutContainer>
+                )}
+              </LayoutContainer>
+
+              {/* Home Indicator na Base do Smartphone */}
+              <LayoutContainer className="h-5 bg-surface flex items-center justify-center pb-1 shrink-0 border-t border-border/40">
+                <LayoutContainer className="w-28 h-1 bg-neutral-500/40 rounded-full" />
+              </LayoutContainer>
+            </LayoutContainer>
+          </LayoutContainer>
         )}
       </LayoutContainer>
     </Modal>
   );
 };
-

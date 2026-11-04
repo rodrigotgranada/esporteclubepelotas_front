@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Search, Globe, Sparkles } from 'lucide-react';
 import { FaXTwitter, FaWhatsapp } from 'react-icons/fa6';
-import { LayoutContainer, Text, Title, Badge, SafeImage } from '@/shared/ui/components';
+import { LayoutContainer, Text, Title, Badge, SafeImage, Button } from '@/shared/ui/components';
 import { ADMIN_NEWS_TEXTS } from '../../../constants/admin-news.constants';
 
 export interface NewsSocialPreviewProps {
@@ -63,44 +63,50 @@ export const NewsSocialPreview: React.FC<NewsSocialPreviewProps> = ({
 
         {/* Botões de Plataforma */}
         <LayoutContainer className="flex flex-wrap items-center gap-2 pt-2">
-          <button
+          <Button
             type="button"
+            variant="custom"
+            size="none"
             onClick={() => setActivePlatform('google')}
-            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
               activePlatform === 'google'
                 ? 'bg-primary text-background shadow-sm'
                 : 'bg-surface text-text-secondary hover:text-text-primary hover:bg-surface-hover border border-border'
             }`}
           >
             <Search className="w-3.5 h-3.5" />
-            <span>{texts.SOCIAL_GOOGLE_TAB}</span>
-          </button>
+            <Text as="span">{texts.SOCIAL_GOOGLE_TAB}</Text>
+          </Button>
 
-          <button
+          <Button
             type="button"
+            variant="custom"
+            size="none"
             onClick={() => setActivePlatform('whatsapp')}
-            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
               activePlatform === 'whatsapp'
                 ? 'bg-primary text-background shadow-sm'
                 : 'bg-surface text-text-secondary hover:text-text-primary hover:bg-surface-hover border border-border'
             }`}
           >
             <FaWhatsapp className="w-3.5 h-3.5 text-[#25D366]" />
-            <span>{texts.SOCIAL_WHATSAPP_TAB}</span>
-          </button>
+            <Text as="span">{texts.SOCIAL_WHATSAPP_TAB}</Text>
+          </Button>
 
-          <button
+          <Button
             type="button"
+            variant="custom"
+            size="none"
             onClick={() => setActivePlatform('twitter')}
-            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
               activePlatform === 'twitter'
                 ? 'bg-primary text-background shadow-sm'
                 : 'bg-surface text-text-secondary hover:text-text-primary hover:bg-surface-hover border border-border'
             }`}
           >
             <FaXTwitter className="w-3.5 h-3.5" />
-            <span>{texts.SOCIAL_TWITTER_TAB}</span>
-          </button>
+            <Text as="span">{texts.SOCIAL_TWITTER_TAB}</Text>
+          </Button>
         </LayoutContainer>
       </LayoutContainer>
 
