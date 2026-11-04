@@ -64,7 +64,7 @@ export const IdolEditorDrawer: React.FC<IdolEditorDrawerProps> = ({
     handleUpdatePeriod,
     handleRemovePeriod,
     galleryItems,
-    setGalleryItems,
+    handleAddGalleryItems,
     handleUpdateGalleryCaption,
     handleRemoveGalleryItem,
     isActiveInClub,
@@ -396,7 +396,7 @@ export const IdolEditorDrawer: React.FC<IdolEditorDrawerProps> = ({
             items={galleryItems}
             onUpdateCaption={handleUpdateGalleryCaption}
             onRemoveItem={handleRemoveGalleryItem}
-            onAddItems={(newItems) => setGalleryItems((prev) => [...prev, ...newItems])}
+            onAddItems={handleAddGalleryItems}
           />
 
           {/* Section: Visibility & Ordering */}

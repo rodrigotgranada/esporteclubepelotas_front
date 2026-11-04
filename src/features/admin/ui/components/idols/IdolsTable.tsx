@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import {
   Edit3,
   Trash2,
@@ -11,6 +12,7 @@ import {
   Shield,
   Heart,
   UserCheck,
+  ExternalLink,
 } from 'lucide-react';
 import {
   LayoutContainer,
@@ -220,6 +222,15 @@ export const IdolsTable: React.FC<IdolsTableProps> = ({
                   {/* Action Buttons */}
                   <TableCell className="text-right">
                     <LayoutContainer className="flex items-center justify-end gap-1.5">
+                      <Link
+                        href={`/idolos/${idol.slug}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-2 rounded-xl text-text-secondary hover:text-primary transition-colors inline-flex items-center justify-center"
+                        title={texts.ACTION_VIEW}
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                      </Link>
                       <Button
                         type="button"
                         variant="ghost"
@@ -313,6 +324,15 @@ export const IdolsTable: React.FC<IdolsTableProps> = ({
                 </Text>
 
                 <LayoutContainer className="flex items-center justify-end gap-2 pt-2 border-t border-border mt-1">
+                  <Link
+                    href={`/idolos/${idol.slug}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-2 rounded-xl text-text-secondary hover:text-primary transition-colors inline-flex items-center justify-center"
+                    title={texts.ACTION_VIEW}
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                  </Link>
                   <Button
                     type="button"
                     variant="secondary"

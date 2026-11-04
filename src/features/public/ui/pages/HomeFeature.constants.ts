@@ -12,6 +12,11 @@ export const HOME_FEATURE_TEXTS = {
   SECTION_NEWS_SUBTITLE: 'Acompanhe em primeira mão os jogos, contratações e comunicados oficiais do clube.',
   BUTTON_ALL_NEWS: 'Ver Todas as Notícias →',
   LATEST_NEWS_TITLE: 'Mais Recentes do Portal',
+  SECTION_IDOLS_BADGE: 'Memorial & Hall da Fama',
+  SECTION_IDOLS_TITLE: 'Lendas da Boca do Lobo',
+  SECTION_IDOLS_SUBTITLE:
+    'Conheça os grandes atletas, treinadores e personagens que marcaram os 118 anos de glória do Pelotas.',
+  BUTTON_ALL_IDOLS: 'Explorar o Memorial Completo →',
   SECTION_STORE_TITLE: 'Loja do Lobo',
   SECTION_STORE_DESC: 'Produtos oficiais em breve.',
 };

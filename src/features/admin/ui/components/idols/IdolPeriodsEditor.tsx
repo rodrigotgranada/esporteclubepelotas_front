@@ -117,3 +117,4 @@ export const IdolPeriodsEditor: React.FC<IdolPeriodsEditorProps> = ({
     </LayoutContainer>
   );
 };
+

@@ -25,6 +25,7 @@ export const ADMIN_IDOLS_TEXTS = {
     EMPTY_DESC: 'Cadastre os primeiros ídolos da história do Pelotas para inaugurar a galeria pública do Memorial.',
     LOADING: 'Carregando ídolos...',
     IN_CLUB: 'Em atividade',
+    ACTION_VIEW: 'Ver perfil no Portal',
     ACTION_EDIT: 'Editar Ídolo',
     ACTION_DELETE: 'Excluir Ídolo',
   },

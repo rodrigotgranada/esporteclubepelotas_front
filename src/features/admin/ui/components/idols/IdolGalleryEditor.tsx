@@ -22,7 +22,7 @@ export interface IdolGalleryEditorProps {
   items: IdolGalleryItem[];
   onUpdateCaption: (index: number, caption: string) => void;
   onRemoveItem: (index: number) => void;
-  onAddItems: (newItems: IdolGalleryItem[]) => void;
+  onAddItems: (newItems: IdolGalleryItem[], newFiles?: File[]) => void;
 }
 
 export const IdolGalleryEditor: React.FC<IdolGalleryEditorProps> = ({
@@ -44,7 +44,7 @@ export const IdolGalleryEditor: React.FC<IdolGalleryEditorProps> = ({
       setIsUploading(true);
 
       if (idolId) {
-        // Upload immediately via API
+        // Upload immediately via API for existing idol
         const res = await adminIdolsService.uploadGallery(idolId, files);
         const newUploaded = (res.gallery || []).slice(items.length).map((url) => ({
           url,
@@ -53,12 +53,12 @@ export const IdolGalleryEditor: React.FC<IdolGalleryEditorProps> = ({
         onAddItems(newUploaded);
         toast.success('Fotos adicionadas à galeria com sucesso!');
       } else {
-        // For new idols not yet created, create preview object URLs
+        // For new idols not yet created, create preview object URLs and queue files for post-create upload
         const localItems: IdolGalleryItem[] = files.map((file) => ({
           url: URL.createObjectURL(file),
           caption: '',
         }));
-        onAddItems(localItems);
+        onAddItems(localItems, files);
       }
     } catch (err) {
       console.error('Erro no upload de fotos:', err);

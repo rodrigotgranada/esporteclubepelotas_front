@@ -38,12 +38,13 @@ export const SafeImage: React.FC<SafeImageProps> = ({
   return (
     <Image
       {...props}
+      key={currentSrc}
       src={currentSrc}
       alt={alt}
       className={className}
-      unoptimized={unoptimized ?? isSvg}
+      unoptimized={unoptimized ?? (isSvg || hasFailed)}
       onError={() => {
-        if (!hasFailed) {
+        if (!hasFailed && currentSrc !== fallbackSrc) {
           setHasFailed(true);
           setCurrentSrc(fallbackSrc);
         }

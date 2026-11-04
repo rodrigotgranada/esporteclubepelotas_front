@@ -31,6 +31,7 @@ export const useAdminIdolDrawer = (
   const [endYear, setEndYear] = useState<number | ''>('');
   const [periods, setPeriods] = useState<IdolPeriod[]>([]);
   const [galleryItems, setGalleryItems] = useState<IdolGalleryItem[]>([]);
+  const [pendingGalleryFiles, setPendingGalleryFiles] = useState<File[]>([]);
   const [isActiveInClub, setIsActiveInClub] = useState(false);
   const [birthDate, setBirthDate] = useState('');
   const [deathDate, setDeathDate] = useState('');
@@ -77,6 +78,7 @@ export const useAdminIdolDrawer = (
     setEndYear('');
     setPeriods([]);
     setGalleryItems([]);
+    setPendingGalleryFiles([]);
     setIsActiveInClub(false);
     setBirthDate('');
     setDeathDate('');
@@ -212,7 +214,26 @@ export const useAdminIdolDrawer = (
     });
   };
 
+  const handleAddGalleryItems = (
+    newItems: IdolGalleryItem[],
+    newFiles?: File[],
+  ) => {
+    setGalleryItems((prev) => [...prev, ...newItems]);
+    if (newFiles && newFiles.length > 0) {
+      setPendingGalleryFiles((prev) => [...prev, ...newFiles]);
+    }
+  };
+
   const handleRemoveGalleryItem = (index: number) => {
+    const itemToRemove = galleryItems[index];
+    if (itemToRemove && itemToRemove.url.startsWith('blob:')) {
+      const blobIndex =
+        galleryItems
+          .slice(0, index + 1)
+          .filter((i) => i.url.startsWith('blob:')).length - 1;
+      setPendingGalleryFiles((prev) => prev.filter((_, i) => i !== blobIndex));
+      URL.revokeObjectURL(itemToRemove.url);
+    }
     setGalleryItems((prev) => prev.filter((_, i) => i !== index));
   };
 
@@ -338,15 +359,40 @@ export const useAdminIdolDrawer = (
         await adminIdolsService.updateIdol(idolId, payload);
         toast.success(ADMIN_IDOLS_TEXTS.TOAST.SUCCESS_UPDATE);
       } else {
-        const created = await adminIdolsService.createIdol(payload);
+        // Strip out temporary preview blob URLs before initial create
+        const initialGalleryItems = galleryItems.filter((i) => !i.url.startsWith('blob:'));
+        const created = await adminIdolsService.createIdol({
+          ...payload,
+          galleryItems: initialGalleryItems,
+        });
         savedIdolId = created._id || created.id;
         toast.success(ADMIN_IDOLS_TEXTS.TOAST.SUCCESS_CREATE);
       }
 
-      // If a new photo was cropped, upload it now
+      // If a new main photo was cropped, upload it now
       if (photoBlob && savedIdolId) {
         const file = new File([photoBlob], `${savedIdolId}-photo.webp`, { type: 'image/webp' });
         await adminIdolsService.uploadPhoto(savedIdolId, file);
+      }
+
+      // If there are pending gallery files queued during creation, upload them now
+      if (pendingGalleryFiles.length > 0 && savedIdolId) {
+        const uploadRes = await adminIdolsService.uploadGallery(savedIdolId, pendingGalleryFiles);
+        const uploadedUrls = uploadRes.gallery || [];
+        const existingItems = galleryItems.filter((i) => !i.url.startsWith('blob:'));
+        const pendingCaptions = galleryItems
+          .filter((i) => i.url.startsWith('blob:'))
+          .map((i) => i.caption || '');
+
+        const finalGalleryItems = [
+          ...existingItems,
+          ...uploadedUrls.slice(existingItems.length).map((url, i) => ({
+            url,
+            caption: pendingCaptions[i] || '',
+          })),
+        ];
+
+        await adminIdolsService.updateIdol(savedIdolId, { galleryItems: finalGalleryItems });
       }
 
       onSaveSuccess();
@@ -382,6 +428,7 @@ export const useAdminIdolDrawer = (
     handleRemovePeriod,
     galleryItems,
     setGalleryItems,
+    handleAddGalleryItems,
     handleUpdateGalleryCaption,
     handleRemoveGalleryItem,
     isActiveInClub,
