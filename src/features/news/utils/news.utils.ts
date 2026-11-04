@@ -68,3 +68,36 @@ export function formatNewsDate(dateStr?: string, includeTime = false): string {
   }
 }
 
+/**
+ * Extrai o ID do vídeo do YouTube e retorna a URL de incorporação segura (youtube-nocookie.com/embed/ID).
+ * Suporta formatos desktop, mobile (m.youtube), compartilhamento do app (youtu.be), Shorts e transmissões ao vivo.
+ */
+export function getYoutubeEmbedUrl(url?: string | null): string | null {
+  if (!url || typeof url !== 'string') return null;
+  const cleanUrl = url.trim();
+  if (!cleanUrl) return null;
+
+  const regex = /(?:https?:\/\/)?(?:www\.|m\.)?(?:youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|v\/|shorts\/|live\/)|youtu\.be\/)([\w-]{11})/;
+  const match = cleanUrl.match(regex);
+  if (match && match[1]) {
+    return `https://www.youtube-nocookie.com/embed/${match[1]}`;
+  }
+  return null;
+}
+
+/**
+ * Retorna o link canônico do YouTube para assistir externamente no app ou navegador.
+ */
+export function getYoutubeWatchUrl(url?: string | null): string | null {
+  if (!url || typeof url !== 'string') return null;
+  const cleanUrl = url.trim();
+  if (!cleanUrl) return null;
+
+  const regex = /(?:https?:\/\/)?(?:www\.|m\.)?(?:youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|v\/|shorts\/|live\/)|youtu\.be\/)([\w-]{11})/;
+  const match = cleanUrl.match(regex);
+  if (match && match[1]) {
+    return `https://www.youtube.com/watch?v=${match[1]}`;
+  }
+  return null;
+}
+

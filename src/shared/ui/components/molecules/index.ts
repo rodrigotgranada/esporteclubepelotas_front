@@ -17,3 +17,5 @@ export * from './EnvironmentBadge';
 export * from './PasswordStrengthMeter';
 export * from './PasswordStrengthMeter.constants';
 export * from './SafeImage';
+export * from './ImageLightboxModal/ImageLightboxModal';
+export * from './ImageLightboxModal/ImageLightboxModal.constants';

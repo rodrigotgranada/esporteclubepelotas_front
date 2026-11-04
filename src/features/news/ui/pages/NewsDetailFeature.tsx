@@ -13,6 +13,7 @@ import {
   Image as ImageIcon,
   Check,
   Clock,
+  ExternalLink,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import {
@@ -23,12 +24,13 @@ import {
   Button,
   Spinner,
   SafeImage,
+  ImageLightboxModal,
 } from '@/shared/ui/components';
 import { PUBLIC_NEWS_TEXTS } from '../../constants/news.constants';
 import { useNewsArticle } from '../../hooks/useNewsArticle';
 import { NewsRenderer } from '../components/NewsRenderer';
 import { NewsCard } from '../components/NewsCard';
-import { calculateReadingTime } from '../../utils/news.utils';
+import { calculateReadingTime, getYoutubeEmbedUrl, getYoutubeWatchUrl } from '../../utils/news.utils';
 
 export interface NewsDetailFeatureProps {
   slug: string;
@@ -38,6 +40,7 @@ export const NewsDetailFeature: React.FC<NewsDetailFeatureProps> = ({ slug }) =>
   const router = useRouter();
   const { article, relatedNews, isLoading, error } = useNewsArticle(slug);
   const [copied, setCopied] = React.useState(false);
+  const [lightboxIndex, setLightboxIndex] = React.useState<number | null>(null);
 
   useEffect(() => {
     if (article?._redirectTo && article._redirectTo !== slug) {
@@ -52,12 +55,6 @@ export const NewsDetailFeature: React.FC<NewsDetailFeatureProps> = ({ slug }) =>
       toast.success('Link copiado com sucesso!');
       setTimeout(() => setCopied(false), 2500);
     }
-  };
-
-  const getYoutubeEmbedUrl = (url?: string) => {
-    if (!url) return null;
-    const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
-    return match ? `https://www.youtube.com/embed/${match[1]}` : null;
   };
 
   if (isLoading) {
@@ -110,6 +107,7 @@ export const NewsDetailFeature: React.FC<NewsDetailFeatureProps> = ({ slug }) =>
     : '';
 
   const youtubeEmbedUrl = getYoutubeEmbedUrl(article.youtubeVideoUrl);
+  const youtubeWatchUrl = getYoutubeWatchUrl(article.youtubeVideoUrl);
 
   return (
     <LayoutContainer className="flex flex-col gap-10 py-8 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto w-full">
@@ -228,11 +226,24 @@ export const NewsDetailFeature: React.FC<NewsDetailFeatureProps> = ({ slug }) =>
       {/* Embedded YouTube Video if available */}
       {youtubeEmbedUrl && (
         <LayoutContainer className="flex flex-col gap-3 p-6 rounded-3xl bg-surface border border-border shadow-xs">
-          <Title level="h3" className="text-lg font-bold text-text-primary flex items-center gap-2">
-            <Video className="w-5 h-5 text-error" />
-            {PUBLIC_NEWS_TEXTS.VIDEO_TITLE}
-          </Title>
-          <LayoutContainer className="relative w-full aspect-video rounded-2xl overflow-hidden border border-border">
+          <LayoutContainer className="flex items-center justify-between">
+            <Title level="h3" className="text-lg font-bold text-text-primary flex items-center gap-2">
+              <Video className="w-5 h-5 text-primary" />
+              {PUBLIC_NEWS_TEXTS.VIDEO_TITLE}
+            </Title>
+            {youtubeWatchUrl && (
+              <a
+                href={youtubeWatchUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-xs text-text-secondary hover:text-primary transition-colors font-medium"
+              >
+                <span>{PUBLIC_NEWS_TEXTS.WATCH_ON_YOUTUBE}</span>
+                <ExternalLink className="w-3.5 h-3.5" />
+              </a>
+            )}
+          </LayoutContainer>
+          <LayoutContainer className="relative w-full aspect-video rounded-2xl overflow-hidden border border-border shadow-md">
             <iframe
               src={youtubeEmbedUrl}
               title={article.title}
@@ -247,26 +258,45 @@ export const NewsDetailFeature: React.FC<NewsDetailFeatureProps> = ({ slug }) =>
       {/* Photo Gallery if available */}
       {article.gallery && article.gallery.length > 0 && (
         <LayoutContainer className="flex flex-col gap-4 p-6 rounded-3xl bg-surface border border-border shadow-xs">
-          <Title level="h3" className="text-lg font-bold text-text-primary flex items-center gap-2">
-            <ImageIcon className="w-5 h-5 text-primary" />
-            {PUBLIC_NEWS_TEXTS.GALLERY_TITLE}
-          </Title>
+          <LayoutContainer className="flex flex-col gap-1">
+            <Title level="h3" className="text-lg font-bold text-text-primary flex items-center gap-2">
+              <ImageIcon className="w-5 h-5 text-primary" />
+              {PUBLIC_NEWS_TEXTS.GALLERY_TITLE}
+            </Title>
+            <Text as="p" className="text-xs text-text-secondary">
+              {PUBLIC_NEWS_TEXTS.GALLERY_CLICK_HINT}
+            </Text>
+          </LayoutContainer>
           <LayoutContainer className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {article.gallery.map((imgUrl, idx) => (
-              <LayoutContainer
+              <Button
                 key={idx}
-                className="relative aspect-video rounded-xl overflow-hidden bg-drawer border border-border hover:opacity-90 transition-opacity cursor-pointer"
-                onClick={() => window.open(imgUrl, '_blank')}
+                type="button"
+                variant="custom"
+                size="none"
+                onClick={() => setLightboxIndex(idx)}
+                className="group relative aspect-video rounded-xl overflow-hidden bg-drawer border border-border hover:border-primary transition-all cursor-pointer"
+                aria-label={`Ampliar foto ${idx + 1}`}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <SafeImage
                   src={imgUrl}
                   alt={`Galeria foto ${idx + 1}`}
-                  className="w-full h-full object-cover"
+                  fill
+                  sizes="(max-width: 640px) 50vw, 300px"
+                  className="object-cover group-hover:scale-105 transition-transform duration-300"
                 />
-              </LayoutContainer>
+              </Button>
             ))}
           </LayoutContainer>
+
+          {/* Lightbox Modal com Carrossel */}
+          <ImageLightboxModal
+            isOpen={lightboxIndex !== null}
+            onClose={() => setLightboxIndex(null)}
+            images={article.gallery}
+            initialIndex={lightboxIndex ?? 0}
+            title={article.title}
+          />
         </LayoutContainer>
       )}
 

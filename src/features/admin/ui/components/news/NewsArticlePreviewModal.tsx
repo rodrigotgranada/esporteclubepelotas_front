@@ -13,6 +13,8 @@ import {
   Wifi,
   Battery,
   Share2,
+  Video,
+  ExternalLink,
 } from 'lucide-react';
 import {
   Modal,
@@ -22,10 +24,12 @@ import {
   Badge,
   Button,
   SafeImage,
+  ImageLightboxModal,
 } from '@/shared/ui/components';
 import { NewsRenderer } from '@/features/news/ui/components/NewsRenderer';
 import { ADMIN_NEWS_TEXTS } from '../../../constants/admin-news.constants';
 import { NewsSocialPreview } from './NewsSocialPreview';
+import { getYoutubeEmbedUrl, getYoutubeWatchUrl } from '@/features/news/utils/news.utils';
 
 export interface NewsArticlePreviewModalProps {
   isOpen: boolean;
@@ -74,18 +78,13 @@ export const NewsArticlePreviewModal: React.FC<NewsArticlePreviewModalProps> = (
 }) => {
   const { DRAWER: texts } = ADMIN_NEWS_TEXTS;
   const [activeMode, setActiveMode] = useState<PreviewMode>('desktop');
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   if (!isOpen) return null;
 
   const allGalleryPhotos = [...gallery, ...galleryPreviews];
-
-  const getYoutubeEmbedUrl = (url?: string) => {
-    if (!url) return null;
-    const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
-    return match ? `https://www.youtube-nocookie.com/embed/${match[1]}` : null;
-  };
-
   const embedUrl = getYoutubeEmbedUrl(youtubeVideoUrl);
+  const watchUrl = getYoutubeWatchUrl(youtubeVideoUrl);
 
   const formattedDate = publishedAt
     ? new Date(publishedAt).toLocaleDateString('pt-BR', {
@@ -280,45 +279,74 @@ export const NewsArticlePreviewModal: React.FC<NewsArticlePreviewModalProps> = (
               </LayoutContainer>
             )}
 
-            {/* Vídeo do YouTube se configurado */}
-            {embedUrl && (
-              <LayoutContainer className="my-6 rounded-2xl overflow-hidden aspect-video border border-border shadow-md">
-                <iframe
-                  src={embedUrl}
-                  title={texts.PREVIEW_VIDEO_TITLE}
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  className="w-full h-full"
-                />
-              </LayoutContainer>
-            )}
-
             {/* Conteúdo Rico Renderizado via NewsRenderer */}
             <LayoutContainer className="my-6">
               <NewsRenderer content={content} />
             </LayoutContainer>
 
-            {/* Galeria de Fotos */}
+            {/* Vídeo do YouTube posicionado após o conteúdo (igual à página pública) */}
+            {embedUrl && (
+              <LayoutContainer className="my-8 flex flex-col gap-3 p-6 rounded-2xl bg-drawer border border-border shadow-md">
+                <LayoutContainer className="flex items-center justify-between">
+                  <Title level="h3" className="text-base font-bold text-text-primary flex items-center gap-2">
+                    <Video className="w-4 h-4 text-primary" />
+                    {texts.PREVIEW_VIDEO_TITLE}
+                  </Title>
+                  {watchUrl && (
+                    <a
+                      href={watchUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-xs text-text-secondary hover:text-primary transition-colors font-medium"
+                    >
+                      <Text as="span">Assistir no YouTube</Text>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  )}
+                </LayoutContainer>
+                <LayoutContainer className="relative w-full aspect-video rounded-xl overflow-hidden border border-border shadow-xs">
+                  <iframe
+                    src={embedUrl}
+                    title={texts.PREVIEW_VIDEO_TITLE}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    className="w-full h-full"
+                  />
+                </LayoutContainer>
+              </LayoutContainer>
+            )}
+
+            {/* Galeria de Fotos Interativa */}
             {allGalleryPhotos.length > 0 && (
               <LayoutContainer className="my-8 flex flex-col gap-3 pt-6 border-t border-border">
-                <Text className="text-sm font-bold text-text-primary uppercase tracking-wider flex items-center gap-2">
-                  <Images className="w-4 h-4 text-primary" />
-                  {texts.PREVIEW_GALLERY_TITLE(allGalleryPhotos.length)}
-                </Text>
+                <LayoutContainer className="flex items-center justify-between">
+                  <Text className="text-sm font-bold text-text-primary uppercase tracking-wider flex items-center gap-2">
+                    <Images className="w-4 h-4 text-primary" />
+                    {texts.PREVIEW_GALLERY_TITLE(allGalleryPhotos.length)}
+                  </Text>
+                  <Text className="text-xs text-text-secondary">
+                    Clique em qualquer foto para abrir o carrossel
+                  </Text>
+                </LayoutContainer>
                 <LayoutContainer className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {allGalleryPhotos.map((photoUrl, idx) => (
-                    <LayoutContainer
+                    <Button
                       key={idx}
-                      className="relative aspect-square rounded-xl overflow-hidden border border-border group bg-drawer shadow-xs"
+                      type="button"
+                      variant="custom"
+                      size="none"
+                      onClick={() => setLightboxIndex(idx)}
+                      className="group relative aspect-video rounded-xl overflow-hidden border border-border bg-drawer shadow-xs hover:border-primary transition-all cursor-pointer"
+                      aria-label={`Ampliar foto ${idx + 1}`}
                     >
                       <SafeImage
                         src={photoUrl}
                         alt={`Foto da galeria ${idx + 1}`}
                         fill
                         sizes="300px"
-                        className="object-cover transition-transform group-hover:scale-105"
+                        className="object-cover transition-transform group-hover:scale-105 duration-300"
                       />
-                    </LayoutContainer>
+                    </Button>
                   ))}
                 </LayoutContainer>
               </LayoutContainer>
@@ -442,25 +470,44 @@ export const NewsArticlePreviewModal: React.FC<NewsArticlePreviewModalProps> = (
                   </LayoutContainer>
                 )}
 
-                {/* Vídeo Mobile */}
-                {embedUrl && (
-                  <LayoutContainer className="mb-4 rounded-xl overflow-hidden aspect-video border border-border">
-                    <iframe
-                      src={embedUrl}
-                      title={texts.PREVIEW_VIDEO_TITLE}
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                      className="w-full h-full"
-                    />
-                  </LayoutContainer>
-                )}
-
                 {/* Conteúdo Rico Mobile */}
                 <LayoutContainer className="mb-4 text-sm">
                   <NewsRenderer content={content} />
                 </LayoutContainer>
 
-                {/* Galeria Mobile */}
+                {/* Vídeo Mobile posicionado após o conteúdo (igual à página pública) */}
+                {embedUrl && (
+                  <LayoutContainer className="mb-6 flex flex-col gap-2 p-3.5 rounded-xl bg-drawer border border-border shadow-xs">
+                    <LayoutContainer className="flex items-center justify-between">
+                      <Title level="h3" className="text-xs font-bold text-text-primary flex items-center gap-1.5">
+                        <Video className="w-3.5 h-3.5 text-primary" />
+                        {texts.PREVIEW_VIDEO_TITLE}
+                      </Title>
+                      {watchUrl && (
+                        <a
+                          href={watchUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-[10px] text-text-secondary hover:text-primary transition-colors font-medium"
+                        >
+                          <Text as="span">YouTube</Text>
+                          <ExternalLink className="w-3 h-3" />
+                        </a>
+                      )}
+                    </LayoutContainer>
+                    <LayoutContainer className="rounded-lg overflow-hidden aspect-video border border-border shadow-xs">
+                      <iframe
+                        src={embedUrl}
+                        title={texts.PREVIEW_VIDEO_TITLE}
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        className="w-full h-full"
+                      />
+                    </LayoutContainer>
+                  </LayoutContainer>
+                )}
+
+                {/* Galeria Mobile Interativa */}
                 {allGalleryPhotos.length > 0 && (
                   <LayoutContainer className="my-4 flex flex-col gap-2 pt-4 border-t border-border">
                     <Text className="text-xs font-bold text-text-primary uppercase tracking-wider flex items-center gap-1.5">
@@ -469,18 +516,23 @@ export const NewsArticlePreviewModal: React.FC<NewsArticlePreviewModalProps> = (
                     </Text>
                     <LayoutContainer className="grid grid-cols-2 gap-2">
                       {allGalleryPhotos.map((photoUrl, idx) => (
-                        <LayoutContainer
+                        <Button
                           key={idx}
-                          className="relative aspect-square rounded-lg overflow-hidden border border-border bg-drawer"
+                          type="button"
+                          variant="custom"
+                          size="none"
+                          onClick={() => setLightboxIndex(idx)}
+                          className="group relative aspect-video rounded-lg overflow-hidden border border-border bg-drawer hover:border-primary transition-all cursor-pointer"
+                          aria-label={`Ampliar foto ${idx + 1}`}
                         >
                           <SafeImage
                             src={photoUrl}
                             alt={`Foto ${idx + 1}`}
                             fill
                             sizes="180px"
-                            className="object-cover"
+                            className="object-cover group-hover:scale-105 transition-transform duration-300"
                           />
-                        </LayoutContainer>
+                        </Button>
                       ))}
                     </LayoutContainer>
                   </LayoutContainer>
@@ -511,6 +563,15 @@ export const NewsArticlePreviewModal: React.FC<NewsArticlePreviewModalProps> = (
           </LayoutContainer>
         )}
       </LayoutContainer>
+
+      {/* Lightbox Modal com Carrossel de Fotos no Preview */}
+      <ImageLightboxModal
+        isOpen={lightboxIndex !== null}
+        onClose={() => setLightboxIndex(null)}
+        images={allGalleryPhotos}
+        initialIndex={lightboxIndex ?? 0}
+        title={title}
+      />
     </Modal>
   );
 };

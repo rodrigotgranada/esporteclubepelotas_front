@@ -14,6 +14,8 @@ export const PUBLIC_NEWS_TEXTS = {
   TAGS_TITLE: 'Tags relacionadas:',
   RELATED_NEWS: 'Mais Notícias Recentes',
   GALLERY_TITLE: 'Galeria de Fotos da Partida',
+  GALLERY_CLICK_HINT: 'Clique em qualquer foto para ampliar e navegar pela galeria',
   VIDEO_TITLE: 'Vídeo da Matéria',
+  WATCH_ON_YOUTUBE: 'Assistir no YouTube',
 };
 
