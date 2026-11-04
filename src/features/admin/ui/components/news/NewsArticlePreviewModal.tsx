@@ -288,3 +288,4 @@ export const NewsArticlePreviewModal: React.FC<NewsArticlePreviewModalProps> = (
     </Modal>
   );
 };
+

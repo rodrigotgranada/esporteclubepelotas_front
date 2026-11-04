@@ -1,7 +1,8 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   Calendar,
   Eye,
@@ -34,8 +35,15 @@ export interface NewsDetailFeatureProps {
 }
 
 export const NewsDetailFeature: React.FC<NewsDetailFeatureProps> = ({ slug }) => {
+  const router = useRouter();
   const { article, relatedNews, isLoading, error } = useNewsArticle(slug);
   const [copied, setCopied] = React.useState(false);
+
+  useEffect(() => {
+    if (article?._redirectTo && article._redirectTo !== slug) {
+      router.replace(`/noticias/${article._redirectTo}`);
+    }
+  }, [article, slug, router]);
 
   const handleCopyLink = () => {
     if (typeof window !== 'undefined') {

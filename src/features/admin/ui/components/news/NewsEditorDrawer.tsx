@@ -10,6 +10,8 @@ import {
   Send,
   Save,
   Eye,
+  Lock,
+  Unlock,
 } from 'lucide-react';
 import {
   Drawer,
@@ -96,6 +98,15 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
 
   const quickCat = useQuickCategoryModal(handleCategoryCreated);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [isSlugUnlocked, setIsSlugUnlocked] = useState(false);
+
+  React.useEffect(() => {
+    setIsSlugUnlocked(false);
+  }, [isOpen, articleId]);
+
+  const isPublishedArticle = Boolean(articleId && status === 'PUBLISHED');
+  const isSlugLocked = isPublishedArticle && !isSlugUnlocked;
+
   const selectedCategory = categories.find((c) => c._id === categoryId || c.slug === categoryId);
 
   return (
@@ -174,17 +185,69 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
 
               {/* Slug Customizado (Opcional) */}
               <LayoutContainer className="flex flex-col gap-1.5">
-                <Text as="span" className="text-xs font-semibold text-text-primary uppercase tracking-wider">
-                  {texts.LABEL_SLUG}
-                </Text>
+                <LayoutContainer className="flex items-center justify-between">
+                  <LayoutContainer className="flex items-center gap-1.5">
+                    <Text as="span" className="text-xs font-semibold text-text-primary uppercase tracking-wider">
+                      {texts.LABEL_SLUG}
+                    </Text>
+                    {isPublishedArticle && (
+                      <Badge variant={isSlugLocked ? 'default' : 'warning'} size="sm">
+                        {isSlugLocked ? (
+                          <span className="flex items-center gap-1">
+                            <Lock className="w-3 h-3" />
+                            {texts.SLUG_LOCKED_BADGE}
+                          </span>
+                        ) : (
+                          <span className="flex items-center gap-1">
+                            <Unlock className="w-3 h-3" />
+                            {texts.SLUG_UNLOCKED_BADGE}
+                          </span>
+                        )}
+                      </Badge>
+                    )}
+                  </LayoutContainer>
+                  {isPublishedArticle && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setIsSlugUnlocked(!isSlugUnlocked)}
+                      className="text-xs h-7 px-2"
+                    >
+                      {isSlugLocked ? (
+                        <>
+                          <Unlock className="w-3.5 h-3.5 mr-1 text-primary" />
+                          <span className="text-primary">{texts.SLUG_UNLOCK_BTN}</span>
+                        </>
+                      ) : (
+                        <>
+                          <Lock className="w-3.5 h-3.5 mr-1 text-text-secondary" />
+                          <span>{texts.SLUG_LOCK_BTN}</span>
+                        </>
+                      )}
+                    </Button>
+                  )}
+                </LayoutContainer>
                 <Input
                   value={slug}
                   onChange={(e) => setSlug(e.target.value)}
                   placeholder={texts.PLACEHOLDER_SLUG}
+                  disabled={isSlugLocked}
+                  className={isSlugLocked ? 'opacity-70 bg-surface-hover cursor-not-allowed' : ''}
                 />
-                <Text as="span" className="text-[11px] text-text-secondary">
-                  {texts.SLUG_HINT}
-                </Text>
+                {isSlugLocked ? (
+                  <Text as="span" className="text-[11px] text-text-secondary">
+                    {texts.SLUG_LOCKED_HINT}
+                  </Text>
+                ) : isPublishedArticle ? (
+                  <Text as="span" className="text-[11px] text-amber-500 font-medium">
+                    {texts.SLUG_UNLOCKED_WARNING}
+                  </Text>
+                ) : (
+                  <Text as="span" className="text-[11px] text-text-secondary">
+                    {texts.SLUG_HINT}
+                  </Text>
+                )}
               </LayoutContainer>
             </LayoutContainer>
 

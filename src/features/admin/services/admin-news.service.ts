@@ -26,6 +26,8 @@ export interface NewsArticleData {
   title: string;
   subtitle?: string;
   slug: string;
+  previousSlugs?: string[];
+  _redirectTo?: string;
   coverImage: string;
   coverCaption?: string;
   content: Record<string, any>;
