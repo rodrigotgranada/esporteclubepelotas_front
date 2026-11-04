@@ -228,6 +228,7 @@ export const PublicFooter = () => {
                     <Link
                       key={idx}
                       href={item.url}
+                      prefetch={false}
                       className="inline-flex items-center gap-1.5 text-text-secondary hover:text-primary transition-colors font-medium"
                     >
                       <ChevronRight className="w-3.5 h-3.5 text-primary shrink-0" />
