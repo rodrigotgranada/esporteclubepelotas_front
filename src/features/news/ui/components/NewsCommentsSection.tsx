@@ -7,7 +7,6 @@ import {
   LayoutContainer,
   Title,
   Text,
-  Badge,
   Button,
   SafeImage,
   Spinner,
@@ -84,11 +83,6 @@ export const NewsCommentsSection: React.FC<NewsCommentsSectionProps> = ({ slug }
             <Text className="text-xs font-bold text-text-primary">
               {user.firstName} {user.lastName}
             </Text>
-            {user.role?.name && (
-              <Badge variant="primary" size="sm" className="text-[10px] uppercase font-black">
-                {user.role.name}
-              </Badge>
-            )}
           </LayoutContainer>
 
           <LayoutContainer className="relative">
@@ -201,7 +195,6 @@ export const NewsCommentsSection: React.FC<NewsCommentsSectionProps> = ({ slug }
             const author = comment.author;
             const authorName = author ? `${author.firstName || ''} ${author.lastName || ''}`.trim() : 'Torcedor';
             const authorAvatar = author?.avatarUrl || author?.avatar;
-            const authorRole = author?.role;
 
             const isAuthor = Boolean(user && author?._id && (user._id === author._id));
             const isStaff = Boolean(user && ['Owner', 'Admin', 'Editor'].includes(user.role?.name));
@@ -223,16 +216,9 @@ export const NewsCommentsSection: React.FC<NewsCommentsSectionProps> = ({ slug }
                         {getUserInitials(author?.firstName, author?.lastName)}
                       </LayoutContainer>
                     )}
-                    <LayoutContainer className="flex flex-col sm:flex-row sm:items-center sm:gap-2">
-                      <Text className="text-xs font-bold text-text-primary">
-                        {authorName}
-                      </Text>
-                      {authorRole && (
-                        <Badge variant="default" size="sm" className="w-fit text-[9px] uppercase px-1.5 py-0 bg-drawer border border-border">
-                          {authorRole}
-                        </Badge>
-                      )}
-                    </LayoutContainer>
+                    <Text className="text-xs font-bold text-text-primary">
+                      {authorName}
+                    </Text>
                   </LayoutContainer>
 
                   <LayoutContainer className="flex items-center gap-2">
