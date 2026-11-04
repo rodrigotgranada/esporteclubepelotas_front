@@ -24,6 +24,7 @@ import {
   Checkbox,
   Badge,
   Spinner,
+  ConfirmModal,
 } from '@/shared/ui/components';
 import { ADMIN_NEWS_TEXTS } from '../../../constants/admin-news.constants';
 import { useAdminNewsDrawer } from '../../../hooks/news/useAdminNewsDrawer';
@@ -51,7 +52,7 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
   articleId,
   onSaveSuccess,
 }) => {
-  const { DRAWER: texts, STATUS_MAP } = ADMIN_NEWS_TEXTS;
+  const { DRAWER: texts, STATUS_MAP, MODAL_REPLACE_MAIN: replaceMainTexts } = ADMIN_NEWS_TEXTS;
 
   const {
     isLoading,
@@ -92,6 +93,11 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
     setYoutubeVideoUrl,
     featuredSlot,
     setFeaturedSlot,
+    handleSelectFeaturedSlot,
+    replaceMainModalOpen,
+    existingMainTitle,
+    confirmReplaceMain,
+    cancelReplaceMain,
     isPinned,
     setIsPinned,
     reporterName,
@@ -378,7 +384,7 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
             {/* 9. Vitrine Editorial & Destaques da Capa */}
             <NewsEditorFeaturedSection
               featuredSlot={featuredSlot}
-              setFeaturedSlot={setFeaturedSlot}
+              setFeaturedSlot={handleSelectFeaturedSlot}
               isPinned={isPinned}
               setIsPinned={setIsPinned}
             />
@@ -519,6 +525,18 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
         galleryPreviews={galleryPreviews}
         youtubeVideoUrl={youtubeVideoUrl}
         tags={tags}
+      />
+
+      {/* Modal de Confirmação para Substituir Manchetão */}
+      <ConfirmModal
+        isOpen={replaceMainModalOpen}
+        onClose={cancelReplaceMain}
+        onConfirm={confirmReplaceMain}
+        title={replaceMainTexts.TITLE}
+        description={replaceMainTexts.DESC(existingMainTitle)}
+        confirmText={replaceMainTexts.BUTTON_CONFIRM}
+        cancelText={replaceMainTexts.BUTTON_CANCEL}
+        variant="warning"
       />
     </>
   );

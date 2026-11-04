@@ -1,17 +1,18 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Newspaper, MessageSquare } from 'lucide-react';
+import { Newspaper, Sparkles, MessageSquare } from 'lucide-react';
 import { LayoutContainer, Title, Text, Button } from '@/shared/ui/components';
 import { ADMIN_NEWS_TEXTS } from '../../../constants/admin-news.constants';
 import { useAdminNewsList } from '../../../hooks/news/useAdminNewsList';
 import { AdminNewsFilterBar } from '../../components/news/AdminNewsFilterBar';
 import { AdminNewsList } from '../../components/news/AdminNewsList';
+import { AdminShowcaseTab } from '../../components/news/AdminShowcaseTab';
 import { AdminCommentsModerationTab } from '../../components/news/AdminCommentsModerationTab';
 import { NewsEditorDrawer } from '../../components/news/NewsEditorDrawer';
 
 export const AdminNewsFeature = () => {
-  const [activeTab, setActiveTab] = useState<'articles' | 'comments'>('articles');
+  const [activeTab, setActiveTab] = useState<'articles' | 'showcase' | 'comments'>('articles');
 
   const {
     news,
@@ -77,6 +78,16 @@ export const AdminNewsFeature = () => {
         </Button>
         <Button
           type="button"
+          variant={activeTab === 'showcase' ? 'primary' : 'ghost'}
+          size="sm"
+          onClick={() => setActiveTab('showcase')}
+          leftIcon={<Sparkles className="w-4 h-4" />}
+          className="rounded-lg font-bold text-xs"
+        >
+          {ADMIN_NEWS_TEXTS.SHOWCASE.TAB_TITLE}
+        </Button>
+        <Button
+          type="button"
           variant={activeTab === 'comments' ? 'primary' : 'ghost'}
           size="sm"
           onClick={() => setActiveTab('comments')}
@@ -126,7 +137,10 @@ export const AdminNewsFeature = () => {
         </>
       )}
 
-      {/* Tab 2: Comments Moderation */}
+      {/* Tab 2: Showcase Visual Manager (Vitrine da Capa) */}
+      {activeTab === 'showcase' && <AdminShowcaseTab />}
+
+      {/* Tab 3: Comments Moderation */}
       {activeTab === 'comments' && <AdminCommentsModerationTab />}
 
       {/* Editor Drawer */}

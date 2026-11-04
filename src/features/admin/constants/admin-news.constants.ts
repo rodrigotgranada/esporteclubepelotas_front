@@ -260,5 +260,43 @@ export const ADMIN_NEWS_TEXTS = {
     PAGINATION_LABEL: (page: number, totalPages: number) => `Página ${page} de ${totalPages}`,
     TOTAL_COUNT: (count: number) => `${count} comentário(s)`,
   },
+
+  SHOWCASE: {
+    TAB_TITLE: 'Vitrine da Capa',
+    PAGE_TITLE: 'Gestão Visual da Vitrine da Capa',
+    PAGE_SUBTITLE: 'Organize as matérias em destaque na Home arrastando-as para os slots do Bento Grid ou usando os botões rápidos.',
+    SAVE_BUTTON: 'Salvar Vitrine da Capa',
+    SAVING_BUTTON: 'Salvando...',
+    TOAST_SUCCESS: 'Vitrine da capa atualizada com sucesso!',
+    TOAST_ERROR: 'Erro ao atualizar vitrine da capa.',
+    SLOT_MAIN_BADGE: '⭐ Manchetão Principal',
+    SLOT_MAIN_TITLE: 'Slot 1 - Manchetão Principal',
+    SLOT_MAIN_HINT: '1 vaga exclusiva. Ocupa a maior manchete com imagem expandida na Home.',
+    SLOT_MAIN_EMPTY: 'Arraste uma matéria aqui ou clique em (+ Manchetão) no banco abaixo para ocupar esta vaga.',
+    SLOT_SECONDARY_BADGE: 'Destaque Secundário',
+    SLOT_SECONDARY_1_TITLE: 'Slot 2 - Destaque Secundário A',
+    SLOT_SECONDARY_2_TITLE: 'Slot 3 - Destaque Secundário B',
+    SLOT_SECONDARY_HINT: '1 vaga exclusiva. Ocupa o card lateral de apoio na Home.',
+    SLOT_SECONDARY_EMPTY: 'Arraste uma matéria aqui ou clique em (+ Secundário) para ocupar esta vaga.',
+    BTN_REMOVE_SLOT: 'Remover do Destaque',
+    BTN_REMOVE_SLOT_TOOLTIP: 'Remove esta matéria da vitrine e a torna uma matéria comum',
+    POOL_TITLE: 'Matérias Publicadas Disponíveis',
+    POOL_SUBTITLE: 'Arraste qualquer matéria abaixo para os slots da vitrine acima ou use os botões rápidos.',
+    POOL_SEARCH_PLACEHOLDER: 'Buscar matérias por título para destacar...',
+    POOL_EMPTY: 'Nenhuma matéria publicada disponível encontrada.',
+    BTN_ADD_MAIN: '+ Manchetão',
+    BTN_ADD_SECONDARY_1: '+ Secundário A',
+    BTN_ADD_SECONDARY_2: '+ Secundário B',
+    DRAG_HINT: '💡 Dica: Arraste matérias entre os slots para trocar posições em tempo real.',
+    UNSAVED_CHANGES: 'Existem alterações não salvas na vitrine.',
+  },
+
+  MODAL_REPLACE_MAIN: {
+    TITLE: 'Substituir Manchetão Atual?',
+    DESC: (currentTitle: string) =>
+      `A matéria "${currentTitle}" já ocupa o Manchetão Principal da capa. Ao continuar, a matéria atual assumirá o Manchetão e a anterior se tornará uma matéria comum (sem destaque). Deseja confirmar?`,
+    BUTTON_CONFIRM: 'Confirmar Substituição',
+    BUTTON_CANCEL: 'Cancelar',
+  },
 };
 

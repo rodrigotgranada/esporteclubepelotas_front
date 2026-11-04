@@ -42,6 +42,8 @@ export const useAdminNewsDrawer = (
   const [youtubeVideoUrl, setYoutubeVideoUrl] = useState('');
   const [isFeatured, setIsFeatured] = useState(false);
   const [featuredSlot, setFeaturedSlot] = useState<'MAIN' | 'SECONDARY' | 'NONE'>('NONE');
+  const [replaceMainModalOpen, setReplaceMainModalOpen] = useState(false);
+  const [existingMainTitle, setExistingMainTitle] = useState('');
   const [isPinned, setIsPinned] = useState(false);
   const [reporterName, setReporterName] = useState('');
   const [photographerName, setPhotographerName] = useState('');
@@ -419,6 +421,33 @@ export const useAdminNewsDrawer = (
     }
   };
 
+  const handleSelectFeaturedSlot = async (slot: 'MAIN' | 'SECONDARY' | 'NONE') => {
+    if (slot === 'MAIN' && featuredSlot !== 'MAIN') {
+      try {
+        const currentMain = await adminNewsService.getCurrentMain();
+        if (currentMain && currentMain._id !== articleId && currentMain.id !== articleId) {
+          setExistingMainTitle(currentMain.title);
+          setReplaceMainModalOpen(true);
+          return;
+        }
+      } catch (err) {
+        console.error('Failed to check current main article', err);
+      }
+    }
+    setFeaturedSlot(slot);
+    setIsFeatured(slot !== 'NONE');
+  };
+
+  const confirmReplaceMain = () => {
+    setFeaturedSlot('MAIN');
+    setIsFeatured(true);
+    setReplaceMainModalOpen(false);
+  };
+
+  const cancelReplaceMain = () => {
+    setReplaceMainModalOpen(false);
+  };
+
   return {
     isLoading,
     isSaving,
@@ -460,6 +489,11 @@ export const useAdminNewsDrawer = (
     setIsFeatured,
     featuredSlot,
     setFeaturedSlot,
+    handleSelectFeaturedSlot,
+    replaceMainModalOpen,
+    existingMainTitle,
+    confirmReplaceMain,
+    cancelReplaceMain,
     isPinned,
     setIsPinned,
     reporterName,

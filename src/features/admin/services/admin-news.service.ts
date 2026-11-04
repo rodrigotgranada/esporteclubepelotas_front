@@ -50,6 +50,26 @@ export interface GetAdminCommentsResponse {
   totalPages: number;
 }
 
+export interface ShowcaseResponse {
+  main: NewsArticleData | null;
+  secondary: NewsArticleData[];
+  available: NewsArticleData[];
+}
+
+export interface UpdateShowcaseDto {
+  mainId: string | null;
+  secondaryIds: string[];
+}
+
+export interface CurrentMainResponse {
+  _id: string;
+  id: string;
+  title: string;
+  slug: string;
+  coverImage: string;
+  publishedAt?: string;
+}
+
 export type NewsStatusType = 'DRAFT' | 'PUBLISHED' | 'SCHEDULED' | 'ARCHIVED';
 
 export interface NewsArticleData {
@@ -202,6 +222,21 @@ export const adminNewsService = {
 
   deleteComment: async (commentId: string): Promise<{ success: boolean; message: string }> => {
     const response = await api.delete(`/news/admin/comments/${commentId}`);
+    return response.data;
+  },
+
+  getShowcase: async (): Promise<ShowcaseResponse> => {
+    const response = await api.get('/news/admin/showcase');
+    return response.data;
+  },
+
+  updateShowcase: async (dto: UpdateShowcaseDto): Promise<{ success: boolean; message: string }> => {
+    const response = await api.put('/news/admin/showcase', dto);
+    return response.data;
+  },
+
+  getCurrentMain: async (): Promise<CurrentMainResponse | null> => {
+    const response = await api.get('/news/admin/current-main');
     return response.data;
   },
 };
