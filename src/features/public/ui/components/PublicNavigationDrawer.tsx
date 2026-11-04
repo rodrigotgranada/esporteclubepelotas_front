@@ -31,6 +31,7 @@ import {
 import { useAuthStore } from '@/store/useAuthStore';
 import { useSettingsStore } from '@/store/useSettingsStore';
 import { useThemeStore } from '@/store/useThemeStore';
+import { useSystemModulesStore } from '@/store/useSystemModulesStore';
 import { PUBLIC_DRAWER_TEXTS } from './PublicNavigationDrawer.constants';
 
 export interface PublicNavigationDrawerProps {
@@ -45,9 +46,12 @@ export const PublicNavigationDrawer: React.FC<PublicNavigationDrawerProps> = ({
   const { user, logout } = useAuthStore();
   const { settings } = useSettingsStore();
   const { mode, setMode } = useThemeStore();
+  const { isLoaded: isModulesLoaded, isModuleActive } = useSystemModulesStore();
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [isDark, setIsDark] = useState(false);
+
+  const idolsActive = isModulesLoaded ? isModuleActive('idols') : true;
 
   useEffect(() => {
     setMounted(true);
@@ -284,17 +288,33 @@ export const PublicNavigationDrawer: React.FC<PublicNavigationDrawerProps> = ({
 
                 {/* Ídolos e Linha do Tempo Grid */}
                 <LayoutContainer className="grid grid-cols-2 gap-2">
-                  <LayoutContainer className="p-3 rounded-xl bg-surface/50 border border-border/60 flex items-center justify-between opacity-85 hover:opacity-100 transition-opacity">
-                    <LayoutContainer className="flex items-center gap-2">
-                      <Trophy className="w-3.5 h-3.5 text-primary" />
-                      <span className="text-xs font-bold text-text-primary">
-                        {PUBLIC_DRAWER_TEXTS.LINK_IDOLS}
-                      </span>
+                  {idolsActive ? (
+                    <Link
+                      href="/idolos"
+                      onClick={onClose}
+                      className="p-3 rounded-xl bg-surface/70 hover:bg-surface border border-border/80 hover:border-primary/50 flex items-center justify-between transition-all group"
+                    >
+                      <LayoutContainer className="flex items-center gap-2">
+                        <Trophy className="w-3.5 h-3.5 text-primary group-hover:scale-110 transition-transform" />
+                        <span className="text-xs font-bold text-text-primary group-hover:text-primary transition-colors">
+                          {PUBLIC_DRAWER_TEXTS.LINK_IDOLS}
+                        </span>
+                      </LayoutContainer>
+                      <ChevronRight className="w-3.5 h-3.5 text-text-secondary/60 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
+                    </Link>
+                  ) : (
+                    <LayoutContainer className="p-3 rounded-xl bg-surface/50 border border-border/60 flex items-center justify-between opacity-85 hover:opacity-100 transition-opacity">
+                      <LayoutContainer className="flex items-center gap-2">
+                        <Trophy className="w-3.5 h-3.5 text-primary" />
+                        <span className="text-xs font-bold text-text-primary">
+                          {PUBLIC_DRAWER_TEXTS.LINK_IDOLS}
+                        </span>
+                      </LayoutContainer>
+                      <Badge variant="default" size="sm" className="text-[9px] py-0 px-1.5 font-medium">
+                        {PUBLIC_DRAWER_TEXTS.BADGE_COMING_SOON}
+                      </Badge>
                     </LayoutContainer>
-                    <Badge variant="default" size="sm" className="text-[9px] py-0 px-1.5 font-medium">
-                      {PUBLIC_DRAWER_TEXTS.BADGE_COMING_SOON}
-                    </Badge>
-                  </LayoutContainer>
+                  )}
 
                   <LayoutContainer className="p-3 rounded-xl bg-surface/50 border border-border/60 flex items-center justify-between opacity-85 hover:opacity-100 transition-opacity">
                     <LayoutContainer className="flex items-center gap-2">

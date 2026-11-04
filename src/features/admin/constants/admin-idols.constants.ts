@@ -1,0 +1,121 @@
+export const ADMIN_IDOLS_TEXTS = {
+  PAGE_TITLE: 'Ídolos & Memorial',
+  PAGE_SUBTITLE: 'Gerencie os atletas lendários, treinadores, funcionários e torcedores ilustres que marcaram a história da Boca do Lobo.',
+  BTN_NEW_IDOL: '+ Novo Ídolo',
+
+  CATEGORIES: {
+    ALL: 'Todas as Categorias',
+    PLAYER: 'Jogador',
+    COACH: 'Treinador',
+    STAFF: 'Funcionário',
+    FAN: 'Torcedor Símbolo',
+  },
+
+  FILTER_SEARCH_PLACEHOLDER: 'Buscar por nome, apelido ou citação...',
+
+  TABLE: {
+    COL_PHOTO: 'Foto',
+    COL_NAME: 'Nome / Apelido',
+    COL_CATEGORY: 'Categoria',
+    COL_PERIOD: 'Período',
+    COL_FEATURED: 'Destaque',
+    COL_ACTIONS: 'Ações',
+    EMPTY_TITLE: 'Nenhum ídolo cadastrado',
+    EMPTY_DESC: 'Cadastre os primeiros ídolos da história do Pelotas para inaugurar a galeria pública do Memorial.',
+    LOADING: 'Carregando ídolos...',
+    IN_CLUB: 'Em atividade',
+    ACTION_EDIT: 'Editar Ídolo',
+    ACTION_DELETE: 'Excluir Ídolo',
+  },
+
+  DRAWER: {
+    TITLE_CREATE: 'Cadastrar Novo Ídolo',
+    TITLE_EDIT: 'Editar Ídolo',
+    SECTION_BASIC: 'Identificação & Categoria',
+    LABEL_CATEGORY: 'Categoria do Ídolo',
+    LABEL_NAME: 'Nome Completo',
+    PLACEHOLDER_NAME: 'Ex: Flávio Almeida da Silva',
+    LABEL_NICKNAME: 'Apelido / Como era conhecido',
+    PLACEHOLDER_NICKNAME: 'Ex: Flávio Minuano',
+    LABEL_SLUG: 'Slug (URL amigável)',
+    PLACEHOLDER_SLUG: 'Ex: flavio-minuano',
+    LABEL_PHOTO: 'Foto Principal (Retrato)',
+    PHOTO_HINT: 'Envie uma foto nítida. O sistema permite recorte vertical e remoção de fundo por IA.',
+    LABEL_START_YEAR: 'Ano de Início no Clube',
+    PLACEHOLDER_START_YEAR: 'Ex: 1961',
+    LABEL_END_YEAR: 'Ano de Fim',
+    PLACEHOLDER_END_YEAR: 'Ex: 1974',
+    CHECKBOX_ACTIVE_IN_CLUB: 'Ainda em atividade / no clube atualmente',
+    LABEL_BIRTH_DATE: 'Data de Nascimento',
+    LABEL_DEATH_DATE: 'Data de Falecimento (Opcional - In Memoriam)',
+    LABEL_BIRTH_PLACE: 'Naturalidade (Cidade - UF)',
+    PLACEHOLDER_BIRTH_PLACE: 'Ex: Pelotas - RS',
+    LABEL_QUOTE: 'Frase Marcante / Citação Famosa',
+    PLACEHOLDER_QUOTE: 'Ex: "A Boca do Lobo sempre foi meu templo sagrado"',
+    SECTION_BIO: 'História & Biografia na Boca do Lobo',
+    LABEL_BIOGRAPHY: 'Biografia Completa',
+    PLACEHOLDER_BIOGRAPHY: 'Conte a trajetória detalhada, partidas célebres, início da relação com o clube...',
+    LABEL_FEATURED: 'Destacar no topo da galeria do Memorial',
+    LABEL_ORDER: 'Ordem de Exibição (menor número = maior prioridade)',
+
+    // Player Specific Fields
+    SECTION_PLAYER: 'Estatísticas & Trajetória do Jogador',
+    LABEL_POSITION: 'Posição em Campo',
+    PLACEHOLDER_POSITION: 'Ex: Centroavante, Meia Armador, Zagueiro',
+    LABEL_PREFERRED_FOOT: 'Pé Preferencial',
+    LABEL_JERSEY: 'Número da Camisa Histórica',
+    PLACEHOLDER_JERSEY: 'Ex: 9, 10, 1',
+    LABEL_MATCHES: 'Total de Jogos pelo Pelotas',
+    PLACEHOLDER_MATCHES: 'Ex: 312',
+    LABEL_GOALS: 'Gols Marcados',
+    PLACEHOLDER_GOALS: 'Ex: 148',
+    LABEL_TITLES: 'Títulos Conquistados (1 por linha)',
+    PLACEHOLDER_TITLES: 'Ex:\nCampeonato Citadino 1964\nCopa FGF 2019',
+    LABEL_MEMORABLE_MATCH: 'Jogo Inesquecível',
+    PLACEHOLDER_MEMORABLE_MATCH: 'Ex: Pelotas 3x1 Brasil em 1964 com 3 gols de Minuano',
+
+    // Coach Specific Fields
+    SECTION_COACH: 'Histórico & Marcas do Treinador',
+    LABEL_COACH_MATCHES: 'Total de Partidas no Comando',
+    LABEL_COACH_WINS: 'Vitórias',
+    LABEL_COACH_DRAWS: 'Empates',
+    LABEL_COACH_LOSSES: 'Derrotas',
+    LABEL_TACTICAL_STYLE: 'Estilo Tático & Legado',
+    PLACEHOLDER_TACTICAL_STYLE: 'Ex: Time intenso, marcação pressão e transição veloz',
+
+    // Staff Specific Fields
+    SECTION_STAFF: 'Dedicação & História do Funcionário',
+    LABEL_ROLE_NAME: 'Cargo ou Função no Clube',
+    PLACEHOLDER_ROLE_NAME: 'Ex: Roupeiro Histórico, Massagista, Cozinheira',
+    LABEL_YEARS_DEDICATION: 'Tempo de Dedicação',
+    PLACEHOLDER_YEARS_DEDICATION: 'Ex: Mais de 35 anos ininterruptos',
+    LABEL_BACKSTAGE_STORY: 'Causo de Vestiário / Bastidor',
+    PLACEHOLDER_BACKSTAGE_STORY: 'Ex: Cuidava com carinho das camisas do título de 1930...',
+
+    // Fan Specific Fields
+    SECTION_FAN: 'História & Amor do Torcedor Símbolo',
+    LABEL_STADIUM_SECTOR: 'Lugar Marcante no Estádio',
+    PLACEHOLDER_STADIUM_SECTOR: 'Ex: Pavilhão Social das Sociais, Atrás do Gol',
+    LABEL_TRADEMARK: 'Marca Registrada / Objeto Símbolo',
+    PLACEHOLDER_TRADEMARK: 'Ex: O famoso bumbo da Charanga, a bandeira de 30 metros',
+
+    // Buttons & Actions
+    BUTTON_CANCEL: 'Cancelar',
+    BUTTON_SAVE: 'Salvar Ídolo',
+    BUTTON_SAVING: 'Salvando...',
+  },
+
+  MODAL_DELETE: {
+    TITLE: 'Excluir Ídolo',
+    DESC: (name: string) => `Tem certeza de que deseja remover o ídolo "${name}" do Memorial? Esta ação removerá a publicação do portal.`,
+    BUTTON_CONFIRM: 'Sim, excluir ídolo',
+    BUTTON_CANCEL: 'Cancelar',
+  },
+
+  TOAST: {
+    SUCCESS_CREATE: 'Ídolo cadastrado com sucesso no Memorial!',
+    SUCCESS_UPDATE: 'Dados do ídolo atualizados com sucesso!',
+    SUCCESS_DELETE: 'Ídolo removido com sucesso.',
+    ERROR_SAVE: 'Erro ao salvar ídolo. Verifique os campos.',
+  },
+};

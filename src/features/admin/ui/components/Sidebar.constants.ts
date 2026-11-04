@@ -6,6 +6,7 @@ export const SIDEBAR_TEXTS = {
     DASHBOARD: 'Dashboard',
     USERS: 'Usuários',
     NEWS: 'Matérias',
+    IDOLS: 'Ídolos & Memorial',
     MODULES: 'Módulos do Sistema',
     ROLES: 'Cargos e Permissões',
     SETTINGS: 'Configurações',

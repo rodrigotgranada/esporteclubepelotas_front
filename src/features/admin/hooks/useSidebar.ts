@@ -2,7 +2,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useSystemModulesStore } from '@/store/useSystemModulesStore';
 import { startTransition, useEffect } from 'react';
-import { Home, Users, Settings, Layers, Shield, Newspaper } from 'lucide-react';
+import { Home, Users, Settings, Layers, Shield, Newspaper, Trophy } from 'lucide-react';
 import { SIDEBAR_TEXTS } from '../ui/components/Sidebar.constants';
 
 export const useSidebar = () => {
@@ -27,6 +27,7 @@ export const useSidebar = () => {
   const navItems = [
     { label: SIDEBAR_TEXTS.NAV.DASHBOARD, href: '/gestao', icon: Home, show: true },
     { label: SIDEBAR_TEXTS.NAV.NEWS, href: '/gestao/news', icon: Newspaper, show: isLoaded ? isModuleActive('news') : true },
+    { label: SIDEBAR_TEXTS.NAV.IDOLS, href: '/gestao/idols', icon: Trophy, show: isLoaded ? isModuleActive('idols') : true },
     { label: SIDEBAR_TEXTS.NAV.USERS, href: '/gestao/users', icon: Users, show: isLoaded ? isModuleActive('users') : true },
     { label: SIDEBAR_TEXTS.NAV.SETTINGS, href: '/gestao/settings', icon: Settings, show: true },
   ];
