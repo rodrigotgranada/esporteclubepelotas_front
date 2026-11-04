@@ -39,6 +39,7 @@ export const PUBLIC_FOOTER_TEXTS = {
   DEFAULT_NAV_LINKS: [
     { label: 'Início', url: '/', isVisible: true, isExternal: false },
     { label: 'Notícias do Lobo', url: '/noticias', isVisible: true, isExternal: false },
+    { label: 'Elenco Profissional', url: '/elenco', isVisible: true, isExternal: false },
     { label: 'Memorial & Ídolos', url: '/idolos', isVisible: true, isExternal: false },
     { label: 'Quadro Social (Seja Sócio)', url: '/socio', isVisible: true, isExternal: false },
     { label: 'Ingressos e Jogos', url: '/ingressos', isVisible: true, isExternal: false },

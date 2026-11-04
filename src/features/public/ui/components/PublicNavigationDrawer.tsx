@@ -52,6 +52,7 @@ export const PublicNavigationDrawer: React.FC<PublicNavigationDrawerProps> = ({
   const [isDark, setIsDark] = useState(false);
 
   const idolsActive = isModulesLoaded ? isModuleActive('idols') : true;
+  const footballActive = isModulesLoaded ? isModuleActive('football') : true;
 
   useEffect(() => {
     setMounted(true);
@@ -231,29 +232,61 @@ export const PublicNavigationDrawer: React.FC<PublicNavigationDrawerProps> = ({
               </Text>
 
               <LayoutContainer className="grid grid-cols-2 gap-2">
-                <LayoutContainer className="p-3.5 rounded-xl bg-surface/50 border border-border/70 flex flex-col gap-2 opacity-85 hover:opacity-100 transition-opacity">
-                  <LayoutContainer className="flex items-center justify-between">
-                    <Trophy className="w-4 h-4 text-primary" />
-                    <Badge variant="default" size="sm" className="text-[9px] py-0 px-1.5 font-medium">
-                      {PUBLIC_DRAWER_TEXTS.BADGE_COMING_SOON}
-                    </Badge>
+                {footballActive ? (
+                  <Link
+                    href="/elenco"
+                    onClick={onClose}
+                    className="p-3.5 rounded-xl bg-surface/70 hover:bg-surface border border-border/80 hover:border-primary/50 flex flex-col gap-2 transition-all group"
+                  >
+                    <LayoutContainer className="flex items-center justify-between">
+                      <Trophy className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
+                      <ChevronRight className="w-3.5 h-3.5 text-text-secondary/60 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
+                    </LayoutContainer>
+                    <span className="text-xs font-bold text-text-primary group-hover:text-primary transition-colors">
+                      {PUBLIC_DRAWER_TEXTS.LINK_SQUAD}
+                    </span>
+                  </Link>
+                ) : (
+                  <LayoutContainer className="p-3.5 rounded-xl bg-surface/50 border border-border/70 flex flex-col gap-2 opacity-85 hover:opacity-100 transition-opacity">
+                    <LayoutContainer className="flex items-center justify-between">
+                      <Trophy className="w-4 h-4 text-primary" />
+                      <Badge variant="default" size="sm" className="text-[9px] py-0 px-1.5 font-medium">
+                        {PUBLIC_DRAWER_TEXTS.BADGE_COMING_SOON}
+                      </Badge>
+                    </LayoutContainer>
+                    <span className="text-xs font-bold text-text-primary">
+                      {PUBLIC_DRAWER_TEXTS.LINK_SQUAD}
+                    </span>
                   </LayoutContainer>
-                  <span className="text-xs font-bold text-text-primary">
-                    {PUBLIC_DRAWER_TEXTS.LINK_SQUAD}
-                  </span>
-                </LayoutContainer>
+                )}
 
-                <LayoutContainer className="p-3.5 rounded-xl bg-surface/50 border border-border/70 flex flex-col gap-2 opacity-85 hover:opacity-100 transition-opacity">
-                  <LayoutContainer className="flex items-center justify-between">
-                    <Shield className="w-4 h-4 text-primary" />
-                    <Badge variant="default" size="sm" className="text-[9px] py-0 px-1.5 font-medium">
-                      {PUBLIC_DRAWER_TEXTS.BADGE_COMING_SOON}
-                    </Badge>
+                {footballActive ? (
+                  <Link
+                    href="/elenco?category=UNDER_20"
+                    onClick={onClose}
+                    className="p-3.5 rounded-xl bg-surface/70 hover:bg-surface border border-border/80 hover:border-primary/50 flex flex-col gap-2 transition-all group"
+                  >
+                    <LayoutContainer className="flex items-center justify-between">
+                      <Shield className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
+                      <ChevronRight className="w-3.5 h-3.5 text-text-secondary/60 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
+                    </LayoutContainer>
+                    <span className="text-xs font-bold text-text-primary group-hover:text-primary transition-colors">
+                      {PUBLIC_DRAWER_TEXTS.LINK_YOUTH}
+                    </span>
+                  </Link>
+                ) : (
+                  <LayoutContainer className="p-3.5 rounded-xl bg-surface/50 border border-border/70 flex flex-col gap-2 opacity-85 hover:opacity-100 transition-opacity">
+                    <LayoutContainer className="flex items-center justify-between">
+                      <Shield className="w-4 h-4 text-primary" />
+                      <Badge variant="default" size="sm" className="text-[9px] py-0 px-1.5 font-medium">
+                        {PUBLIC_DRAWER_TEXTS.BADGE_COMING_SOON}
+                      </Badge>
+                    </LayoutContainer>
+                    <span className="text-xs font-bold text-text-primary">
+                      {PUBLIC_DRAWER_TEXTS.LINK_YOUTH}
+                    </span>
                   </LayoutContainer>
-                  <span className="text-xs font-bold text-text-primary">
-                    {PUBLIC_DRAWER_TEXTS.LINK_YOUTH}
-                  </span>
-                </LayoutContainer>
+                )}
               </LayoutContainer>
             </LayoutContainer>
 
