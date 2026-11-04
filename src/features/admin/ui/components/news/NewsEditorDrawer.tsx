@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
   X,
   Plus,
@@ -9,6 +9,7 @@ import {
   Video,
   Send,
   Save,
+  Eye,
 } from 'lucide-react';
 import {
   Drawer,
@@ -29,6 +30,7 @@ import { NewsBlockEditor } from './NewsBlockEditor';
 import { QuickCategoryModal } from './QuickCategoryModal';
 import { useQuickCategoryModal } from '../../../hooks/news/useQuickCategoryModal';
 import { NewsEditorGallerySection } from './NewsEditorGallerySection';
+import { NewsArticlePreviewModal } from './NewsArticlePreviewModal';
 
 export interface NewsEditorDrawerProps {
   isOpen: boolean;
@@ -93,6 +95,8 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
   } = useAdminNewsDrawer(articleId, isOpen, onSaveSuccess);
 
   const quickCat = useQuickCategoryModal(handleCategoryCreated);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const selectedCategory = categories.find((c) => c._id === categoryId || c.slug === categoryId);
 
   return (
     <>
@@ -375,6 +379,17 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
               </Button>
 
               <LayoutContainer className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsPreviewOpen(true)}
+                  disabled={isSaving}
+                  leftIcon={<Eye className="w-4 h-4 text-primary" />}
+                  className="font-bold border-border hover:border-primary"
+                >
+                  {texts.BUTTON_PREVIEW}
+                </Button>
+
                 {status !== 'PUBLISHED' && (
                   <Button
                     type="button"
@@ -426,6 +441,23 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
         setDescription={quickCat.setDescription}
         isLoading={quickCat.isLoading}
         onSubmit={quickCat.handleSubmit}
+      />
+
+      {/* Modal Preview da Matéria (Desktop & Mobile) */}
+      <NewsArticlePreviewModal
+        isOpen={isPreviewOpen}
+        onClose={() => setIsPreviewOpen(false)}
+        title={title}
+        subtitle={subtitle}
+        categoryName={selectedCategory?.name}
+        publishedAt={publishedAt}
+        coverImage={coverImage}
+        coverCaption={coverCaption}
+        content={content}
+        gallery={gallery}
+        galleryPreviews={galleryPreviews}
+        youtubeVideoUrl={youtubeVideoUrl}
+        tags={tags}
       />
     </>
   );
