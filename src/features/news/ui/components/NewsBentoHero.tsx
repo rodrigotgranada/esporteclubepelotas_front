@@ -33,8 +33,12 @@ export const NewsBentoHero: React.FC<NewsBentoHeroProps> = ({
     return null;
   }
 
-  const mainArticle = articles[0];
-  const subArticles = articles.slice(1, 3);
+  const mainArticle =
+    articles.find((a) => a.featuredSlot === 'MAIN') ||
+    articles.find((a) => a.isFeatured && a.featuredSlot !== 'SECONDARY') ||
+    articles[0];
+  const mainId = mainArticle._id || (mainArticle as any).id;
+  const subArticles = articles.filter((a) => (a._id || (a as any).id) !== mainId).slice(0, 2);
   const hasSubArticles = subArticles.length > 0;
 
   return (
