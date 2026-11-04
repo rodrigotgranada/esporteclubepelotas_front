@@ -33,6 +33,8 @@ import { QuickCategoryModal } from './QuickCategoryModal';
 import { useQuickCategoryModal } from '../../../hooks/news/useQuickCategoryModal';
 import { NewsEditorGallerySection } from './NewsEditorGallerySection';
 import { NewsArticlePreviewModal } from './NewsArticlePreviewModal';
+import { NewsEditorFeaturedSection } from './NewsEditorFeaturedSection';
+import { NewsEditorCreditsSection } from './NewsEditorCreditsSection';
 
 export interface NewsEditorDrawerProps {
   isOpen: boolean;
@@ -86,8 +88,14 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
     setContent,
     youtubeVideoUrl,
     setYoutubeVideoUrl,
-    isFeatured,
-    setIsFeatured,
+    featuredSlot,
+    setFeaturedSlot,
+    isPinned,
+    setIsPinned,
+    reporterName,
+    setReporterName,
+    photographerName,
+    setPhotographerName,
     status,
     setStatus,
     publishedAt,
@@ -369,10 +377,18 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
               )}
             </LayoutContainer>
 
-            {/* 7. Video do YouTube */}
+            {/* 7. Créditos Editoriais Livres (Repórter / Fotógrafo) */}
+            <NewsEditorCreditsSection
+              reporterName={reporterName}
+              setReporterName={setReporterName}
+              photographerName={photographerName}
+              setPhotographerName={setPhotographerName}
+            />
+
+            {/* 8. Video do YouTube */}
             <LayoutContainer className="flex flex-col gap-1.5">
               <Text as="span" className="text-xs font-semibold text-text-primary uppercase tracking-wider flex items-center gap-1.5">
-                <Video className="w-4 h-4 text-error" />
+                <Video className="w-4 h-4 text-primary" />
                 {texts.LABEL_YOUTUBE}
               </Text>
               <Input
@@ -382,22 +398,15 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
               />
             </LayoutContainer>
 
-            {/* 8. Destacar como Manchetão */}
-            <LayoutContainer className="p-4 rounded-xl border border-primary/30 bg-primary/5">
-              <Checkbox
-                checked={isFeatured}
-                onChange={(e) => setIsFeatured(e.target.checked)}
-                label={
-                  <span className="font-bold text-text-primary text-sm flex items-center gap-1.5">
-                    <Sparkles className="w-4 h-4 text-primary" />
-                    {texts.LABEL_FEATURED}
-                  </span>
-                }
-                description={texts.LABEL_FEATURED_HINT}
-              />
-            </LayoutContainer>
+            {/* 9. Vitrine Editorial & Destaques da Capa */}
+            <NewsEditorFeaturedSection
+              featuredSlot={featuredSlot}
+              setFeaturedSlot={setFeaturedSlot}
+              isPinned={isPinned}
+              setIsPinned={setIsPinned}
+            />
 
-            {/* 9. Status & Agendamento */}
+            {/* 10. Status & Agendamento */}
             <LayoutContainer className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-xl border border-border bg-surface">
               <LayoutContainer className="flex flex-col gap-1.5">
                 <Text as="span" className="text-xs font-semibold text-text-primary uppercase tracking-wider">
@@ -514,6 +523,8 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
         subtitle={subtitle}
         categoryName={selectedCategory?.name}
         publishedAt={publishedAt}
+        reporterName={reporterName}
+        photographerName={photographerName}
         coverImage={coverImage}
         coverCaption={coverCaption}
         content={content}

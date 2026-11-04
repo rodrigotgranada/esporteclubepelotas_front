@@ -150,7 +150,7 @@ export const NewsDetailFeature: React.FC<NewsDetailFeatureProps> = ({ slug }) =>
           <LayoutContainer className="flex items-center gap-4">
             <LayoutContainer className="flex items-center gap-1.5">
               <Text as="span" className="font-semibold text-text-primary">
-                Por {authorName}
+                Por {article.reporterName || authorName}
               </Text>
             </LayoutContainer>
 
@@ -209,9 +209,13 @@ export const NewsDetailFeature: React.FC<NewsDetailFeatureProps> = ({ slug }) =>
             className="object-cover"
           />
         </LayoutContainer>
-        {article.coverCaption && (
+        {(article.photographerName || article.coverCaption) && (
           <Text as="p" className="text-xs text-text-secondary text-center italic">
-            {article.coverCaption}
+            {article.photographerName && article.coverCaption
+              ? `${article.coverCaption} (Foto: ${article.photographerName})`
+              : article.photographerName
+              ? `Foto: ${article.photographerName}`
+              : article.coverCaption}
           </Text>
         )}
       </LayoutContainer>

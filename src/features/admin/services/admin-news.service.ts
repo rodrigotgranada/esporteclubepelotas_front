@@ -36,6 +36,10 @@ export interface NewsArticleData {
   tags: string[];
   status: NewsStatusType;
   isFeatured: boolean;
+  featuredSlot?: 'MAIN' | 'SECONDARY' | 'NONE';
+  isPinned?: boolean;
+  reporterName?: string;
+  photographerName?: string;
   author: NewsAuthorData | string;
   publishedAt?: string;
   gallery?: string[];

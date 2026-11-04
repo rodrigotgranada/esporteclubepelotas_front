@@ -11,6 +11,8 @@ export const newsService = {
     category?: string;
     tag?: string;
     isFeatured?: boolean;
+    featuredSlot?: 'MAIN' | 'SECONDARY' | 'NONE';
+    isPinned?: boolean;
   }): Promise<GetPublicNewsResponse> => {
     const response = await api.get('/news', { params });
     return response.data;

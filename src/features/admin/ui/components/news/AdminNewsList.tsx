@@ -10,6 +10,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Calendar,
+  Pin,
 } from 'lucide-react';
 import {
   Table,
@@ -182,18 +183,36 @@ export const AdminNewsList: React.FC<AdminNewsListProps> = ({
                     {/* Status */}
                     <TableCell>{getStatusBadge(item.status)}</TableCell>
 
-                    {/* Featured */}
+                    {/* Featured & Pinned */}
                     <TableCell>
-                      {item.isFeatured ? (
-                        <Badge variant="primary" size="sm" className="flex items-center gap-1">
-                          <Sparkles className="w-3 h-3" />
-                          Sim
-                        </Badge>
-                      ) : (
-                        <Text as="span" className="text-xs text-text-secondary">
-                          Não
-                        </Text>
-                      )}
+                      <LayoutContainer className="flex flex-col gap-1 items-start">
+                        {item.isPinned && (
+                          <Badge variant="default" size="sm" className="flex items-center gap-1 border-primary/30 text-primary">
+                            <Pin className="w-3 h-3 text-primary" />
+                            {texts.BADGE_PINNED}
+                          </Badge>
+                        )}
+                        {item.featuredSlot === 'MAIN' ? (
+                          <Badge variant="primary" size="sm" className="flex items-center gap-1">
+                            <Sparkles className="w-3 h-3" />
+                            {texts.BADGE_MAIN}
+                          </Badge>
+                        ) : item.featuredSlot === 'SECONDARY' ? (
+                          <Badge variant="warning" size="sm" className="flex items-center gap-1">
+                            <Sparkles className="w-3 h-3" />
+                            {texts.BADGE_SECONDARY}
+                          </Badge>
+                        ) : item.isFeatured ? (
+                          <Badge variant="primary" size="sm" className="flex items-center gap-1">
+                            <Sparkles className="w-3 h-3" />
+                            {texts.BADGE_MAIN}
+                          </Badge>
+                        ) : !item.isPinned ? (
+                          <Text as="span" className="text-xs text-text-secondary">
+                            {texts.BADGE_NORMAL}
+                          </Text>
+                        ) : null}
+                      </LayoutContainer>
                     </TableCell>
 
                     {/* Date */}

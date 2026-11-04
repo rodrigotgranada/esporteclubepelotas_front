@@ -31,6 +31,8 @@ export interface NewsArticlePreviewModalProps {
   categoryName?: string;
   authorName?: string;
   authorAvatar?: string | null;
+  reporterName?: string;
+  photographerName?: string;
   publishedAt?: string;
   coverImage?: string | null;
   coverCaption?: string;
@@ -49,6 +51,8 @@ export const NewsArticlePreviewModal: React.FC<NewsArticlePreviewModalProps> = (
   categoryName,
   authorName,
   authorAvatar,
+  reporterName,
+  photographerName,
   publishedAt,
   coverImage,
   coverCaption,
@@ -193,7 +197,7 @@ export const NewsArticlePreviewModal: React.FC<NewsArticlePreviewModalProps> = (
             <LayoutContainer className="flex items-center gap-4 text-xs text-text-secondary pt-2">
               <LayoutContainer className="flex items-center gap-1.5 font-medium">
                 <User className="w-3.5 h-3.5 text-primary" />
-                <span>{authorName || 'Redação E.C. Pelotas'}</span>
+                <span>{reporterName ? `Por ${reporterName}` : (authorName || 'Redação E.C. Pelotas')}</span>
               </LayoutContainer>
 
               <LayoutContainer className="flex items-center gap-1.5">
@@ -215,9 +219,13 @@ export const NewsArticlePreviewModal: React.FC<NewsArticlePreviewModalProps> = (
                   className="object-cover"
                 />
               </LayoutContainer>
-              {coverCaption && (
+              {(photographerName || coverCaption) && (
                 <Text className="text-xs text-text-secondary italic text-center">
-                  {coverCaption}
+                  {photographerName && coverCaption
+                    ? `${coverCaption} (Foto: ${photographerName})`
+                    : photographerName
+                    ? `Foto: ${photographerName}`
+                    : coverCaption}
                 </Text>
               )}
             </LayoutContainer>

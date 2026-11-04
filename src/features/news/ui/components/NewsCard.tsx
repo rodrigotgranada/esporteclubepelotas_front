@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Eye, Calendar, Sparkles, Clock, Video, Image as ImageIcon } from 'lucide-react';
+import { Eye, Calendar, Sparkles, Clock, Video, Image as ImageIcon, Pin } from 'lucide-react';
 import { LayoutContainer, Title, Text, Badge, SafeImage } from '@/shared/ui/components';
 import { NewsArticleData } from '@/features/admin/services/admin-news.service';
 import { calculateReadingTime, formatNewsDate, getCategoryName } from '../../utils/news.utils';
@@ -60,14 +60,20 @@ export const NewsCard: React.FC<NewsCardProps> = ({ article, className = '' }) =
             )}
           </LayoutContainer>
 
-          {article.isFeatured && (
-            <LayoutContainer className="absolute top-3 right-3 z-10">
-              <Badge variant="default" size="sm" className="bg-surface/90 text-primary font-bold border-primary/30 flex items-center gap-1 shadow-sm">
-                <Sparkles className="w-3 h-3 text-primary" />
-                Destaque
+          <LayoutContainer className="absolute top-3 right-3 z-10 flex items-center gap-1.5">
+            {article.isPinned && (
+              <Badge variant="default" size="sm" className="bg-surface/95 text-primary font-bold border-primary/30 flex items-center gap-1 shadow-sm">
+                <Pin className="w-3 h-3 text-primary" />
+                Fixado
               </Badge>
-            </LayoutContainer>
-          )}
+            )}
+            {article.isFeatured && (
+              <Badge variant="default" size="sm" className="bg-surface/95 text-amber-500 font-bold border-amber-500/30 flex items-center gap-1 shadow-sm">
+                <Sparkles className="w-3 h-3 text-amber-500" />
+                {article.featuredSlot === 'MAIN' ? 'Manchetão' : 'Destaque'}
+              </Badge>
+            )}
+          </LayoutContainer>
         </LayoutContainer>
 
         {/* Content Body */}

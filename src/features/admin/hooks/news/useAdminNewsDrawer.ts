@@ -41,6 +41,10 @@ export const useAdminNewsDrawer = (
   const [content, setContent] = useState<Record<string, any>>({});
   const [youtubeVideoUrl, setYoutubeVideoUrl] = useState('');
   const [isFeatured, setIsFeatured] = useState(false);
+  const [featuredSlot, setFeaturedSlot] = useState<'MAIN' | 'SECONDARY' | 'NONE'>('NONE');
+  const [isPinned, setIsPinned] = useState(false);
+  const [reporterName, setReporterName] = useState('');
+  const [photographerName, setPhotographerName] = useState('');
   const [status, setStatus] = useState<NewsStatusType>('DRAFT');
   const [publishedAt, setPublishedAt] = useState('');
 
@@ -77,6 +81,10 @@ export const useAdminNewsDrawer = (
     setContent({});
     setYoutubeVideoUrl('');
     setIsFeatured(false);
+    setFeaturedSlot('NONE');
+    setIsPinned(false);
+    setReporterName('');
+    setPhotographerName('');
     setStatus('DRAFT');
     setPublishedAt('');
   };
@@ -106,6 +114,10 @@ export const useAdminNewsDrawer = (
             setContent(art.content || {});
             setYoutubeVideoUrl(art.youtubeVideoUrl || '');
             setIsFeatured(!!art.isFeatured);
+            setFeaturedSlot(art.featuredSlot || (art.isFeatured ? 'MAIN' : 'NONE'));
+            setIsPinned(Boolean(art.isPinned));
+            setReporterName(art.reporterName || '');
+            setPhotographerName(art.photographerName || '');
             setStatus(art.status || 'DRAFT');
             if (art.publishedAt) {
               // format to datetime-local input YYYY-MM-DDTHH:mm
@@ -259,7 +271,11 @@ export const useAdminNewsDrawer = (
         gallery,
         content,
         youtubeVideoUrl: youtubeVideoUrl.trim() || undefined,
-        isFeatured,
+        isFeatured: featuredSlot !== 'NONE',
+        featuredSlot,
+        isPinned,
+        reporterName: reporterName.trim() || undefined,
+        photographerName: photographerName.trim() || undefined,
         status: chosenStatus,
         publishedAt:
           chosenStatus === 'SCHEDULED' && publishedAt
@@ -353,6 +369,14 @@ export const useAdminNewsDrawer = (
     setYoutubeVideoUrl,
     isFeatured,
     setIsFeatured,
+    featuredSlot,
+    setFeaturedSlot,
+    isPinned,
+    setIsPinned,
+    reporterName,
+    setReporterName,
+    photographerName,
+    setPhotographerName,
     status,
     setStatus,
     publishedAt,
