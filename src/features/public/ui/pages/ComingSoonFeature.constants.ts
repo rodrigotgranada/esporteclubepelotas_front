@@ -18,3 +18,4 @@ export const COMING_SOON_CONSTANTS = {
     BTN_NEWS: 'Ver Próximos Jogos & Notícias',
   },
 };
+

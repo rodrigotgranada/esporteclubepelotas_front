@@ -22,6 +22,18 @@ export const useSystemModulesStore = create<SystemModulesState>((set, get) => ({
   isLoaded: false,
   fetchModules: async (force?: boolean) => {
     if ((get().isLoaded && !force) || get().isLoading) return;
+    
+    // Only attempt to fetch admin modules if user is authenticated with a token
+    try {
+      const { useAuthStore } = await import('@/store/useAuthStore');
+      const token = useAuthStore.getState().token;
+      if (!token) {
+        return;
+      }
+    } catch {
+      return;
+    }
+
     set({ isLoading: true });
     try {
       const { adminService } = await import('@/features/admin/services/admin.service');
@@ -36,6 +48,6 @@ export const useSystemModulesStore = create<SystemModulesState>((set, get) => ({
   isModuleActive: (slug: string) => {
     const { modules } = get();
     const mod = modules.find(m => m.slug === slug);
-    return mod ? mod.isActive : false;
+    return mod ? mod.isActive : true; // Default to true if not loaded in public views
   }
 }));

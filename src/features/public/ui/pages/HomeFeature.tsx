@@ -18,19 +18,15 @@ import { NewsBentoHero } from '@/features/news/ui/components/NewsBentoHero';
 import { NewsCard } from '@/features/news/ui/components/NewsCard';
 import { idolsService, IdolData } from '@/features/idols/services/idols.service';
 import { IdolCard } from '@/features/idols/ui/components/IdolCard';
-import { useSystemModulesStore } from '@/store/useSystemModulesStore';
 
 export const HomeFeature = () => {
   const { settings } = useSettingsStore();
-  const { isLoaded, isModuleActive, fetchModules } = useSystemModulesStore();
   const [featuredNews, setFeaturedNews] = useState<NewsArticleData[]>([]);
   const [latestNews, setLatestNews] = useState<NewsArticleData[]>([]);
   const [featuredIdols, setFeaturedIdols] = useState<IdolData[]>([]);
 
   useEffect(() => {
     let isMounted = true;
-
-    fetchModules();
 
     async function loadHomeData() {
       try {
@@ -69,7 +65,7 @@ export const HomeFeature = () => {
     return () => {
       isMounted = false;
     };
-  }, [fetchModules]);
+  }, []);
 
   return (
     <LayoutContainer className="flex flex-col">
@@ -172,7 +168,7 @@ export const HomeFeature = () => {
       )}
 
       {/* Seção Memorial & Ídolos */}
-      {featuredIdols.length > 0 && (!isLoaded || isModuleActive('idols')) && (
+      {featuredIdols.length > 0 && (
         <LayoutContainer className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 w-full flex flex-col gap-10">
           <LayoutContainer className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <LayoutContainer className="flex flex-col gap-1">

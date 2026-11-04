@@ -73,3 +73,4 @@ export const ComingSoonFeature: React.FC<ComingSoonFeatureProps> = ({ variant })
     </LayoutContainer>
   );
 };
+

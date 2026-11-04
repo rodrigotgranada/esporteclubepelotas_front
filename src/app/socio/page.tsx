@@ -9,3 +9,4 @@ export const metadata: Metadata = {
 export default function SocioPage() {
   return <ComingSoonFeature variant="socio" />;
 }
+

@@ -8,3 +8,4 @@ export default function SocioLayout({
 }) {
   return <PublicLayout>{children}</PublicLayout>;
 }
+

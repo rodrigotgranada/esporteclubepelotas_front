@@ -30,13 +30,15 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+    const hasToken = typeof window !== 'undefined' ? !!useAuthStore.getState().token : false;
     
-    // Only intercept 401s that are not from login or refresh itself
+    // Only intercept 401s if the user actually had an active session and is not already on auth endpoints
     if (
       error.response?.status === 401 && 
       !originalRequest._retry && 
       originalRequest.url !== '/auth/refresh' && 
-      originalRequest.url !== '/auth/login'
+      originalRequest.url !== '/auth/login' &&
+      hasToken
     ) {
       originalRequest._retry = true;
       try {
@@ -56,7 +58,15 @@ api.interceptors.response.use(
       } catch (refreshError) {
         if (typeof window !== 'undefined') {
           useAuthStore.getState().logout();
-          window.location.href = '/login';
+          const pathname = window.location.pathname;
+          const isProtectedRoute = 
+            pathname.startsWith('/gestao') || 
+            pathname.startsWith('/profile') || 
+            pathname.startsWith('/dashboard');
+
+          if (isProtectedRoute) {
+            window.location.href = '/login';
+          }
         }
         return Promise.reject(refreshError);
       }

@@ -8,3 +8,4 @@ export default function IngressosLayout({
 }) {
   return <PublicLayout>{children}</PublicLayout>;
 }
+
