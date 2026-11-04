@@ -49,14 +49,23 @@ export const IdolCard: React.FC<IdolCardProps> = ({ idol }) => {
     }
   };
 
-  const formatPeriod = (startYear: number, endYear?: number | null, isActiveInClub?: boolean) => {
-    if (isActiveInClub) {
-      return `Desde ${startYear} • ${texts.ACTIVE_IN_CLUB}`;
+  const formatPeriod = (idolData: IdolData) => {
+    if (idolData.periods && idolData.periods.length > 0) {
+      return idolData.periods
+        .map((p) =>
+          p.endYear && p.endYear !== p.startYear
+            ? `${p.startYear} - ${p.endYear}`
+            : `${p.startYear}`,
+        )
+        .join(' • ');
     }
-    if (endYear && endYear !== startYear) {
-      return `${startYear} - ${endYear}`;
+    if (idolData.isActiveInClub) {
+      return `Desde ${idolData.startYear} • ${texts.ACTIVE_IN_CLUB}`;
     }
-    return `${startYear}`;
+    if (idolData.endYear && idolData.endYear !== idolData.startYear) {
+      return `${idolData.startYear} - ${idolData.endYear}`;
+    }
+    return `${idolData.startYear}`;
   };
 
   const renderStatsPill = () => {
@@ -141,7 +150,7 @@ export const IdolCard: React.FC<IdolCardProps> = ({ idol }) => {
           {/* Bottom Info over Image */}
           <LayoutContainer className="absolute bottom-3 left-3 right-3 z-10 flex flex-col gap-1">
             <Text as="span" className="text-[11px] font-extrabold uppercase tracking-wider text-text-muted">
-              {formatPeriod(idol.startYear, idol.endYear, idol.isActiveInClub)}
+              {formatPeriod(idol)}
             </Text>
 
             <Title

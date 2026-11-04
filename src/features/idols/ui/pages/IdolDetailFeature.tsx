@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import {
   ArrowLeft,
@@ -14,6 +14,7 @@ import {
   UserCheck,
   Heart,
   Award,
+  Maximize2,
 } from 'lucide-react';
 import {
   LayoutContainer,
@@ -25,10 +26,12 @@ import {
   SafeImage,
   DEFAULT_IDOL_COVER,
   DEFAULT_NEWS_COVER,
+  ImageLightboxModal,
 } from '@/shared/ui/components';
 import { IDOLS_CONSTANTS } from '../../constants/idols.constants';
 import { useIdolDetail } from '../../hooks/useIdolDetail';
-import { IdolCategory } from '../../services/idols.service';
+import { IdolCategory, IdolData } from '../../services/idols.service';
+import { IdolPrevNextNav } from '../components/IdolPrevNextNav';
 
 export interface IdolDetailFeatureProps {
   slug: string;
@@ -37,6 +40,7 @@ export interface IdolDetailFeatureProps {
 export const IdolDetailFeature: React.FC<IdolDetailFeatureProps> = ({ slug }) => {
   const texts = IDOLS_CONSTANTS.DETAIL;
   const { idol, isLoading, notFound } = useIdolDetail(slug);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   const getCategoryBadge = (category: IdolCategory) => {
     switch (category) {
@@ -73,14 +77,23 @@ export const IdolDetailFeature: React.FC<IdolDetailFeatureProps> = ({ slug }) =>
     }
   };
 
-  const formatPeriod = (startYear: number, endYear?: number | null, isActiveInClub?: boolean) => {
-    if (isActiveInClub) {
-      return `Desde ${startYear} • Em atividade no clube`;
+  const formatPeriod = (idolData: IdolData) => {
+    if (idolData.periods && idolData.periods.length > 0) {
+      return idolData.periods
+        .map((p) =>
+          p.endYear && p.endYear !== p.startYear
+            ? `${p.startYear} a ${p.endYear}`
+            : `${p.startYear}`,
+        )
+        .join(' • ');
     }
-    if (endYear && endYear !== startYear) {
-      return `${startYear} a ${endYear}`;
+    if (idolData.isActiveInClub) {
+      return `Desde ${idolData.startYear} • Em atividade no clube`;
     }
-    return `${startYear}`;
+    if (idolData.endYear && idolData.endYear !== idolData.startYear) {
+      return `${idolData.startYear} a ${idolData.endYear}`;
+    }
+    return `${idolData.startYear}`;
   };
 
   const formatDateString = (dateStr?: string | null) => {
@@ -193,7 +206,7 @@ export const IdolDetailFeature: React.FC<IdolDetailFeatureProps> = ({ slug }) =>
           <LayoutContainer className="flex flex-wrap items-center justify-center lg:justify-start gap-4 text-xs font-semibold text-text-muted pt-1">
             <LayoutContainer className="flex items-center gap-1.5">
               <Calendar className="w-4 h-4 text-primary" />
-              <Text as="span">{texts.PERIOD} <strong className="text-text-primary">{formatPeriod(idol.startYear, idol.endYear, idol.isActiveInClub)}</strong></Text>
+              <Text as="span">{texts.PERIOD} <strong className="text-text-primary">{formatPeriod(idol)}</strong></Text>
             </LayoutContainer>
 
             {idol.birthPlace && (
@@ -388,31 +401,75 @@ export const IdolDetailFeature: React.FC<IdolDetailFeatureProps> = ({ slug }) =>
         </Text>
       </LayoutContainer>
 
-      {/* Historical Gallery */}
-      {idol.gallery && idol.gallery.length > 0 && (
-        <LayoutContainer className="flex flex-col gap-4 p-6 sm:p-8 rounded-3xl bg-surface border border-border shadow-xs">
-          <Title level="h2" className="text-xl font-black text-text-primary tracking-tight">
-            {texts.GALLERY_TITLE}
-          </Title>
-          <LayoutContainer className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-            {idol.gallery.map((photo, idx) => (
-              <LayoutContainer
-                key={idx}
-                className="relative aspect-video rounded-2xl overflow-hidden bg-background border border-border shadow-xs hover:border-primary/50 transition-colors"
-              >
-                <SafeImage
-                  src={photo}
-                  fallbackSrc={DEFAULT_NEWS_COVER}
-                  alt={`${idol.name} foto histórica ${idx + 1}`}
-                  fill
-                  className="object-cover hover:scale-105 transition-transform duration-300"
-                  sizes="(max-width: 640px) 50vw, 33vw"
-                />
-              </LayoutContainer>
-            ))}
+      {/* Historical Gallery with Captions and Lightbox */}
+      {((idol.galleryItems && idol.galleryItems.length > 0) || (idol.gallery && idol.gallery.length > 0)) && (() => {
+        const items =
+          idol.galleryItems && idol.galleryItems.length > 0
+            ? idol.galleryItems
+            : (idol.gallery || []).map((url) => ({ url, caption: '' }));
+        const imageUrls = items.map((i) => i.url);
+
+        return (
+          <LayoutContainer className="flex flex-col gap-4 p-6 sm:p-8 rounded-3xl bg-surface border border-border shadow-xs">
+            <LayoutContainer className="flex items-center justify-between">
+              <Title level="h2" className="text-xl font-black text-text-primary tracking-tight">
+                {texts.GALLERY_TITLE}
+              </Title>
+              <Text as="span" className="text-xs font-semibold text-text-muted hidden sm:inline">
+                {IDOLS_CONSTANTS.LIGHTBOX.HINT}
+              </Text>
+            </LayoutContainer>
+
+            <LayoutContainer className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+              {items.map((item, idx) => (
+                <Button
+                  key={idx}
+                  type="button"
+                  variant="ghost"
+                  onClick={() => setLightboxIndex(idx)}
+                  className="relative aspect-video rounded-2xl overflow-hidden p-0 border border-border hover:border-primary/50 transition-all group text-left cursor-pointer focus:ring-2 focus:ring-primary/40 h-auto"
+                  title={item.caption || `${idol.name} foto ${idx + 1}`}
+                >
+                  <SafeImage
+                    src={item.url}
+                    fallbackSrc={DEFAULT_NEWS_COVER}
+                    alt={item.caption || `${idol.name} foto histórica ${idx + 1}`}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    sizes="(max-width: 640px) 50vw, 33vw"
+                  />
+
+                  {/* Hover icon */}
+                  <LayoutContainer className="absolute top-2 right-2 p-1.5 rounded-lg bg-black/60 text-white opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-xs">
+                    <Maximize2 className="w-3.5 h-3.5" />
+                  </LayoutContainer>
+
+                  {/* Caption Bar */}
+                  {item.caption && (
+                    <LayoutContainer className="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-black/85 via-black/40 to-transparent flex items-center">
+                      <Text as="span" className="text-[11px] font-medium text-white line-clamp-1 leading-tight">
+                        {item.caption}
+                      </Text>
+                    </LayoutContainer>
+                  )}
+                </Button>
+              ))}
+            </LayoutContainer>
+
+            {/* Lightbox Modal */}
+            <ImageLightboxModal
+              isOpen={lightboxIndex !== null}
+              onClose={() => setLightboxIndex(null)}
+              images={imageUrls}
+              initialIndex={lightboxIndex ?? 0}
+              title={`${idol.name} • ${texts.GALLERY_TITLE}`}
+            />
           </LayoutContainer>
-        </LayoutContainer>
-      )}
+        );
+      })()}
+
+      {/* Prev / Next Navigation in Footer */}
+      <IdolPrevNextNav currentSlug={slug} />
     </LayoutContainer>
   );
 };

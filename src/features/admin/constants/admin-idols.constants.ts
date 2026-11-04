@@ -18,6 +18,7 @@ export const ADMIN_IDOLS_TEXTS = {
     COL_NAME: 'Nome / Apelido',
     COL_CATEGORY: 'Categoria',
     COL_PERIOD: 'Período',
+    COL_ORDER: 'Posição',
     COL_FEATURED: 'Destaque',
     COL_ACTIONS: 'Ações',
     EMPTY_TITLE: 'Nenhum ídolo cadastrado',
@@ -98,6 +99,21 @@ export const ADMIN_IDOLS_TEXTS = {
     PLACEHOLDER_STADIUM_SECTOR: 'Ex: Pavilhão Social das Sociais, Atrás do Gol',
     LABEL_TRADEMARK: 'Marca Registrada / Objeto Símbolo',
     PLACEHOLDER_TRADEMARK: 'Ex: O famoso bumbo da Charanga, a bandeira de 30 metros',
+
+    // Gallery with Captions
+    SECTION_GALLERY: 'Galeria de Fotos Históricas & Legendas',
+    GALLERY_HINT: 'Adicione fotos históricas de época, jornais e momentos marcantes com legendas personalizadas.',
+    LABEL_PHOTO_CAPTION: 'Legenda da foto',
+    PLACEHOLDER_PHOTO_CAPTION: 'Ex: Comemorando título citadino de 1964 na Boca do Lobo',
+    BTN_REMOVE_PHOTO: 'Remover foto da galeria',
+    BTN_UPLOAD_PHOTOS: 'Adicionar fotos à galeria',
+
+    // Multiple Periods
+    SECTION_PERIODS: 'Passagens pelo Pelotas (Períodos)',
+    BTN_ADD_PERIOD: '+ Adicionar Outra Passagem',
+    BTN_REMOVE_PERIOD: 'Remover passagem',
+    LABEL_PERIOD_LABEL: 'Identificação da passagem (opcional)',
+    PLACEHOLDER_PERIOD_LABEL: 'Ex: Retorno ao clube, Segunda passagem',
 
     // Buttons & Actions
     BUTTON_CANCEL: 'Cancelar',

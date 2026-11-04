@@ -137,6 +137,7 @@ export const IdolsTable: React.FC<IdolsTableProps> = ({
               <TableHead>{texts.COL_NAME}</TableHead>
               <TableHead className="w-36">{texts.COL_CATEGORY}</TableHead>
               <TableHead className="w-36">{texts.COL_PERIOD}</TableHead>
+              <TableHead className="w-20 text-center">{texts.COL_ORDER}</TableHead>
               <TableHead className="w-24 text-center">{texts.COL_FEATURED}</TableHead>
               <TableHead className="w-28 text-right">{texts.COL_ACTIONS}</TableHead>
             </TableRow>
@@ -191,6 +192,11 @@ export const IdolsTable: React.FC<IdolsTableProps> = ({
                     <Text as="span" className="text-xs font-bold text-text-primary">
                       {formatPeriod(idol.startYear, idol.endYear, idol.isActiveInClub)}
                     </Text>
+                  </TableCell>
+
+                  {/* Order */}
+                  <TableCell className="text-center font-bold text-xs text-text-muted">
+                    {idol.order ?? 0}
                   </TableCell>
 
                   {/* Featured Toggle */}
@@ -265,7 +271,14 @@ export const IdolsTable: React.FC<IdolsTableProps> = ({
 
               <LayoutContainer className="flex flex-col gap-1.5 flex-1 min-w-0">
                 <LayoutContainer className="flex items-center justify-between gap-2">
-                  {getCategoryBadge(idol.category)}
+                  <LayoutContainer className="flex items-center gap-1.5">
+                    {getCategoryBadge(idol.category)}
+                    {typeof idol.order === 'number' && idol.order > 0 && (
+                      <Badge variant="default" size="sm" className="text-[10px] py-0 px-1 font-bold">
+                        #{idol.order}
+                      </Badge>
+                    )}
+                  </LayoutContainer>
                   <Button
                     type="button"
                     variant="ghost"

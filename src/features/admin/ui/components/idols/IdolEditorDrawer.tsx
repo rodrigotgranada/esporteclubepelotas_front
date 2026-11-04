@@ -22,6 +22,8 @@ import { IdolPlayerFields } from './IdolPlayerFields';
 import { IdolCoachFields } from './IdolCoachFields';
 import { IdolStaffFields } from './IdolStaffFields';
 import { IdolFanFields } from './IdolFanFields';
+import { IdolPeriodsEditor } from './IdolPeriodsEditor';
+import { IdolGalleryEditor } from './IdolGalleryEditor';
 import { IdolCategory } from '../../../../idols/services/idols.service';
 
 export interface IdolEditorDrawerProps {
@@ -57,6 +59,14 @@ export const IdolEditorDrawer: React.FC<IdolEditorDrawerProps> = ({
     setStartYear,
     endYear,
     setEndYear,
+    periods,
+    handleAddPeriod,
+    handleUpdatePeriod,
+    handleRemovePeriod,
+    galleryItems,
+    setGalleryItems,
+    handleUpdateGalleryCaption,
+    handleRemoveGalleryItem,
     isActiveInClub,
     setIsActiveInClub,
     birthDate,
@@ -306,6 +316,14 @@ export const IdolEditorDrawer: React.FC<IdolEditorDrawerProps> = ({
               label={texts.CHECKBOX_ACTIVE_IN_CLUB}
             />
 
+            {/* Multiple Periods Editor */}
+            <IdolPeriodsEditor
+              periods={periods}
+              onAdd={handleAddPeriod}
+              onUpdate={handleUpdatePeriod}
+              onRemove={handleRemovePeriod}
+            />
+
             <LayoutContainer className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
               <LayoutContainer className="flex flex-col gap-1.5">
                 <Text as="span" className="text-xs font-semibold text-text-secondary">
@@ -372,24 +390,49 @@ export const IdolEditorDrawer: React.FC<IdolEditorDrawerProps> = ({
             </LayoutContainer>
           </LayoutContainer>
 
+          {/* Section: Historical Gallery with Captions */}
+          <IdolGalleryEditor
+            idolId={idolId}
+            items={galleryItems}
+            onUpdateCaption={handleUpdateGalleryCaption}
+            onRemoveItem={handleRemoveGalleryItem}
+            onAddItems={(newItems) => setGalleryItems((prev) => [...prev, ...newItems])}
+          />
+
           {/* Section: Visibility & Ordering */}
-          <LayoutContainer className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl bg-surface border border-border shadow-xs">
-            <LayoutContainer className="flex items-center gap-3">
-              <Star className={`w-5 h-5 ${isFeatured ? 'text-primary fill-primary' : 'text-text-muted'}`} />
-              <LayoutContainer className="flex flex-col">
-                <Text as="span" className="text-sm font-bold text-text-primary">
-                  {texts.LABEL_FEATURED}
-                </Text>
-                <Text as="span" className="text-xs text-text-muted">
-                  Exibe este ídolo com destaque especial no topo do Memorial público
-                </Text>
+          <LayoutContainer className="flex flex-col gap-4 p-5 rounded-2xl bg-surface border border-border shadow-xs">
+            <LayoutContainer className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <LayoutContainer className="flex items-center gap-3">
+                <Star className={`w-5 h-5 ${isFeatured ? 'text-primary fill-primary' : 'text-text-muted'}`} />
+                <LayoutContainer className="flex flex-col">
+                  <Text as="span" className="text-sm font-bold text-text-primary">
+                    {texts.LABEL_FEATURED}
+                  </Text>
+                  <Text as="span" className="text-xs text-text-muted">
+                    Exibe este ídolo com destaque especial no topo do Memorial público
+                  </Text>
+                </LayoutContainer>
               </LayoutContainer>
+              <Checkbox
+                label="Destacar"
+                checked={isFeatured}
+                onChange={(e) => setIsFeatured(e.target.checked)}
+              />
             </LayoutContainer>
-            <Checkbox
-              label="Destacar"
-              checked={isFeatured}
-              onChange={(e) => setIsFeatured(e.target.checked)}
-            />
+
+            <LayoutContainer className="flex flex-col gap-1.5 pt-3 border-t border-border">
+              <Text as="span" className="text-xs font-semibold text-text-secondary">
+                {texts.LABEL_ORDER}
+              </Text>
+              <Input
+                type="number"
+                min={0}
+                value={order}
+                onChange={(e) => setOrder(Number(e.target.value))}
+                placeholder="0"
+                className="max-w-xs"
+              />
+            </LayoutContainer>
           </LayoutContainer>
 
           {/* Drawer Footer Actions */}

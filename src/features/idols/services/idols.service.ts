@@ -2,6 +2,17 @@ import { api } from '@/services/api';
 
 export type IdolCategory = 'PLAYER' | 'COACH' | 'STAFF' | 'FAN';
 
+export interface IdolGalleryItem {
+  url: string;
+  caption?: string;
+}
+
+export interface IdolPeriod {
+  startYear: number;
+  endYear?: number | null;
+  label?: string;
+}
+
 export interface IdolData {
   _id: string;
   id: string;
@@ -11,8 +22,10 @@ export interface IdolData {
   category: IdolCategory;
   photoUrl?: string;
   gallery?: string[];
+  galleryItems?: IdolGalleryItem[];
   startYear: number;
   endYear?: number | null;
+  periods?: IdolPeriod[];
   isActiveInClub?: boolean;
   birthDate?: string | null;
   deathDate?: string | null;
@@ -75,6 +88,13 @@ export const idolsService = {
 
   getIdolBySlug: async (slug: string): Promise<IdolData> => {
     const response = await api.get(`/idols/${slug}`);
+    return response.data;
+  },
+
+  getPrevNext: async (
+    slug: string,
+  ): Promise<{ previous: IdolData | null; next: IdolData | null }> => {
+    const response = await api.get(`/idols/${slug}/prev-next`);
     return response.data;
   },
 

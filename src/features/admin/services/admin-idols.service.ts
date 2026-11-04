@@ -1,5 +1,10 @@
 import { api } from '@/services/api';
-import { IdolCategory, IdolData } from '../../idols/services/idols.service';
+import {
+  IdolCategory,
+  IdolData,
+  IdolGalleryItem,
+  IdolPeriod,
+} from '../../idols/services/idols.service';
 
 export interface GetAdminIdolsResponse {
   data: IdolData[];
@@ -16,8 +21,10 @@ export interface CreateAdminIdolDto {
   category: IdolCategory;
   photoUrl?: string;
   gallery?: string[];
+  galleryItems?: IdolGalleryItem[];
   startYear: number;
   endYear?: number;
+  periods?: IdolPeriod[];
   isActiveInClub?: boolean;
   birthDate?: string;
   deathDate?: string;

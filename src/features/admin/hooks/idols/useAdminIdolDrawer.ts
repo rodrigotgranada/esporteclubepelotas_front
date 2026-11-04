@@ -3,7 +3,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import toast from 'react-hot-toast';
 import { adminIdolsService } from '../../services/admin-idols.service';
-import { IdolCategory } from '../../../idols/services/idols.service';
+import {
+  IdolCategory,
+  IdolGalleryItem,
+  IdolPeriod,
+} from '../../../idols/services/idols.service';
 import { ADMIN_IDOLS_TEXTS } from '../../constants/admin-idols.constants';
 
 export const useAdminIdolDrawer = (
@@ -25,6 +29,8 @@ export const useAdminIdolDrawer = (
   const [photoBlob, setPhotoBlob] = useState<Blob | null>(null);
   const [startYear, setStartYear] = useState<number | ''>('');
   const [endYear, setEndYear] = useState<number | ''>('');
+  const [periods, setPeriods] = useState<IdolPeriod[]>([]);
+  const [galleryItems, setGalleryItems] = useState<IdolGalleryItem[]>([]);
   const [isActiveInClub, setIsActiveInClub] = useState(false);
   const [birthDate, setBirthDate] = useState('');
   const [deathDate, setDeathDate] = useState('');
@@ -69,6 +75,8 @@ export const useAdminIdolDrawer = (
     setPhotoBlob(null);
     setStartYear('');
     setEndYear('');
+    setPeriods([]);
+    setGalleryItems([]);
     setIsActiveInClub(false);
     setBirthDate('');
     setDeathDate('');
@@ -114,6 +122,18 @@ export const useAdminIdolDrawer = (
         setPhotoBlob(null);
         setStartYear(data.startYear || '');
         setEndYear(data.endYear || '');
+        setPeriods(
+          data.periods && data.periods.length > 0
+            ? data.periods
+            : data.startYear
+              ? [{ startYear: data.startYear, endYear: data.endYear || null, label: '' }]
+              : [],
+        );
+        setGalleryItems(
+          data.galleryItems && data.galleryItems.length > 0
+            ? data.galleryItems
+            : (data.gallery || []).map((url) => ({ url, caption: '' })),
+        );
         setIsActiveInClub(Boolean(data.isActiveInClub));
         setBirthDate(data.birthDate ? data.birthDate.substring(0, 10) : '');
         setDeathDate(data.deathDate ? data.deathDate.substring(0, 10) : '');
@@ -182,12 +202,64 @@ export const useAdminIdolDrawer = (
     setPhotoUrl(null);
   };
 
+  const handleUpdateGalleryCaption = (index: number, caption: string) => {
+    setGalleryItems((prev) => {
+      const copy = [...prev];
+      if (copy[index]) {
+        copy[index] = { ...copy[index], caption };
+      }
+      return copy;
+    });
+  };
+
+  const handleRemoveGalleryItem = (index: number) => {
+    setGalleryItems((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleAddPeriod = () => {
+    setPeriods((prev) => [
+      ...prev,
+      { startYear: new Date().getFullYear(), endYear: null, label: '' },
+    ]);
+  };
+
+  const handleUpdatePeriod = (
+    index: number,
+    field: 'startYear' | 'endYear' | 'label',
+    value: any,
+  ) => {
+    setPeriods((prev) => {
+      const copy = [...prev];
+      if (copy[index]) {
+        copy[index] = { ...copy[index], [field]: value };
+      }
+      return copy;
+    });
+  };
+
+  const handleRemovePeriod = (index: number) => {
+    setPeriods((prev) => prev.filter((_, i) => i !== index));
+  };
+
   const handleSave = async () => {
     if (!name.trim()) {
       toast.error('O nome completo do ídolo é obrigatório.');
       return;
     }
-    if (!startYear) {
+
+    const finalPeriods = periods.filter((p) => Number(p.startYear) > 0);
+    const computedStartYear =
+      finalPeriods.length > 0 ? Number(finalPeriods[0].startYear) : Number(startYear);
+    const computedEndYear =
+      finalPeriods.length > 0
+        ? finalPeriods[finalPeriods.length - 1].endYear
+          ? Number(finalPeriods[finalPeriods.length - 1].endYear)
+          : undefined
+        : endYear
+          ? Number(endYear)
+          : undefined;
+
+    if (!computedStartYear) {
       toast.error('O ano inicial no clube é obrigatório.');
       return;
     }
@@ -203,8 +275,10 @@ export const useAdminIdolDrawer = (
         name: name.trim(),
         nickname: nickname.trim() || undefined,
         category,
-        startYear: Number(startYear),
-        endYear: endYear ? Number(endYear) : undefined,
+        startYear: computedStartYear,
+        endYear: computedEndYear,
+        periods: finalPeriods,
+        galleryItems,
         isActiveInClub,
         birthDate: birthDate || undefined,
         deathDate: deathDate || undefined,
@@ -302,6 +376,14 @@ export const useAdminIdolDrawer = (
     setStartYear,
     endYear,
     setEndYear,
+    periods,
+    handleAddPeriod,
+    handleUpdatePeriod,
+    handleRemovePeriod,
+    galleryItems,
+    setGalleryItems,
+    handleUpdateGalleryCaption,
+    handleRemoveGalleryItem,
     isActiveInClub,
     setIsActiveInClub,
     birthDate,

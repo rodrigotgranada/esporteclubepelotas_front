@@ -64,5 +64,21 @@ export const IDOLS_CONSTANTS = {
     DESC: 'A galeria de ídolos está em manutenção ou aguardando ativação pela assessoria do clube.',
     BTN_HOME: 'Voltar para a Página Inicial',
   },
+
+  PREV_NEXT: {
+    TITLE: 'Continue Explorando o Memorial',
+    PREVIOUS: 'Ídolo Anterior',
+    NEXT: 'Próximo Ídolo',
+    BACK_TO_MEMORIAL: 'Ver todos os ídolos',
+  },
+
+  LIGHTBOX: {
+    TITLE: 'Foto Histórica do Memorial',
+    HINT: 'Clique para ver foto ampliada',
+  },
+
+  PERIODS: {
+    PASSAGES: 'Passagens pelo Lobo:',
+  },
 };
 
