@@ -8,3 +8,4 @@ export default function ElencoLayout({
 }) {
   return <PublicLayout>{children}</PublicLayout>;
 }
+

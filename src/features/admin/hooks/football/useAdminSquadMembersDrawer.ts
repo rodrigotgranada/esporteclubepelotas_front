@@ -150,3 +150,4 @@ export const useAdminSquadMembersDrawer = (onSuccess: () => void) => {
     handleRemoveMember,
   };
 };
+

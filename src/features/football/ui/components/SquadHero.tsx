@@ -72,3 +72,4 @@ export const SquadHero: React.FC<SquadHeroProps> = ({ squad, selectedCategory })
     </LayoutContainer>
   );
 };
+

@@ -81,3 +81,4 @@ export const FOOTBALL_CONSTANTS = {
     BTN_HOME: 'Voltar à Página Inicial',
   },
 };
+

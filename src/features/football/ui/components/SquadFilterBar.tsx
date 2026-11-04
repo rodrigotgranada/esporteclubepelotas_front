@@ -91,3 +91,4 @@ export const SquadFilterBar: React.FC<SquadFilterBarProps> = ({
     </LayoutContainer>
   );
 };
+

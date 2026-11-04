@@ -113,3 +113,4 @@ export const AthleteCard: React.FC<AthleteCardProps> = ({ member, athlete: direc
     </Link>
   );
 };
+

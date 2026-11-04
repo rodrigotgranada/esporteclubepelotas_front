@@ -120,3 +120,4 @@ export const ADMIN_FOOTBALL_CONSTANTS = {
     SUCCESS_DELETE: 'Registro inativado com sucesso.',
   },
 };
+

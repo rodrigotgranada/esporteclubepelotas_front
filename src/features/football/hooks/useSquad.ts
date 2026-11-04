@@ -128,3 +128,4 @@ export const useSquad = (initialCategory: SquadCategory = 'PROFESSIONAL') => {
     reload: loadSquad,
   };
 };
+
