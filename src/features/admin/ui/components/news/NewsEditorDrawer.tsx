@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import {
   X,
-  Plus,
   Sparkles,
   Calendar,
   Video,
@@ -26,7 +25,6 @@ import {
   Badge,
   Spinner,
 } from '@/shared/ui/components';
-import { ImageCropper } from '@/shared/ui/components';
 import { ADMIN_NEWS_TEXTS } from '../../../constants/admin-news.constants';
 import { useAdminNewsDrawer } from '../../../hooks/news/useAdminNewsDrawer';
 import { NewsBlockEditor } from './NewsBlockEditor';
@@ -37,6 +35,8 @@ import { NewsArticlePreviewModal } from './NewsArticlePreviewModal';
 import { NewsEditorFeaturedSection } from './NewsEditorFeaturedSection';
 import { NewsEditorCreditsSection } from './NewsEditorCreditsSection';
 import { NewsEditorInteractivitySection } from './NewsEditorInteractivitySection';
+import { NewsEditorCoverSection } from './NewsEditorCoverSection';
+import { NewsEditorTagsSection } from './NewsEditorTagsSection';
 
 export interface NewsEditorDrawerProps {
   isOpen: boolean;
@@ -301,32 +301,13 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
             </LayoutContainer>
 
             {/* 3. Imagem de Capa 16:9 com Crop & Legenda */}
-            <LayoutContainer className="flex flex-col gap-3 p-4 rounded-xl border border-border bg-surface shadow-xs">
-              <Text as="span" className="text-xs font-semibold text-text-primary uppercase tracking-wider">
-                {texts.LABEL_COVER_IMAGE}
-              </Text>
-
-              <ImageCropper
-                shape="rect"
-                aspect={16 / 9}
-                initialImage={coverImage}
-                onCropSave={handleCropCover}
-                onImageRemove={handleRemoveCover}
-                placeholderLabel="Clique para carregar e recortar capa em 16:9"
-                className="w-full"
-              />
-
-              <LayoutContainer className="flex flex-col gap-1.5 mt-2">
-                <Text as="span" className="text-xs font-semibold text-text-secondary">
-                  {texts.LABEL_COVER_CAPTION}
-                </Text>
-                <Input
-                  value={coverCaption}
-                  onChange={(e) => setCoverCaption(e.target.value)}
-                  placeholder={texts.PLACEHOLDER_COVER_CAPTION}
-                />
-              </LayoutContainer>
-            </LayoutContainer>
+            <NewsEditorCoverSection
+              coverImage={coverImage}
+              coverCaption={coverCaption}
+              setCoverCaption={setCoverCaption}
+              onCropSave={handleCropCover}
+              onImageRemove={handleRemoveCover}
+            />
 
             {/* 4. Galeria de Fotos da Matéria */}
             <NewsEditorGallerySection
@@ -365,58 +346,13 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
             </LayoutContainer>
 
             {/* 6. Tags com Enter e chips */}
-            <LayoutContainer className="flex flex-col gap-2">
-              <Text as="span" className="text-xs font-semibold text-text-primary uppercase tracking-wider">
-                {texts.LABEL_TAGS}
-              </Text>
-              <LayoutContainer className="flex items-center gap-2">
-                <Input
-                  value={tagInput}
-                  onChange={(e) => setTagInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleAddTag();
-                    }
-                  }}
-                  placeholder={texts.PLACEHOLDER_TAGS}
-                  className="flex-1"
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleAddTag}
-                  leftIcon={<Plus className="w-4 h-4" />}
-                >
-                  {texts.BUTTON_ADD_TAG}
-                </Button>
-              </LayoutContainer>
-
-              {tags.length > 0 && (
-                <LayoutContainer className="flex flex-wrap items-center gap-1.5 pt-1">
-                  {tags.map((tag) => (
-                    <Badge
-                      key={tag}
-                      variant="primary"
-                      size="sm"
-                      className="flex items-center gap-1 pl-2.5 pr-1 py-1"
-                    >
-                      <span>#{tag}</span>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleRemoveTag(tag)}
-                        className="p-0.5 h-auto hover:bg-black/10 rounded-full"
-                        aria-label={`Remover tag ${tag}`}
-                      >
-                        <X className="w-3 h-3" />
-                      </Button>
-                    </Badge>
-                  ))}
-                </LayoutContainer>
-              )}
-            </LayoutContainer>
+            <NewsEditorTagsSection
+              tags={tags}
+              tagInput={tagInput}
+              setTagInput={setTagInput}
+              onAddTag={handleAddTag}
+              onRemoveTag={handleRemoveTag}
+            />
 
             {/* 7. Créditos Editoriais Livres (Repórter / Fotógrafo) */}
             <NewsEditorCreditsSection
