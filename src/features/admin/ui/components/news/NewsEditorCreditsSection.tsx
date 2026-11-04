@@ -70,3 +70,4 @@ export const NewsEditorCreditsSection: React.FC<NewsEditorCreditsSectionProps> =
     </LayoutContainer>
   );
 };
+

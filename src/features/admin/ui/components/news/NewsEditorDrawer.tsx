@@ -101,6 +101,9 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
     publishedAt,
     setPublishedAt,
     handleCategoryCreated,
+    hasRecoverableDraft,
+    recoverDraft,
+    discardDraft,
     handleSave,
   } = useAdminNewsDrawer(articleId, isOpen, onSaveSuccess);
 
@@ -134,6 +137,38 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
           </LayoutContainer>
         ) : (
           <LayoutContainer className="flex flex-col gap-6 pb-8">
+            {/* Aviso de Rascunho Recuperado do LocalStorage */}
+            {hasRecoverableDraft && !articleId && (
+              <LayoutContainer className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl border border-primary/40 bg-primary/10 shadow-sm animate-in fade-in duration-300">
+                <LayoutContainer className="flex items-center gap-2.5">
+                  <Sparkles className="w-4 h-4 text-primary shrink-0" />
+                  <Text as="span" className="text-xs font-semibold text-text-primary">
+                    {texts.AUTOSAVE_NOTICE}
+                  </Text>
+                </LayoutContainer>
+                <LayoutContainer className="flex items-center gap-2 shrink-0">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="primary"
+                    onClick={recoverDraft}
+                    className="text-xs font-bold h-7 px-3"
+                  >
+                    {texts.AUTOSAVE_RECOVER_BTN}
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    onClick={discardDraft}
+                    className="text-xs h-7 px-2 text-text-secondary hover:text-text-primary"
+                  >
+                    {texts.AUTOSAVE_DISCARD_BTN}
+                  </Button>
+                </LayoutContainer>
+              </LayoutContainer>
+            )}
+
             {/* 1. Titulo & Subtitulo */}
             <LayoutContainer className="flex flex-col gap-4">
               <LayoutContainer className="flex flex-col gap-1.5">
@@ -521,6 +556,8 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
         onClose={() => setIsPreviewOpen(false)}
         title={title}
         subtitle={subtitle}
+        summary={summary}
+        slug={slug}
         categoryName={selectedCategory?.name}
         publishedAt={publishedAt}
         reporterName={reporterName}

@@ -22,12 +22,15 @@ import {
 } from '@/shared/ui/components';
 import { NewsRenderer } from '@/features/news/ui/components/NewsRenderer';
 import { ADMIN_NEWS_TEXTS } from '../../../constants/admin-news.constants';
+import { NewsSocialPreview } from './NewsSocialPreview';
 
 export interface NewsArticlePreviewModalProps {
   isOpen: boolean;
   onClose: () => void;
   title: string;
   subtitle?: string;
+  summary?: string;
+  slug?: string;
   categoryName?: string;
   authorName?: string;
   authorAvatar?: string | null;
@@ -48,6 +51,8 @@ export const NewsArticlePreviewModal: React.FC<NewsArticlePreviewModalProps> = (
   onClose,
   title,
   subtitle,
+  summary,
+  slug,
   categoryName,
   authorName,
   authorAvatar,
@@ -63,6 +68,7 @@ export const NewsArticlePreviewModal: React.FC<NewsArticlePreviewModalProps> = (
   tags = [],
 }) => {
   const { DRAWER: texts } = ADMIN_NEWS_TEXTS;
+  const [previewTab, setPreviewTab] = useState<'site' | 'social'>('site');
   const [deviceMode, setDeviceMode] = useState<'desktop' | 'mobile'>('desktop');
 
   if (!isOpen) return null;
@@ -107,32 +113,62 @@ export const NewsArticlePreviewModal: React.FC<NewsArticlePreviewModalProps> = (
           </Text>
         </LayoutContainer>
 
-        {/* Device Switcher (Desktop vs Mobile) */}
-        <LayoutContainer className="flex items-center gap-1 bg-surface p-1 rounded-xl border border-border">
-          <button
-            type="button"
-            onClick={() => setDeviceMode('desktop')}
-            className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-              deviceMode === 'desktop'
-                ? 'bg-primary text-button-primary-text shadow-xs'
-                : 'text-text-secondary hover:text-text-primary'
-            }`}
-          >
-            <Laptop className="w-3.5 h-3.5" />
-            <span>{texts.PREVIEW_MODE_DESKTOP}</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setDeviceMode('mobile')}
-            className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-              deviceMode === 'mobile'
-                ? 'bg-primary text-button-primary-text shadow-xs'
-                : 'text-text-secondary hover:text-text-primary'
-            }`}
-          >
-            <Smartphone className="w-3.5 h-3.5" />
-            <span>{texts.PREVIEW_MODE_MOBILE}</span>
-          </button>
+        {/* View Switcher: Site vs Social */}
+        <LayoutContainer className="flex items-center gap-2">
+          <LayoutContainer className="flex items-center gap-1 bg-surface p-1 rounded-xl border border-border">
+            <button
+              type="button"
+              onClick={() => setPreviewTab('site')}
+              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                previewTab === 'site'
+                  ? 'bg-primary text-background shadow-xs'
+                  : 'text-text-secondary hover:text-text-primary'
+              }`}
+            >
+              {texts.PREVIEW_TAB_SITE}
+            </button>
+            <button
+              type="button"
+              onClick={() => setPreviewTab('social')}
+              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                previewTab === 'social'
+                  ? 'bg-primary text-background shadow-xs'
+                  : 'text-text-secondary hover:text-text-primary'
+              }`}
+            >
+              {texts.PREVIEW_TAB_SOCIAL}
+            </button>
+          </LayoutContainer>
+
+          {/* Device Switcher (Desktop vs Mobile) */}
+          {previewTab === 'site' && (
+            <LayoutContainer className="hidden sm:flex items-center gap-1 bg-surface p-1 rounded-xl border border-border">
+              <button
+                type="button"
+                onClick={() => setDeviceMode('desktop')}
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  deviceMode === 'desktop'
+                    ? 'bg-primary text-background shadow-xs'
+                    : 'text-text-secondary hover:text-text-primary'
+                }`}
+              >
+                <Laptop className="w-3.5 h-3.5" />
+                <span>{texts.PREVIEW_MODE_DESKTOP}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setDeviceMode('mobile')}
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  deviceMode === 'mobile'
+                    ? 'bg-primary text-background shadow-xs'
+                    : 'text-text-secondary hover:text-text-primary'
+                }`}
+              >
+                <Smartphone className="w-3.5 h-3.5" />
+                <span>{texts.PREVIEW_MODE_MOBILE}</span>
+              </button>
+            </LayoutContainer>
+          )}
         </LayoutContainer>
 
         <LayoutContainer className="flex items-center gap-2">
@@ -158,13 +194,23 @@ export const NewsArticlePreviewModal: React.FC<NewsArticlePreviewModalProps> = (
 
       {/* Preview Viewport Container */}
       <LayoutContainer className="flex-1 overflow-y-auto bg-drawer/30 p-4 sm:p-8 flex justify-center">
-        <LayoutContainer
-          className={`transition-all duration-300 bg-surface rounded-2xl shadow-xl overflow-hidden border border-border flex flex-col ${
-            deviceMode === 'mobile'
-              ? 'w-[390px] border-4 border-neutral-800 rounded-[40px] shadow-2xl p-4 my-auto min-h-[700px]'
-              : 'w-full max-w-4xl p-6 sm:p-10'
-          }`}
-        >
+        {previewTab === 'social' ? (
+          <NewsSocialPreview
+            title={title}
+            summary={summary}
+            subtitle={subtitle}
+            slug={slug}
+            coverImage={coverImage}
+            publishedAt={publishedAt}
+          />
+        ) : (
+          <LayoutContainer
+            className={`transition-all duration-300 bg-surface rounded-2xl shadow-xl overflow-hidden border border-border flex flex-col ${
+              deviceMode === 'mobile'
+                ? 'w-[390px] border-4 border-neutral-800 rounded-[40px] shadow-2xl p-4 my-auto min-h-[700px]'
+                : 'w-full max-w-4xl p-6 sm:p-10'
+            }`}
+          >
           {/* Header Metadata */}
           <LayoutContainer className="flex flex-col gap-3 pb-6 border-b border-border/60">
             {categoryName && (
@@ -292,6 +338,7 @@ export const NewsArticlePreviewModal: React.FC<NewsArticlePreviewModalProps> = (
             </LayoutContainer>
           )}
         </LayoutContainer>
+        )}
       </LayoutContainer>
     </Modal>
   );

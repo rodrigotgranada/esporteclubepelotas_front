@@ -47,6 +47,8 @@ export const useAdminNewsDrawer = (
   const [photographerName, setPhotographerName] = useState('');
   const [status, setStatus] = useState<NewsStatusType>('DRAFT');
   const [publishedAt, setPublishedAt] = useState('');
+  const [hasRecoverableDraft, setHasRecoverableDraft] = useState(false);
+  const AUTOSAVE_KEY = 'ecp_news_draft_autosave';
 
   // Quick category modal inside drawer
   const [quickCategoryOpen, setQuickCategoryOpen] = useState(false);
@@ -61,6 +63,84 @@ export const useAdminNewsDrawer = (
     } catch (err) {
       console.error('Failed to load categories', err);
     }
+  };
+
+  // Verifica se há rascunho recuperável no localStorage ao abrir para criar nova matéria
+  useEffect(() => {
+    if (isOpen && !articleId && typeof window !== 'undefined') {
+      try {
+        const savedStr = localStorage.getItem(AUTOSAVE_KEY);
+        if (savedStr) {
+          const parsed = JSON.parse(savedStr);
+          if (parsed && (parsed.title || (parsed.content && Object.keys(parsed.content).length > 0))) {
+            setHasRecoverableDraft(true);
+          }
+        }
+      } catch (err) {
+        console.error('Error checking autosave draft', err);
+      }
+    } else {
+      setHasRecoverableDraft(false);
+    }
+  }, [isOpen, articleId]);
+
+  // Autosave contínuo para localStorage durante a digitação
+  useEffect(() => {
+    if (!isOpen || articleId || typeof window === 'undefined') return;
+
+    if (!title && (!content || Object.keys(content).length === 0)) return;
+
+    const timeout = setTimeout(() => {
+      try {
+        const draftData = {
+          title,
+          subtitle,
+          slug,
+          summary,
+          categoryId,
+          tags,
+          content,
+          reporterName,
+          photographerName,
+          savedAt: new Date().toISOString(),
+        };
+        localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(draftData));
+      } catch (err) {
+        console.error('Error saving draft locally', err);
+      }
+    }, 2000);
+
+    return () => clearTimeout(timeout);
+  }, [title, subtitle, slug, summary, categoryId, tags, content, reporterName, photographerName, isOpen, articleId]);
+
+  const recoverDraft = () => {
+    if (typeof window === 'undefined') return;
+    try {
+      const savedStr = localStorage.getItem(AUTOSAVE_KEY);
+      if (savedStr) {
+        const d = JSON.parse(savedStr);
+        if (d.title) setTitle(d.title);
+        if (d.subtitle) setSubtitle(d.subtitle);
+        if (d.slug) setSlug(d.slug);
+        if (d.summary) setSummary(d.summary);
+        if (d.categoryId) setCategoryId(d.categoryId);
+        if (d.tags) setTags(d.tags);
+        if (d.content) setContent(d.content);
+        if (d.reporterName) setReporterName(d.reporterName);
+        if (d.photographerName) setPhotographerName(d.photographerName);
+        setHasRecoverableDraft(false);
+        toast.success('Rascunho recuperado com sucesso!');
+      }
+    } catch (err) {
+      console.error('Failed to recover draft', err);
+    }
+  };
+
+  const discardDraft = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(AUTOSAVE_KEY);
+    }
+    setHasRecoverableDraft(false);
   };
 
   const resetForm = () => {
@@ -320,6 +400,7 @@ export const useAdminNewsDrawer = (
         }
       }
 
+      discardDraft();
       onSuccess();
     } catch (err: any) {
       console.error(err);
@@ -384,6 +465,9 @@ export const useAdminNewsDrawer = (
     quickCategoryOpen,
     setQuickCategoryOpen,
     handleCategoryCreated,
+    hasRecoverableDraft,
+    recoverDraft,
+    discardDraft,
     handleSave,
   };
 };
