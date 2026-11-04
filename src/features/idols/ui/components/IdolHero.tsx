@@ -37,3 +37,4 @@ export const IdolHero: React.FC = () => {
     </LayoutContainer>
   );
 };
+

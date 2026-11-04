@@ -62,3 +62,4 @@ export const IdolFilterBar: React.FC<IdolFilterBarProps> = ({
     </LayoutContainer>
   );
 };
+

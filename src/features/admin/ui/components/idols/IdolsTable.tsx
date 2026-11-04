@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import Image from 'next/image';
 import {
   Edit3,
   Trash2,
@@ -26,6 +25,8 @@ import {
   Badge,
   Button,
   Spinner,
+  SafeImage,
+  DEFAULT_IDOL_COVER,
 } from '@/shared/ui/components';
 import { ADMIN_IDOLS_TEXTS } from '../../../constants/admin-idols.constants';
 import { IdolCategory, IdolData } from '../../../../idols/services/idols.service';
@@ -148,19 +149,14 @@ export const IdolsTable: React.FC<IdolsTableProps> = ({
                   {/* Photo Thumbnail */}
                   <TableCell>
                     <LayoutContainer className="relative w-12 h-16 rounded-lg overflow-hidden bg-background border border-border shrink-0">
-                      {idol.photoUrl ? (
-                        <Image
-                          src={idol.photoUrl}
-                          alt={idol.name}
-                          fill
-                          className="object-cover"
-                          sizes="48px"
-                        />
-                      ) : (
-                        <LayoutContainer className="w-full h-full flex items-center justify-center text-text-muted">
-                          <Trophy className="w-5 h-5 opacity-40" />
-                        </LayoutContainer>
-                      )}
+                      <SafeImage
+                        src={idol.photoUrl}
+                        fallbackSrc={DEFAULT_IDOL_COVER}
+                        alt={idol.name}
+                        fill
+                        className="object-cover"
+                        sizes="48px"
+                      />
                     </LayoutContainer>
                   </TableCell>
 
@@ -257,19 +253,14 @@ export const IdolsTable: React.FC<IdolsTableProps> = ({
               className="flex items-start gap-4 p-4 rounded-2xl bg-surface border border-border shadow-xs"
             >
               <LayoutContainer className="relative w-16 h-20 rounded-xl overflow-hidden bg-background border border-border shrink-0">
-                {idol.photoUrl ? (
-                  <Image
-                    src={idol.photoUrl}
-                    alt={idol.name}
-                    fill
-                    className="object-cover"
-                    sizes="64px"
-                  />
-                ) : (
-                  <LayoutContainer className="w-full h-full flex items-center justify-center text-text-muted">
-                    <Trophy className="w-6 h-6 opacity-40" />
-                  </LayoutContainer>
-                )}
+                <SafeImage
+                  src={idol.photoUrl}
+                  fallbackSrc={DEFAULT_IDOL_COVER}
+                  alt={idol.name}
+                  fill
+                  className="object-cover"
+                  sizes="64px"
+                />
               </LayoutContainer>
 
               <LayoutContainer className="flex flex-col gap-1.5 flex-1 min-w-0">
@@ -368,3 +359,4 @@ export const IdolsTable: React.FC<IdolsTableProps> = ({
     </LayoutContainer>
   );
 };
+

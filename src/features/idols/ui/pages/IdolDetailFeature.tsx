@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import {
   ArrowLeft,
@@ -23,6 +22,9 @@ import {
   Badge,
   Button,
   Spinner,
+  SafeImage,
+  DEFAULT_IDOL_COVER,
+  DEFAULT_NEWS_COVER,
 } from '@/shared/ui/components';
 import { IDOLS_CONSTANTS } from '../../constants/idols.constants';
 import { useIdolDetail } from '../../hooks/useIdolDetail';
@@ -144,20 +146,15 @@ export const IdolDetailFeature: React.FC<IdolDetailFeatureProps> = ({ slug }) =>
 
         {/* Photo Container 3:4 */}
         <LayoutContainer className="relative w-64 sm:w-72 aspect-[3/4] rounded-2xl overflow-hidden bg-background border border-border shrink-0 shadow-lg">
-          {idol.photoUrl ? (
-            <Image
-              src={idol.photoUrl}
-              alt={idol.name}
-              fill
-              className="object-cover object-top"
-              sizes="(max-width: 640px) 256px, 288px"
-              priority
-            />
-          ) : (
-            <LayoutContainer className="w-full h-full flex items-center justify-center text-text-muted">
-              <Trophy className="w-20 h-20 opacity-30" />
-            </LayoutContainer>
-          )}
+          <SafeImage
+            src={idol.photoUrl}
+            fallbackSrc={DEFAULT_IDOL_COVER}
+            alt={idol.name}
+            fill
+            className="object-cover object-top"
+            sizes="(max-width: 640px) 256px, 288px"
+            priority
+          />
 
           {idol.deathDate && (
             <LayoutContainer className="absolute bottom-3 left-3 right-3 text-center py-1 px-2 rounded-lg bg-background/90 backdrop-blur-md border border-border text-[11px] font-black text-text-muted">
@@ -403,8 +400,9 @@ export const IdolDetailFeature: React.FC<IdolDetailFeatureProps> = ({ slug }) =>
                 key={idx}
                 className="relative aspect-video rounded-2xl overflow-hidden bg-background border border-border shadow-xs hover:border-primary/50 transition-colors"
               >
-                <Image
+                <SafeImage
                   src={photo}
+                  fallbackSrc={DEFAULT_NEWS_COVER}
                   alt={`${idol.name} foto histórica ${idx + 1}`}
                   fill
                   className="object-cover hover:scale-105 transition-transform duration-300"

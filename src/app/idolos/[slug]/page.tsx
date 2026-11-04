@@ -19,3 +19,4 @@ export default async function Page({ params }: Props) {
   const { slug } = await params;
   return <IdolDetailFeature slug={slug} />;
 }
+

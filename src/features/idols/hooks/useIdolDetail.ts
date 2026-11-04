@@ -34,3 +34,4 @@ export const useIdolDetail = (slug: string) => {
     reload: loadIdol,
   };
 };
+

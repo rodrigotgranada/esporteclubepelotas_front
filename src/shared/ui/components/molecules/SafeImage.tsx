@@ -9,6 +9,7 @@ export interface SafeImageProps extends Omit<ImageProps, 'src'> {
 }
 
 export const DEFAULT_NEWS_COVER = '/images/default-news-cover.svg';
+export const DEFAULT_IDOL_COVER = '/images/default-idol-cover.svg';
 
 export const SafeImage: React.FC<SafeImageProps> = ({
   src,

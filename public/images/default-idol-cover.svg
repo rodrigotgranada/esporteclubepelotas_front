@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" width="600" height="800">
+  <defs>
+    <linearGradient id="idol-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#050b14" />
+      <stop offset="45%" stop-color="#0a172a" />
+      <stop offset="100%" stop-color="#0e2343" />
+    </linearGradient>
+
+    <radialGradient id="idol-aura" cx="50%" cy="40%" r="45%">
+      <stop offset="0%" stop-color="#eab308" stop-opacity="0.22" />
+      <stop offset="60%" stop-color="#ca8a04" stop-opacity="0.06" />
+      <stop offset="100%" stop-color="#0a172a" stop-opacity="0" />
+    </radialGradient>
+
+    <linearGradient id="gold-stroke" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef08a" />
+      <stop offset="50%" stop-color="#eab308" />
+      <stop offset="100%" stop-color="#a16207" />
+    </linearGradient>
+
+    <linearGradient id="shield-core" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#091424" />
+      <stop offset="100%" stop-color="#040912" />
+    </linearGradient>
+
+    <pattern id="diagonal-stripes" width="30" height="30" patternUnits="userSpaceOnUse" patternTransform="rotate(35)">
+      <line x1="0" y1="0" x2="0" y2="30" stroke="#facc15" stroke-opacity="0.02" stroke-width="1.5" />
+    </pattern>
+  </defs>
+
+  <!-- Background Base -->
+  <rect width="600" height="800" fill="url(#idol-bg)" />
+  <rect width="600" height="800" fill="url(#diagonal-stripes)" />
+
+  <!-- Aura Glow behind emblem -->
+  <circle cx="300" cy="360" r="280" fill="url(#idol-aura)" />
+
+  <!-- Decorative Fine Arch -->
+  <path d="M 120,700 C 120,220 480,220 480,700" fill="none" stroke="#eab308" stroke-opacity="0.08" stroke-width="1.5" stroke-dasharray="4 6" />
+
+  <!-- Central Crest / Memorial Silhouette -->
+  <g transform="translate(300, 340)">
+    <!-- Shield Outer with Drop Shadow -->
+    <path d="M 0,-115 L 80,-80 C 80,35 52,105 0,140 C -52,105 -80,35 -80,-80 Z"
+          fill="url(#shield-core)"
+          stroke="url(#gold-stroke)"
+          stroke-width="5"
+          filter="drop-shadow(0 20px 30px rgba(0,0,0,0.7))" />
+
+    <!-- Shield Inner Border -->
+    <path d="M 0,-105 L 70,-74 C 70,28 45,92 0,123 C -45,92 -70,28 -70,-74 Z"
+          fill="none"
+          stroke="#facc15"
+          stroke-opacity="0.25"
+          stroke-width="1.5" />
+
+    <!-- Diagonal Golden Sash -->
+    <clipPath id="inner-shield-clip">
+      <path d="M 0,-105 L 70,-74 C 70,28 45,92 0,123 C -45,92 -70,28 -70,-74 Z" />
+    </clipPath>
+    <g clip-path="url(#inner-shield-clip)">
+      <polygon points="-80,25 80,-45 80,-15 -80,55" fill="#eab308" fill-opacity="0.85" />
+      <polygon points="-80,30 80,-40 80,-34 -80,36" fill="#fef08a" fill-opacity="0.9" />
+    </g>
+
+    <!-- Star of Glory on Top -->
+    <path d="M 0,-140 L 4,-128 L 16,-128 L 6,-120 L 10,-108 L 0,-115 L -10,-108 L -6,-120 L -16,-128 L -4,-128 Z"
+          fill="#facc15"
+          stroke="#eab308"
+          stroke-width="1"
+          filter="drop-shadow(0 2px 8px rgba(250,204,21,0.5))" />
+
+    <!-- Monogram ECP -->
+    <text x="0" y="24"
+          font-family="system-ui, -apple-system, sans-serif"
+          font-size="28"
+          font-weight="900"
+          letter-spacing="4"
+          fill="#fef08a"
+          text-anchor="middle"
+          filter="drop-shadow(0 2px 4px rgba(0,0,0,0.8))">
+      ECP
+    </text>
+  </g>
+
+  <!-- Memorial Text Bottom -->
+  <text x="300" y="550"
+        font-family="system-ui, -apple-system, sans-serif"
+        font-size="13"
+        font-weight="800"
+        letter-spacing="5"
+        fill="#facc15"
+        fill-opacity="0.75"
+        text-anchor="middle">
+    MEMORIAL DO LOBO
+  </text>
+
+  <text x="300" y="575"
+        font-family="system-ui, -apple-system, sans-serif"
+        font-size="11"
+        font-weight="600"
+        letter-spacing="2"
+        fill="#ffffff"
+        fill-opacity="0.4"
+        text-anchor="middle">
+    ESPORTE CLUBE PELOTAS • 1908
+  </text>
+</svg>

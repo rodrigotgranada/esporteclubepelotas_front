@@ -1,10 +1,9 @@
 'use client';
 
 import React from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { Trophy, Star, Shield, UserCheck, Heart } from 'lucide-react';
-import { LayoutContainer, Title, Text, Badge } from '@/shared/ui/components';
+import { LayoutContainer, Title, Text, Badge, SafeImage, DEFAULT_IDOL_COVER } from '@/shared/ui/components';
 import { IDOLS_CONSTANTS } from '../../constants/idols.constants';
 import { IdolCategory, IdolData } from '../../services/idols.service';
 
@@ -109,19 +108,14 @@ export const IdolCard: React.FC<IdolCardProps> = ({ idol }) => {
       <LayoutContainer className="relative h-full flex flex-col rounded-3xl overflow-hidden bg-surface border border-border group-hover:border-primary/50 group-hover:shadow-lg transition-all duration-300">
         {/* Photo Container 3:4 */}
         <LayoutContainer className="relative w-full aspect-[3/4] overflow-hidden bg-background">
-          {idol.photoUrl ? (
-            <Image
-              src={idol.photoUrl}
-              alt={idol.name}
-              fill
-              className="object-cover object-top group-hover:scale-105 transition-transform duration-500"
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            />
-          ) : (
-            <LayoutContainer className="w-full h-full flex items-center justify-center text-text-muted bg-surface/50">
-              <Trophy className="w-16 h-16 opacity-30" />
-            </LayoutContainer>
-          )}
+          <SafeImage
+            src={idol.photoUrl}
+            fallbackSrc={DEFAULT_IDOL_COVER}
+            alt={idol.name}
+            fill
+            className="object-cover object-top group-hover:scale-105 transition-transform duration-500"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          />
 
           {/* Gradient Overlay for Readable Text */}
           <LayoutContainer className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
@@ -189,3 +183,4 @@ export const IdolCard: React.FC<IdolCardProps> = ({ idol }) => {
     </Link>
   );
 };
+

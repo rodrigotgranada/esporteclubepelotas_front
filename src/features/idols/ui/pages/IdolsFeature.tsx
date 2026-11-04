@@ -143,3 +143,4 @@ export const IdolsFeature: React.FC = () => {
     </LayoutContainer>
   );
 };
+

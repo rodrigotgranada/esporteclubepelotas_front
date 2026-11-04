@@ -65,3 +65,4 @@ export const IDOLS_CONSTANTS = {
     BTN_HOME: 'Voltar para a Página Inicial',
   },
 };
+

@@ -65,3 +65,4 @@ export const useIdolsList = (initialCategory: string = '') => {
     setPage,
   };
 };
+

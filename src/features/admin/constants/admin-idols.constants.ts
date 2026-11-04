@@ -119,3 +119,4 @@ export const ADMIN_IDOLS_TEXTS = {
     ERROR_SAVE: 'Erro ao salvar ídolo. Verifique os campos.',
   },
 };
+
