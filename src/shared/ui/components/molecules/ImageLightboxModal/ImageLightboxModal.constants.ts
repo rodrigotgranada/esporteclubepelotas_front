@@ -5,3 +5,4 @@ export const IMAGE_LIGHTBOX_TEXTS = {
   COUNTER: (current: number, total: number) => `Foto ${current} de ${total}`,
   THUMBNAILS_LABEL: 'Miniaturas da galeria',
 };
+

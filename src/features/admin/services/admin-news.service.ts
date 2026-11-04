@@ -44,6 +44,19 @@ export interface NewsArticleData {
   publishedAt?: string;
   gallery?: string[];
   youtubeVideoUrl?: string;
+  allowReactions?: boolean;
+  allowComments?: boolean;
+  reactions?: {
+    wolf: number;
+    fire: number;
+    clap: number;
+    heart: number;
+  };
+  lastEditedBy?: {
+    firstName: string;
+    lastName: string;
+    email?: string;
+  } | string;
   viewsCount: number;
   isActive: boolean;
   createdAt: string;
@@ -129,6 +142,11 @@ export const adminNewsService = {
 
   createCategory: async (data: { name: string; description?: string }): Promise<NewsCategoryData> => {
     const response = await api.post('/news/admin/categories', data);
+    return response.data;
+  },
+
+  duplicateNews: async (id: string): Promise<NewsArticleData> => {
+    const response = await api.post(`/news/admin/${id}/duplicate`);
     return response.data;
   },
 };

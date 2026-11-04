@@ -121,6 +121,25 @@ export const ADMIN_NEWS_TEXTS = {
     AUTOSAVE_NOTICE: 'Identificamos um rascunho anterior salvo no seu navegador.',
     AUTOSAVE_RECOVER_BTN: 'Restaurar Rascunho',
     AUTOSAVE_DISCARD_BTN: 'Descartar',
+    LABEL_INTERACTIVITY_SECTION: 'Interatividade com a Torcida',
+    LABEL_INTERACTIVITY_HINT: 'Controle quais recursos de participação estão habilitados para esta publicação.',
+    LABEL_ALLOW_REACTIONS: 'Permitir Reações da Torcida',
+    ALLOW_REACTIONS_HINT: 'Exibe o bloco de reações áureo-cerúleas (Na Torcida 🐺, Baita Notícia 🔥, etc.) ao final do texto.',
+    LABEL_ALLOW_COMMENTS: 'Permitir Comentários de Usuários Cadastrados',
+    ALLOW_COMMENTS_HINT: 'Habilita a área de comentários exclusivos para torcedores logados no portal.',
+    BUTTON_DUPLICATE: 'Duplicar Matéria',
+    SUCCESS_DUPLICATE: 'Matéria duplicada com sucesso como rascunho!',
+    SEO_STATS_TITLE: 'Análise de Texto & SEO',
+    SEO_WORDS: (count: number) => `${count} palavras`,
+    SEO_CHARS: (count: number) => `${count} caracteres`,
+    VIEWS_COUNT: (count: number) => `${count} views`,
+  },
+
+  MODAL_DUPLICATE: {
+    TITLE: 'Duplicar Matéria',
+    DESC: (title: string) => `Deseja criar uma cópia da matéria "${title}"? A cópia será gerada como Rascunho sem alterar a matéria original.`,
+    BUTTON_CONFIRM: 'Sim, duplicar matéria',
+    BUTTON_CANCEL: 'Cancelar',
   },
 
   MODAL_CATEGORY: {

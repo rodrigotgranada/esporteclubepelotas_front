@@ -125,6 +125,36 @@ export const useAdminNewsList = () => {
     }
   };
 
+  // Duplicate modal state
+  const [duplicateModalOpen, setDuplicateModalOpen] = useState(false);
+  const [articleToDuplicate, setArticleToDuplicate] = useState<NewsArticleData | null>(null);
+  const [isDuplicating, setIsDuplicating] = useState(false);
+
+  const openDuplicateModal = (article: NewsArticleData) => {
+    setArticleToDuplicate(article);
+    setDuplicateModalOpen(true);
+  };
+
+  const closeDuplicateModal = () => {
+    setDuplicateModalOpen(false);
+    setArticleToDuplicate(null);
+  };
+
+  const confirmDuplicate = async () => {
+    if (!articleToDuplicate) return;
+    try {
+      setIsDuplicating(true);
+      await adminNewsService.duplicateNews(articleToDuplicate._id || articleToDuplicate.id || '');
+      toast.success(ADMIN_NEWS_TEXTS.DRAWER.SUCCESS_DUPLICATE);
+      closeDuplicateModal();
+      loadNews();
+    } catch {
+      toast.error('Erro ao duplicar matéria.');
+    } finally {
+      setIsDuplicating(false);
+    }
+  };
+
   return {
     news,
     categories,
@@ -157,6 +187,13 @@ export const useAdminNewsList = () => {
     openDeleteModal,
     closeDeleteModal,
     confirmDelete,
+    // Duplicate
+    duplicateModalOpen,
+    articleToDuplicate,
+    isDuplicating,
+    openDuplicateModal,
+    closeDuplicateModal,
+    confirmDuplicate,
   };
 };
 

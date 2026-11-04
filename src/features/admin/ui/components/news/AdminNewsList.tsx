@@ -11,6 +11,7 @@ import {
   ChevronRight,
   Calendar,
   Pin,
+  Copy,
 } from 'lucide-react';
 import {
   Table,
@@ -43,6 +44,12 @@ export interface AdminNewsListProps {
   isDeleting: boolean;
   onCloseDeleteModal: () => void;
   onConfirmDelete: () => void;
+  onDuplicate?: (article: NewsArticleData) => void;
+  duplicateModalOpen?: boolean;
+  articleToDuplicate?: NewsArticleData | null;
+  isDuplicating?: boolean;
+  onCloseDuplicateModal?: () => void;
+  onConfirmDuplicate?: () => void;
 }
 
 export const AdminNewsList: React.FC<AdminNewsListProps> = ({
@@ -58,6 +65,12 @@ export const AdminNewsList: React.FC<AdminNewsListProps> = ({
   isDeleting,
   onCloseDeleteModal,
   onConfirmDelete,
+  onDuplicate,
+  duplicateModalOpen = false,
+  articleToDuplicate = null,
+  isDuplicating = false,
+  onCloseDuplicateModal,
+  onConfirmDuplicate,
 }) => {
   const { TABLE: texts, STATUS_MAP } = ADMIN_NEWS_TEXTS;
 
@@ -215,11 +228,17 @@ export const AdminNewsList: React.FC<AdminNewsListProps> = ({
                       </LayoutContainer>
                     </TableCell>
 
-                    {/* Date */}
+                    {/* Date & Views */}
                     <TableCell>
-                      <Text as="span" className="text-xs text-text-secondary">
-                        {formatDate(item.publishedAt || item.createdAt)}
-                      </Text>
+                      <LayoutContainer className="flex flex-col gap-0.5">
+                        <Text as="span" className="text-xs text-text-secondary">
+                          {formatDate(item.publishedAt || item.createdAt)}
+                        </Text>
+                        <Text as="span" className="text-[10px] text-text-secondary font-mono flex items-center gap-1">
+                          <Eye className="w-3 h-3 text-primary" />
+                          {item.viewsCount || 0} views
+                        </Text>
+                      </LayoutContainer>
                     </TableCell>
 
                     {/* Actions */}
@@ -233,6 +252,16 @@ export const AdminNewsList: React.FC<AdminNewsListProps> = ({
                             title="Ver notícia publicada"
                             onClick={() => window.open(`/noticias/${item.slug}`, '_blank')}
                             icon={<ExternalLink className="w-4 h-4 text-text-secondary hover:text-text-primary" />}
+                          />
+                        )}
+                        {onDuplicate && (
+                          <IconButton
+                            variant="ghost"
+                            size="sm"
+                            aria-label="Duplicar"
+                            title="Duplicar matéria como rascunho"
+                            onClick={() => onDuplicate(item)}
+                            icon={<Copy className="w-4 h-4 text-text-secondary hover:text-primary" />}
                           />
                         )}
                         <IconButton
@@ -302,6 +331,17 @@ export const AdminNewsList: React.FC<AdminNewsListProps> = ({
                   </LayoutContainer>
 
                   <LayoutContainer className="flex items-center gap-1">
+                    {onDuplicate && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onDuplicate(item)}
+                        leftIcon={<Copy className="w-3.5 h-3.5 text-primary" />}
+                        className="text-xs h-8"
+                      >
+                        Duplicar
+                      </Button>
+                    )}
                     <Button
                       variant="ghost"
                       size="sm"
@@ -371,6 +411,21 @@ export const AdminNewsList: React.FC<AdminNewsListProps> = ({
           cancelText={ADMIN_NEWS_TEXTS.MODAL_DELETE.BUTTON_CANCEL}
           isLoading={isDeleting}
           variant="danger"
+        />
+      )}
+
+      {/* Duplicate Confirmation Modal */}
+      {articleToDuplicate && onCloseDuplicateModal && onConfirmDuplicate && (
+        <ConfirmModal
+          isOpen={duplicateModalOpen}
+          onClose={onCloseDuplicateModal}
+          onConfirm={onConfirmDuplicate}
+          title={ADMIN_NEWS_TEXTS.MODAL_DUPLICATE.TITLE}
+          description={ADMIN_NEWS_TEXTS.MODAL_DUPLICATE.DESC(articleToDuplicate.title)}
+          confirmText={ADMIN_NEWS_TEXTS.MODAL_DUPLICATE.BUTTON_CONFIRM}
+          cancelText={ADMIN_NEWS_TEXTS.MODAL_DUPLICATE.BUTTON_CANCEL}
+          isLoading={isDuplicating}
+          variant="info"
         />
       )}
     </LayoutContainer>

@@ -182,3 +182,4 @@ export const ImageLightboxModal: React.FC<ImageLightboxModalProps> = ({
     document.body
   );
 };
+

@@ -45,6 +45,8 @@ export const useAdminNewsDrawer = (
   const [isPinned, setIsPinned] = useState(false);
   const [reporterName, setReporterName] = useState('');
   const [photographerName, setPhotographerName] = useState('');
+  const [allowReactions, setAllowReactions] = useState(true);
+  const [allowComments, setAllowComments] = useState(true);
   const [status, setStatus] = useState<NewsStatusType>('DRAFT');
   const [publishedAt, setPublishedAt] = useState('');
   const [hasRecoverableDraft, setHasRecoverableDraft] = useState(false);
@@ -165,6 +167,8 @@ export const useAdminNewsDrawer = (
     setIsPinned(false);
     setReporterName('');
     setPhotographerName('');
+    setAllowReactions(true);
+    setAllowComments(true);
     setStatus('DRAFT');
     setPublishedAt('');
   };
@@ -198,6 +202,8 @@ export const useAdminNewsDrawer = (
             setIsPinned(Boolean(art.isPinned));
             setReporterName(art.reporterName || '');
             setPhotographerName(art.photographerName || '');
+            setAllowReactions(art.allowReactions ?? true);
+            setAllowComments(art.allowComments ?? true);
             setStatus(art.status || 'DRAFT');
             if (art.publishedAt) {
               // format to datetime-local input YYYY-MM-DDTHH:mm
@@ -356,6 +362,8 @@ export const useAdminNewsDrawer = (
         isPinned,
         reporterName: reporterName.trim() || undefined,
         photographerName: photographerName.trim() || undefined,
+        allowReactions,
+        allowComments,
         status: chosenStatus,
         publishedAt:
           chosenStatus === 'SCHEDULED' && publishedAt
@@ -458,6 +466,10 @@ export const useAdminNewsDrawer = (
     setReporterName,
     photographerName,
     setPhotographerName,
+    allowReactions,
+    setAllowReactions,
+    allowComments,
+    setAllowComments,
     status,
     setStatus,
     publishedAt,

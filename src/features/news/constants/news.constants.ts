@@ -17,5 +17,45 @@ export const PUBLIC_NEWS_TEXTS = {
   GALLERY_CLICK_HINT: 'Clique em qualquer foto para ampliar e navegar pela galeria',
   VIDEO_TITLE: 'Vídeo da Matéria',
   WATCH_ON_YOUTUBE: 'Assistir no YouTube',
+
+  // Compartilhamento Social
+  SHARE_WHATSAPP: 'WhatsApp',
+  SHARE_TWITTER: 'X',
+  SHARE_FACEBOOK: 'Facebook',
+  SHARE_COPY: 'Copiar Link',
+  SHARE_COPIED: 'Link copiado!',
+  SHARE_WHATSAPP_TEXT: (title: string, url: string) => `Confira no portal oficial do Lobo: "${title}" ${url}`,
+
+  // Reações da Torcida
+  REACTIONS_TITLE: 'O que a torcida achou da matéria?',
+  REACTION_WOLF: 'Na Torcida',
+  REACTION_FIRE: 'Baita Notícia',
+  REACTION_CLAP: 'Sensacional',
+  REACTION_HEART: 'Sempre Pelotas',
+
+  // Banner do Quadro Social
+  SOCIO_BANNER_BADGE: 'Quadro Social ECP',
+  SOCIO_BANNER_TITLE: 'O Pelotas somos nós. Seja Sócio do Lobo!',
+  SOCIO_BANNER_SUB: 'Apoie o Áureo-Cerúleo com planos a partir de R$ 30/mês e garanta descontos exclusivos em ingressos e experiências na Boca do Lobo.',
+  SOCIO_BANNER_BTN: 'Conhecer Planos de Sócio',
+
+  // Comentários da Torcida
+  COMMENTS_TITLE: (count: number) => `Comentários da Torcida (${count})`,
+  COMMENTS_EMPTY: 'Nenhum comentário ainda. Seja o primeiro torcedor a comentar!',
+  COMMENTS_LOGIN_TITLE: 'Participe da conversa!',
+  COMMENTS_LOGIN_SUB: 'Para garantir um ambiente seguro e exclusivo aos torcedores, faça login ou cadastre-se para comentar.',
+  COMMENTS_LOGIN_BTN: 'Entrar para Comentar',
+  COMMENTS_REGISTER_BTN: 'Criar Conta Gratuita',
+  COMMENTS_INPUT_PLACEHOLDER: 'Escreva seu comentário sobre a matéria (máx. 1000 caracteres)...',
+  COMMENTS_SUBMIT_BTN: 'Publicar Comentário',
+  COMMENTS_SUBMITTING: 'Publicando...',
+  COMMENTS_DELETE_CONFIRM: 'Deseja excluir seu comentário?',
+  COMMENTS_DELETE_BTN: 'Excluir',
+  COMMENTS_DELETE_SUCCESS: 'Comentário removido.',
+  COMMENTS_POST_SUCCESS: 'Comentário publicado!',
+
+  // Navegação Anterior / Próxima
+  PREV_ARTICLE: '← Matéria Anterior',
+  NEXT_ARTICLE: 'Próxima Matéria →',
 };
 

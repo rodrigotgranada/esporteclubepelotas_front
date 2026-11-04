@@ -38,6 +38,13 @@ export const AdminNewsFeature = () => {
     openDeleteModal,
     closeDeleteModal,
     confirmDelete,
+    // Duplicate
+    duplicateModalOpen,
+    articleToDuplicate,
+    isDuplicating,
+    openDuplicateModal,
+    closeDuplicateModal,
+    confirmDuplicate,
   } = useAdminNewsList();
 
   return (
@@ -80,6 +87,12 @@ export const AdminNewsFeature = () => {
         isDeleting={isDeleting}
         onCloseDeleteModal={closeDeleteModal}
         onConfirmDelete={confirmDelete}
+        onDuplicate={openDuplicateModal}
+        duplicateModalOpen={duplicateModalOpen}
+        articleToDuplicate={articleToDuplicate}
+        isDuplicating={isDuplicating}
+        onCloseDuplicateModal={closeDuplicateModal}
+        onConfirmDuplicate={confirmDuplicate}
       />
 
       {/* Editor Drawer */}

@@ -12,6 +12,7 @@ import {
   Eye,
   Lock,
   Unlock,
+  MessageSquare,
 } from 'lucide-react';
 import {
   Drawer,
@@ -35,6 +36,7 @@ import { NewsEditorGallerySection } from './NewsEditorGallerySection';
 import { NewsArticlePreviewModal } from './NewsArticlePreviewModal';
 import { NewsEditorFeaturedSection } from './NewsEditorFeaturedSection';
 import { NewsEditorCreditsSection } from './NewsEditorCreditsSection';
+import { NewsEditorInteractivitySection } from './NewsEditorInteractivitySection';
 
 export interface NewsEditorDrawerProps {
   isOpen: boolean;
@@ -96,6 +98,10 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
     setReporterName,
     photographerName,
     setPhotographerName,
+    allowReactions,
+    setAllowReactions,
+    allowComments,
+    setAllowComments,
     status,
     setStatus,
     publishedAt,
@@ -441,7 +447,15 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
               setIsPinned={setIsPinned}
             />
 
-            {/* 10. Status & Agendamento */}
+            {/* 10. Interatividade com a Torcida (Reações e Comentários) */}
+            <NewsEditorInteractivitySection
+              allowReactions={allowReactions}
+              setAllowReactions={setAllowReactions}
+              allowComments={allowComments}
+              setAllowComments={setAllowComments}
+            />
+
+            {/* 11. Status & Agendamento */}
             <LayoutContainer className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-xl border border-border bg-surface">
               <LayoutContainer className="flex flex-col gap-1.5">
                 <Text as="span" className="text-xs font-semibold text-text-primary uppercase tracking-wider">

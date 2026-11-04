@@ -30,6 +30,12 @@ import { PUBLIC_NEWS_TEXTS } from '../../constants/news.constants';
 import { useNewsArticle } from '../../hooks/useNewsArticle';
 import { NewsRenderer } from '../components/NewsRenderer';
 import { NewsCard } from '../components/NewsCard';
+import { NewsReadingProgressBar } from '../components/NewsReadingProgressBar';
+import { NewsSocialShareBar } from '../components/NewsSocialShareBar';
+import { NewsReactions } from '../components/NewsReactions';
+import { NewsSocioBanner } from '../components/NewsSocioBanner';
+import { NewsCommentsSection } from '../components/NewsCommentsSection';
+import { NewsPrevNextNav } from '../components/NewsPrevNextNav';
 import { calculateReadingTime, getYoutubeEmbedUrl, getYoutubeWatchUrl } from '../../utils/news.utils';
 
 export interface NewsDetailFeatureProps {
@@ -110,7 +116,9 @@ export const NewsDetailFeature: React.FC<NewsDetailFeatureProps> = ({ slug }) =>
   const youtubeWatchUrl = getYoutubeWatchUrl(article.youtubeVideoUrl);
 
   return (
-    <LayoutContainer className="flex flex-col gap-10 py-8 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto w-full">
+    <>
+      <NewsReadingProgressBar />
+      <LayoutContainer className="flex flex-col gap-10 py-8 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto w-full">
       {/* Back button */}
       <LayoutContainer>
         <Link href="/noticias" className="inline-flex items-center gap-2 text-sm text-text-secondary hover:text-primary font-semibold transition-colors">
@@ -179,19 +187,8 @@ export const NewsDetailFeature: React.FC<NewsDetailFeatureProps> = ({ slug }) =>
             )}
           </LayoutContainer>
 
-          {/* Share Button */}
-          <LayoutContainer className="flex items-center gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handleCopyLink}
-              leftIcon={copied ? <Check className="w-3.5 h-3.5 text-success" /> : <Copy className="w-3.5 h-3.5" />}
-              className="text-xs h-8"
-            >
-              {copied ? 'Copiado!' : 'Compartilhar'}
-            </Button>
-          </LayoutContainer>
+          {/* Social Share Bar */}
+          <NewsSocialShareBar title={article.title} slug={article.slug} />
         </LayoutContainer>
       </LayoutContainer>
 
@@ -316,6 +313,22 @@ export const NewsDetailFeature: React.FC<NewsDetailFeatureProps> = ({ slug }) =>
         </LayoutContainer>
       )}
 
+      {/* Reações da Torcida */}
+      {article.allowReactions !== false && (
+        <NewsReactions slug={article.slug} initialReactions={article.reactions} />
+      )}
+
+      {/* Banner de Conversão para o Quadro Social */}
+      <NewsSocioBanner />
+
+      {/* Seção de Comentários Autenticados da Torcida */}
+      {article.allowComments !== false && (
+        <NewsCommentsSection slug={article.slug} />
+      )}
+
+      {/* Navegação Cronológica Anterior / Próxima */}
+      <NewsPrevNextNav slug={article.slug} />
+
       {/* Related News Section */}
       {relatedNews.length > 0 && (
         <LayoutContainer className="flex flex-col gap-6 pt-10 border-t border-border mt-6">
@@ -333,5 +346,6 @@ export const NewsDetailFeature: React.FC<NewsDetailFeatureProps> = ({ slug }) =>
         </LayoutContainer>
       )}
     </LayoutContainer>
+    </>
   );
 };
