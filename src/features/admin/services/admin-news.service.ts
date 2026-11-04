@@ -18,6 +18,38 @@ export interface NewsAuthorData {
   email?: string;
 }
 
+export interface AdminCommentData {
+  _id: string;
+  id?: string;
+  news: {
+    _id: string;
+    title: string;
+    slug: string;
+  };
+  author: {
+    _id: string;
+    firstName: string;
+    lastName: string;
+    email?: string;
+    avatar?: string;
+    avatarUrl?: string;
+    role: string;
+  };
+  content: string;
+  status: 'ACTIVE' | 'HIDDEN';
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface GetAdminCommentsResponse {
+  data: AdminCommentData[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
 export type NewsStatusType = 'DRAFT' | 'PUBLISHED' | 'SCHEDULED' | 'ARCHIVED';
 
 export interface NewsArticleData {
@@ -147,6 +179,29 @@ export const adminNewsService = {
 
   duplicateNews: async (id: string): Promise<NewsArticleData> => {
     const response = await api.post(`/news/admin/${id}/duplicate`);
+    return response.data;
+  },
+
+  getComments: async (params?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    status?: string;
+  }): Promise<GetAdminCommentsResponse> => {
+    const response = await api.get('/news/admin/comments', { params });
+    return response.data;
+  },
+
+  updateCommentStatus: async (
+    commentId: string,
+    status: 'ACTIVE' | 'HIDDEN',
+  ): Promise<AdminCommentData> => {
+    const response = await api.patch(`/news/admin/comments/${commentId}/status`, { status });
+    return response.data;
+  },
+
+  deleteComment: async (commentId: string): Promise<{ success: boolean; message: string }> => {
+    const response = await api.delete(`/news/admin/comments/${commentId}`);
     return response.data;
   },
 };

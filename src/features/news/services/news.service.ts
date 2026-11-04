@@ -18,6 +18,15 @@ export interface NewsCommentData {
   };
 }
 
+export interface GetNewsCommentsResponse {
+  data: NewsCommentData[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+  hasMore: boolean;
+}
+
 export interface NewsPrevNextData {
   previous: {
     title: string;
@@ -93,8 +102,14 @@ export const newsService = {
     return response.data;
   },
 
-  getComments: async (slug: string): Promise<NewsCommentData[]> => {
-    const response = await api.get(`/news/${slug}/comments`);
+  getComments: async (
+    slug: string,
+    page = 1,
+    limit = 10,
+  ): Promise<GetNewsCommentsResponse> => {
+    const response = await api.get(`/news/${slug}/comments`, {
+      params: { page, limit },
+    });
     return response.data;
   },
 

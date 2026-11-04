@@ -60,6 +60,14 @@ export const PUBLIC_NEWS_TEXTS = {
   COMMENTS_DELETE_BTN: 'Excluir',
   COMMENTS_DELETE_SUCCESS: 'Comentário removido.',
   COMMENTS_POST_SUCCESS: 'Comentário publicado!',
+  COMMENTS_LOAD_MORE: 'Carregar mais comentários',
+  COMMENTS_LOADING_MORE: 'Carregando mais comentários...',
+  COMMENTS_REMAINING: (count: number) => `(${count} restantes)`,
+
+  // Filtro de Tags
+  FILTER_TAG_PREFIX: 'Filtrando pela tag:',
+  CLEAR_TAG_FILTER: 'Limpar filtro de tag',
+  CLICK_TAG_HINT: 'Ver todas as matérias sobre esta tag',
 
   // Navegação Anterior / Próxima
   PREV_ARTICLE: '← Matéria Anterior',

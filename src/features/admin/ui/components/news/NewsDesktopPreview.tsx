@@ -201,3 +201,4 @@ export const NewsDesktopPreview: React.FC<NewsDesktopPreviewProps> = ({
     </LayoutContainer>
   );
 };
+

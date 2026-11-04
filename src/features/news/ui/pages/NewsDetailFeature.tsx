@@ -304,11 +304,25 @@ export const NewsDetailFeature: React.FC<NewsDetailFeatureProps> = ({ slug }) =>
             {PUBLIC_NEWS_TEXTS.TAGS_TITLE}
           </Text>
           <LayoutContainer className="flex flex-wrap items-center gap-2">
-            {article.tags.map((tag) => (
-              <Badge key={tag} variant="default" size="sm" className="font-semibold px-3 py-1">
-                #{tag}
-              </Badge>
-            ))}
+            {article.tags.map((tag) => {
+              const cleanTag = tag.trim().replace(/^#/, '');
+              return (
+                <Link
+                  key={tag}
+                  href={`/noticias?tag=${encodeURIComponent(cleanTag)}`}
+                  title={PUBLIC_NEWS_TEXTS.CLICK_TAG_HINT}
+                  className="inline-block transition-transform hover:-translate-y-0.5"
+                >
+                  <Badge
+                    variant="default"
+                    size="sm"
+                    className="font-semibold px-3 py-1 cursor-pointer hover:border-primary hover:text-primary transition-colors"
+                  >
+                    #{cleanTag}
+                  </Badge>
+                </Link>
+              );
+            })}
           </LayoutContainer>
         </LayoutContainer>
       )}

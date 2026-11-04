@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { newsService } from '../services/news.service';
 import {
   NewsArticleData,
@@ -8,15 +9,26 @@ import {
 } from '@/features/admin/services/admin-news.service';
 
 export const useNewsFeed = () => {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const initialTag = searchParams?.get('tag') || '';
+
   const [news, setNews] = useState<NewsArticleData[]>([]);
   const [featuredArticles, setFeaturedArticles] = useState<NewsArticleData[]>([]);
   const [categories, setCategories] = useState<NewsCategoryData[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [selectedTag, setSelectedTag] = useState<string>(initialTag);
   const [search, setSearch] = useState<string>('');
   const [page, setPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  // Sync state if URL search query changes externally
+  useEffect(() => {
+    const urlTag = searchParams?.get('tag') || '';
+    setSelectedTag(urlTag);
+  }, [searchParams]);
 
   const loadCategories = useCallback(async () => {
     try {
@@ -39,10 +51,12 @@ export const useNewsFeed = () => {
   const loadNews = useCallback(async () => {
     try {
       setIsLoading(true);
+      const cleanTag = selectedTag.trim().replace(/^#/, '');
       const res = await newsService.getNews({
         page,
         limit: 9,
         category: selectedCategory || undefined,
+        tag: cleanTag || undefined,
         search: search.trim() || undefined,
       });
 
@@ -54,7 +68,7 @@ export const useNewsFeed = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [page, selectedCategory, search]);
+  }, [page, selectedCategory, selectedTag, search]);
 
   useEffect(() => {
     loadCategories();
@@ -70,6 +84,21 @@ export const useNewsFeed = () => {
     setPage(1);
   };
 
+  const handleTagSelect = (tag: string) => {
+    const cleanTag = tag.trim().replace(/^#/, '');
+    setSelectedTag(cleanTag);
+    setPage(1);
+    if (cleanTag) {
+      router.push(`/noticias?tag=${encodeURIComponent(cleanTag)}`);
+    } else {
+      router.push('/noticias');
+    }
+  };
+
+  const clearTag = () => {
+    handleTagSelect('');
+  };
+
   const handleSearchChange = (query: string) => {
     setSearch(query);
     setPage(1);
@@ -81,6 +110,9 @@ export const useNewsFeed = () => {
     categories,
     selectedCategory,
     setSelectedCategory: handleCategorySelect,
+    selectedTag,
+    setSelectedTag: handleTagSelect,
+    clearTag,
     search,
     setSearch: handleSearchChange,
     page,

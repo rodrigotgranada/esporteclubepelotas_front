@@ -24,13 +24,17 @@ export const NewsCommentsSection: React.FC<NewsCommentsSectionProps> = ({ slug }
     user,
     isUserActive,
     comments,
+    total,
+    hasMore,
     isLoading,
+    isLoadingMore,
     newComment,
     setNewComment,
     isSubmitting,
     deletingId,
     handleSubmit,
     handleDelete,
+    handleLoadMore,
   } = useNewsComments(slug);
 
   const formatDate = (dateStr?: string) => {
@@ -60,7 +64,7 @@ export const NewsCommentsSection: React.FC<NewsCommentsSectionProps> = ({ slug }
       <LayoutContainer className="flex items-center justify-between">
         <Title level="h3" className="text-xl sm:text-2xl font-black text-text-primary flex items-center gap-2.5">
           <MessageSquare className="w-5 h-5 text-primary" />
-          {PUBLIC_NEWS_TEXTS.COMMENTS_TITLE(comments.length)}
+          {PUBLIC_NEWS_TEXTS.COMMENTS_TITLE(total)}
         </Title>
       </LayoutContainer>
 
@@ -257,6 +261,32 @@ export const NewsCommentsSection: React.FC<NewsCommentsSectionProps> = ({ slug }
               </LayoutContainer>
             );
           })}
+
+          {/* Botão de Paginação: Carregar Mais Comentários */}
+          {hasMore && (
+            <LayoutContainer className="flex items-center justify-center pt-3 pb-1">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleLoadMore}
+                isLoading={isLoadingMore}
+                disabled={isLoadingMore}
+                className="text-xs font-bold px-6 py-2 border-border hover:border-primary shadow-xs"
+              >
+                {isLoadingMore ? (
+                  PUBLIC_NEWS_TEXTS.COMMENTS_LOADING_MORE
+                ) : (
+                  <LayoutContainer className="flex items-center gap-1.5">
+                    <span>{PUBLIC_NEWS_TEXTS.COMMENTS_LOAD_MORE}</span>
+                    <span className="text-text-secondary text-[11px] font-mono">
+                      {PUBLIC_NEWS_TEXTS.COMMENTS_REMAINING(Math.max(0, total - comments.length))}
+                    </span>
+                  </LayoutContainer>
+                )}
+              </Button>
+            </LayoutContainer>
+          )}
         </LayoutContainer>
       )}
     </LayoutContainer>

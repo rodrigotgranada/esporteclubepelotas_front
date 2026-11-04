@@ -9,7 +9,11 @@ import { useAuthStore } from '@/store/useAuthStore';
 export const useNewsComments = (slug: string) => {
   const { user } = useAuthStore();
   const [comments, setComments] = useState<NewsCommentData[]>([]);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [newComment, setNewComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -18,11 +22,17 @@ export const useNewsComments = (slug: string) => {
 
   useEffect(() => {
     let isMounted = true;
+    setIsLoading(true);
+    setPage(1);
+
     newsService
-      .getComments(slug)
-      .then((data) => {
+      .getComments(slug, 1, 10)
+      .then((res) => {
         if (isMounted) {
-          setComments(Array.isArray(data) ? data : []);
+          const list = Array.isArray(res?.data) ? res.data : [];
+          setComments(list);
+          setTotal(res?.total ?? list.length);
+          setHasMore(Boolean(res?.hasMore));
           setIsLoading(false);
         }
       })
@@ -34,6 +44,26 @@ export const useNewsComments = (slug: string) => {
       isMounted = false;
     };
   }, [slug]);
+
+  const handleLoadMore = async () => {
+    if (isLoadingMore || !hasMore) return;
+
+    try {
+      setIsLoadingMore(true);
+      const nextPage = page + 1;
+      const res = await newsService.getComments(slug, nextPage, 10);
+      const nextList = Array.isArray(res?.data) ? res.data : [];
+
+      setComments((prev) => [...prev, ...nextList]);
+      setPage(nextPage);
+      setTotal(res?.total ?? (comments.length + nextList.length));
+      setHasMore(Boolean(res?.hasMore));
+    } catch {
+      toast.error('Erro ao carregar mais comentários.');
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,6 +84,7 @@ export const useNewsComments = (slug: string) => {
       setIsSubmitting(true);
       const created = await newsService.addComment(slug, trimmed);
       setComments((prev) => [created, ...prev]);
+      setTotal((prev) => prev + 1);
       setNewComment('');
       toast.success(PUBLIC_NEWS_TEXTS.COMMENTS_POST_SUCCESS);
     } catch (err: any) {
@@ -71,6 +102,7 @@ export const useNewsComments = (slug: string) => {
       setDeletingId(commentId);
       await newsService.deleteComment(commentId);
       setComments((prev) => prev.filter((c) => (c._id || c.id) !== commentId));
+      setTotal((prev) => Math.max(0, prev - 1));
       toast.success(PUBLIC_NEWS_TEXTS.COMMENTS_DELETE_SUCCESS);
     } catch {
       toast.error('Erro ao excluir comentário.');
@@ -83,12 +115,16 @@ export const useNewsComments = (slug: string) => {
     user,
     isUserActive,
     comments,
+    total,
+    hasMore,
     isLoading,
+    isLoadingMore,
     newComment,
     setNewComment,
     isSubmitting,
     deletingId,
     handleSubmit,
     handleDelete,
+    handleLoadMore,
   };
 };

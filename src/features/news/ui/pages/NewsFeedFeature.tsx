@@ -22,6 +22,8 @@ export const NewsFeedFeature: React.FC = () => {
     categories,
     selectedCategory,
     setSelectedCategory,
+    selectedTag,
+    clearTag,
     search,
     setSearch,
     page,
@@ -30,7 +32,7 @@ export const NewsFeedFeature: React.FC = () => {
     isLoading,
   } = useNewsFeed();
 
-  const showBentoHero = !selectedCategory && !search && featuredArticles.length > 0;
+  const showBentoHero = !selectedCategory && !selectedTag && !search && featuredArticles.length > 0;
 
   return (
     <LayoutContainer className="flex flex-col gap-8 py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
@@ -44,7 +46,7 @@ export const NewsFeedFeature: React.FC = () => {
         </Text>
       </LayoutContainer>
 
-      {/* Featured Bento Hero Grid quando sem pesquisa */}
+      {/* Featured Bento Hero Grid quando sem filtro */}
       {showBentoHero && (
         <NewsBentoHero articles={featuredArticles} />
       )}
@@ -54,6 +56,8 @@ export const NewsFeedFeature: React.FC = () => {
         categories={categories}
         selectedCategory={selectedCategory}
         onSelectCategory={setSelectedCategory}
+        selectedTag={selectedTag}
+        onClearTag={clearTag}
         search={search}
         onSearchChange={setSearch}
       />

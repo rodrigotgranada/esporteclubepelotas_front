@@ -1,14 +1,18 @@
 'use client';
 
-import React from 'react';
-import { LayoutContainer, Title, Text } from '@/shared/ui/components';
+import React, { useState } from 'react';
+import { Newspaper, MessageSquare } from 'lucide-react';
+import { LayoutContainer, Title, Text, Button } from '@/shared/ui/components';
 import { ADMIN_NEWS_TEXTS } from '../../../constants/admin-news.constants';
 import { useAdminNewsList } from '../../../hooks/news/useAdminNewsList';
 import { AdminNewsFilterBar } from '../../components/news/AdminNewsFilterBar';
 import { AdminNewsList } from '../../components/news/AdminNewsList';
+import { AdminCommentsModerationTab } from '../../components/news/AdminCommentsModerationTab';
 import { NewsEditorDrawer } from '../../components/news/NewsEditorDrawer';
 
 export const AdminNewsFeature = () => {
+  const [activeTab, setActiveTab] = useState<'articles' | 'comments'>('articles');
+
   const {
     news,
     categories,
@@ -59,41 +63,71 @@ export const AdminNewsFeature = () => {
         </Text>
       </LayoutContainer>
 
-      {/* Filter and Actions Bar */}
-      <AdminNewsFilterBar
-        search={search}
-        onSearchChange={setSearch}
-        statusFilter={statusFilter}
-        onStatusFilterChange={setStatusFilter}
-        categoryFilter={categoryFilter}
-        onCategoryFilterChange={setCategoryFilter}
-        featuredFilter={featuredFilter}
-        onFeaturedFilterChange={setFeaturedFilter}
-        categories={categories}
-        onNewArticle={openCreateDrawer}
-      />
+      {/* Navigation Tabs */}
+      <LayoutContainer className="flex items-center gap-2 border-b border-border pb-1">
+        <Button
+          type="button"
+          variant={activeTab === 'articles' ? 'primary' : 'ghost'}
+          size="sm"
+          onClick={() => setActiveTab('articles')}
+          leftIcon={<Newspaper className="w-4 h-4" />}
+          className="rounded-lg font-bold text-xs"
+        >
+          {ADMIN_NEWS_TEXTS.COMMENTS_MODERATION.TAB_ARTICLES}
+        </Button>
+        <Button
+          type="button"
+          variant={activeTab === 'comments' ? 'primary' : 'ghost'}
+          size="sm"
+          onClick={() => setActiveTab('comments')}
+          leftIcon={<MessageSquare className="w-4 h-4" />}
+          className="rounded-lg font-bold text-xs"
+        >
+          {ADMIN_NEWS_TEXTS.COMMENTS_MODERATION.TAB_COMMENTS}
+        </Button>
+      </LayoutContainer>
 
-      {/* Articles List / Table */}
-      <AdminNewsList
-        news={news}
-        isLoading={isLoading}
-        page={page}
-        totalPages={totalPages}
-        onPageChange={setPage}
-        onEdit={openEditDrawer}
-        onDelete={openDeleteModal}
-        deleteModalOpen={deleteModalOpen}
-        articleToDelete={articleToDelete}
-        isDeleting={isDeleting}
-        onCloseDeleteModal={closeDeleteModal}
-        onConfirmDelete={confirmDelete}
-        onDuplicate={openDuplicateModal}
-        duplicateModalOpen={duplicateModalOpen}
-        articleToDuplicate={articleToDuplicate}
-        isDuplicating={isDuplicating}
-        onCloseDuplicateModal={closeDuplicateModal}
-        onConfirmDuplicate={confirmDuplicate}
-      />
+      {/* Tab 1: Articles & Publications */}
+      {activeTab === 'articles' && (
+        <>
+          <AdminNewsFilterBar
+            search={search}
+            onSearchChange={setSearch}
+            statusFilter={statusFilter}
+            onStatusFilterChange={setStatusFilter}
+            categoryFilter={categoryFilter}
+            onCategoryFilterChange={setCategoryFilter}
+            featuredFilter={featuredFilter}
+            onFeaturedFilterChange={setFeaturedFilter}
+            categories={categories}
+            onNewArticle={openCreateDrawer}
+          />
+
+          <AdminNewsList
+            news={news}
+            isLoading={isLoading}
+            page={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+            onEdit={openEditDrawer}
+            onDelete={openDeleteModal}
+            deleteModalOpen={deleteModalOpen}
+            articleToDelete={articleToDelete}
+            isDeleting={isDeleting}
+            onCloseDeleteModal={closeDeleteModal}
+            onConfirmDelete={confirmDelete}
+            onDuplicate={openDuplicateModal}
+            duplicateModalOpen={duplicateModalOpen}
+            articleToDuplicate={articleToDuplicate}
+            isDuplicating={isDuplicating}
+            onCloseDuplicateModal={closeDuplicateModal}
+            onConfirmDuplicate={confirmDuplicate}
+          />
+        </>
+      )}
+
+      {/* Tab 2: Comments Moderation */}
+      {activeTab === 'comments' && <AdminCommentsModerationTab />}
 
       {/* Editor Drawer */}
       <NewsEditorDrawer

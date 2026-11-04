@@ -77,3 +77,4 @@ export const NewsEditorTagsSection: React.FC<NewsEditorTagsSectionProps> = ({
     </LayoutContainer>
   );
 };
+

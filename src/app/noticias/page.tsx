@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { Suspense } from 'react';
 import { NewsFeedFeature } from '@/features/news/ui/pages/NewsFeedFeature';
 
 export const metadata: Metadata = {
@@ -7,6 +8,10 @@ export const metadata: Metadata = {
 };
 
 export default function NoticiasPage() {
-  return <NewsFeedFeature />;
+  return (
+    <Suspense fallback={null}>
+      <NewsFeedFeature />
+    </Suspense>
+  );
 }
 
