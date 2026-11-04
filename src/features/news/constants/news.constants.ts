@@ -32,6 +32,9 @@ export const PUBLIC_NEWS_TEXTS = {
   REACTION_FIRE: 'Baita Notícia',
   REACTION_CLAP: 'Sensacional',
   REACTION_HEART: 'Sempre Pelotas',
+  REACTION_LOGIN_REQUIRED: 'Faça login para reagir a esta matéria!',
+  REACTION_INACTIVE_ACCOUNT: 'Sua conta precisa estar ativa e com o e-mail confirmado para reagir.',
+  REACTION_TOGGLED_OFF: 'Reação desmarcada.',
 
   // Banner do Quadro Social
   SOCIO_BANNER_BADGE: 'Quadro Social ECP',
@@ -46,6 +49,10 @@ export const PUBLIC_NEWS_TEXTS = {
   COMMENTS_LOGIN_SUB: 'Para garantir um ambiente seguro e exclusivo aos torcedores, faça login ou cadastre-se para comentar.',
   COMMENTS_LOGIN_BTN: 'Entrar para Comentar',
   COMMENTS_REGISTER_BTN: 'Criar Conta Gratuita',
+  COMMENTS_INACTIVE_TITLE: 'Confirmação de Conta Necessária',
+  COMMENTS_INACTIVE_SUB: 'Sua conta está com verificação pendente. Confirme seu e-mail para participar dos comentários da torcida.',
+  COMMENTS_VERIFY_BTN: 'Confirmar E-mail',
+  COMMENTS_INACTIVE_ALERT: 'Sua conta precisa estar ativa para enviar comentários.',
   COMMENTS_INPUT_PLACEHOLDER: 'Escreva seu comentário sobre a matéria (máx. 1000 caracteres)...',
   COMMENTS_SUBMIT_BTN: 'Publicar Comentário',
   COMMENTS_SUBMITTING: 'Publicando...',
@@ -58,4 +65,3 @@ export const PUBLIC_NEWS_TEXTS = {
   PREV_ARTICLE: '← Matéria Anterior',
   NEXT_ARTICLE: 'Próxima Matéria →',
 };
-

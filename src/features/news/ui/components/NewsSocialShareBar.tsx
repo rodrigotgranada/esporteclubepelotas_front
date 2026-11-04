@@ -126,3 +126,4 @@ export const NewsSocialShareBar: React.FC<NewsSocialShareBarProps> = ({ title, s
     </LayoutContainer>
   );
 };
+

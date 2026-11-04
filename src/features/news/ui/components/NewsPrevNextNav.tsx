@@ -91,3 +91,4 @@ export const NewsPrevNextNav: React.FC<NewsPrevNextNavProps> = ({ slug }) => {
     </LayoutContainer>
   );
 };
+

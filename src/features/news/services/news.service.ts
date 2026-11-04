@@ -33,6 +33,18 @@ export interface NewsPrevNextData {
   } | null;
 }
 
+export type ReactionType = 'wolf' | 'fire' | 'clap' | 'heart';
+
+export interface ReactNewsResponse {
+  reactions: {
+    wolf: number;
+    fire: number;
+    clap: number;
+    heart: number;
+  };
+  userReaction: ReactionType | null;
+}
+
 export const newsService = {
   getNews: async (params?: {
     page?: number;
@@ -68,10 +80,15 @@ export const newsService = {
     return response.data;
   },
 
+  getMyReaction: async (slug: string): Promise<{ userReaction: ReactionType | null }> => {
+    const response = await api.get(`/news/${slug}/my-reaction`);
+    return response.data;
+  },
+
   reactToNews: async (
     slug: string,
-    type: 'wolf' | 'fire' | 'clap' | 'heart',
-  ): Promise<{ reactions: { wolf: number; fire: number; clap: number; heart: number } }> => {
+    type: ReactionType,
+  ): Promise<ReactNewsResponse> => {
     const response = await api.post(`/news/${slug}/reactions`, { type });
     return response.data;
   },
@@ -91,4 +108,3 @@ export const newsService = {
     return response.data;
   },
 };
-

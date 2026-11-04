@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { MessageSquare, Send, Trash2, LogIn, UserPlus } from 'lucide-react';
+import { MessageSquare, Send, Trash2, LogIn, UserPlus, MailCheck } from 'lucide-react';
 import toast from 'react-hot-toast';
 import {
   LayoutContainer,
@@ -29,6 +29,8 @@ export const NewsCommentsSection: React.FC<NewsCommentsSectionProps> = ({ slug }
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
+  const isUserActive = Boolean(user && user.status === 'ACTIVE' && user.isActive !== false);
+
   useEffect(() => {
     let isMounted = true;
     newsService
@@ -50,6 +52,16 @@ export const NewsCommentsSection: React.FC<NewsCommentsSectionProps> = ({ slug }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) {
+      toast.error(PUBLIC_NEWS_TEXTS.COMMENTS_LOGIN_TITLE);
+      return;
+    }
+
+    if (!isUserActive) {
+      toast.error(PUBLIC_NEWS_TEXTS.COMMENTS_INACTIVE_ALERT);
+      return;
+    }
+
     const trimmed = newComment.trim();
     if (!trimmed) return;
 
@@ -113,8 +125,8 @@ export const NewsCommentsSection: React.FC<NewsCommentsSectionProps> = ({ slug }
         </Title>
       </LayoutContainer>
 
-      {/* Formulário para Usuário Autenticado */}
-      {user ? (
+      {/* Cenário 1: Usuário Autenticado e com Conta Ativa */}
+      {user && isUserActive ? (
         <form onSubmit={handleSubmit} className="flex flex-col gap-3 p-4 sm:p-5 rounded-2xl bg-surface border border-border shadow-xs">
           <LayoutContainer className="flex items-center gap-2.5">
             {user.avatarUrl ? (
@@ -165,8 +177,35 @@ export const NewsCommentsSection: React.FC<NewsCommentsSectionProps> = ({ slug }
             </Button>
           </LayoutContainer>
         </form>
+      ) : user && !isUserActive ? (
+        /* Cenário 2: Usuário Autenticado mas com Conta Inativa ou Pendente */
+        <LayoutContainer className="p-6 rounded-2xl bg-surface border border-warning/30 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+          <LayoutContainer className="flex items-center gap-3">
+            <LayoutContainer className="w-10 h-10 rounded-xl bg-warning/10 text-warning flex items-center justify-center shrink-0">
+              <MailCheck className="w-5 h-5" />
+            </LayoutContainer>
+            <LayoutContainer className="flex flex-col gap-1">
+              <Text className="text-sm font-bold text-text-primary">
+                {PUBLIC_NEWS_TEXTS.COMMENTS_INACTIVE_TITLE}
+              </Text>
+              <Text className="text-xs text-text-secondary max-w-md">
+                {PUBLIC_NEWS_TEXTS.COMMENTS_INACTIVE_SUB}
+              </Text>
+            </LayoutContainer>
+          </LayoutContainer>
+          <Link href="/verify-email">
+            <Button
+              variant="primary"
+              size="sm"
+              leftIcon={<MailCheck className="w-3.5 h-3.5" />}
+              className="text-xs font-bold shrink-0"
+            >
+              {PUBLIC_NEWS_TEXTS.COMMENTS_VERIFY_BTN}
+            </Button>
+          </Link>
+        </LayoutContainer>
       ) : (
-        /* Box Convidativo para Torcedores Não-Logados */
+        /* Cenário 3: Usuário Deslogado */
         <LayoutContainer className="p-6 rounded-2xl bg-surface border border-border shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
           <LayoutContainer className="flex flex-col gap-1">
             <Text className="text-sm font-bold text-text-primary">

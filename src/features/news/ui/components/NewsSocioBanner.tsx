@@ -47,3 +47,4 @@ export const NewsSocioBanner: React.FC = () => {
     </LayoutContainer>
   );
 };
+

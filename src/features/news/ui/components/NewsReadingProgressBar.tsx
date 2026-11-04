@@ -31,3 +31,4 @@ export const NewsReadingProgressBar: React.FC = () => {
     </LayoutContainer>
   );
 };
+
