@@ -123,6 +123,11 @@ export interface GetAdminNewsResponse {
   totalPages: number;
 }
 
+export interface ScheduledNewsResponse {
+  data: NewsArticleData[];
+  total: number;
+}
+
 export const adminNewsService = {
   getNews: async (params?: {
     page?: number;
@@ -237,6 +242,16 @@ export const adminNewsService = {
 
   getCurrentMain: async (): Promise<CurrentMainResponse | null> => {
     const response = await api.get('/news/admin/current-main');
+    return response.data;
+  },
+
+  getScheduledNews: async (): Promise<ScheduledNewsResponse> => {
+    const response = await api.get('/news/admin/scheduled');
+    return response.data;
+  },
+
+  publishNow: async (id: string): Promise<{ data: NewsArticleData; message: string }> => {
+    const response = await api.post(`/news/admin/${id}/publish-now`);
     return response.data;
   },
 };

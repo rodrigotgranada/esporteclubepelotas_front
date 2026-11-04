@@ -298,5 +298,31 @@ export const ADMIN_NEWS_TEXTS = {
     BUTTON_CONFIRM: 'Confirmar Substituição',
     BUTTON_CANCEL: 'Cancelar',
   },
+
+  SCHEDULED: {
+    TAB_TITLE: 'Matérias Agendadas',
+    TAB_BADGE: (count: number) => `Agendadas (${count})`,
+    PAGE_TITLE: 'Fila de Publicações Programadas',
+    PAGE_SUBTITLE: 'Acompanhe as matérias com agendamento ativo que entrarão no ar automaticamente na data e horário configurados.',
+    BTN_NEW_SCHEDULED: '+ Agendar Nova Matéria',
+    LOADING: 'Carregando matérias agendadas...',
+    EMPTY_TITLE: 'Nenhuma matéria agendada na fila',
+    EMPTY_DESC: 'Todas as notícias cadastradas com status Agendado e data futura aparecerão aqui em ordem cronológica de publicação.',
+    QUEUE_COUNT: (count: number) => `${count} matéria(s) agendada(s)`,
+    LABEL_SCHEDULED_FOR: 'Entrada programada:',
+    LABEL_TIME_REMAINING: 'Previsão:',
+    BTN_PUBLISH_NOW: 'Publicar Agora',
+    BTN_PUBLISH_NOW_TOOLTIP: 'Publicar esta matéria agora mesmo no portal sem esperar o horário agendado',
+    BTN_EDIT: 'Editar / Reagendar',
+    BTN_DELETE: 'Excluir Matéria',
+    MODAL_PUBLISH_NOW: {
+      TITLE: 'Publicar Matéria Imediatamente?',
+      DESC: (title: string) => `Deseja publicar a matéria "${title}" agora mesmo? Ela entrará no ar no portal público imediatamente com a data atual.`,
+      BUTTON_CONFIRM: 'Sim, publicar agora',
+      BUTTON_CANCEL: 'Cancelar',
+    },
+    TOAST_PUBLISH_SUCCESS: 'Matéria publicada com sucesso no portal!',
+    TOAST_PUBLISH_ERROR: 'Erro ao publicar matéria agendada.',
+  },
 };
 
