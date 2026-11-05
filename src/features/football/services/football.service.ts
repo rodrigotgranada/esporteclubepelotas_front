@@ -94,6 +94,7 @@ export interface SquadData {
 export interface SeasonsFilterResponse {
   years: number[];
   categories: string[];
+  categoriesByYear?: Record<number, SquadCategory[]>;
   isModuleActive: boolean;
 }
 
@@ -140,4 +141,3 @@ export const footballService = {
     return response.data;
   },
 };
-

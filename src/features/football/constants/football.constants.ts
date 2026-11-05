@@ -7,6 +7,8 @@ export const FOOTBALL_CONSTANTS = {
   STAFF_LABEL: 'Comissão Técnica & Apoio',
   CAPTAIN_BADGE: 'Capitão',
   CURRENT_BADGE: 'Elenco Ativo',
+  ATHLETES_COUNT_LABEL: 'Atletas no Elenco',
+  LOADING_TEXT: 'Carregando elenco do Lobo...',
 
   SECTORS: {
     GOALKEEPER: 'Goleiros',
@@ -17,17 +19,32 @@ export const FOOTBALL_CONSTANTS = {
   },
 
   CATEGORIES: {
-    PROFESSIONAL: 'Profissional Masculino',
-    FEMININE: 'Futebol Feminino',
-    SUB_20: 'Sub-20 (Juniores)',
-    SUB_17: 'Sub-17 (Juvenil)',
-    SUB_15: 'Sub-15 (Infantil)',
+    PROFESSIONAL: 'Profissional',
+    PROFESSIONAL_FULL: 'Profissional Masculino',
+    FEMININE: 'Feminino',
+    FEMININE_FULL: 'Futebol Feminino',
+    SUB_20: 'Sub-20',
+    SUB_20_FULL: 'Sub-20 (Juniores)',
+    SUB_17: 'Sub-17',
+    SUB_17_FULL: 'Sub-17 (Juvenil)',
+    SUB_15: 'Sub-15',
+    SUB_15_FULL: 'Sub-15 (Infantil)',
+  },
+
+  YOUTH_DROPDOWN: {
+    DEFAULT_LABEL: 'Categorias de Base',
+    PREFIX_LABEL: 'Base:',
+    NO_CATEGORIES: 'Nenhuma categoria de base',
+    ARIA_BUTTON: 'Abrir seletor de categorias de base',
   },
 
   SELECTION: {
     SELECT_SEASON: 'Temporada',
+    SEASON_PREFIX: 'Temporada',
     ALL_SEASONS: 'Todas as temporadas',
     SELECT_CATEGORY: 'Categoria',
+    SEARCH_PLACEHOLDER: 'Buscar atleta no time...',
+    ARIA_SEASON_BUTTON: 'Abrir seletor de temporadas',
   },
 
   CARD: {
@@ -81,4 +98,3 @@ export const FOOTBALL_CONSTANTS = {
     BTN_HOME: 'Voltar à Página Inicial',
   },
 };
-

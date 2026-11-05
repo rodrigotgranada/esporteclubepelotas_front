@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { AlertCircle, ArrowLeft, ShieldAlert, Users } from 'lucide-react';
+import { AlertCircle, ArrowLeft, Users } from 'lucide-react';
 import {
   LayoutContainer,
   Title,
@@ -23,6 +23,7 @@ export const SquadFeature: React.FC = () => {
     selectedYear,
     handleSelectYear,
     availableYears,
+    availableCategories,
     squad,
     sectors,
     isLoading,
@@ -58,13 +59,14 @@ export const SquadFeature: React.FC = () => {
       {/* Hero do Elenco */}
       <SquadHero squad={squad} selectedCategory={selectedCategory} />
 
-      {/* Barra de Filtros (Categorias, Temporadas, Busca) */}
+      {/* Barra de Filtros (Categorias Dinâmicas, Temporadas, Busca) */}
       <SquadFilterBar
         selectedCategory={selectedCategory}
         onSelectCategory={handleSelectCategory}
         selectedYear={selectedYear}
         onSelectYear={handleSelectYear}
         availableYears={availableYears}
+        availableCategories={availableCategories}
         search={search}
         onSearchChange={setSearch}
       />
@@ -74,7 +76,7 @@ export const SquadFeature: React.FC = () => {
         <LayoutContainer className="flex flex-col items-center justify-center py-24 gap-3">
           <Spinner size={32} />
           <Text as="p" className="text-sm font-semibold text-text-muted">
-            Carregando elenco do Lobo...
+            {FOOTBALL_CONSTANTS.LOADING_TEXT}
           </Text>
         </LayoutContainer>
       ) : !squad ? (
@@ -129,4 +131,3 @@ export const SquadFeature: React.FC = () => {
     </LayoutContainer>
   );
 };
-

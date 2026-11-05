@@ -12,12 +12,13 @@ export const useSquad = (initialCategory: SquadCategory = 'PROFESSIONAL') => {
   const [selectedCategory, setSelectedCategory] = useState<SquadCategory>(initialCategory);
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [availableYears, setAvailableYears] = useState<number[]>([]);
+  const [categoriesByYear, setCategoriesByYear] = useState<Record<number, SquadCategory[]>>({});
   const [squad, setSquad] = useState<SquadData | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isModuleActive, setIsModuleActive] = useState<boolean>(true);
   const [search, setSearch] = useState<string>('');
 
-  // 1. Carrega as temporadas e anos disponíveis
+  // 1. Carrega as temporadas e mapeamento de categorias disponíveis por ano
   useEffect(() => {
     let isMounted = true;
 
@@ -27,10 +28,31 @@ export const useSquad = (initialCategory: SquadCategory = 'PROFESSIONAL') => {
         if (!isMounted) return;
 
         setIsModuleActive(res.isModuleActive !== false);
-        setAvailableYears(res.years || []);
+        const years = res.years || [];
+        setAvailableYears(years);
 
-        if (res.years && res.years.length > 0 && selectedYear === null) {
-          setSelectedYear(res.years[0]);
+        let byYearMap: Record<number, SquadCategory[]> = {};
+        if (res.categoriesByYear && Object.keys(res.categoriesByYear).length > 0) {
+          byYearMap = res.categoriesByYear;
+        } else if (res.categories && res.categories.length > 0) {
+          // Fallback caso categoriesByYear não venha populado
+          const allCats = res.categories as SquadCategory[];
+          years.forEach((y) => {
+            byYearMap[y] = allCats;
+          });
+        }
+        setCategoriesByYear(byYearMap);
+
+        if (years.length > 0 && selectedYear === null) {
+          const firstYear = years[0];
+          setSelectedYear(firstYear);
+
+          const catsInYear = byYearMap[firstYear] || [];
+          if (catsInYear.length > 0 && !catsInYear.includes(selectedCategory)) {
+            setSelectedCategory(
+              catsInYear.includes('PROFESSIONAL') ? 'PROFESSIONAL' : catsInYear[0],
+            );
+          }
         }
       } catch (err) {
         console.error('Erro ao carregar temporadas:', err);
@@ -42,9 +64,40 @@ export const useSquad = (initialCategory: SquadCategory = 'PROFESSIONAL') => {
     return () => {
       isMounted = false;
     };
-  }, [selectedYear]);
+  }, [selectedCategory, selectedYear]);
 
-  // 2. Carrega o elenco da temporada/categoria selecionada
+  // 2. Categorias disponíveis para o ano atualmente selecionado
+  const availableCategories = useMemo<SquadCategory[]>(() => {
+    if (!selectedYear || !categoriesByYear[selectedYear]) {
+      return ['PROFESSIONAL'];
+    }
+    return categoriesByYear[selectedYear];
+  }, [selectedYear, categoriesByYear]);
+
+  // 3. Troca de ano com validação da categoria ativa
+  const handleSelectYear = useCallback(
+    (newYear: number) => {
+      setSelectedYear(newYear);
+
+      const catsInNewYear = categoriesByYear[newYear] || [];
+      if (catsInNewYear.length > 0 && !catsInNewYear.includes(selectedCategory)) {
+        // Se a categoria selecionada não existir no novo ano, seleciona a primeira disponível (prioriza PROFISSIONAL)
+        if (catsInNewYear.includes('PROFESSIONAL')) {
+          setSelectedCategory('PROFESSIONAL');
+        } else {
+          setSelectedCategory(catsInNewYear[0]);
+        }
+      }
+    },
+    [categoriesByYear, selectedCategory],
+  );
+
+  // 4. Troca de categoria
+  const handleSelectCategory = useCallback((cat: SquadCategory) => {
+    setSelectedCategory(cat);
+  }, []);
+
+  // 5. Carrega o elenco da temporada/categoria selecionada
   const loadSquad = useCallback(async () => {
     try {
       setIsLoading(true);
@@ -75,7 +128,7 @@ export const useSquad = (initialCategory: SquadCategory = 'PROFESSIONAL') => {
     loadSquad();
   }, [loadSquad]);
 
-  // 3. Filtro de busca de atletas dentro do elenco
+  // 6. Filtro de busca de atletas dentro do elenco
   const filteredMembers = useMemo(() => {
     if (!squad?.members) return [];
     if (!search.trim()) return squad.members;
@@ -89,7 +142,7 @@ export const useSquad = (initialCategory: SquadCategory = 'PROFESSIONAL') => {
     });
   }, [squad?.members, search]);
 
-  // 4. Setores filtrados
+  // 7. Setores filtrados
   const sectors = useMemo(() => {
     const goalkeepers = filteredMembers.filter((m) => m.sector === 'GOALKEEPER');
     const defenders = filteredMembers.filter((m) => m.sector === 'DEFENDER');
@@ -105,20 +158,14 @@ export const useSquad = (initialCategory: SquadCategory = 'PROFESSIONAL') => {
     };
   }, [filteredMembers, squad?.staff]);
 
-  const handleSelectCategory = (cat: SquadCategory) => {
-    setSelectedCategory(cat);
-  };
-
-  const handleSelectYear = (year: number) => {
-    setSelectedYear(year);
-  };
-
   return {
     selectedCategory,
     handleSelectCategory,
     selectedYear,
     handleSelectYear,
     availableYears,
+    availableCategories,
+    categoriesByYear,
     squad,
     sectors,
     isLoading,
@@ -128,4 +175,3 @@ export const useSquad = (initialCategory: SquadCategory = 'PROFESSIONAL') => {
     reload: loadSquad,
   };
 };
-

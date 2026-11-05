@@ -12,8 +12,11 @@ export interface SquadHeroProps {
 }
 
 export const SquadHero: React.FC<SquadHeroProps> = ({ squad, selectedCategory }) => {
+  const categoryFullKey = `${selectedCategory}_FULL` as keyof typeof FOOTBALL_CONSTANTS.CATEGORIES;
   const categoryLabel =
-    (FOOTBALL_CONSTANTS.CATEGORIES as any)[selectedCategory] || selectedCategory;
+    FOOTBALL_CONSTANTS.CATEGORIES[categoryFullKey] ||
+    FOOTBALL_CONSTANTS.CATEGORIES[selectedCategory as keyof typeof FOOTBALL_CONSTANTS.CATEGORIES] ||
+    selectedCategory;
 
   return (
     <LayoutContainer className="relative overflow-hidden rounded-3xl bg-surface border border-border p-6 sm:p-10 mb-8 shadow-xs">
@@ -47,8 +50,8 @@ export const SquadHero: React.FC<SquadHeroProps> = ({ squad, selectedCategory })
           {squad?.coachName && (
             <LayoutContainer className="inline-flex items-center gap-2 mt-2 pt-2 border-t border-border/60 text-xs font-semibold text-text-primary">
               <Shield className="w-4 h-4 text-primary shrink-0" />
-              <span className="text-text-muted">{FOOTBALL_CONSTANTS.COACH_LABEL}:</span>
-              <span className="text-primary font-bold">{squad.coachName}</span>
+              <Text as="span" className="text-text-muted">{FOOTBALL_CONSTANTS.COACH_LABEL}:</Text>
+              <Text as="span" className="text-primary font-bold">{squad.coachName}</Text>
             </LayoutContainer>
           )}
         </LayoutContainer>
@@ -63,7 +66,7 @@ export const SquadHero: React.FC<SquadHeroProps> = ({ squad, selectedCategory })
                 {squad.members.length}
               </Text>
               <Text as="span" className="text-xs text-text-muted font-medium mt-1">
-                Atletas no Elenco
+                {FOOTBALL_CONSTANTS.ATHLETES_COUNT_LABEL}
               </Text>
             </LayoutContainer>
           </LayoutContainer>
@@ -72,4 +75,3 @@ export const SquadHero: React.FC<SquadHeroProps> = ({ squad, selectedCategory })
     </LayoutContainer>
   );
 };
-
