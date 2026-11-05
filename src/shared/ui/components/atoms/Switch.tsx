@@ -27,7 +27,7 @@ export const Switch: React.FC<SwitchProps> = ({
 
   return (
     <LayoutContainer
-      className={`flex items-start justify-between gap-4 select-none ${
+      className={`inline-flex items-center gap-3 select-none ${
         disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
       } ${className}`}
       onClick={() => {
@@ -56,7 +56,7 @@ export const Switch: React.FC<SwitchProps> = ({
         </LayoutContainer>
       )}
 
-      {/* Pill do Switch */}
+      {/* Pill / Trilho do Switch (Alto Contraste Claro e Escuro) */}
       <LayoutContainer
         id={switchId}
         role="switch"
@@ -69,16 +69,20 @@ export const Switch: React.FC<SwitchProps> = ({
             onChange(!checked);
           }
         }}
-        className={`relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background ${
-          checked ? 'bg-primary' : 'bg-surface-secondary border border-border'
+        className={`relative inline-flex h-7 w-12 shrink-0 items-center rounded-full p-0.5 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background ${
+          checked
+            ? 'bg-primary border-2 border-primary shadow-sm'
+            : 'bg-zinc-300 dark:bg-zinc-700 border-2 border-zinc-400 dark:border-zinc-500 hover:bg-zinc-400/70 dark:hover:bg-zinc-600'
         }`}
       >
-        {/* Thumb Circular */}
+        {/* Thumb / Bolinha Deslizante (Sempre altamente visível) */}
         <LayoutContainer
           as="div"
           aria-hidden="true"
-          className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white dark:bg-background shadow-md transform ring-0 transition duration-200 ease-in-out ${
-            checked ? 'translate-x-5 bg-background dark:bg-primary text-primary' : 'translate-x-0'
+          className={`pointer-events-none inline-block h-5 w-5 rounded-full shadow-md transform transition duration-200 ease-in-out ${
+            checked
+              ? 'translate-x-5 bg-secondary border border-secondary/60'
+              : 'translate-x-0.5 bg-white border border-zinc-300 shadow-sm'
           }`}
         />
       </LayoutContainer>
