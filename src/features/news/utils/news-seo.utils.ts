@@ -7,7 +7,7 @@ export async function fetchArticleServer(slug: string): Promise<NewsArticleData 
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7998';
   try {
     const res = await fetch(`${apiUrl}/news/${encodeURIComponent(slug)}`, {
-      next: { revalidate: 60 },
+      next: { revalidate: 60 }, signal: AbortSignal.timeout(3000),
     });
     if (!res.ok) return null;
     return await res.json();

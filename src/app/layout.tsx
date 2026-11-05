@@ -19,7 +19,7 @@ const geistMono = Geist_Mono({
 export async function generateMetadata(): Promise<Metadata> {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7998';
   try {
-    const res = await fetch(`${apiUrl}/settings`, { next: { revalidate: 60 } });
+    const res = await fetch(`${apiUrl}/settings`, { next: { revalidate: 60 }, signal: AbortSignal.timeout(3000) });
     if (res.ok) {
       const data = await res.json();
       return {
