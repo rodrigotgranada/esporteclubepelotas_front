@@ -1,3 +1,5 @@
+'use client';
+
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useSystemModulesStore } from '@/store/useSystemModulesStore';
@@ -8,7 +10,7 @@ import { SIDEBAR_TEXTS } from '../ui/components/Sidebar.constants';
 export const useSidebar = () => {
   const pathname = usePathname();
   const { user, logout } = useAuthStore();
-  const { isLoaded, fetchModules, isModuleActive } = useSystemModulesStore();
+  const { fetchModules } = useSystemModulesStore();
   const router = useRouter();
 
   useEffect(() => {
@@ -24,19 +26,21 @@ export const useSidebar = () => {
     }, 100);
   };
 
+  const userRole = (user?.role?.name || user?.role || '').toString().toUpperCase();
+  const isOwner = userRole === 'OWNER';
+  const isAdmin = userRole === 'ADMIN' || isOwner;
+
+  // No painel de controle administrativo, todas as áreas de gestão devem estar acessíveis para o admin/owner
   const navItems = [
     { label: SIDEBAR_TEXTS.NAV.DASHBOARD, href: '/gestao', icon: Home, show: true },
-    { label: SIDEBAR_TEXTS.NAV.NEWS, href: '/gestao/news', icon: Newspaper, show: isLoaded ? isModuleActive('news') : true },
-    { label: SIDEBAR_TEXTS.NAV.FOOTBALL, href: '/gestao/football', icon: Shirt, show: isLoaded ? isModuleActive('football') : true },
-    { label: SIDEBAR_TEXTS.NAV.IDOLS, href: '/gestao/idols', icon: Trophy, show: isLoaded ? isModuleActive('idols') : true },
-    { label: SIDEBAR_TEXTS.NAV.USERS, href: '/gestao/users', icon: Users, show: isLoaded ? isModuleActive('users') : true },
-    { label: SIDEBAR_TEXTS.NAV.SETTINGS, href: '/gestao/settings', icon: Settings, show: true },
+    { label: SIDEBAR_TEXTS.NAV.NEWS, href: '/gestao/news', icon: Newspaper, show: true },
+    { label: SIDEBAR_TEXTS.NAV.FOOTBALL, href: '/gestao/football', icon: Shirt, show: true },
+    { label: SIDEBAR_TEXTS.NAV.IDOLS, href: '/gestao/idols', icon: Trophy, show: true },
+    { label: SIDEBAR_TEXTS.NAV.USERS, href: '/gestao/users', icon: Users, show: isAdmin },
+    { label: SIDEBAR_TEXTS.NAV.MODULES, href: '/gestao/modules', icon: Layers, show: isOwner },
+    { label: SIDEBAR_TEXTS.NAV.ROLES, href: '/gestao/roles', icon: Shield, show: isOwner },
+    { label: SIDEBAR_TEXTS.NAV.SETTINGS, href: '/gestao/settings', icon: Settings, show: isAdmin },
   ];
-
-  if ((user?.role?.name || user?.role) === 'OWNER') {
-    navItems.splice(3, 0, { label: SIDEBAR_TEXTS.NAV.MODULES, href: '/gestao/modules', icon: Layers, show: true });
-    navItems.splice(4, 0, { label: SIDEBAR_TEXTS.NAV.ROLES, href: '/gestao/roles', icon: Shield, show: true });
-  }
 
   const checkIsActive = (href: string) => {
     const isActive = pathname === href || pathname.startsWith(`${href}/`);

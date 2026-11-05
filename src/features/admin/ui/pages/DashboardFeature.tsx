@@ -18,17 +18,20 @@ export const DashboardFeature = () => {
     // In a real scenario, you'd have a specific /stats endpoint
     // For now, we fetch first page to get total count
     adminService.getUsers({ limit: 1 }).then(res => {
-      setStats(prev => ({ ...prev, total: res.total }));
-    });
+      setStats(prev => ({ ...prev, total: res?.total || 0 }));
+    }).catch(err => console.warn('Erro ao obter total de usuários:', err));
+
     adminService.getUsers({ limit: 1, status: 'ACTIVE' }).then(res => {
-      setStats(prev => ({ ...prev, active: res.total }));
-    });
+      setStats(prev => ({ ...prev, active: res?.total || 0 }));
+    }).catch(err => console.warn('Erro ao obter usuários ativos:', err));
+
     adminService.getUsers({ limit: 1, status: 'BLOCKED' }).then(res => {
-      setStats(prev => ({ ...prev, blocked: res.total }));
-    });
+      setStats(prev => ({ ...prev, blocked: res?.total || 0 }));
+    }).catch(err => console.warn('Erro ao obter usuários bloqueados:', err));
+
     adminService.getUsers({ limit: 1, status: 'PENDING' }).then(res => {
-      setStats(prev => ({ ...prev, pending: res.total }));
-    });
+      setStats(prev => ({ ...prev, pending: res?.total || 0 }));
+    }).catch(err => console.warn('Erro ao obter usuários pendentes:', err));
   }, []);
 
   const cards = [

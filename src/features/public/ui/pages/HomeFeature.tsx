@@ -30,24 +30,36 @@ export const HomeFeature = () => {
 
     async function loadHomeData() {
       try {
-        const [featuredRes, feedRes] = await Promise.all([
+        const [featuredResult, feedResult] = await Promise.allSettled([
           newsService.getFeaturedNews(3),
           newsService.getNews({ limit: 6 }),
         ]);
 
         if (!isMounted) return;
 
-        setFeaturedNews(featuredRes);
+        const featuredArticles =
+          featuredResult.status === 'fulfilled' && Array.isArray(featuredResult.value)
+            ? featuredResult.value
+            : [];
 
-        // Remove duplicados que já aparecem no Hero
-        const featuredSlugs = new Set(featuredRes.map((f) => f.slug));
-        const filteredLatest = feedRes.data
-          .filter((a) => !featuredSlugs.has(a.slug))
+        const feedArticles =
+          feedResult.status === 'fulfilled' && Array.isArray(feedResult.value?.data)
+            ? feedResult.value.data
+            : [];
+
+        setFeaturedNews(featuredArticles);
+
+        const featuredSlugs = new Set(
+          featuredArticles.map((f) => f.slug).filter(Boolean),
+        );
+
+        const filteredLatest = feedArticles
+          .filter((a) => a?.slug && !featuredSlugs.has(a.slug))
           .slice(0, 3);
 
         setLatestNews(filteredLatest);
       } catch (err) {
-        console.error('Falha ao carregar notícias na Home', err);
+        console.warn('Nenhuma notícia carregada para a Home:', err);
       }
     }
 

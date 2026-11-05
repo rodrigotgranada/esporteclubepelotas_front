@@ -126,3 +126,4 @@ export const YouthNewsSection: React.FC<YouthNewsSectionProps> = ({ news, isLoad
     </LayoutContainer>
   );
 };
+

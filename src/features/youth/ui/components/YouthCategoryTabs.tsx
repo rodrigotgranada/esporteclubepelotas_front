@@ -42,3 +42,4 @@ export const YouthCategoryTabs: React.FC<YouthCategoryTabsProps> = ({
     </LayoutContainer>
   );
 };
+

@@ -48,6 +48,8 @@ export const useSystemModulesStore = create<SystemModulesState>((set, get) => ({
   isModuleActive: (slug: string) => {
     const { modules } = get();
     const mod = modules.find(m => m.slug === slug);
-    return mod ? mod.isActive : true; // Default to true if not loaded in public views
+    if (!mod) return true;
+    const active = (mod as any).isActive ?? (mod as any).active;
+    return active !== undefined ? Boolean(active) : true;
   }
 }));
