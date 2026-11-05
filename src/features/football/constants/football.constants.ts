@@ -19,8 +19,8 @@ export const FOOTBALL_CONSTANTS = {
   },
 
   CATEGORIES: {
-    PROFESSIONAL: 'Profissional',
-    PROFESSIONAL_FULL: 'Profissional Masculino',
+    PROFESSIONAL: 'Masculino',
+    PROFESSIONAL_FULL: 'Futebol Masculino',
     FEMININE: 'Feminino',
     FEMININE_FULL: 'Futebol Feminino',
     SUB_20: 'Sub-20',

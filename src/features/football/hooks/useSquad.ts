@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useSearchParams } from 'next/navigation';
 import {
   footballService,
   SquadCategory,
@@ -8,8 +9,23 @@ import {
   SquadMemberData,
 } from '../services/football.service';
 
+const VALID_CATEGORIES: SquadCategory[] = [
+  'PROFESSIONAL',
+  'FEMININE',
+  'SUB_20',
+  'SUB_17',
+  'SUB_15',
+];
+
 export const useSquad = (initialCategory: SquadCategory = 'PROFESSIONAL') => {
-  const [selectedCategory, setSelectedCategory] = useState<SquadCategory>(initialCategory);
+  const searchParams = useSearchParams();
+  const queryCategory = searchParams.get('category') as SquadCategory | null;
+  const initial =
+    queryCategory && VALID_CATEGORIES.includes(queryCategory)
+      ? queryCategory
+      : initialCategory;
+
+  const [selectedCategory, setSelectedCategory] = useState<SquadCategory>(initial);
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [availableYears, setAvailableYears] = useState<number[]>([]);
   const [categoriesByYear, setCategoriesByYear] = useState<Record<number, SquadCategory[]>>({});
@@ -35,7 +51,6 @@ export const useSquad = (initialCategory: SquadCategory = 'PROFESSIONAL') => {
         if (res.categoriesByYear && Object.keys(res.categoriesByYear).length > 0) {
           byYearMap = res.categoriesByYear;
         } else if (res.categories && res.categories.length > 0) {
-          // Fallback caso categoriesByYear não venha populado
           const allCats = res.categories as SquadCategory[];
           years.forEach((y) => {
             byYearMap[y] = allCats;
@@ -81,7 +96,6 @@ export const useSquad = (initialCategory: SquadCategory = 'PROFESSIONAL') => {
 
       const catsInNewYear = categoriesByYear[newYear] || [];
       if (catsInNewYear.length > 0 && !catsInNewYear.includes(selectedCategory)) {
-        // Se a categoria selecionada não existir no novo ano, seleciona a primeira disponível (prioriza PROFISSIONAL)
         if (catsInNewYear.includes('PROFESSIONAL')) {
           setSelectedCategory('PROFESSIONAL');
         } else {

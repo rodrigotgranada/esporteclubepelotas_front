@@ -26,6 +26,20 @@ export const PUBLIC_FOOTER_TEXTS = {
   OPEN_IN_GOOGLE_MAPS: 'Ver no Google Maps',
   CLICK_TO_OPEN_MAPS: 'Clique para abrir no Google Maps',
 
+  DEFAULT_PHONE: '(53) 3305-1908',
+  DEFAULT_WHATSAPP: '(53) 98408-1908',
+  DEFAULT_EMAIL: 'contato@esporteclubepelotas.com.br',
+  DEFAULT_PRESS_EMAIL: 'imprensa@esporteclubepelotas.com.br',
+
+  DEFAULT_ADDRESS: {
+    street: 'Av. Bento Gonçalves, esquina com Praça Vinte de Setembro',
+    number: 's/n',
+    neighborhood: 'Centro',
+    city: 'Pelotas',
+    state: 'RS',
+    zipCode: '96015-140',
+  },
+
   DEFAULT_MAPS_EMBED_URL:
     'https://maps.google.com/maps?q=Est%C3%A1dio+Boca+do+Lobo,+Pelotas+-+RS&t=&z=16&ie=UTF8&iwloc=&output=embed',
   DEFAULT_MAPS_DIRECT_URL:
@@ -39,7 +53,7 @@ export const PUBLIC_FOOTER_TEXTS = {
   DEFAULT_NAV_LINKS: [
     { label: 'Início', url: '/', isVisible: true, isExternal: false },
     { label: 'Notícias do Lobo', url: '/noticias', isVisible: true, isExternal: false },
-    { label: 'Elenco Profissional', url: '/elenco', isVisible: true, isExternal: false },
+    { label: 'Elencos', url: '/elenco', isVisible: true, isExternal: false },
     { label: 'Memorial & Ídolos', url: '/idolos', isVisible: true, isExternal: false },
     { label: 'Quadro Social (Seja Sócio)', url: '/socio', isVisible: true, isExternal: false },
     { label: 'Ingressos e Jogos', url: '/ingressos', isVisible: true, isExternal: false },

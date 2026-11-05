@@ -15,7 +15,7 @@ export const PUBLIC_DRAWER_TEXTS = {
   LINK_NEWS_DESC: 'Cobertura completa, notas e bastidores',
 
   SECTION_FOOTBALL: 'Futebol & Temporada',
-  LINK_SQUAD: 'Elenco Profissional',
+  LINK_SQUAD: 'Elencos',
   LINK_YOUTH: 'Categorias de Base',
   LINK_MATCHES: 'Jogos & Campeonatos',
   BADGE_COMING_SOON: 'Em breve',
@@ -41,6 +41,3 @@ export const PUBLIC_DRAWER_TEXTS = {
   BTN_ADMIN: 'Painel Admin',
   COPYRIGHT: '© 2026 Esporte Clube Pelotas • Tradição Centenária',
 };
-
-
-
