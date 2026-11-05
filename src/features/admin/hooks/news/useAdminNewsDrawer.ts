@@ -45,6 +45,7 @@ export const useAdminNewsDrawer = (
   const [replaceMainModalOpen, setReplaceMainModalOpen] = useState(false);
   const [existingMainTitle, setExistingMainTitle] = useState('');
   const [isPinned, setIsPinned] = useState(false);
+  const [isYouth, setIsYouth] = useState(false);
   const [showOnHomepage, setShowOnHomepage] = useState(true);
   const [reporterName, setReporterName] = useState('');
   const [photographerName, setPhotographerName] = useState('');
@@ -133,6 +134,7 @@ export const useAdminNewsDrawer = (
         if (d.content) setContent(d.content);
         if (d.reporterName) setReporterName(d.reporterName);
         if (d.photographerName) setPhotographerName(d.photographerName);
+        if (typeof d.isYouth === "boolean") setIsYouth(d.isYouth);
         setHasRecoverableDraft(false);
         toast.success('Rascunho recuperado com sucesso!');
       }
@@ -168,6 +170,7 @@ export const useAdminNewsDrawer = (
     setIsFeatured(false);
     setFeaturedSlot('NONE');
     setIsPinned(false);
+    setIsYouth(false);
     setShowOnHomepage(true);
     setReporterName('');
     setPhotographerName('');
@@ -204,6 +207,7 @@ export const useAdminNewsDrawer = (
             setIsFeatured(!!art.isFeatured);
             setFeaturedSlot(art.featuredSlot || (art.isFeatured ? 'MAIN' : 'NONE'));
             setIsPinned(Boolean(art.isPinned));
+            setIsYouth(Boolean(art.isYouth));
             setShowOnHomepage(art.showOnHomepage ?? true);
             setReporterName(art.reporterName || '');
             setPhotographerName(art.photographerName || '');
@@ -500,6 +504,8 @@ export const useAdminNewsDrawer = (
     cancelReplaceMain,
     isPinned,
     setIsPinned,
+    isYouth,
+    setIsYouth,
     showOnHomepage,
     setShowOnHomepage,
     reporterName,

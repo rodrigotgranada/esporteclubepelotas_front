@@ -42,7 +42,7 @@ export const useYouthHub = () => {
     try {
       setIsLoadingNews(true);
       // Busca notícias recentes com filtro de busca ou categoria
-      const res = await newsService.getNews({ limit: 12 });
+      const res = await newsService.getNews({ limit: 12, isYouth: true });
       const articles = res.data || [];
 
       // Filtra matérias que pertençam à categoria da base ou que contenham a tag #base
@@ -53,7 +53,7 @@ export const useYouthHub = () => {
             : '';
         const hasBaseCategory = catName.includes('base') || catName.includes('formação');
         const hasBaseTag = (art.tags || []).some((t) => t.toLowerCase().includes('base'));
-        return hasBaseCategory || hasBaseTag;
+        return art.isYouth || hasBaseCategory || hasBaseTag;
       });
 
       // Se não houver matérias marcadas especificamente como base, pega as 3 mais recentes como demonstração

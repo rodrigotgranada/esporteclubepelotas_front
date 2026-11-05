@@ -64,6 +64,8 @@ export const newsService = {
     isFeatured?: boolean;
     featuredSlot?: 'MAIN' | 'SECONDARY' | 'NONE';
     isPinned?: boolean;
+    isYouth?: boolean;
+    showOnHomepage?: boolean;
   }): Promise<GetPublicNewsResponse> => {
     const response = await api.get('/news', { params });
     return response.data;

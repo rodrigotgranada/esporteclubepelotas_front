@@ -188,9 +188,16 @@ export const AdminNewsList: React.FC<AdminNewsListProps> = ({
 
                     {/* Category */}
                     <TableCell>
-                      <Badge variant="default" size="sm">
-                        {getCategoryName(item.category)}
-                      </Badge>
+                      <LayoutContainer className="flex flex-col gap-1 items-start">
+                        <Badge variant="default" size="sm">
+                          {getCategoryName(item.category)}
+                        </Badge>
+                        {item.isYouth && (
+                          <Badge variant="primary" size="sm" className="text-[10px] font-extrabold uppercase py-0 px-1.5">
+                            🌱 Base
+                          </Badge>
+                        )}
+                      </LayoutContainer>
                     </TableCell>
 
                     {/* Status */}

@@ -90,6 +90,7 @@ export interface NewsArticleData {
   isFeatured: boolean;
   featuredSlot?: 'MAIN' | 'SECONDARY' | 'NONE';
   showOnHomepage?: boolean;
+  isYouth?: boolean;
   isPinned?: boolean;
   reporterName?: string;
   photographerName?: string;
@@ -137,6 +138,8 @@ export const adminNewsService = {
     category?: string;
     status?: string;
     isFeatured?: boolean;
+    isYouth?: boolean;
+    showOnHomepage?: boolean;
   }): Promise<GetAdminNewsResponse> => {
     const response = await api.get('/news/admin', { params });
     return response.data;

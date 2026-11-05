@@ -19,3 +19,5 @@ export * from './Option';
 export * from './ShieldPlaceholder';
 export * from './Spinner';
 export * from './Textarea';
+
+export * from './Switch';

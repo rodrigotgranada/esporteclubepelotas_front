@@ -26,6 +26,7 @@ import {
   Badge,
   Spinner,
   ConfirmModal,
+  Switch,
 } from '@/shared/ui/components';
 import { ADMIN_NEWS_TEXTS } from '../../../constants/admin-news.constants';
 import { useAdminNewsDrawer } from '../../../hooks/news/useAdminNewsDrawer';
@@ -101,6 +102,8 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
     cancelReplaceMain,
     isPinned,
     setIsPinned,
+    isYouth,
+    setIsYouth,
     showOnHomepage,
     setShowOnHomepage,
     reporterName,
@@ -208,6 +211,34 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
                   placeholder={texts.PLACEHOLDER_SUBTITLE}
                 />
               </LayoutContainer>
+            </LayoutContainer>
+
+                        {/* Classificação: Matéria da Categoria de Base */}
+            <LayoutContainer className={`p-4 rounded-2xl border transition-all duration-300 flex flex-col gap-2 ${
+              isYouth 
+                ? 'bg-primary/10 border-primary/40 shadow-xs' 
+                : 'bg-surface border-border'
+            }`}>
+              <LayoutContainer className="flex items-center justify-between">
+                <LayoutContainer className="flex items-center gap-2">
+                  <Text as="span" className="text-sm font-bold text-text-primary">
+                    {texts.SWITCH_IS_YOUTH_LABEL}
+                  </Text>
+                  <Badge variant={isYouth ? 'primary' : 'default'} size="sm" className="font-extrabold text-[10px] uppercase">
+                    {isYouth ? `🌱 ${texts.BADGE_YOUTH_ACTIVE}` : texts.BADGE_PRO_ACTIVE}
+                  </Badge>
+                </LayoutContainer>
+
+                <Switch
+                  checked={isYouth}
+                  onChange={setIsYouth}
+                  aria-label={texts.SWITCH_IS_YOUTH_LABEL}
+                />
+              </LayoutContainer>
+
+              <Text as="p" className="text-xs text-text-muted leading-relaxed">
+                {texts.SWITCH_IS_YOUTH_DESC}
+              </Text>
             </LayoutContainer>
 
             {/* 2. Categoria & Nova Categoria & Slug */}
@@ -392,27 +423,26 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
               setIsPinned={setIsPinned}
             />
 
-            {/* Distribuição & Exibição da Matéria */}
-            <LayoutContainer className="p-4 rounded-2xl bg-surface border border-border flex flex-col gap-3">
-              <Text as="span" className="text-xs font-semibold text-text-primary uppercase tracking-wider flex items-center gap-1.5">
-                <Globe className="w-4 h-4 text-primary" />
-                {texts.LABEL_DISTRIBUTION_SECTION}
-              </Text>
+            {/* Distribuição & Exibição da Matéria (Aparece apenas quando marcado como Categoria de Base) */}
+            {isYouth && (
+              <LayoutContainer className="p-4 rounded-2xl bg-surface border border-border flex flex-col gap-3 animate-in fade-in duration-200">
+                <Text as="span" className="text-xs font-semibold text-text-primary uppercase tracking-wider flex items-center gap-1.5">
+                  <Globe className="w-4 h-4 text-primary" />
+                  {texts.LABEL_DISTRIBUTION_SECTION}
+                </Text>
 
-              <Checkbox
-                label={texts.LABEL_SHOW_ON_HOMEPAGE}
-                description={texts.SHOW_ON_HOMEPAGE_HINT}
-                checked={showOnHomepage}
-                onChange={(e) => setShowOnHomepage(e.target.checked)}
-              />
+                <Checkbox
+                  label={texts.LABEL_SHOW_ON_HOMEPAGE}
+                  description={texts.SHOW_ON_HOMEPAGE_HINT}
+                  checked={showOnHomepage}
+                  onChange={(e) => setShowOnHomepage(e.target.checked)}
+                />
 
-              {/* Aviso dinâmico quando a matéria for de Base */}
-              {selectedCategory?.name?.toLowerCase().includes('base') && (
                 <LayoutContainer className="p-2.5 rounded-xl bg-primary/10 border border-primary/20 text-xs text-text-secondary mt-1">
                   {texts.YOUTH_CATEGORY_NOTICE}
                 </LayoutContainer>
-              )}
-            </LayoutContainer>
+              </LayoutContainer>
+            )}
 
             {/* 10. Interatividade com a Torcida (Reações e Comentários) */}
             <NewsEditorInteractivitySection
