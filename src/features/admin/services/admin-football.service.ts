@@ -22,6 +22,8 @@ export const adminFootballService = {
     search?: string;
     position?: string;
     isActive?: boolean;
+    gender?: 'MALE' | 'FEMALE';
+    athleteType?: 'PROFESSIONAL' | 'YOUTH';
   }): Promise<GetAthletesResponse> => {
     const response = await api.get('/athletes/admin', { params });
     return response.data;

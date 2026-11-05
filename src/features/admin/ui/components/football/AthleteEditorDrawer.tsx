@@ -14,7 +14,7 @@ import {
   Spinner,
 } from '@/shared/ui/components';
 import { ADMIN_FOOTBALL_CONSTANTS } from '../../../constants/admin-football.constants';
-import { PreferredFoot } from '@/features/football/services/football.service';
+import { PreferredFoot, AthleteGender, AthleteType } from '@/features/football/services/football.service';
 
 export interface AthleteEditorDrawerProps {
   isOpen: boolean;
@@ -23,6 +23,14 @@ export interface AthleteEditorDrawerProps {
   onSave: () => void;
   isSaving: boolean;
   errors: Record<string, string>;
+  gender: AthleteGender;
+  setGender: (v: AthleteGender) => void;
+  athleteType: AthleteType;
+  setAthleteType: (v: AthleteType) => void;
+  youthCategory: string;
+  setYouthCategory: (v: string) => void;
+  entryYear: string;
+  setEntryYear: (v: string) => void;
   name: string;
   setName: (v: string) => void;
   nickname: string;
@@ -60,6 +68,14 @@ export const AthleteEditorDrawer: React.FC<AthleteEditorDrawerProps> = ({
   onSave,
   isSaving,
   errors,
+  gender,
+  setGender,
+  athleteType,
+  setAthleteType,
+  youthCategory,
+  setYouthCategory,
+  entryYear,
+  setEntryYear,
   name,
   setName,
   nickname,
@@ -121,6 +137,37 @@ export const AthleteEditorDrawer: React.FC<AthleteEditorDrawerProps> = ({
             }}
             placeholderLabel={texts.PHOTO_LABEL}
           />
+        </LayoutContainer>
+
+        {/* Gênero & Vínculo (Profissional vs Base) */}
+        <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-2xl bg-surface-secondary border border-border">
+          <LayoutContainer className="flex flex-col gap-1.5">
+            <Text as="span" className="text-xs font-bold text-text-primary">
+              {texts.FIELD_GENDER} *
+            </Text>
+            <Select
+              value={gender}
+              onChange={(e) => setGender(e.target.value as AthleteGender)}
+              className="w-full"
+            >
+              <Option value="MALE">{texts.GENDER_MALE}</Option>
+              <Option value="FEMALE">{texts.GENDER_FEMALE}</Option>
+            </Select>
+          </LayoutContainer>
+
+          <LayoutContainer className="flex flex-col gap-1.5">
+            <Text as="span" className="text-xs font-bold text-text-primary">
+              {texts.FIELD_ATHLETE_TYPE} *
+            </Text>
+            <Select
+              value={athleteType}
+              onChange={(e) => setAthleteType(e.target.value as AthleteType)}
+              className="w-full"
+            >
+              <Option value="PROFESSIONAL">{texts.TYPE_PROFESSIONAL}</Option>
+              <Option value="YOUTH">{texts.TYPE_YOUTH}</Option>
+            </Select>
+          </LayoutContainer>
         </LayoutContainer>
 
         {/* Nome Completo & Apelido */}
@@ -253,17 +300,54 @@ export const AthleteEditorDrawer: React.FC<AthleteEditorDrawerProps> = ({
           />
         </LayoutContainer>
 
-        {/* Clubes Anteriores */}
-        <LayoutContainer className="flex flex-col gap-1.5">
-          <Text as="span" className="text-xs font-bold text-text-primary">
-            {texts.FIELD_PAST_CLUBS}
-          </Text>
-          <Input
-            value={pastClubsText}
-            onChange={(e) => setPastClubsText(e.target.value)}
-            placeholder={texts.FIELD_PAST_CLUBS_PLACEHOLDER}
-          />
-        </LayoutContainer>
+        {/* Condicional: Base (Ano de Chegada & Categoria) vs Profissional (Clubes Anteriores) */}
+        {athleteType === 'YOUTH' ? (
+          <LayoutContainer className="p-4 rounded-2xl bg-surface border border-primary/20 flex flex-col gap-4">
+            <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <LayoutContainer className="flex flex-col gap-1.5">
+                <Text as="span" className="text-xs font-bold text-text-primary">
+                  {texts.FIELD_YOUTH_CATEGORY}
+                </Text>
+                <Select
+                  value={youthCategory}
+                  onChange={(e) => setYouthCategory(e.target.value)}
+                  className="w-full"
+                >
+                  <Option value="">Selecione a Categoria</Option>
+                  <Option value="SUB_20">Sub-20 (Júnior)</Option>
+                  <Option value="SUB_17">Sub-17 (Juvenil)</Option>
+                  <Option value="SUB_15">Sub-15 (Infantil)</Option>
+                </Select>
+              </LayoutContainer>
+
+              <LayoutContainer className="flex flex-col gap-1.5">
+                <Text as="span" className="text-xs font-bold text-text-primary">
+                  {texts.FIELD_ENTRY_YEAR}
+                </Text>
+                <Input
+                  type="number"
+                  value={entryYear}
+                  onChange={(e) => setEntryYear(e.target.value)}
+                  placeholder={texts.FIELD_ENTRY_YEAR_PLACEHOLDER}
+                />
+              </LayoutContainer>
+            </LayoutContainer>
+            <Text as="p" className="text-xs text-text-muted italic">
+              ℹ️ {texts.YOUTH_NOTICE}
+            </Text>
+          </LayoutContainer>
+        ) : (
+          <LayoutContainer className="flex flex-col gap-1.5">
+            <Text as="span" className="text-xs font-bold text-text-primary">
+              {texts.FIELD_PAST_CLUBS}
+            </Text>
+            <Input
+              value={pastClubsText}
+              onChange={(e) => setPastClubsText(e.target.value)}
+              placeholder={texts.FIELD_PAST_CLUBS_PLACEHOLDER}
+            />
+          </LayoutContainer>
+        )}
 
         {/* Instagram Oficial */}
         <LayoutContainer className="flex flex-col gap-1.5">

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { adminFootballService } from '../../services/admin-football.service';
-import { AthleteData, PreferredFoot } from '@/features/football/services/football.service';
+import { AthleteData, PreferredFoot, AthleteGender, AthleteType } from '@/features/football/services/football.service';
 import { ADMIN_FOOTBALL_CONSTANTS } from '../../constants/admin-football.constants';
 
 export const useAdminAthleteDrawer = (onSuccess: () => void) => {
@@ -11,6 +11,10 @@ export const useAdminAthleteDrawer = (onSuccess: () => void) => {
   const [editingAthleteId, setEditingAthleteId] = useState<string | null>(null);
 
   // Form Fields
+  const [gender, setGender] = useState<AthleteGender>('MALE');
+  const [athleteType, setAthleteType] = useState<AthleteType>('PROFESSIONAL');
+  const [youthCategory, setYouthCategory] = useState<string>('');
+  const [entryYear, setEntryYear] = useState<string>('');
   const [name, setName] = useState<string>('');
   const [nickname, setNickname] = useState<string>('');
   const [birthDate, setBirthDate] = useState<string>('');
@@ -33,6 +37,10 @@ export const useAdminAthleteDrawer = (onSuccess: () => void) => {
 
   const resetForm = () => {
     setEditingAthleteId(null);
+    setGender('MALE');
+    setAthleteType('PROFESSIONAL');
+    setYouthCategory('');
+    setEntryYear('');
     setName('');
     setNickname('');
     setBirthDate('');
@@ -58,6 +66,10 @@ export const useAdminAthleteDrawer = (onSuccess: () => void) => {
   const openEdit = (athlete: AthleteData) => {
     resetForm();
     setEditingAthleteId(athlete.id || athlete._id);
+    setGender(athlete.gender || 'MALE');
+    setAthleteType(athlete.athleteType || 'PROFESSIONAL');
+    setYouthCategory(athlete.youthCategory || '');
+    setEntryYear(athlete.entryYear ? String(athlete.entryYear) : '');
     setName(athlete.name || '');
     setNickname(athlete.nickname || '');
     setBirthDate(athlete.birthDate ? athlete.birthDate.split('T')[0] : '');
@@ -106,9 +118,13 @@ export const useAdminAthleteDrawer = (onSuccess: () => void) => {
       const payload: any = {
         name: name.trim(),
         nickname: nickname.trim() || undefined,
+        gender,
+        athleteType,
+        youthCategory: athleteType === 'YOUTH' && youthCategory.trim() ? youthCategory.trim() : undefined,
+        entryYear: athleteType === 'YOUTH' && entryYear ? Number(entryYear) : undefined,
         primaryPosition: primaryPosition.trim(),
         secondaryPositions,
-        pastClubs,
+        pastClubs: athleteType === 'PROFESSIONAL' ? pastClubs : [],
         preferredFoot,
         birthDate: birthDate ? birthDate : undefined,
         birthPlace: birthPlace.trim() || undefined,
@@ -154,6 +170,14 @@ export const useAdminAthleteDrawer = (onSuccess: () => void) => {
     isSaving,
     errors,
     // Fields
+    gender,
+    setGender,
+    athleteType,
+    setAthleteType,
+    youthCategory,
+    setYouthCategory,
+    entryYear,
+    setEntryYear,
     name,
     setName,
     nickname,

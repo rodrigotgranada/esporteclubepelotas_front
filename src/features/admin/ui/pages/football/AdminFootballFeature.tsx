@@ -155,6 +155,14 @@ export const AdminFootballFeature: React.FC = () => {
         onSave={athleteDrawer.save}
         isSaving={athleteDrawer.isSaving}
         errors={athleteDrawer.errors}
+        gender={athleteDrawer.gender}
+        setGender={athleteDrawer.setGender}
+        athleteType={athleteDrawer.athleteType}
+        setAthleteType={athleteDrawer.setAthleteType}
+        youthCategory={athleteDrawer.youthCategory}
+        setYouthCategory={athleteDrawer.setYouthCategory}
+        entryYear={athleteDrawer.entryYear}
+        setEntryYear={athleteDrawer.setEntryYear}
         name={athleteDrawer.name}
         setName={athleteDrawer.setName}
         nickname={athleteDrawer.nickname}
@@ -218,6 +226,8 @@ export const AdminFootballFeature: React.FC = () => {
         availableAthletes={squadMembersDrawer.availableAthletes}
         isLoadingAthletes={squadMembersDrawer.isLoadingAthletes}
         isSaving={squadMembersDrawer.isSaving}
+        includeYouthAthletes={squadMembersDrawer.includeYouthAthletes}
+        setIncludeYouthAthletes={squadMembersDrawer.setIncludeYouthAthletes}
         onClose={squadMembersDrawer.close}
         onSave={squadMembersDrawer.save}
         selectedAthleteId={squadMembersDrawer.selectedAthleteId}

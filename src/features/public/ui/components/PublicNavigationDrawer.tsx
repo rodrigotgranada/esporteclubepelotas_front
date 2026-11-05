@@ -262,7 +262,7 @@ export const PublicNavigationDrawer: React.FC<PublicNavigationDrawerProps> = ({
 
                 {footballActive ? (
                   <Link
-                    href="/elenco?category=UNDER_20"
+                    href="/base"
                     onClick={onClose}
                     className="p-3.5 rounded-xl bg-surface/70 hover:bg-surface border border-border/80 hover:border-primary/50 flex flex-col gap-2 transition-all group"
                   >

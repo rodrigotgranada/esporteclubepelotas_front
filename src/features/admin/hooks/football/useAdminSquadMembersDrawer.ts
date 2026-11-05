@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { toast } from 'react-hot-toast';
 import { adminFootballService } from '../../services/admin-football.service';
 import {
@@ -19,6 +19,7 @@ export const useAdminSquadMembersDrawer = (onSuccess: () => void) => {
   const [availableAthletes, setAvailableAthletes] = useState<AthleteData[]>([]);
   const [isLoadingAthletes, setIsLoadingAthletes] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [includeYouthAthletes, setIncludeYouthAthletes] = useState<boolean>(false);
 
   // New Member Temp State
   const [selectedAthleteId, setSelectedAthleteId] = useState<string>('');
@@ -45,6 +46,7 @@ export const useAdminSquadMembersDrawer = (onSuccess: () => void) => {
     setJerseyNumber('');
     setSector('FORWARD');
     setRole('STARTER');
+    setIncludeYouthAthletes(false);
     setIsOpen(true);
     await loadAthletesBank();
   };
@@ -53,7 +55,36 @@ export const useAdminSquadMembersDrawer = (onSuccess: () => void) => {
     setIsOpen(false);
     setSquad(null);
     setMembers([]);
+    setIncludeYouthAthletes(false);
   };
+
+  const filteredAvailableAthletes = useMemo(() => {
+    if (!squad) return availableAthletes;
+
+    if (squad.category === 'FEMININE') {
+      // Apenas atletas femininas
+      return availableAthletes.filter((a) => a.gender === 'FEMALE');
+    }
+
+    if (squad.category === 'PROFESSIONAL') {
+      // Apenas atletas masculinos
+      // Por padrão apenas profissionais, a menos que includeYouthAthletes seja true
+      return availableAthletes.filter((a) => {
+        const isMale = a.gender !== 'FEMALE';
+        if (!isMale) return false;
+        if (includeYouthAthletes) return true;
+        return a.athleteType !== 'YOUTH';
+      });
+    }
+
+    // Se for categoria de base (SUB_20, SUB_17, SUB_15):
+    // Bloqueia estritamente atletas profissionais, exibe apenas masculinos da base
+    return availableAthletes.filter((a) => {
+      const isMale = a.gender !== 'FEMALE';
+      const isYouth = a.athleteType === 'YOUTH';
+      return isMale && isYouth;
+    });
+  }, [availableAthletes, squad, includeYouthAthletes]);
 
   const handleAddMember = () => {
     if (!selectedAthleteId) {
@@ -131,7 +162,10 @@ export const useAdminSquadMembersDrawer = (onSuccess: () => void) => {
     isOpen,
     squad,
     members,
-    availableAthletes,
+    availableAthletes: filteredAvailableAthletes,
+    rawAvailableAthletes: availableAthletes,
+    includeYouthAthletes,
+    setIncludeYouthAthletes,
     isLoadingAthletes,
     isSaving,
     open,

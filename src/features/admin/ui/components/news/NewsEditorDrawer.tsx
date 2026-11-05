@@ -12,6 +12,7 @@ import {
   Lock,
   Unlock,
   MessageSquare,
+  Globe,
 } from 'lucide-react';
 import {
   Drawer,
@@ -100,6 +101,8 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
     cancelReplaceMain,
     isPinned,
     setIsPinned,
+    showOnHomepage,
+    setShowOnHomepage,
     reporterName,
     setReporterName,
     photographerName,
@@ -388,6 +391,28 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
               isPinned={isPinned}
               setIsPinned={setIsPinned}
             />
+
+            {/* Distribuição & Exibição da Matéria */}
+            <LayoutContainer className="p-4 rounded-2xl bg-surface border border-border flex flex-col gap-3">
+              <Text as="span" className="text-xs font-semibold text-text-primary uppercase tracking-wider flex items-center gap-1.5">
+                <Globe className="w-4 h-4 text-primary" />
+                {texts.LABEL_DISTRIBUTION_SECTION}
+              </Text>
+
+              <Checkbox
+                label={texts.LABEL_SHOW_ON_HOMEPAGE}
+                description={texts.SHOW_ON_HOMEPAGE_HINT}
+                checked={showOnHomepage}
+                onChange={(e) => setShowOnHomepage(e.target.checked)}
+              />
+
+              {/* Aviso dinâmico quando a matéria for de Base */}
+              {selectedCategory?.name?.toLowerCase().includes('base') && (
+                <LayoutContainer className="p-2.5 rounded-xl bg-primary/10 border border-primary/20 text-xs text-text-secondary mt-1">
+                  {texts.YOUTH_CATEGORY_NOTICE}
+                </LayoutContainer>
+              )}
+            </LayoutContainer>
 
             {/* 10. Interatividade com a Torcida (Reações e Comentários) */}
             <NewsEditorInteractivitySection

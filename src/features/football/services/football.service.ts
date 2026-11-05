@@ -2,6 +2,9 @@ import { api } from '@/services/api';
 
 export type PreferredFoot = 'RIGHT' | 'LEFT' | 'BOTH';
 
+export type AthleteGender = 'MALE' | 'FEMALE';
+export type AthleteType = 'PROFESSIONAL' | 'YOUTH';
+
 export type SquadCategory =
   | 'PROFESSIONAL'
   | 'FEMININE'
@@ -38,6 +41,10 @@ export interface AthleteData {
   nickname?: string | null;
   slug: string;
   photoUrl?: string | null;
+  gender?: AthleteGender;
+  athleteType?: AthleteType;
+  youthCategory?: string | null;
+  entryYear?: number | null;
   birthDate?: string | null;
   age?: number | null;
   birthPlace?: string | null;

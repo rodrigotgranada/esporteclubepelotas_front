@@ -89,6 +89,7 @@ export interface NewsArticleData {
   status: NewsStatusType;
   isFeatured: boolean;
   featuredSlot?: 'MAIN' | 'SECONDARY' | 'NONE';
+  showOnHomepage?: boolean;
   isPinned?: boolean;
   reporterName?: string;
   photographerName?: string;

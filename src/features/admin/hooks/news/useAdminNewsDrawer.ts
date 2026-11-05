@@ -45,6 +45,7 @@ export const useAdminNewsDrawer = (
   const [replaceMainModalOpen, setReplaceMainModalOpen] = useState(false);
   const [existingMainTitle, setExistingMainTitle] = useState('');
   const [isPinned, setIsPinned] = useState(false);
+  const [showOnHomepage, setShowOnHomepage] = useState(true);
   const [reporterName, setReporterName] = useState('');
   const [photographerName, setPhotographerName] = useState('');
   const [allowReactions, setAllowReactions] = useState(true);
@@ -167,6 +168,7 @@ export const useAdminNewsDrawer = (
     setIsFeatured(false);
     setFeaturedSlot('NONE');
     setIsPinned(false);
+    setShowOnHomepage(true);
     setReporterName('');
     setPhotographerName('');
     setAllowReactions(true);
@@ -202,6 +204,7 @@ export const useAdminNewsDrawer = (
             setIsFeatured(!!art.isFeatured);
             setFeaturedSlot(art.featuredSlot || (art.isFeatured ? 'MAIN' : 'NONE'));
             setIsPinned(Boolean(art.isPinned));
+            setShowOnHomepage(art.showOnHomepage ?? true);
             setReporterName(art.reporterName || '');
             setPhotographerName(art.photographerName || '');
             setAllowReactions(art.allowReactions ?? true);
@@ -362,6 +365,7 @@ export const useAdminNewsDrawer = (
         isFeatured: featuredSlot !== 'NONE',
         featuredSlot,
         isPinned,
+        showOnHomepage,
         reporterName: reporterName.trim() || undefined,
         photographerName: photographerName.trim() || undefined,
         allowReactions,
@@ -496,6 +500,8 @@ export const useAdminNewsDrawer = (
     cancelReplaceMain,
     isPinned,
     setIsPinned,
+    showOnHomepage,
+    setShowOnHomepage,
     reporterName,
     setReporterName,
     photographerName,

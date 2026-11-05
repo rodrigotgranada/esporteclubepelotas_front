@@ -33,6 +33,8 @@ export interface SquadMembersDrawerProps {
   availableAthletes: AthleteData[];
   isLoadingAthletes: boolean;
   isSaving: boolean;
+  includeYouthAthletes?: boolean;
+  setIncludeYouthAthletes?: (v: boolean) => void;
   onClose: () => void;
   onSave: () => void;
   selectedAthleteId: string;
@@ -54,6 +56,8 @@ export const SquadMembersDrawer: React.FC<SquadMembersDrawerProps> = ({
   availableAthletes,
   isLoadingAthletes,
   isSaving,
+  includeYouthAthletes = false,
+  setIncludeYouthAthletes,
   onClose,
   onSave,
   selectedAthleteId,
@@ -84,10 +88,44 @@ export const SquadMembersDrawer: React.FC<SquadMembersDrawerProps> = ({
       <LayoutContainer className="flex flex-col gap-6 p-6">
         {/* Adicionar Atleta Form Card */}
         <LayoutContainer className="p-4 rounded-2xl bg-surface border border-border flex flex-col gap-4 shadow-xs">
-          <Title level="h4" className="text-sm font-bold text-text-primary flex items-center gap-1.5">
-            <Plus className="w-4 h-4 text-primary" />
-            <Text as="span">{texts.ADD_ATHLETE}</Text>
-          </Title>
+          <LayoutContainer className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-border/50 pb-3">
+            <Title level="h4" className="text-sm font-bold text-text-primary flex items-center gap-1.5">
+              <Plus className="w-4 h-4 text-primary" />
+              <Text as="span">{texts.ADD_ATHLETE}</Text>
+            </Title>
+
+            {/* Toggle para incluir Atletas da Base no Elenco Profissional */}
+            {squad?.category === 'PROFESSIONAL' && setIncludeYouthAthletes && (
+              <Button
+                type="button"
+                variant={includeYouthAthletes ? 'primary' : 'outline'}
+                size="sm"
+                onClick={() => setIncludeYouthAthletes(!includeYouthAthletes)}
+                className="text-xs font-bold rounded-full transition-all"
+              >
+                {includeYouthAthletes ? `✓ ${texts.TOGGLE_INCLUDE_YOUTH_ACTIVE}` : `🌱 ${texts.TOGGLE_INCLUDE_YOUTH}`}
+              </Button>
+            )}
+          </LayoutContainer>
+
+          {/* Avisos de Contexto e Regras de Negócio do Elenco */}
+          {squad?.category === 'FEMININE' && (
+            <LayoutContainer className="px-3 py-2 rounded-xl bg-primary/10 border border-primary/20 text-xs text-text-secondary font-medium">
+              ℹ️ {texts.FEMALE_ONLY_NOTICE}
+            </LayoutContainer>
+          )}
+
+          {squad?.category?.startsWith('SUB_') && (
+            <LayoutContainer className="px-3 py-2 rounded-xl bg-primary/10 border border-primary/20 text-xs text-text-secondary font-medium">
+              ℹ️ {texts.YOUTH_ONLY_NOTICE}
+            </LayoutContainer>
+          )}
+
+          {squad?.category === 'PROFESSIONAL' && !includeYouthAthletes && (
+            <LayoutContainer className="px-3 py-2 rounded-xl bg-surface-secondary border border-border text-[11px] text-text-muted">
+              {texts.MALE_ONLY_NOTICE} Clique no botão acima para permitir alocar atletas da base em transição.
+            </LayoutContainer>
+          )}
 
           <LayoutContainer className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
             {/* Selecionar Atleta */}
@@ -122,7 +160,9 @@ export const SquadMembersDrawer: React.FC<SquadMembersDrawerProps> = ({
                   const isAllocated = allocatedIds.has(id);
                   return (
                     <Option key={id} value={id}>
-                      {a.nickname || a.name} ({a.primaryPosition}) {isAllocated ? '✓ Já no elenco' : ''}
+                      {a.nickname || a.name} ({a.primaryPosition})
+                      {a.athleteType === 'YOUTH' ? ` [${texts.YOUTH_BADGE}${a.youthCategory ? ` - ${a.youthCategory}` : ''}]` : ''}
+                      {isAllocated ? ' ✓ Já no elenco' : ''}
                     </Option>
                   );
                 })}
