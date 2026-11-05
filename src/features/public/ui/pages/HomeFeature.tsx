@@ -16,14 +16,14 @@ import { newsService } from '@/features/news/services/news.service';
 import { NewsArticleData } from '@/features/admin/services/admin-news.service';
 import { NewsBentoHero } from '@/features/news/ui/components/NewsBentoHero';
 import { NewsCard } from '@/features/news/ui/components/NewsCard';
-import { idolsService, IdolData } from '@/features/idols/services/idols.service';
-import { IdolCard } from '@/features/idols/ui/components/IdolCard';
+
+
 
 export const HomeFeature = () => {
   const { settings } = useSettingsStore();
   const [featuredNews, setFeaturedNews] = useState<NewsArticleData[]>([]);
   const [latestNews, setLatestNews] = useState<NewsArticleData[]>([]);
-  const [featuredIdols, setFeaturedIdols] = useState<IdolData[]>([]);
+
 
   useEffect(() => {
     let isMounted = true;
@@ -48,15 +48,6 @@ export const HomeFeature = () => {
         setLatestNews(filteredLatest);
       } catch (err) {
         console.error('Falha ao carregar notícias na Home', err);
-      }
-
-      try {
-        const idols = await idolsService.getFeaturedIdols(4);
-        if (isMounted) {
-          setFeaturedIdols(idols);
-        }
-      } catch (err) {
-        console.error('Falha ao carregar ídolos na Home', err);
       }
     }
 
@@ -164,40 +155,6 @@ export const HomeFeature = () => {
               </LayoutContainer>
             </LayoutContainer>
           )}
-        </LayoutContainer>
-      )}
-
-      {/* Seção Memorial & Ídolos */}
-      {featuredIdols.length > 0 && (
-        <LayoutContainer className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 w-full flex flex-col gap-10">
-          <LayoutContainer className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-            <LayoutContainer className="flex flex-col gap-1">
-              <LayoutContainer className="inline-block px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary font-bold text-xs uppercase tracking-wider w-fit">
-                {HOME_FEATURE_TEXTS.SECTION_IDOLS_BADGE}
-              </LayoutContainer>
-              <Title
-                level="h2"
-                className="text-3xl sm:text-4xl font-black text-text-primary tracking-tight"
-              >
-                {HOME_FEATURE_TEXTS.SECTION_IDOLS_TITLE}
-              </Title>
-              <Text className="text-text-secondary text-sm sm:text-base max-w-xl">
-                {HOME_FEATURE_TEXTS.SECTION_IDOLS_SUBTITLE}
-              </Text>
-            </LayoutContainer>
-
-            <Link href="/idolos">
-              <Button variant="outline" size="sm" className="font-bold text-xs whitespace-nowrap">
-                {HOME_FEATURE_TEXTS.BUTTON_ALL_IDOLS}
-              </Button>
-            </Link>
-          </LayoutContainer>
-
-          <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredIdols.map((idol) => (
-              <IdolCard key={idol._id || idol.id || idol.slug} idol={idol} />
-            ))}
-          </LayoutContainer>
         </LayoutContainer>
       )}
 
