@@ -3,7 +3,7 @@ import { api } from '@/services/api';
 export type PreferredFoot = 'RIGHT' | 'LEFT' | 'BOTH';
 
 export type AthleteGender = 'MALE' | 'FEMALE';
-export type AthleteType = 'PROFESSIONAL' | 'YOUTH';
+export type AthleteType = 'PROFESSIONAL' | 'YOUTH' | 'STAFF';
 
 export type SquadCategory =
   | 'PROFESSIONAL'
@@ -16,7 +16,8 @@ export type SquadSector =
   | 'GOALKEEPER'
   | 'DEFENDER'
   | 'MIDFIELDER'
-  | 'FORWARD';
+  | 'FORWARD'
+  | 'STAFF';
 
 export type SquadMemberRole =
   | 'STARTER'
@@ -45,12 +46,13 @@ export interface AthleteData {
   athleteType?: AthleteType;
   youthCategory?: string | null;
   entryYear?: number | null;
+  staffRole?: string | null;
   birthDate?: string | null;
   age?: number | null;
   birthPlace?: string | null;
   height?: number | null;
   weight?: number | null;
-  preferredFoot: PreferredFoot;
+  preferredFoot?: PreferredFoot | null;
   primaryPosition: string;
   secondaryPositions: string[];
   pastClubs: string[];
@@ -65,7 +67,7 @@ export interface AthleteData {
 export interface SquadMemberData {
   athleteId: string;
   athlete?: AthleteData | null;
-  jerseyNumber: number;
+  jerseyNumber?: number | null;
   sector: SquadSector;
   role: SquadMemberRole;
   order: number;
@@ -92,6 +94,7 @@ export interface SquadData {
     defenders: SquadMemberData[];
     midfielders: SquadMemberData[];
     forwards: SquadMemberData[];
+    staff?: SquadMemberData[];
   };
   isActive: boolean;
   createdAt?: string | null;
@@ -138,6 +141,8 @@ export const footballService = {
     limit?: number;
     search?: string;
     position?: string;
+    athleteType?: AthleteType;
+    gender?: AthleteGender;
   }): Promise<GetAthletesResponse> => {
     const response = await api.get('/athletes', { params });
     return response.data;

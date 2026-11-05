@@ -103,7 +103,7 @@ export const adminFootballService = {
     squadId: string,
     members: Array<{
       athleteId: string;
-      jerseyNumber: number;
+      jerseyNumber?: number | null;
       sector: string;
       role?: string;
       order?: number;

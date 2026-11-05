@@ -159,6 +159,8 @@ export const AdminFootballFeature: React.FC = () => {
         setGender={athleteDrawer.setGender}
         athleteType={athleteDrawer.athleteType}
         setAthleteType={athleteDrawer.setAthleteType}
+        staffRole={athleteDrawer.staffRole}
+        setStaffRole={athleteDrawer.setStaffRole}
         youthCategory={athleteDrawer.youthCategory}
         setYouthCategory={athleteDrawer.setYouthCategory}
         entryYear={athleteDrawer.entryYear}

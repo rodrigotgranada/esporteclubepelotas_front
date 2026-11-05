@@ -123,7 +123,7 @@ export const SquadFeature: React.FC = () => {
             <SquadSectorSection
               title={FOOTBALL_CONSTANTS.SECTORS.STAFF}
               icon="📋"
-              staff={sectors.staff}
+              members={sectors.staff}
             />
           )}
         </LayoutContainer>

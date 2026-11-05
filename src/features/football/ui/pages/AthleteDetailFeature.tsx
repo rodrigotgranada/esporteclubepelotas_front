@@ -110,8 +110,7 @@ export const AthleteDetailFeature: React.FC = () => {
     );
   }
 
-  const footLabel =
-    (FOOTBALL_CONSTANTS.FEET as any)[athlete.preferredFoot] || athlete.preferredFoot;
+  const footLabel = athlete?.preferredFoot ? ((FOOTBALL_CONSTANTS.FEET as Record<string, string>)[athlete.preferredFoot] || athlete.preferredFoot) : "-";
 
   return (
     <LayoutContainer className="min-h-screen py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
@@ -140,7 +139,7 @@ export const AthleteDetailFeature: React.FC = () => {
             <LayoutContainer className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
             <LayoutContainer className="absolute bottom-4 left-4 right-4">
               <Badge variant="primary" size="md" className="font-extrabold uppercase text-xs tracking-wider shadow-sm">
-                {athlete.primaryPosition}
+                {athlete.athleteType === 'STAFF' ? (athlete.staffRole || 'Comissão Técnica') : athlete.primaryPosition}
               </Badge>
             </LayoutContainer>
           </LayoutContainer>
@@ -174,51 +173,81 @@ export const AthleteDetailFeature: React.FC = () => {
           </LayoutContainer>
 
           {/* Cards de Métricas Físicas e Técnicas */}
-          <LayoutContainer className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
-            {/* Idade */}
-            <LayoutContainer className="p-4 rounded-2xl bg-surface border border-border flex flex-col gap-1">
-              <LayoutContainer className="flex items-center gap-1.5 text-text-muted text-xs font-semibold">
-                <Calendar className="w-3.5 h-3.5 text-primary" />
-                <span>{FOOTBALL_CONSTANTS.ATHLETE_DETAIL.AGE}</span>
+          {athlete.athleteType === 'STAFF' ? (
+            <LayoutContainer className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+              <LayoutContainer className="p-4 rounded-2xl bg-surface border border-border flex flex-col gap-1">
+                <LayoutContainer className="flex items-center gap-1.5 text-text-muted text-xs font-semibold">
+                  <Shield className="w-3.5 h-3.5 text-primary" />
+                  <span>Cargo / Função</span>
+                </LayoutContainer>
+                <Text as="span" className="text-base sm:text-lg font-black text-text-primary">
+                  {athlete.staffRole || 'Comissão Técnica'}
+                </Text>
               </LayoutContainer>
-              <Text as="span" className="text-lg font-black text-text-primary">
-                {athlete.age ? `${athlete.age} anos` : '-'}
-              </Text>
-            </LayoutContainer>
 
-            {/* Altura */}
-            <LayoutContainer className="p-4 rounded-2xl bg-surface border border-border flex flex-col gap-1">
-              <LayoutContainer className="flex items-center gap-1.5 text-text-muted text-xs font-semibold">
-                <Ruler className="w-3.5 h-3.5 text-primary" />
-                <span>{FOOTBALL_CONSTANTS.ATHLETE_DETAIL.HEIGHT}</span>
+              <LayoutContainer className="p-4 rounded-2xl bg-surface border border-border flex flex-col gap-1">
+                <LayoutContainer className="flex items-center gap-1.5 text-text-muted text-xs font-semibold">
+                  <Calendar className="w-3.5 h-3.5 text-primary" />
+                  <span>{FOOTBALL_CONSTANTS.ATHLETE_DETAIL.AGE}</span>
+                </LayoutContainer>
+                <Text as="span" className="text-base sm:text-lg font-black text-text-primary">
+                  {athlete.age ? `${athlete.age} anos` : '-'}
+                </Text>
               </LayoutContainer>
-              <Text as="span" className="text-lg font-black text-text-primary">
-                {athlete.height ? `${athlete.height} cm` : '-'}
-              </Text>
-            </LayoutContainer>
 
-            {/* Peso */}
-            <LayoutContainer className="p-4 rounded-2xl bg-surface border border-border flex flex-col gap-1">
-              <LayoutContainer className="flex items-center gap-1.5 text-text-muted text-xs font-semibold">
-                <Weight className="w-3.5 h-3.5 text-primary" />
-                <span>{FOOTBALL_CONSTANTS.ATHLETE_DETAIL.WEIGHT}</span>
+              <LayoutContainer className="p-4 rounded-2xl bg-surface border border-border flex flex-col gap-1">
+                <LayoutContainer className="flex items-center gap-1.5 text-text-muted text-xs font-semibold">
+                  <MapPin className="w-3.5 h-3.5 text-primary" />
+                  <span>Naturalidade</span>
+                </LayoutContainer>
+                <Text as="span" className="text-base sm:text-lg font-black text-text-primary">
+                  {athlete.birthPlace || 'Brasil'}
+                </Text>
               </LayoutContainer>
-              <Text as="span" className="text-lg font-black text-text-primary">
-                {athlete.weight ? `${athlete.weight} kg` : '-'}
-              </Text>
             </LayoutContainer>
+          ) : (
+            <LayoutContainer className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
+              <LayoutContainer className="p-4 rounded-2xl bg-surface border border-border flex flex-col gap-1">
+                <LayoutContainer className="flex items-center gap-1.5 text-text-muted text-xs font-semibold">
+                  <Calendar className="w-3.5 h-3.5 text-primary" />
+                  <span>{FOOTBALL_CONSTANTS.ATHLETE_DETAIL.AGE}</span>
+                </LayoutContainer>
+                <Text as="span" className="text-lg font-black text-text-primary">
+                  {athlete.age ? `${athlete.age} anos` : '-'}
+                </Text>
+              </LayoutContainer>
 
-            {/* Pé Preferencial */}
-            <LayoutContainer className="p-4 rounded-2xl bg-surface border border-border flex flex-col gap-1">
-              <LayoutContainer className="flex items-center gap-1.5 text-text-muted text-xs font-semibold">
-                <Footprints className="w-3.5 h-3.5 text-primary" />
-                <span>Pé</span>
+              <LayoutContainer className="p-4 rounded-2xl bg-surface border border-border flex flex-col gap-1">
+                <LayoutContainer className="flex items-center gap-1.5 text-text-muted text-xs font-semibold">
+                  <Ruler className="w-3.5 h-3.5 text-primary" />
+                  <span>{FOOTBALL_CONSTANTS.ATHLETE_DETAIL.HEIGHT}</span>
+                </LayoutContainer>
+                <Text as="span" className="text-lg font-black text-text-primary">
+                  {athlete.height ? `${athlete.height} cm` : '-'}
+                </Text>
               </LayoutContainer>
-              <Text as="span" className="text-lg font-black text-text-primary">
-                {footLabel}
-              </Text>
+
+              <LayoutContainer className="p-4 rounded-2xl bg-surface border border-border flex flex-col gap-1">
+                <LayoutContainer className="flex items-center gap-1.5 text-text-muted text-xs font-semibold">
+                  <Weight className="w-3.5 h-3.5 text-primary" />
+                  <span>{FOOTBALL_CONSTANTS.ATHLETE_DETAIL.WEIGHT}</span>
+                </LayoutContainer>
+                <Text as="span" className="text-lg font-black text-text-primary">
+                  {athlete.weight ? `${athlete.weight} kg` : '-'}
+                </Text>
+              </LayoutContainer>
+
+              <LayoutContainer className="p-4 rounded-2xl bg-surface border border-border flex flex-col gap-1">
+                <LayoutContainer className="flex items-center gap-1.5 text-text-muted text-xs font-semibold">
+                  <Footprints className="w-3.5 h-3.5 text-primary" />
+                  <span>Pé</span>
+                </LayoutContainer>
+                <Text as="span" className="text-lg font-black text-text-primary">
+                  {footLabel}
+                </Text>
+              </LayoutContainer>
             </LayoutContainer>
-          </LayoutContainer>
+          )}
 
           {/* Naturalidade & Posições Secundárias */}
           <LayoutContainer className="flex flex-wrap items-center gap-4 text-xs text-text-secondary">
@@ -292,7 +321,7 @@ export const AthleteDetailFeature: React.FC = () => {
                   >
                     <LayoutContainer className="flex items-center gap-3">
                       <Badge variant="primary" size="sm" className="font-black text-xs px-2.5">
-                        #{season.jerseyNumber || '-'}
+                        {season.sector === 'STAFF' || !season.jerseyNumber ? 'STAFF' : '#' + season.jerseyNumber}
                       </Badge>
                       <LayoutContainer className="flex flex-col">
                         <Text as="span" className="font-bold text-text-primary">

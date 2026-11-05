@@ -2,12 +2,12 @@ export const FOOTBALL_CONSTANTS = {
   PAGE_TITLE: 'Elenco & Comissões Técnicas',
   PAGE_SUBTITLE:
     'Conheça o plantel de atletas e profissionais que defendem as cores do Esporte Clube Pelotas na Boca do Lobo.',
-  HERO_BADGE: 'Temporada Oficial',
+  HERO_BADGE: 'Competição Oficial',
   COACH_LABEL: 'Comandante Técnico',
-  STAFF_LABEL: 'Comissão Técnica & Apoio',
+  STAFF_LABEL: 'Comissão Técnica',
   CAPTAIN_BADGE: 'Capitão',
-  CURRENT_BADGE: 'Elenco Ativo',
-  ATHLETES_COUNT_LABEL: 'Atletas no Elenco',
+  CURRENT_BADGE: 'Em Disputa',
+  ATHLETES_COUNT_LABEL: 'Profissionais no Plantel',
   LOADING_TEXT: 'Carregando elenco do Lobo...',
 
   SECTORS: {
@@ -17,6 +17,21 @@ export const FOOTBALL_CONSTANTS = {
     FORWARD: 'Atacantes',
     STAFF: 'Comissão Técnica',
   },
+
+  STAFF_ROLES: [
+    { value: 'Treinador', label: 'Treinador / Técnico' },
+    { value: 'Auxiliar Técnico', label: 'Auxiliar Técnico' },
+    { value: 'Preparador Físico', label: 'Preparador Físico' },
+    { value: 'Preparador de Goleiros', label: 'Preparador de Goleiros' },
+    { value: 'Analista de Desempenho', label: 'Analista de Desempenho' },
+    { value: 'Fisiologista', label: 'Fisiologista' },
+    { value: 'Fisioterapeuta', label: 'Fisioterapeuta' },
+    { value: 'Médico', label: 'Médico' },
+    { value: 'Massagista', label: 'Massagista' },
+    { value: 'Roupeiro', label: 'Roupeiro' },
+    { value: 'Coordenador Técnico', label: 'Coordenador Técnico' },
+    { value: 'Gerente de Futebol', label: 'Gerente de Futebol' },
+  ],
 
   CATEGORIES: {
     PROFESSIONAL: 'Masculino',
@@ -39,12 +54,13 @@ export const FOOTBALL_CONSTANTS = {
   },
 
   SELECTION: {
-    SELECT_SEASON: 'Temporada',
+    SELECT_SEASON: 'Competição',
     SEASON_PREFIX: 'Temporada',
-    ALL_SEASONS: 'Todas as temporadas',
+    COMPETITION_LABEL: 'Competição',
+    ALL_SEASONS: 'Todas as competições',
     SELECT_CATEGORY: 'Categoria',
-    SEARCH_PLACEHOLDER: 'Buscar atleta no time...',
-    ARIA_SEASON_BUTTON: 'Abrir seletor de temporadas',
+    SEARCH_PLACEHOLDER: 'Buscar atleta ou profissional...',
+    ARIA_SEASON_BUTTON: 'Abrir seletor de competições',
   },
 
   CARD: {
@@ -58,6 +74,8 @@ export const FOOTBALL_CONSTANTS = {
   ATHLETE_DETAIL: {
     BACK_TO_SQUAD: 'Voltar ao Elenco',
     TECHNICAL_FILE: 'Ficha Técnica do Atleta',
+    TECHNICAL_STAFF_FILE: 'Ficha Técnica da Comissão',
+    ROLE_LABEL: 'Função / Cargo',
     FULL_NAME: 'Nome Completo',
     NICKNAME: 'Nome de Camisa',
     BIRTH_DATE: 'Nascimento',
@@ -66,13 +84,13 @@ export const FOOTBALL_CONSTANTS = {
     HEIGHT: 'Altura',
     WEIGHT: 'Peso',
     PREFERRED_FOOT: 'Pé Preferencial',
-    PRIMARY_POSITION: 'Posição Principal',
+    PRIMARY_POSITION: 'Posição / Função',
     SECONDARY_POSITIONS: 'Posições Secundárias',
     PAST_CLUBS: 'Clubes Anteriores',
-    NO_PAST_CLUBS: 'Atleta formado nas categorias de base do clube.',
+    NO_PAST_CLUBS: 'Profissional formado no Esporte Clube Pelotas.',
     BIOGRAPHY_TITLE: 'Trajetória & Características',
     SEASONS_TITLE: 'Histórico no Esporte Clube Pelotas',
-    SEASON_ROW: 'Temporada',
+    SEASON_ROW: 'Competição / Temporada',
     JERSEY_ROW: 'Camisa',
     SECTOR_ROW: 'Setor',
     ROLE_ROW: 'Status',
@@ -88,7 +106,7 @@ export const FOOTBALL_CONSTANTS = {
   EMPTY: {
     TITLE: 'Nenhum elenco encontrado',
     DESCRIPTION:
-      'Ainda não há atletas registrados para a temporada ou categoria selecionada.',
+      'Ainda não há atletas registrados para a competição ou categoria selecionada.',
     BTN_CURRENT: 'Ver Elenco Atual',
   },
 

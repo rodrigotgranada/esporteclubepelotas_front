@@ -162,13 +162,14 @@ export const useSquad = (initialCategory: SquadCategory = 'PROFESSIONAL') => {
     const defenders = filteredMembers.filter((m) => m.sector === 'DEFENDER');
     const midfielders = filteredMembers.filter((m) => m.sector === 'MIDFIELDER');
     const forwards = filteredMembers.filter((m) => m.sector === 'FORWARD');
+    const staff = filteredMembers.filter((m) => m.sector === 'STAFF');
 
     return {
       goalkeepers,
       defenders,
       midfielders,
       forwards,
-      staff: squad?.staff || [],
+      staff: staff.length > 0 ? staff : (squad?.sectors?.staff || []),
     };
   }, [filteredMembers, squad?.staff]);
 

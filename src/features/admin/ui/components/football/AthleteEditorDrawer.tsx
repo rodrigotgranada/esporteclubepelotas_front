@@ -4,17 +4,21 @@ import React from 'react';
 import {
   Drawer,
   LayoutContainer,
+  Title,
   Text,
   Input,
-  Textarea,
   Select,
   Option,
   Button,
   ImageCropper,
-  Spinner,
 } from '@/shared/ui/components';
 import { ADMIN_FOOTBALL_CONSTANTS } from '../../../constants/admin-football.constants';
-import { PreferredFoot, AthleteGender, AthleteType } from '@/features/football/services/football.service';
+import { FOOTBALL_CONSTANTS } from '@/features/football/constants/football.constants';
+import {
+  AthleteGender,
+  AthleteType,
+  PreferredFoot,
+} from '@/features/football/services/football.service';
 
 export interface AthleteEditorDrawerProps {
   isOpen: boolean;
@@ -23,6 +27,8 @@ export interface AthleteEditorDrawerProps {
   onSave: () => void;
   isSaving: boolean;
   errors: Record<string, string>;
+
+  // Fields
   gender: AthleteGender;
   setGender: (v: AthleteGender) => void;
   athleteType: AthleteType;
@@ -31,6 +37,8 @@ export interface AthleteEditorDrawerProps {
   setYouthCategory: (v: string) => void;
   entryYear: string;
   setEntryYear: (v: string) => void;
+  staffRole: string;
+  setStaffRole: (v: string) => void;
   name: string;
   setName: (v: string) => void;
   nickname: string;
@@ -76,6 +84,8 @@ export const AthleteEditorDrawer: React.FC<AthleteEditorDrawerProps> = ({
   setYouthCategory,
   entryYear,
   setEntryYear,
+  staffRole,
+  setStaffRole,
   name,
   setName,
   nickname,
@@ -105,11 +115,13 @@ export const AthleteEditorDrawer: React.FC<AthleteEditorDrawerProps> = ({
   setPendingPhotoFile,
 }) => {
   const texts = ADMIN_FOOTBALL_CONSTANTS.DRAWER_ATHLETE;
+  const isStaff = athleteType === 'STAFF';
+  const isYouth = athleteType === 'YOUTH';
 
-  const handleCropComplete = (blob: Blob) => {
-    const file = new File([blob], 'athlete-cropped.webp', { type: 'image/webp' });
+  const handleCropComplete = (croppedImageBlob: Blob) => {
+    const file = new File([croppedImageBlob], 'photo.webp', { type: croppedImageBlob.type || 'image/webp' });
     setPendingPhotoFile(file);
-    const previewUrl = URL.createObjectURL(blob);
+    const previewUrl = URL.createObjectURL(croppedImageBlob);
     setPhotoUrl(previewUrl);
   };
 
@@ -139,7 +151,7 @@ export const AthleteEditorDrawer: React.FC<AthleteEditorDrawerProps> = ({
           />
         </LayoutContainer>
 
-        {/* Gênero & Vínculo (Profissional vs Base) */}
+        {/* Gênero & Vínculo */}
         <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-2xl bg-surface-secondary border border-border">
           <LayoutContainer className="flex flex-col gap-1.5">
             <Text as="span" className="text-xs font-bold text-text-primary">
@@ -161,14 +173,51 @@ export const AthleteEditorDrawer: React.FC<AthleteEditorDrawerProps> = ({
             </Text>
             <Select
               value={athleteType}
-              onChange={(e) => setAthleteType(e.target.value as AthleteType)}
+              onChange={(e) => {
+                const nextType = e.target.value as AthleteType;
+                setAthleteType(nextType);
+                if (nextType === 'STAFF' && !staffRole) {
+                  setStaffRole('Treinador');
+                }
+              }}
               className="w-full"
             >
               <Option value="PROFESSIONAL">{texts.TYPE_PROFESSIONAL}</Option>
               <Option value="YOUTH">{texts.TYPE_YOUTH}</Option>
+              <Option value="STAFF">{texts.TYPE_STAFF}</Option>
             </Select>
           </LayoutContainer>
         </LayoutContainer>
+
+        {/* Submenu Condicional da Comissão Técnica */}
+        {isStaff && (
+          <LayoutContainer className="p-4 rounded-2xl bg-surface border border-primary/20 flex flex-col gap-2 shadow-xs">
+            <LayoutContainer className="flex flex-col gap-1.5">
+              <Text as="span" className="text-xs font-bold text-text-primary">
+                {texts.FIELD_STAFF_ROLE} *
+              </Text>
+              <Select
+                value={staffRole}
+                onChange={(e) => setStaffRole(e.target.value)}
+                className="w-full"
+              >
+                {FOOTBALL_CONSTANTS.STAFF_ROLES.map((role) => (
+                  <Option key={role.value} value={role.value}>
+                    {role.label}
+                  </Option>
+                ))}
+              </Select>
+              {errors.staffRole && (
+                <Text as="span" className="text-[11px] text-[#ea580c] font-medium">
+                  {errors.staffRole}
+                </Text>
+              )}
+            </LayoutContainer>
+            <Text as="p" className="text-xs text-text-muted italic">
+              ℹ️ {texts.STAFF_NOTICE}
+            </Text>
+          </LayoutContainer>
+        )}
 
         {/* Nome Completo & Apelido */}
         <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -201,40 +250,42 @@ export const AthleteEditorDrawer: React.FC<AthleteEditorDrawerProps> = ({
           </LayoutContainer>
         </LayoutContainer>
 
-        {/* Posição Principal & Pé Preferencial */}
-        <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <LayoutContainer className="flex flex-col gap-1.5">
-            <Text as="span" className="text-xs font-bold text-text-primary">
-              {texts.FIELD_PRIMARY_POSITION} *
-            </Text>
-            <Input
-              value={primaryPosition}
-              onChange={(e) => setPrimaryPosition(e.target.value)}
-              placeholder={texts.FIELD_PRIMARY_POSITION_PLACEHOLDER}
-              className={errors.primaryPosition ? 'border-[#ea580c]' : ''}
-            />
-            {errors.primaryPosition && (
-              <Text as="span" className="text-[11px] text-[#ea580c] font-medium">
-                {errors.primaryPosition}
+        {/* Posição Principal & Pé Preferencial (Apenas Atletas) */}
+        {!isStaff && (
+          <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <LayoutContainer className="flex flex-col gap-1.5">
+              <Text as="span" className="text-xs font-bold text-text-primary">
+                {texts.FIELD_PRIMARY_POSITION} *
               </Text>
-            )}
-          </LayoutContainer>
+              <Input
+                value={primaryPosition}
+                onChange={(e) => setPrimaryPosition(e.target.value)}
+                placeholder={texts.FIELD_PRIMARY_POSITION_PLACEHOLDER}
+                className={errors.primaryPosition ? 'border-[#ea580c]' : ''}
+              />
+              {errors.primaryPosition && (
+                <Text as="span" className="text-[11px] text-[#ea580c] font-medium">
+                  {errors.primaryPosition}
+                </Text>
+              )}
+            </LayoutContainer>
 
-          <LayoutContainer className="flex flex-col gap-1.5">
-            <Text as="span" className="text-xs font-bold text-text-primary">
-              {texts.FIELD_PREFERRED_FOOT}
-            </Text>
-            <Select
-              value={preferredFoot}
-              onChange={(e) => setPreferredFoot(e.target.value as PreferredFoot)}
-              className="w-full"
-            >
-              <Option value="RIGHT">Destro</Option>
-              <Option value="LEFT">Canhoto</Option>
-              <Option value="BOTH">Ambidestro</Option>
-            </Select>
+            <LayoutContainer className="flex flex-col gap-1.5">
+              <Text as="span" className="text-xs font-bold text-text-primary">
+                {texts.FIELD_PREFERRED_FOOT}
+              </Text>
+              <Select
+                value={preferredFoot}
+                onChange={(e) => setPreferredFoot(e.target.value as PreferredFoot)}
+                className="w-full"
+              >
+                <Option value="RIGHT">Destro</Option>
+                <Option value="LEFT">Canhoto</Option>
+                <Option value="BOTH">Ambidestro</Option>
+              </Select>
+            </LayoutContainer>
           </LayoutContainer>
-        </LayoutContainer>
+        )}
 
         {/* Data de Nascimento & Naturalidade */}
         <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -261,47 +312,51 @@ export const AthleteEditorDrawer: React.FC<AthleteEditorDrawerProps> = ({
           </LayoutContainer>
         </LayoutContainer>
 
-        {/* Altura & Peso */}
-        <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {/* Altura & Peso (Apenas Atletas) */}
+        {!isStaff && (
+          <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <LayoutContainer className="flex flex-col gap-1.5">
+              <Text as="span" className="text-xs font-bold text-text-primary">
+                {texts.FIELD_HEIGHT}
+              </Text>
+              <Input
+                type="number"
+                value={height}
+                onChange={(e) => setHeight(e.target.value)}
+                placeholder={texts.FIELD_HEIGHT_PLACEHOLDER}
+              />
+            </LayoutContainer>
+
+            <LayoutContainer className="flex flex-col gap-1.5">
+              <Text as="span" className="text-xs font-bold text-text-primary">
+                {texts.FIELD_WEIGHT}
+              </Text>
+              <Input
+                type="number"
+                value={weight}
+                onChange={(e) => setWeight(e.target.value)}
+                placeholder={texts.FIELD_WEIGHT_PLACEHOLDER}
+              />
+            </LayoutContainer>
+          </LayoutContainer>
+        )}
+
+        {/* Posições Secundárias (Apenas Atletas) */}
+        {!isStaff && (
           <LayoutContainer className="flex flex-col gap-1.5">
             <Text as="span" className="text-xs font-bold text-text-primary">
-              {texts.FIELD_HEIGHT}
+              {texts.FIELD_SECONDARY_POSITIONS}
             </Text>
             <Input
-              type="number"
-              value={height}
-              onChange={(e) => setHeight(e.target.value)}
-              placeholder={texts.FIELD_HEIGHT_PLACEHOLDER}
+              value={secondaryPositionsText}
+              onChange={(e) => setSecondaryPositionsText(e.target.value)}
+              placeholder={texts.FIELD_SECONDARY_POSITIONS_PLACEHOLDER}
             />
           </LayoutContainer>
+        )}
 
-          <LayoutContainer className="flex flex-col gap-1.5">
-            <Text as="span" className="text-xs font-bold text-text-primary">
-              {texts.FIELD_WEIGHT}
-            </Text>
-            <Input
-              type="number"
-              value={weight}
-              onChange={(e) => setWeight(e.target.value)}
-              placeholder={texts.FIELD_WEIGHT_PLACEHOLDER}
-            />
-          </LayoutContainer>
-        </LayoutContainer>
-
-        {/* Posições Secundárias */}
-        <LayoutContainer className="flex flex-col gap-1.5">
-          <Text as="span" className="text-xs font-bold text-text-primary">
-            {texts.FIELD_SECONDARY_POSITIONS}
-          </Text>
-          <Input
-            value={secondaryPositionsText}
-            onChange={(e) => setSecondaryPositionsText(e.target.value)}
-            placeholder={texts.FIELD_SECONDARY_POSITIONS_PLACEHOLDER}
-          />
-        </LayoutContainer>
-
-        {/* Condicional: Base (Ano de Chegada & Categoria) vs Profissional (Clubes Anteriores) */}
-        {athleteType === 'YOUTH' ? (
+        {/* Base vs Clubes Anteriores (Comissão técnica e Profissionais têm clubes anteriores) */}
+        {isYouth ? (
           <LayoutContainer className="p-4 rounded-2xl bg-surface border border-primary/20 flex flex-col gap-4">
             <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <LayoutContainer className="flex flex-col gap-1.5">
@@ -349,7 +404,7 @@ export const AthleteEditorDrawer: React.FC<AthleteEditorDrawerProps> = ({
           </LayoutContainer>
         )}
 
-        {/* Instagram Oficial */}
+        {/* Instagram */}
         <LayoutContainer className="flex flex-col gap-1.5">
           <Text as="span" className="text-xs font-bold text-text-primary">
             {texts.FIELD_INSTAGRAM}
@@ -361,38 +416,38 @@ export const AthleteEditorDrawer: React.FC<AthleteEditorDrawerProps> = ({
           />
         </LayoutContainer>
 
-        {/* Biografia / Trajetória */}
+        {/* Biografia / Resumo da Trajetória */}
         <LayoutContainer className="flex flex-col gap-1.5">
           <Text as="span" className="text-xs font-bold text-text-primary">
             {texts.FIELD_BIOGRAPHY}
           </Text>
-          <Textarea
+          <textarea
             value={biography}
             onChange={(e) => setBiography(e.target.value)}
-            placeholder={texts.FIELD_BIOGRAPHY_PLACEHOLDER}
             rows={4}
+            placeholder={texts.FIELD_BIOGRAPHY_PLACEHOLDER}
+            className="w-full p-3 rounded-xl bg-background border border-border text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-primary transition-colors resize-y"
           />
         </LayoutContainer>
 
-        {/* Drawer Actions */}
-        <LayoutContainer className="flex items-center justify-end gap-3 pt-4 border-t border-border">
-          <Button variant="ghost" onClick={onClose} disabled={isSaving}>
+        {/* Footer Actions */}
+        <LayoutContainer className="flex items-center justify-end gap-3 pt-4 border-t border-border mt-4">
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={onClose}
+            disabled={isSaving}
+          >
             Cancelar
           </Button>
           <Button
+            type="button"
             variant="primary"
             onClick={onSave}
-            disabled={isSaving}
-            className="font-bold min-w-[120px]"
+            isLoading={isSaving}
+            className="font-bold"
           >
-            {isSaving ? (
-              <LayoutContainer className="flex items-center gap-2">
-                <Spinner size={16} />
-                <span>{texts.BTN_SAVING}</span>
-              </LayoutContainer>
-            ) : (
-              texts.BTN_SAVE
-            )}
+            {isSaving ? texts.BTN_SAVING : texts.BTN_SAVE}
           </Button>
         </LayoutContainer>
       </LayoutContainer>

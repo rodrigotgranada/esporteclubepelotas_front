@@ -18,6 +18,8 @@ export const AthleteCard: React.FC<AthleteCardProps> = ({ member, athlete: direc
 
   const jerseyNumber = member?.jerseyNumber;
   const isCaptain = member?.role === 'CAPTAIN';
+  const isStaff = athlete.athleteType === 'STAFF' || member?.sector === 'STAFF';
+  const displayPosition = isStaff ? (athlete.staffRole || athlete.primaryPosition || 'Comissão Técnica') : athlete.primaryPosition;
 
   return (
     <Link href={`/elenco/${athlete.slug}`} className="group block h-full focus:outline-none">
@@ -70,7 +72,7 @@ export const AthleteCard: React.FC<AthleteCardProps> = ({ member, athlete: direc
                 size="sm"
                 className="text-[10px] font-extrabold uppercase tracking-wider bg-background/80 backdrop-blur-xs border border-border/70 text-primary px-2"
               >
-                {athlete.primaryPosition}
+                {displayPosition}
               </Badge>
             </LayoutContainer>
 

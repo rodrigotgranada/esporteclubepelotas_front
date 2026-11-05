@@ -62,13 +62,12 @@ export const useAdminSquadMembersDrawer = (onSuccess: () => void) => {
     if (!squad) return availableAthletes;
 
     if (squad.category === 'FEMININE') {
-      // Apenas atletas femininas
+      // Atletas femininas ou comissão técnica feminina
       return availableAthletes.filter((a) => a.gender === 'FEMALE');
     }
 
     if (squad.category === 'PROFESSIONAL') {
-      // Apenas atletas masculinos
-      // Por padrão apenas profissionais, a menos que includeYouthAthletes seja true
+      // Atletas masculinos profissionais ou comissão técnica (STAFF)
       return availableAthletes.filter((a) => {
         const isMale = a.gender !== 'FEMALE';
         if (!isMale) return false;
@@ -78,22 +77,30 @@ export const useAdminSquadMembersDrawer = (onSuccess: () => void) => {
     }
 
     // Se for categoria de base (SUB_20, SUB_17, SUB_15):
-    // Bloqueia estritamente atletas profissionais, exibe apenas masculinos da base
+    // Bloqueia atletas profissionais em campo, mas permite comissão técnica (STAFF)
     return availableAthletes.filter((a) => {
       const isMale = a.gender !== 'FEMALE';
-      const isYouth = a.athleteType === 'YOUTH';
-      return isMale && isYouth;
+      const isYouthOrStaff = a.athleteType === 'YOUTH' || a.athleteType === 'STAFF';
+      return isMale && isYouthOrStaff;
     });
   }, [availableAthletes, squad, includeYouthAthletes]);
 
   const handleAddMember = () => {
     if (!selectedAthleteId) {
-      toast.error('Selecione um atleta.');
+      toast.error('Selecione um profissional do banco.');
       return;
     }
-    const num = Number(jerseyNumber);
-    if (!num || num < 1) {
-      toast.error('Informe um número de camisa válido.');
+
+    const athleteObj = availableAthletes.find((a) => (a.id || a._id) === selectedAthleteId);
+    const isStaff = sector === 'STAFF' || athleteObj?.athleteType === 'STAFF';
+
+    let num: number | null = null;
+    if (jerseyNumber) {
+      num = Number(jerseyNumber);
+    }
+
+    if (!isStaff && (!num || num < 1)) {
+      toast.error('Informe um número de camisa válido para o atleta.');
       return;
     }
 
@@ -102,13 +109,13 @@ export const useAdminSquadMembersDrawer = (onSuccess: () => void) => {
       (m) => (m.athleteId || m.athlete?._id || m.athlete?.id) === selectedAthleteId,
     );
 
-    const athleteObj = availableAthletes.find((a) => (a.id || a._id) === selectedAthleteId);
+    const targetSector: SquadSector = isStaff ? 'STAFF' : sector;
 
     const newMember: SquadMemberData = {
       athleteId: selectedAthleteId,
       athlete: athleteObj,
-      jerseyNumber: num,
-      sector,
+      jerseyNumber: isStaff ? num : num!,
+      sector: targetSector,
       role,
       order: members.length + 1,
     };
@@ -117,7 +124,7 @@ export const useAdminSquadMembersDrawer = (onSuccess: () => void) => {
       const updated = [...members];
       updated[existingIndex] = newMember;
       setMembers(updated);
-      toast.success('Atleta já estava no elenco; dados atualizados!');
+      toast.success('Registro já estava no elenco; dados atualizados!');
     } else {
       setMembers([...members, newMember]);
     }
@@ -138,15 +145,17 @@ export const useAdminSquadMembersDrawer = (onSuccess: () => void) => {
 
     try {
       setIsSaving(true);
-      const formatted = members.map((m) => ({
-        athleteId: m.athleteId || m.athlete?._id || m.athlete?.id || '',
-        jerseyNumber: Number(m.jerseyNumber),
+      const squadId = squad.id || squad._id;
+
+      const membersPayload = members.map((m, idx) => ({
+        athleteId: (m.athleteId || m.athlete?.id || m.athlete?._id || "") as string,
+        jerseyNumber: m.jerseyNumber || null,
         sector: m.sector,
         role: m.role || 'STARTER',
-        order: m.order || 0,
+        order: idx + 1,
       }));
 
-      await adminFootballService.setSquadMembers(squad.id || squad._id, formatted);
+      await adminFootballService.setSquadMembers(squadId, membersPayload);
       toast.success(ADMIN_FOOTBALL_CONSTANTS.DRAWER_MEMBERS.SUCCESS_UPDATE);
       close();
       onSuccess();
@@ -163,15 +172,13 @@ export const useAdminSquadMembersDrawer = (onSuccess: () => void) => {
     squad,
     members,
     availableAthletes: filteredAvailableAthletes,
-    rawAvailableAthletes: availableAthletes,
-    includeYouthAthletes,
-    setIncludeYouthAthletes,
     isLoadingAthletes,
     isSaving,
+    includeYouthAthletes,
+    setIncludeYouthAthletes,
     open,
     close,
     save,
-    // Add Member Fields
     selectedAthleteId,
     setSelectedAthleteId,
     jerseyNumber,
@@ -184,4 +191,3 @@ export const useAdminSquadMembersDrawer = (onSuccess: () => void) => {
     handleRemoveMember,
   };
 };
-

@@ -103,7 +103,7 @@ export const AthletesTable: React.FC<AthletesTableProps> = ({
                 {/* Posição */}
                 <td className="py-3 px-4">
                   <Badge variant="primary" size="sm" className="font-bold text-[10px] uppercase">
-                    {athlete.primaryPosition}
+                    {athlete.athleteType === 'STAFF' ? (athlete.staffRole || 'Comissão Técnica') : athlete.primaryPosition}
                   </Badge>
                 </td>
 
@@ -183,7 +183,7 @@ export const AthletesTable: React.FC<AthletesTableProps> = ({
                   {athlete.nickname || athlete.name}
                 </Text>
                 <Badge variant="primary" size="sm" className="w-fit text-[9px] uppercase font-bold py-0">
-                  {athlete.primaryPosition}
+                  {athlete.athleteType === 'STAFF' ? (athlete.staffRole || 'Comissão Técnica') : athlete.primaryPosition}
                 </Badge>
                 {athlete.age ? (
                   <Text as="span" className="text-[11px] text-text-muted">

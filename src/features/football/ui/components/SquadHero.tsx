@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Users, Shield, Trophy } from 'lucide-react';
+import { Users, Trophy } from 'lucide-react';
 import { LayoutContainer, Title, Text, Badge } from '@/shared/ui/components';
 import { FOOTBALL_CONSTANTS } from '../../constants/football.constants';
 import { SquadData } from '../../services/football.service';
@@ -46,14 +46,6 @@ export const SquadHero: React.FC<SquadHeroProps> = ({ squad, selectedCategory })
           <Text as="p" className="text-text-secondary text-sm sm:text-base leading-relaxed">
             {FOOTBALL_CONSTANTS.PAGE_SUBTITLE}
           </Text>
-
-          {squad?.coachName && (
-            <LayoutContainer className="inline-flex items-center gap-2 mt-2 pt-2 border-t border-border/60 text-xs font-semibold text-text-primary">
-              <Shield className="w-4 h-4 text-primary shrink-0" />
-              <Text as="span" className="text-text-muted">{FOOTBALL_CONSTANTS.COACH_LABEL}:</Text>
-              <Text as="span" className="text-primary font-bold">{squad.coachName}</Text>
-            </LayoutContainer>
-          )}
         </LayoutContainer>
 
         {squad?.members && (

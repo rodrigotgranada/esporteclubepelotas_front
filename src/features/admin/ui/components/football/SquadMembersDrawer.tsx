@@ -142,14 +142,18 @@ export const SquadMembersDrawer: React.FC<SquadMembersDrawerProps> = ({
                     (a) => (a.id || a._id) === e.target.value,
                   );
                   if (found) {
-                    const pos = found.primaryPosition.toLowerCase();
-                    if (pos.includes('gol')) setSector('GOALKEEPER');
-                    else if (pos.includes('zag') || pos.includes('lat') || pos.includes('def'))
-                      setSector('DEFENDER');
-                    else if (pos.includes('vol') || pos.includes('meia') || pos.includes('meio'))
-                      setSector('MIDFIELDER');
-                    else if (pos.includes('ata') || pos.includes('pon') || pos.includes('cen'))
-                      setSector('FORWARD');
+                    if (found.athleteType === 'STAFF') {
+                      setSector('STAFF');
+                    } else {
+                      const pos = (found.primaryPosition || '').toLowerCase();
+                      if (pos.includes('gol')) setSector('GOALKEEPER');
+                      else if (pos.includes('zag') || pos.includes('lat') || pos.includes('def'))
+                        setSector('DEFENDER');
+                      else if (pos.includes('vol') || pos.includes('meia') || pos.includes('meio'))
+                        setSector('MIDFIELDER');
+                      else if (pos.includes('ata') || pos.includes('pon') || pos.includes('cen'))
+                        setSector('FORWARD');
+                    }
                   }
                 }}
                 className="w-full"
@@ -176,7 +180,8 @@ export const SquadMembersDrawer: React.FC<SquadMembersDrawerProps> = ({
               </Text>
               <Input
                 type="number"
-                placeholder="Ex: 9"
+                placeholder={sector === 'STAFF' ? 'N/A' : 'Ex: 9'}
+                disabled={sector === 'STAFF'}
                 value={jerseyNumber}
                 onChange={(e) => setJerseyNumber(e.target.value)}
                 className="text-xs"
@@ -197,6 +202,7 @@ export const SquadMembersDrawer: React.FC<SquadMembersDrawerProps> = ({
                 <Option value="DEFENDER">Defensores</Option>
                 <Option value="MIDFIELDER">Meio-Campistas</Option>
                 <Option value="FORWARD">Atacantes</Option>
+                <Option value="STAFF">Comissão Técnica</Option>
               </Select>
             </LayoutContainer>
 
@@ -261,7 +267,7 @@ export const SquadMembersDrawer: React.FC<SquadMembersDrawerProps> = ({
                     <LayoutContainer className="flex items-center gap-3">
                       {/* Camisa Badge */}
                       <Badge variant="primary" size="sm" className="font-black text-xs px-2.5">
-                        #{member.jerseyNumber}
+                        {member.sector === 'STAFF' || !member.jerseyNumber ? 'STAFF' : '#' + member.jerseyNumber}
                       </Badge>
 
                       {/* Mini Foto */}

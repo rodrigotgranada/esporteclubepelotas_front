@@ -15,6 +15,7 @@ export const useAdminAthleteDrawer = (onSuccess: () => void) => {
   const [athleteType, setAthleteType] = useState<AthleteType>('PROFESSIONAL');
   const [youthCategory, setYouthCategory] = useState<string>('');
   const [entryYear, setEntryYear] = useState<string>('');
+  const [staffRole, setStaffRole] = useState<string>('Treinador');
   const [name, setName] = useState<string>('');
   const [nickname, setNickname] = useState<string>('');
   const [birthDate, setBirthDate] = useState<string>('');
@@ -41,6 +42,7 @@ export const useAdminAthleteDrawer = (onSuccess: () => void) => {
     setAthleteType('PROFESSIONAL');
     setYouthCategory('');
     setEntryYear('');
+    setStaffRole('Treinador');
     setName('');
     setNickname('');
     setBirthDate('');
@@ -70,6 +72,7 @@ export const useAdminAthleteDrawer = (onSuccess: () => void) => {
     setAthleteType(athlete.athleteType || 'PROFESSIONAL');
     setYouthCategory(athlete.youthCategory || '');
     setEntryYear(athlete.entryYear ? String(athlete.entryYear) : '');
+    setStaffRole(athlete.staffRole || athlete.primaryPosition || 'Treinador');
     setName(athlete.name || '');
     setNickname(athlete.nickname || '');
     setBirthDate(athlete.birthDate ? athlete.birthDate.split('T')[0] : '');
@@ -94,7 +97,11 @@ export const useAdminAthleteDrawer = (onSuccess: () => void) => {
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {};
     if (!name.trim()) newErrors.name = 'O nome completo é obrigatório.';
-    if (!primaryPosition.trim()) newErrors.primaryPosition = 'A posição principal é obrigatória.';
+    if (athleteType === 'STAFF') {
+      if (!staffRole.trim()) newErrors.staffRole = 'O cargo na comissão técnica é obrigatório.';
+    } else {
+      if (!primaryPosition.trim()) newErrors.primaryPosition = 'A posição principal é obrigatória.';
+    }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -115,6 +122,8 @@ export const useAdminAthleteDrawer = (onSuccess: () => void) => {
         .map((s) => s.trim())
         .filter((s) => s.length > 0);
 
+      const isStaff = athleteType === 'STAFF';
+
       const payload: any = {
         name: name.trim(),
         nickname: nickname.trim() || undefined,
@@ -122,14 +131,15 @@ export const useAdminAthleteDrawer = (onSuccess: () => void) => {
         athleteType,
         youthCategory: athleteType === 'YOUTH' && youthCategory.trim() ? youthCategory.trim() : undefined,
         entryYear: athleteType === 'YOUTH' && entryYear ? Number(entryYear) : undefined,
-        primaryPosition: primaryPosition.trim(),
-        secondaryPositions,
-        pastClubs: athleteType === 'PROFESSIONAL' ? pastClubs : [],
-        preferredFoot,
+        staffRole: isStaff ? staffRole.trim() : undefined,
+        primaryPosition: isStaff ? staffRole.trim() : primaryPosition.trim(),
+        secondaryPositions: isStaff ? [] : secondaryPositions,
+        pastClubs: athleteType === 'YOUTH' ? [] : pastClubs,
+        preferredFoot: isStaff ? undefined : preferredFoot,
         birthDate: birthDate ? birthDate : undefined,
         birthPlace: birthPlace.trim() || undefined,
-        height: height ? Number(height) : undefined,
-        weight: weight ? Number(weight) : undefined,
+        height: isStaff ? undefined : (height ? Number(height) : undefined),
+        weight: isStaff ? undefined : (weight ? Number(weight) : undefined),
         biography: biography.trim() || undefined,
         instagram: instagram.trim() ? instagram.replace('@', '').trim() : undefined,
         photoUrl: photoUrl.trim() || undefined,
@@ -153,8 +163,8 @@ export const useAdminAthleteDrawer = (onSuccess: () => void) => {
       close();
       onSuccess();
     } catch (err: any) {
-      console.error('Erro ao salvar atleta:', err);
-      toast.error(err?.response?.data?.message || 'Erro ao salvar atleta.');
+      console.error('Erro ao salvar profissional:', err);
+      toast.error(err?.response?.data?.message || 'Erro ao salvar profissional.');
     } finally {
       setIsSaving(false);
     }
@@ -169,7 +179,6 @@ export const useAdminAthleteDrawer = (onSuccess: () => void) => {
     save,
     isSaving,
     errors,
-    // Fields
     gender,
     setGender,
     athleteType,
@@ -178,6 +187,8 @@ export const useAdminAthleteDrawer = (onSuccess: () => void) => {
     setYouthCategory,
     entryYear,
     setEntryYear,
+    staffRole,
+    setStaffRole,
     name,
     setName,
     nickname,
@@ -208,4 +219,3 @@ export const useAdminAthleteDrawer = (onSuccess: () => void) => {
     setPendingPhotoFile,
   };
 };
-
