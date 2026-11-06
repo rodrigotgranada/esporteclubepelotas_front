@@ -230,3 +230,4 @@ export const YouthSquadFilterBar: React.FC<YouthSquadFilterBarProps> = ({
     </LayoutContainer>
   );
 };
+

@@ -189,3 +189,4 @@ export const useYouthSquads = () => {
     hasActiveSearch: search.trim().length > 0,
   };
 };
+
