@@ -6,24 +6,19 @@ import {
   footballService,
   SquadCategory,
   SquadData,
-  SquadMemberData,
 } from '../services/football.service';
 
-const VALID_CATEGORIES: SquadCategory[] = [
-  'PROFESSIONAL',
-  'FEMININE',
-  'SUB_20',
-  'SUB_17',
-  'SUB_15',
-];
+const SENIOR_CATEGORIES: SquadCategory[] = ['PROFESSIONAL', 'FEMININE'];
 
 export const useSquad = (initialCategory: SquadCategory = 'PROFESSIONAL') => {
   const searchParams = useSearchParams();
   const queryCategory = searchParams.get('category') as SquadCategory | null;
   const initial =
-    queryCategory && VALID_CATEGORIES.includes(queryCategory)
+    queryCategory && SENIOR_CATEGORIES.includes(queryCategory)
       ? queryCategory
-      : initialCategory;
+      : SENIOR_CATEGORIES.includes(initialCategory)
+        ? initialCategory
+        : 'PROFESSIONAL';
 
   const [selectedCategory, setSelectedCategory] = useState<SquadCategory>(initial);
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
@@ -34,7 +29,7 @@ export const useSquad = (initialCategory: SquadCategory = 'PROFESSIONAL') => {
   const [isModuleActive, setIsModuleActive] = useState<boolean>(true);
   const [search, setSearch] = useState<string>('');
 
-  // 1. Carrega as temporadas e mapeamento de categorias disponíveis por ano
+  // 1. Carrega as temporadas e mapeamento apenas das categorias profissionais (Masculino / Feminino)
   useEffect(() => {
     let isMounted = true;
 
@@ -44,22 +39,38 @@ export const useSquad = (initialCategory: SquadCategory = 'PROFESSIONAL') => {
         if (!isMounted) return;
 
         setIsModuleActive(res.isModuleActive !== false);
-        const years = res.years || [];
-        setAvailableYears(years);
+        const rawYears = res.years || [];
 
-        let byYearMap: Record<number, SquadCategory[]> = {};
+        const byYearMap: Record<number, SquadCategory[]> = {};
         if (res.categoriesByYear && Object.keys(res.categoriesByYear).length > 0) {
-          byYearMap = res.categoriesByYear;
-        } else if (res.categories && res.categories.length > 0) {
-          const allCats = res.categories as SquadCategory[];
-          years.forEach((y) => {
-            byYearMap[y] = allCats;
+          Object.entries(res.categoriesByYear).forEach(([yearStr, cats]) => {
+            const seniorCats = (cats as SquadCategory[]).filter((cat) =>
+              SENIOR_CATEGORIES.includes(cat),
+            );
+            if (seniorCats.length > 0) {
+              byYearMap[Number(yearStr)] = seniorCats;
+            }
           });
+        } else if (res.categories && res.categories.length > 0) {
+          const seniorCats = (res.categories as SquadCategory[]).filter((cat) =>
+            SENIOR_CATEGORIES.includes(cat),
+          );
+          if (seniorCats.length > 0) {
+            rawYears.forEach((y) => {
+              byYearMap[y] = seniorCats;
+            });
+          }
         }
+
+        const filteredYears = rawYears.filter(
+          (y) => byYearMap[y] && byYearMap[y].length > 0,
+        );
+
+        setAvailableYears(filteredYears);
         setCategoriesByYear(byYearMap);
 
-        if (years.length > 0 && selectedYear === null) {
-          const firstYear = years[0];
+        if (filteredYears.length > 0 && selectedYear === null) {
+          const firstYear = filteredYears[0];
           setSelectedYear(firstYear);
 
           const catsInYear = byYearMap[firstYear] || [];
@@ -70,7 +81,7 @@ export const useSquad = (initialCategory: SquadCategory = 'PROFESSIONAL') => {
           }
         }
       } catch (err) {
-        console.error('Erro ao carregar temporadas:', err);
+        console.warn('Erro ao carregar temporadas:', err);
       }
     }
 
@@ -81,7 +92,7 @@ export const useSquad = (initialCategory: SquadCategory = 'PROFESSIONAL') => {
     };
   }, [selectedCategory, selectedYear]);
 
-  // 2. Categorias disponíveis para o ano atualmente selecionado
+  // 2. Categorias disponíveis para o ano atualmente selecionado (apenas Masculino / Feminino)
   const availableCategories = useMemo<SquadCategory[]>(() => {
     if (!selectedYear || !categoriesByYear[selectedYear]) {
       return ['PROFESSIONAL'];
@@ -108,7 +119,9 @@ export const useSquad = (initialCategory: SquadCategory = 'PROFESSIONAL') => {
 
   // 4. Troca de categoria
   const handleSelectCategory = useCallback((cat: SquadCategory) => {
-    setSelectedCategory(cat);
+    if (SENIOR_CATEGORIES.includes(cat)) {
+      setSelectedCategory(cat);
+    }
   }, []);
 
   // 5. Carrega o elenco da temporada/categoria selecionada
@@ -171,7 +184,7 @@ export const useSquad = (initialCategory: SquadCategory = 'PROFESSIONAL') => {
       forwards,
       staff: staff.length > 0 ? staff : (squad?.sectors?.staff || []),
     };
-  }, [filteredMembers, squad?.staff]);
+  }, [filteredMembers, squad?.sectors?.staff]);
 
   return {
     selectedCategory,

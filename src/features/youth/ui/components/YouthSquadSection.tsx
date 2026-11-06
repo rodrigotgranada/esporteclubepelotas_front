@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Users, User, Shield, AlertCircle, Search } from 'lucide-react';
+import { Users, AlertCircle, Search } from 'lucide-react';
 import {
   LayoutContainer,
   Title,
@@ -145,11 +145,13 @@ export const YouthSquadSection: React.FC<YouthSquadSectionProps> = ({
 
           return (
             <LayoutContainer key={group.title} className="flex flex-col gap-4">
-              <LayoutContainer className="flex items-center gap-2 border-b border-border/60 pb-2">
-                <Shield className="w-4 h-4 text-primary" />
+              <LayoutContainer className="flex items-center justify-between border-b border-border/60 pb-2">
                 <Title level="h4" className="text-sm font-extrabold text-text-primary uppercase tracking-wider">
-                  {group.title} ({group.members.length})
+                  {group.title}
                 </Title>
+                <Badge variant="default" size="sm" className="font-extrabold text-xs">
+                  {group.members.length}
+                </Badge>
               </LayoutContainer>
 
               <LayoutContainer className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
@@ -220,8 +222,7 @@ export const YouthSquadSection: React.FC<YouthSquadSectionProps> = ({
       {/* Comissão Técnica adicional cadastrada no texto do elenco */}
       {squad.staff && squad.staff.length > 0 && (
         <LayoutContainer className="p-5 rounded-2xl bg-surface border border-border flex flex-col gap-3 mt-2">
-          <Title level="h4" className="text-xs font-bold text-text-primary uppercase tracking-wider flex items-center gap-1.5">
-            <User className="w-3.5 h-3.5 text-primary" />
+          <Title level="h4" className="text-xs font-bold text-text-primary uppercase tracking-wider">
             <Text as="span">{texts.STAFF_SECTION_TITLE}</Text>
           </Title>
           <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">

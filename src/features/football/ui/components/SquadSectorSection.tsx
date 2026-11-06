@@ -1,21 +1,19 @@
 'use client';
 
 import React from 'react';
-import { Shield, Sparkles, UserCheck } from 'lucide-react';
+import { UserCheck } from 'lucide-react';
 import { LayoutContainer, Title, Text, Badge } from '@/shared/ui/components';
 import { AthleteCard } from './AthleteCard';
 import { SquadMemberData, SquadStaffData } from '../../services/football.service';
 
 export interface SquadSectorSectionProps {
   title: string;
-  icon?: string;
   members?: SquadMemberData[];
   staff?: SquadStaffData[];
 }
 
 export const SquadSectorSection: React.FC<SquadSectorSectionProps> = ({
   title,
-  icon,
   members,
   staff,
 }) => {
@@ -26,9 +24,8 @@ export const SquadSectorSection: React.FC<SquadSectorSectionProps> = ({
 
   return (
     <LayoutContainer className="flex flex-col gap-5 mb-12">
-      {/* Sector Header */}
+      {/* Sector Header (sem ícone ao lado do título) */}
       <LayoutContainer className="flex items-center gap-3 pb-3 border-b border-border">
-        {icon && <span className="text-2xl">{icon}</span>}
         <Title level="h2" className="text-xl sm:text-2xl font-black text-text-primary tracking-tight">
           {title}
         </Title>
@@ -44,7 +41,7 @@ export const SquadSectorSection: React.FC<SquadSectorSectionProps> = ({
         <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {members.map((member, idx) => (
             <AthleteCard
-              key={member.athleteId || (member.athlete?._id) || `member-${idx}`}
+              key={member.athleteId || member.athlete?._id || `member-${idx}`}
               member={member}
             />
           ))}
@@ -77,4 +74,3 @@ export const SquadSectorSection: React.FC<SquadSectorSectionProps> = ({
     </LayoutContainer>
   );
 };
-

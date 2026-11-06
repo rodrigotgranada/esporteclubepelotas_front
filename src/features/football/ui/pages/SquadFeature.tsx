@@ -59,7 +59,7 @@ export const SquadFeature: React.FC = () => {
       {/* Hero do Elenco */}
       <SquadHero squad={squad} selectedCategory={selectedCategory} />
 
-      {/* Barra de Filtros (Categorias Dinâmicas, Temporadas, Busca) */}
+      {/* Barra de Filtros (Masculino / Feminino, Temporadas, Busca) */}
       <SquadFilterBar
         selectedCategory={selectedCategory}
         onSelectCategory={handleSelectCategory}
@@ -93,36 +93,31 @@ export const SquadFeature: React.FC = () => {
           </Text>
         </LayoutContainer>
       ) : (
-        /* Setores Táticos */
+        /* Setores Táticos (sem ícones ao lado dos títulos) */
         <LayoutContainer className="flex flex-col animate-in fade-in duration-300">
           <SquadSectorSection
             title={FOOTBALL_CONSTANTS.SECTORS.GOALKEEPER}
-            icon="🧤"
             members={sectors.goalkeepers}
           />
 
           <SquadSectorSection
             title={FOOTBALL_CONSTANTS.SECTORS.DEFENDER}
-            icon="🛡️"
             members={sectors.defenders}
           />
 
           <SquadSectorSection
             title={FOOTBALL_CONSTANTS.SECTORS.MIDFIELDER}
-            icon="⚙️"
             members={sectors.midfielders}
           />
 
           <SquadSectorSection
             title={FOOTBALL_CONSTANTS.SECTORS.FORWARD}
-            icon="⚡"
             members={sectors.forwards}
           />
 
           {sectors.staff && sectors.staff.length > 0 && (
             <SquadSectorSection
               title={FOOTBALL_CONSTANTS.SECTORS.STAFF}
-              icon="📋"
               members={sectors.staff}
             />
           )}

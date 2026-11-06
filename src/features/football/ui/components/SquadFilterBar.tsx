@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Search, Calendar, ChevronDown, Check } from 'lucide-react';
 import { LayoutContainer, Input, Button, Text } from '@/shared/ui/components';
 import { FOOTBALL_CONSTANTS } from '../../constants/football.constants';
@@ -17,12 +17,6 @@ export interface SquadFilterBarProps {
   onSearchChange: (val: string) => void;
 }
 
-const YOUTH_CATEGORY_KEYS: SquadCategory[] = ['SUB_20', 'SUB_17', 'SUB_15'];
-
-const isYouthCategory = (cat: string): boolean => {
-  return YOUTH_CATEGORY_KEYS.includes(cat as SquadCategory) || cat.startsWith('SUB_');
-};
-
 export const SquadFilterBar: React.FC<SquadFilterBarProps> = ({
   selectedCategory,
   onSelectCategory,
@@ -33,22 +27,12 @@ export const SquadFilterBar: React.FC<SquadFilterBarProps> = ({
   search,
   onSearchChange,
 }) => {
-  const [isYouthDropdownOpen, setIsYouthDropdownOpen] = useState(false);
   const [isSeasonDropdownOpen, setIsSeasonDropdownOpen] = useState(false);
-
-  const youthDropdownRef = useRef<HTMLDivElement>(null);
   const seasonDropdownRef = useRef<HTMLDivElement>(null);
 
-  // Fecha dropdowns em cliques externos ou tecla Escape
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node;
-      if (
-        youthDropdownRef.current &&
-        !youthDropdownRef.current.contains(target)
-      ) {
-        setIsYouthDropdownOpen(false);
-      }
       if (
         seasonDropdownRef.current &&
         !seasonDropdownRef.current.contains(target)
@@ -59,7 +43,6 @@ export const SquadFilterBar: React.FC<SquadFilterBarProps> = ({
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        setIsYouthDropdownOpen(false);
         setIsSeasonDropdownOpen(false);
       }
     };
@@ -73,32 +56,14 @@ export const SquadFilterBar: React.FC<SquadFilterBarProps> = ({
     };
   }, []);
 
-  // Categorias disponíveis no ano selecionado
   const hasProfessional = availableCategories.includes('PROFESSIONAL');
   const hasFeminine = availableCategories.includes('FEMININE');
-
-  const youthCategories = useMemo(() => {
-    return availableCategories.filter((cat) => isYouthCategory(cat));
-  }, [availableCategories]);
-
-  const isYouthSelected = isYouthCategory(selectedCategory);
-
-  // Label ativa da categoria de base selecionada
-  const selectedYouthLabel = useMemo(() => {
-    if (!isYouthSelected) return null;
-    return (
-      FOOTBALL_CONSTANTS.CATEGORIES[
-        selectedCategory as keyof typeof FOOTBALL_CONSTANTS.CATEGORIES
-      ] || selectedCategory
-    );
-  }, [isYouthSelected, selectedCategory]);
 
   return (
     <LayoutContainer className="flex flex-col gap-4 mb-8">
       <LayoutContainer className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
-        {/* Categorias Dinâmicas (Profissional, Feminino, Dropdown de Base) */}
+        {/* Categorias Principais (Masculino e Feminino) */}
         <LayoutContainer className="flex items-center gap-2 overflow-x-visible pb-1 no-scrollbar flex-wrap">
-          {/* Botão: Profissional */}
           {hasProfessional && (
             <Button
               type="button"
@@ -111,7 +76,6 @@ export const SquadFilterBar: React.FC<SquadFilterBarProps> = ({
             </Button>
           )}
 
-          {/* Botão: Feminino */}
           {hasFeminine && (
             <Button
               type="button"
@@ -123,74 +87,10 @@ export const SquadFilterBar: React.FC<SquadFilterBarProps> = ({
               {FOOTBALL_CONSTANTS.CATEGORIES.FEMININE}
             </Button>
           )}
-
-          {/* Dropdown: Categorias de Base (somente se houver categorias de base no ano) */}
-          {youthCategories.length > 0 && (
-            <LayoutContainer className="relative inline-block" ref={youthDropdownRef}>
-              <Button
-                type="button"
-                variant={isYouthSelected ? 'primary' : 'outline'}
-                size="sm"
-                onClick={() => setIsYouthDropdownOpen((prev) => !prev)}
-                aria-expanded={isYouthDropdownOpen}
-                aria-label={FOOTBALL_CONSTANTS.YOUTH_DROPDOWN.ARIA_BUTTON}
-                className="font-bold text-xs whitespace-nowrap rounded-full transition-all flex items-center gap-1.5"
-              >
-                <Text as="span">
-                  {isYouthSelected && selectedYouthLabel
-                    ? `${FOOTBALL_CONSTANTS.YOUTH_DROPDOWN.PREFIX_LABEL} ${selectedYouthLabel}`
-                    : FOOTBALL_CONSTANTS.YOUTH_DROPDOWN.DEFAULT_LABEL}
-                </Text>
-                <ChevronDown
-                  className={`w-3.5 h-3.5 transition-transform duration-200 ${
-                    isYouthDropdownOpen ? 'rotate-180' : ''
-                  }`}
-                />
-              </Button>
-
-              {/* Menu Flutuante de Categorias de Base */}
-              {isYouthDropdownOpen && (
-                <LayoutContainer className="absolute left-0 top-full mt-2 min-w-[210px] bg-surface border border-border rounded-2xl shadow-xl p-1.5 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
-                  {youthCategories.map((cat) => {
-                    const isSelected = selectedCategory === cat;
-                    const fullKey = `${cat}_FULL` as keyof typeof FOOTBALL_CONSTANTS.CATEGORIES;
-                    const fullLabel =
-                      FOOTBALL_CONSTANTS.CATEGORIES[fullKey] ||
-                      FOOTBALL_CONSTANTS.CATEGORIES[
-                        cat as keyof typeof FOOTBALL_CONSTANTS.CATEGORIES
-                      ] ||
-                      cat;
-
-                    return (
-                      <Button
-                        key={cat}
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          onSelectCategory(cat);
-                          setIsYouthDropdownOpen(false);
-                        }}
-                        className={`w-full justify-between text-left text-xs font-semibold py-2 px-3 rounded-xl transition-colors ${
-                          isSelected
-                            ? 'bg-primary/10 text-primary font-bold'
-                            : 'text-text-secondary hover:text-text-primary hover:bg-background'
-                        }`}
-                      >
-                        <Text as="span">{fullLabel}</Text>
-                        {isSelected && <Check className="w-3.5 h-3.5 text-primary shrink-0" />}
-                      </Button>
-                    );
-                  })}
-                </LayoutContainer>
-              )}
-            </LayoutContainer>
-          )}
         </LayoutContainer>
 
         {/* Seletor de Temporadas e Busca */}
         <LayoutContainer className="flex items-center gap-3">
-          {/* Seletor Customizado de Temporadas */}
           {availableYears.length > 0 && (
             <LayoutContainer className="relative inline-block" ref={seasonDropdownRef}>
               <Button
@@ -213,7 +113,6 @@ export const SquadFilterBar: React.FC<SquadFilterBarProps> = ({
                 />
               </Button>
 
-              {/* Menu Flutuante de Temporadas */}
               {isSeasonDropdownOpen && (
                 <LayoutContainer className="absolute right-0 top-full mt-2 min-w-[170px] bg-surface border border-border rounded-2xl shadow-xl p-1.5 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
                   {availableYears.map((year) => {
