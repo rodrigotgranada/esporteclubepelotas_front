@@ -19,6 +19,7 @@ import {
   Newspaper,
   Shield,
   Trophy,
+  Users,
   History,
   Sparkles,
   User as UserIcon,
@@ -231,35 +232,42 @@ export const PublicNavigationDrawer: React.FC<PublicNavigationDrawerProps> = ({
                 {PUBLIC_DRAWER_TEXTS.SECTION_FOOTBALL}
               </Text>
 
-              <LayoutContainer className="grid grid-cols-2 gap-2">
-                {footballActive ? (
-                  <Link
-                    href="/elenco"
-                    onClick={onClose}
-                    className="p-3.5 rounded-xl bg-surface/70 hover:bg-surface border border-border/80 hover:border-primary/50 flex flex-col gap-2 transition-all group"
-                  >
-                    <LayoutContainer className="flex items-center justify-between">
-                      <Trophy className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
-                      <ChevronRight className="w-3.5 h-3.5 text-text-secondary/60 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
-                    </LayoutContainer>
-                    <span className="text-xs font-bold text-text-primary group-hover:text-primary transition-colors">
-                      {PUBLIC_DRAWER_TEXTS.LINK_SQUAD}
-                    </span>
-                  </Link>
-                ) : (
-                  <LayoutContainer className="p-3.5 rounded-xl bg-surface/50 border border-border/70 flex flex-col gap-2 opacity-85 hover:opacity-100 transition-opacity">
-                    <LayoutContainer className="flex items-center justify-between">
-                      <Trophy className="w-4 h-4 text-primary" />
-                      <Badge variant="default" size="sm" className="text-[9px] py-0 px-1.5 font-medium">
-                        {PUBLIC_DRAWER_TEXTS.BADGE_COMING_SOON}
-                      </Badge>
-                    </LayoutContainer>
-                    <span className="text-xs font-bold text-text-primary">
-                      {PUBLIC_DRAWER_TEXTS.LINK_SQUAD}
-                    </span>
+              {footballActive ? (
+                <Link
+                  href="/elenco"
+                  onClick={onClose}
+                  className="p-3.5 rounded-xl bg-surface/70 hover:bg-surface border border-border/80 hover:border-primary/50 flex flex-col gap-2 transition-all group"
+                >
+                  <LayoutContainer className="flex items-center justify-between">
+                    <Trophy className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
+                    <ChevronRight className="w-3.5 h-3.5 text-text-secondary/60 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
                   </LayoutContainer>
-                )}
+                  <Text as="span" className="text-xs font-bold text-text-primary group-hover:text-primary transition-colors">
+                    {PUBLIC_DRAWER_TEXTS.LINK_SQUAD}
+                  </Text>
+                </Link>
+              ) : (
+                <LayoutContainer className="p-3.5 rounded-xl bg-surface/50 border border-border/70 flex flex-col gap-2 opacity-85 hover:opacity-100 transition-opacity">
+                  <LayoutContainer className="flex items-center justify-between">
+                    <Trophy className="w-4 h-4 text-primary" />
+                    <Badge variant="default" size="sm" className="text-[9px] py-0 px-1.5 font-medium">
+                      {PUBLIC_DRAWER_TEXTS.BADGE_COMING_SOON}
+                    </Badge>
+                  </LayoutContainer>
+                  <Text as="span" className="text-xs font-bold text-text-primary">
+                    {PUBLIC_DRAWER_TEXTS.LINK_SQUAD}
+                  </Text>
+                </LayoutContainer>
+              )}
+            </LayoutContainer>
 
+            {/* 4. Navigation Section: Base */}
+            <LayoutContainer className="flex flex-col gap-2">
+              <Text className="text-[11px] font-extrabold text-text-secondary uppercase tracking-wider px-1">
+                {PUBLIC_DRAWER_TEXTS.SECTION_YOUTH}
+              </Text>
+
+              <LayoutContainer className="grid grid-cols-2 gap-2">
                 {footballActive ? (
                   <Link
                     href="/base"
@@ -270,9 +278,9 @@ export const PublicNavigationDrawer: React.FC<PublicNavigationDrawerProps> = ({
                       <Shield className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
                       <ChevronRight className="w-3.5 h-3.5 text-text-secondary/60 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
                     </LayoutContainer>
-                    <span className="text-xs font-bold text-text-primary group-hover:text-primary transition-colors">
+                    <Text as="span" className="text-xs font-bold text-text-primary group-hover:text-primary transition-colors">
                       {PUBLIC_DRAWER_TEXTS.LINK_YOUTH}
-                    </span>
+                    </Text>
                   </Link>
                 ) : (
                   <LayoutContainer className="p-3.5 rounded-xl bg-surface/50 border border-border/70 flex flex-col gap-2 opacity-85 hover:opacity-100 transition-opacity">
@@ -282,34 +290,40 @@ export const PublicNavigationDrawer: React.FC<PublicNavigationDrawerProps> = ({
                         {PUBLIC_DRAWER_TEXTS.BADGE_COMING_SOON}
                       </Badge>
                     </LayoutContainer>
-                    <span className="text-xs font-bold text-text-primary">
+                    <Text as="span" className="text-xs font-bold text-text-primary">
                       {PUBLIC_DRAWER_TEXTS.LINK_YOUTH}
-                    </span>
+                    </Text>
                   </LayoutContainer>
                 )}
-              </LayoutContainer>
 
-              {/* Sub-atalhos das Categorias de Base */}
-              {footballActive && (
-                <LayoutContainer className="grid grid-cols-2 gap-2">
+                {footballActive ? (
                   <Link
                     href="/base/elencos"
                     onClick={onClose}
-                    className="px-3 py-2 rounded-lg bg-surface/50 hover:bg-surface border border-border/60 hover:border-primary/40 flex items-center justify-between text-xs font-medium text-text-secondary hover:text-primary transition-colors group"
+                    className="p-3.5 rounded-xl bg-surface/70 hover:bg-surface border border-border/80 hover:border-primary/50 flex flex-col gap-2 transition-all group"
                   >
-                    <span>{PUBLIC_DRAWER_TEXTS.LINK_YOUTH_SQUADS}</span>
-                    <ChevronRight className="w-3 h-3 text-text-secondary/50 group-hover:text-primary group-hover:translate-x-0.5 transition-transform" />
+                    <LayoutContainer className="flex items-center justify-between">
+                      <Users className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
+                      <ChevronRight className="w-3.5 h-3.5 text-text-secondary/60 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
+                    </LayoutContainer>
+                    <Text as="span" className="text-xs font-bold text-text-primary group-hover:text-primary transition-colors">
+                      {PUBLIC_DRAWER_TEXTS.LINK_YOUTH_SQUADS}
+                    </Text>
                   </Link>
-                  <Link
-                    href="/base/materias"
-                    onClick={onClose}
-                    className="px-3 py-2 rounded-lg bg-surface/50 hover:bg-surface border border-border/60 hover:border-primary/40 flex items-center justify-between text-xs font-medium text-text-secondary hover:text-primary transition-colors group"
-                  >
-                    <span>{PUBLIC_DRAWER_TEXTS.LINK_YOUTH_NEWS}</span>
-                    <ChevronRight className="w-3 h-3 text-text-secondary/50 group-hover:text-primary group-hover:translate-x-0.5 transition-transform" />
-                  </Link>
-                </LayoutContainer>
-              )}
+                ) : (
+                  <LayoutContainer className="p-3.5 rounded-xl bg-surface/50 border border-border/70 flex flex-col gap-2 opacity-85 hover:opacity-100 transition-opacity">
+                    <LayoutContainer className="flex items-center justify-between">
+                      <Users className="w-4 h-4 text-primary" />
+                      <Badge variant="default" size="sm" className="text-[9px] py-0 px-1.5 font-medium">
+                        {PUBLIC_DRAWER_TEXTS.BADGE_COMING_SOON}
+                      </Badge>
+                    </LayoutContainer>
+                    <Text as="span" className="text-xs font-bold text-text-primary">
+                      {PUBLIC_DRAWER_TEXTS.LINK_YOUTH_SQUADS}
+                    </Text>
+                  </LayoutContainer>
+                )}
+              </LayoutContainer>
             </LayoutContainer>
 
             {/* 4. Navigation Section: O Clube & Memória */}

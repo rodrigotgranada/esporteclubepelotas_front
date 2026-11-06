@@ -8,6 +8,43 @@ import {
 import { newsService } from '@/features/news/services/news.service';
 import { NewsArticleData } from '@/features/admin/services/admin-news.service';
 
+const FALLBACK_YOUTH_CONFIG: YouthPortalConfig = {
+  pillars: [
+    {
+      title: 'DNA Competitivo Áureo-Cerúleo',
+      description:
+        'Ensinamos o respeito à história centenária do Pelotas, a dedicação intransigente em campo e o orgulho de defender as cores azul e amarela na Boca do Lobo.',
+    },
+    {
+      title: 'Metodologia Tática & Intensidade',
+      description:
+        'Treinamentos modernos focados em rápida leitura de jogo, tomada de decisão sob pressão, transições velozes e alto rigor físico.',
+    },
+    {
+      title: 'Acompanhamento Cidadão & Escolar',
+      description:
+        'O atleta do Pelotas deve manter bom rendimento escolar comprovado. Oferecemos suporte pedagógico e orientação para a vida fora das quatro linhas.',
+    },
+    {
+      title: 'Integração com o Profissional',
+      description:
+        'Comunicação direta entre as comissões técnicas da base e a equipe principal, possibilitando treinos integrados e promoção gradual dos jovens talentos.',
+    },
+  ],
+  peneirasCriteria: [
+    'Atestado médico cardiológico de aptidão física original (emitido nos últimos 6 meses).',
+    'Documento de identidade oficial com foto (RG) e CPF do atleta e do responsável.',
+    'Declaração de matrícula e frequência escolar ativa no ano letivo corrente.',
+    'Material de treino próprio: chuteiras, caneleiras, meiões e calção (azul, amarelo, branco ou preto; proibido uniforme de rivais).',
+    'Termo de autorização de participação preenchido e assinado pelos pais ou responsáveis legais.',
+  ],
+  contactTitle: 'Departamento de Futebol de Base',
+  contactDescription:
+    'As datas oficiais de avaliações abertas e peneiras são divulgadas periodicamente nos canais oficiais do clube. Fique atento às redes sociais do Pelotas!',
+  contactEmail: 'base@esporteclubepelotas.com.br',
+  contactPhone: null,
+};
+
 export const useYouthHub = () => {
   const [news, setNews] = useState<NewsArticleData[]>([]);
   const [isLoadingNews, setIsLoadingNews] = useState<boolean>(true);
@@ -33,7 +70,7 @@ export const useYouthHub = () => {
 
       setNews(filtered.length > 0 ? filtered.slice(0, 4) : articles.slice(0, 4));
     } catch (err) {
-      console.error('[useYouthHub] Erro ao carregar notícias da base:', err);
+      console.warn('[useYouthHub] Falha temporária ao carregar notícias da base:', err);
       setNews([]);
     } finally {
       setIsLoadingNews(false);
@@ -46,8 +83,11 @@ export const useYouthHub = () => {
       const data = await footballService.getYouthPortalConfig();
       setYouthConfig(data);
     } catch (err) {
-      console.error('[useYouthHub] Erro ao carregar configurações da base:', err);
-      setYouthConfig(null);
+      console.warn(
+        '[useYouthHub] Usando configuração padrão da base enquanto o servidor sincroniza:',
+        err,
+      );
+      setYouthConfig(FALLBACK_YOUTH_CONFIG);
     } finally {
       setIsLoadingConfig(false);
     }

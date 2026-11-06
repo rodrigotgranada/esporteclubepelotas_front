@@ -11,6 +11,18 @@ export interface SafeImageProps extends Omit<ImageProps, 'src'> {
 export const DEFAULT_NEWS_COVER = '/images/default-news-cover.svg';
 export const DEFAULT_IDOL_COVER = '/images/default-idol-cover.svg';
 
+const SYNTHETIC_UNSPLASH_REGEX = /^https?:\/\/images\.unsplash\.com\/photo-\d+(\?|$)/i;
+const KNOWN_DEAD_IMAGE_TOKENS = ['photo-1508098682722', 'photo-1517649763962'];
+
+function isUsableImageSrc(url?: string | null): url is string {
+  if (!url) return false;
+  const trimmed = url.trim();
+  if (!trimmed) return false;
+  if (SYNTHETIC_UNSPLASH_REGEX.test(trimmed)) return false;
+  if (KNOWN_DEAD_IMAGE_TOKENS.some((token) => trimmed.includes(token))) return false;
+  return true;
+}
+
 export const SafeImage: React.FC<SafeImageProps> = ({
   src,
   fallbackSrc = DEFAULT_NEWS_COVER,
@@ -19,13 +31,14 @@ export const SafeImage: React.FC<SafeImageProps> = ({
   unoptimized,
   ...props
 }) => {
-  const initialSrc = src && src.trim() !== '' ? src : fallbackSrc;
+  const usable = isUsableImageSrc(src);
+  const initialSrc = usable ? src.trim() : fallbackSrc;
   const [currentSrc, setCurrentSrc] = useState<string>(initialSrc);
-  const [hasFailed, setHasFailed] = useState<boolean>(!src || src.trim() === '');
+  const [hasFailed, setHasFailed] = useState<boolean>(!usable);
 
   useEffect(() => {
-    if (src && src.trim() !== '') {
-      setCurrentSrc(src);
+    if (isUsableImageSrc(src)) {
+      setCurrentSrc(src.trim());
       setHasFailed(false);
     } else {
       setCurrentSrc(fallbackSrc);
@@ -53,4 +66,3 @@ export const SafeImage: React.FC<SafeImageProps> = ({
     />
   );
 };
-

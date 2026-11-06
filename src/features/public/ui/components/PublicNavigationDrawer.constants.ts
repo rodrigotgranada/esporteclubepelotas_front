@@ -15,10 +15,12 @@ export const PUBLIC_DRAWER_TEXTS = {
   LINK_NEWS_DESC: 'Cobertura completa, notas e bastidores',
 
   SECTION_FOOTBALL: 'Futebol & Temporada',
-  LINK_SQUAD: 'Elenco Profissional',
+  LINK_SQUAD: 'Elencos',
+
+  SECTION_YOUTH: 'Base',
   LINK_YOUTH: 'Categorias de Base',
-  LINK_YOUTH_SQUADS: 'Elencos da Base',
-  LINK_YOUTH_NEWS: 'Notícias da Base',
+  LINK_YOUTH_SQUADS: 'Elencos',
+
   LINK_MATCHES: 'Jogos & Campeonatos',
   BADGE_COMING_SOON: 'Em breve',
 
