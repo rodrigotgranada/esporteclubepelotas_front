@@ -192,28 +192,30 @@ export const NewsDetailFeature: React.FC<NewsDetailFeatureProps> = ({ slug }) =>
         </LayoutContainer>
       </LayoutContainer>
 
-      {/* Cover Image 16:9 & Caption */}
-      <LayoutContainer className="flex flex-col gap-2">
-        <LayoutContainer className="relative w-full aspect-video rounded-3xl overflow-hidden bg-drawer border border-border shadow-md">
-          <SafeImage
-            src={article.coverImage}
-            alt={article.title}
-            fill
-            priority
-            sizes="(max-width: 1200px) 100vw, 896px"
-            className="object-cover"
-          />
+      {/* Cover Image 16:9 & Caption (Apenas se a matéria possuir imagem de capa) */}
+      {Boolean(article.coverImage && article.coverImage.trim()) && (
+        <LayoutContainer className="flex flex-col gap-2">
+          <LayoutContainer className="relative w-full aspect-video rounded-3xl overflow-hidden bg-drawer border border-border shadow-md">
+            <SafeImage
+              src={article.coverImage!}
+              alt={article.title}
+              fill
+              priority
+              sizes="(max-width: 1200px) 100vw, 896px"
+              className="object-cover"
+            />
+          </LayoutContainer>
+          {(article.photographerName || article.coverCaption) && (
+            <Text as="p" className="text-xs text-text-secondary text-center italic">
+              {article.photographerName && article.coverCaption
+                ? `${article.coverCaption} (Foto: ${article.photographerName})`
+                : article.photographerName
+                ? `Foto: ${article.photographerName}`
+                : article.coverCaption}
+            </Text>
+          )}
         </LayoutContainer>
-        {(article.photographerName || article.coverCaption) && (
-          <Text as="p" className="text-xs text-text-secondary text-center italic">
-            {article.photographerName && article.coverCaption
-              ? `${article.coverCaption} (Foto: ${article.photographerName})`
-              : article.photographerName
-              ? `Foto: ${article.photographerName}`
-              : article.coverCaption}
-          </Text>
-        )}
-      </LayoutContainer>
+      )}
 
       {/* Main Content Body */}
       <LayoutContainer className="py-2">
