@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
-import { LayoutContainer, Text, Button, ShieldPlaceholder } from '@/shared/ui/components';
+import { LayoutContainer, Button, ShieldPlaceholder } from '@/shared/ui/components';
 import { Menu, User, Settings, LogOut } from 'lucide-react';
 import { ThemeToggle } from '@/shared/ui/components/molecules/ThemeToggle';
 import { useSettingsStore } from '@/store/useSettingsStore';
@@ -46,51 +46,71 @@ export const PublicHeader = () => {
         as="header"
         className="sticky top-0 z-40 w-full bg-header/95 backdrop-blur-md border-b border-header-border transition-colors duration-200"
       >
-        <LayoutContainer className="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between gap-4">
-          {/* Left Side: Brand Logo + Club Name + Explorar Menu Button */}
-          <LayoutContainer className="flex items-center gap-3 sm:gap-5">
-            <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group focus:outline-none shrink-0">
+        <LayoutContainer className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 relative flex items-center justify-between">
+          {/* LADO ESQUERDO: */}
+          {/* No Mobile: Distintivo do clube na esquerda */}
+          {/* No Desktop: Botão de Menu Hamburguer (sem bordas e sem texto) */}
+          <LayoutContainer className="flex items-center gap-2">
+            {/* Botão de Hambúrguer Desktop (apenas ícone, sem bordas, sem texto) */}
+            <button
+              onClick={() => setIsDrawerOpen(true)}
+              className="hidden md:flex items-center justify-center p-2 rounded-xl text-header-text hover:bg-header-text/10 transition-colors cursor-pointer focus:outline-none"
+              aria-label={PUBLIC_HEADER_TEXTS.ARIA_OPEN_MENU}
+              title={PUBLIC_HEADER_TEXTS.NAV_EXPLORE}
+            >
+              <Menu className="w-6 h-6" />
+            </button>
+
+            {/* Distintivo Mobile (apenas o escudo, alinhado à esquerda) */}
+            <Link
+              href="/"
+              className="md:hidden flex items-center group focus:outline-none shrink-0"
+              aria-label={settings?.clubName || PUBLIC_HEADER_TEXTS.LOGO_FULL}
+            >
               {settings?.clubLogoUrl ? (
                 <Image
                   src={settings.clubLogoUrl}
                   alt={settings?.clubName || PUBLIC_HEADER_TEXTS.LOGO_FULL}
-                  width={44}
-                  height={44}
+                  width={38}
+                  height={38}
                   className="object-contain drop-shadow-sm group-hover:scale-105 transition-transform"
                 />
               ) : (
-                <ShieldPlaceholder size={44} />
+                <ShieldPlaceholder size={38} />
               )}
-              <LayoutContainer className="flex flex-col">
-                <Text className="text-base sm:text-xl font-black text-header-text tracking-tight group-hover:opacity-90 transition-opacity leading-tight">
-                  {settings?.clubName || PUBLIC_HEADER_TEXTS.LOGO_FULL}
-                </Text>
-                <Text className="hidden sm:block text-[11px] font-bold text-header-text-muted uppercase tracking-wider">
-                  {PUBLIC_HEADER_TEXTS.LOGO_SLOGAN}
-                </Text>
-              </LayoutContainer>
             </Link>
-
-            {/* Menu / Explorar Pill Button right next to Esporte Clube Pelotas */}
-            <button
-              onClick={() => setIsDrawerOpen(true)}
-              className="flex items-center gap-2 px-3 py-2 sm:px-3.5 sm:py-2 rounded-xl bg-header-text/10 hover:bg-header-text/20 text-header-text border border-header-border transition-all duration-200 font-bold text-xs sm:text-sm shadow-xs focus:outline-none cursor-pointer shrink-0"
-              aria-label={PUBLIC_HEADER_TEXTS.ARIA_OPEN_MENU}
-              title={PUBLIC_HEADER_TEXTS.NAV_EXPLORE}
-            >
-              <Menu className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
-              <span>{PUBLIC_HEADER_TEXTS.NAV_EXPLORE}</span>
-            </button>
           </LayoutContainer>
 
-          {/* Right Side: Theme Toggle + Dedicated "Entrar" / User Session */}
+          {/* CENTRO: Distintivo Centralizado no Desktop (apenas o escudo, sem texto) */}
+          <LayoutContainer className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center justify-center">
+            <Link
+              href="/"
+              className="flex items-center group focus:outline-none shrink-0"
+              aria-label={settings?.clubName || PUBLIC_HEADER_TEXTS.LOGO_FULL}
+            >
+              {settings?.clubLogoUrl ? (
+                <Image
+                  src={settings.clubLogoUrl}
+                  alt={settings?.clubName || PUBLIC_HEADER_TEXTS.LOGO_FULL}
+                  width={46}
+                  height={46}
+                  className="object-contain drop-shadow-sm group-hover:scale-105 transition-transform"
+                />
+              ) : (
+                <ShieldPlaceholder size={46} />
+              )}
+            </Link>
+          </LayoutContainer>
+
+          {/* LADO DIREITO: */}
+          {/* ThemeToggle (apenas Desktop) + Sessão do Usuário / Botão Entrar + Menu Hamburguer no Mobile */}
           <LayoutContainer className="flex items-center gap-2 sm:gap-3 shrink-0">
-            {/* Theme Mode Toggle */}
-            <LayoutContainer className="shrink-0">
+            {/* Theme Toggle (visível apenas no Desktop; no mobile fica dentro do menu) */}
+            <LayoutContainer className="hidden md:flex shrink-0">
               <ThemeToggle />
             </LayoutContainer>
 
-            {/* User Session Quick Profile OR Dedicated "Entrar" Button */}
+            {/* Sessão do Usuário ou Botão Entrar */}
             {user ? (
               <LayoutContainer className="relative" ref={dropdownRef}>
                 <button
@@ -98,7 +118,7 @@ export const PublicHeader = () => {
                   className="flex items-center gap-2 p-1 rounded-full hover:bg-header-text/10 transition-colors focus:outline-none cursor-pointer"
                   aria-label={PUBLIC_HEADER_TEXTS.MENU_PROFILE}
                 >
-                  <LayoutContainer className="w-9 h-9 rounded-full bg-surface border-2 border-primary overflow-hidden relative shadow-sm">
+                  <LayoutContainer className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-surface border-2 border-primary overflow-hidden relative shadow-sm">
                     {user.avatarUrl ? (
                       <Image
                         src={user.avatarUrl}
@@ -108,14 +128,14 @@ export const PublicHeader = () => {
                         className="object-cover"
                       />
                     ) : (
-                      <LayoutContainer className="w-full h-full flex items-center justify-center text-primary font-bold text-sm">
+                      <LayoutContainer className="w-full h-full flex items-center justify-center text-primary font-bold text-xs sm:text-sm">
                         {user.firstName[0]}
                       </LayoutContainer>
                     )}
                   </LayoutContainer>
                 </button>
 
-                {/* User Dropdown */}
+                {/* Dropdown do Usuário */}
                 {isDropdownOpen && (
                   <LayoutContainer className="absolute top-12 right-0 w-48 bg-surface border border-border rounded-xl shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-200 z-50">
                     <Link href="/profile" onClick={() => setIsDropdownOpen(false)}>
@@ -133,7 +153,7 @@ export const PublicHeader = () => {
                     )}
                     <button
                       onClick={handleLogout}
-                      className="w-full text-left px-4 py-3 hover:bg-background flex items-center gap-3 text-sm text-error hover:text-error/80 transition-colors border-t border-border cursor-pointer"
+                      className="w-full text-left px-4 py-3 hover:bg-background flex items-center gap-3 text-sm text-[#ea580c] hover:bg-[#ea580c]/10 transition-colors border-t border-border cursor-pointer"
                     >
                       <LogOut size={16} /> {PUBLIC_HEADER_TEXTS.MENU_LOGOUT}
                     </button>
@@ -145,17 +165,27 @@ export const PublicHeader = () => {
                 <Button
                   variant="primary"
                   size="sm"
-                  className="font-extrabold uppercase tracking-wide text-xs sm:text-sm px-4 sm:px-6 py-2 sm:py-2.5 shadow-md hover:shadow-lg transition-transform hover:-translate-y-0.5"
+                  className="font-extrabold uppercase tracking-wide text-xs px-3 sm:px-5 py-1.5 sm:py-2 shadow-xs hover:shadow-md transition-transform"
                 >
                   {PUBLIC_HEADER_TEXTS.BUTTON_LOGIN}
                 </Button>
               </Link>
             )}
+
+            {/* Botão de Hambúrguer Mobile (apenas o ícone, sem bordas e sem texto) */}
+            <button
+              onClick={() => setIsDrawerOpen(true)}
+              className="md:hidden flex items-center justify-center p-1.5 rounded-xl text-header-text hover:bg-header-text/10 transition-colors cursor-pointer focus:outline-none shrink-0"
+              aria-label={PUBLIC_HEADER_TEXTS.ARIA_OPEN_MENU}
+              title={PUBLIC_HEADER_TEXTS.NAV_EXPLORE}
+            >
+              <Menu className="w-6 h-6" />
+            </button>
           </LayoutContainer>
         </LayoutContainer>
       </LayoutContainer>
 
-      {/* Unified Mobile & Desktop Mega Navigation Drawer */}
+      {/* Unified Mobile & Desktop Mega Navigation Drawer (contém o alternador de temas no mobile) */}
       <PublicNavigationDrawer
         isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}

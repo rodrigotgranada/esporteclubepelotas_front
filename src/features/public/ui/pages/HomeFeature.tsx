@@ -17,13 +17,10 @@ import { NewsArticleData } from '@/features/admin/services/admin-news.service';
 import { NewsBentoHero } from '@/features/news/ui/components/NewsBentoHero';
 import { NewsCard } from '@/features/news/ui/components/NewsCard';
 
-
-
 export const HomeFeature = () => {
   const { settings } = useSettingsStore();
   const [featuredNews, setFeaturedNews] = useState<NewsArticleData[]>([]);
   const [latestNews, setLatestNews] = useState<NewsArticleData[]>([]);
-
 
   useEffect(() => {
     let isMounted = true;
@@ -72,59 +69,9 @@ export const HomeFeature = () => {
 
   return (
     <LayoutContainer className="flex flex-col">
-      {/* Hero Principal do Clube */}
-      <LayoutContainer className="relative h-[600px] flex items-center justify-center overflow-hidden">
-        {/* Background Overlay */}
-        <LayoutContainer className="absolute inset-0 bg-background z-0">
-          <LayoutContainer className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/40 to-background" />
-        </LayoutContainer>
-
-        <LayoutContainer className="relative z-10 max-w-4xl mx-auto px-4 text-center animate-in fade-in slide-in-from-bottom-8 duration-1000 flex flex-col items-center">
-          <LayoutContainer className="mb-8 animate-in zoom-in duration-1000 delay-150">
-            {settings?.clubLogoUrl ? (
-              <Image
-                src={settings.clubLogoUrl}
-                alt="Logo"
-                width={140}
-                height={140}
-                className="object-contain drop-shadow-2xl"
-              />
-            ) : (
-              <ShieldPlaceholder size={140} className="drop-shadow-2xl opacity-80" />
-            )}
-          </LayoutContainer>
-
-          <LayoutContainer className="inline-block px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary font-bold text-sm mb-6 uppercase tracking-wider">
-            {HOME_FEATURE_TEXTS.BADGE}
-          </LayoutContainer>
-          <Title
-            level="h1"
-            className="text-5xl sm:text-7xl font-black text-text-primary tracking-tighter mb-6 leading-tight"
-          >
-            {HOME_FEATURE_TEXTS.TITLE_PREFIX}{' '}
-            <span className="text-primary">{HOME_FEATURE_TEXTS.TITLE_HIGHLIGHT}</span>
-          </Title>
-          <Text className="text-xl text-text-secondary max-w-2xl mx-auto mb-10">
-            {HOME_FEATURE_TEXTS.DESCRIPTION}
-          </Text>
-          <LayoutContainer className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/register">
-              <Button variant="primary" size="lg" className="w-full sm:w-auto px-8 font-bold">
-                {HOME_FEATURE_TEXTS.BUTTON_REGISTER}
-              </Button>
-            </Link>
-            <Link href="/login">
-              <Button variant="secondary" size="lg" className="w-full sm:w-auto px-8 font-bold">
-                {HOME_FEATURE_TEXTS.BUTTON_LOGIN}
-              </Button>
-            </Link>
-          </LayoutContainer>
-        </LayoutContainer>
-      </LayoutContainer>
-
-      {/* Seção Editorial de Notícias (Bento Hero Grid + Últimas Notícias) */}
+      {/* 1. Primeira Seção: Vitrine Editorial de Notícias (Destaques & Bento Grid) */}
       {(featuredNews.length > 0 || latestNews.length > 0) && (
-        <LayoutContainer className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 w-full flex flex-col gap-10">
+        <LayoutContainer className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-14 w-full flex flex-col gap-8 sm:gap-10">
           <LayoutContainer className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <LayoutContainer className="flex flex-col gap-1">
               <LayoutContainer className="inline-block px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary font-bold text-xs uppercase tracking-wider w-fit">
@@ -132,11 +79,11 @@ export const HomeFeature = () => {
               </LayoutContainer>
               <Title
                 level="h2"
-                className="text-3xl sm:text-4xl font-black text-text-primary tracking-tight"
+                className="text-2xl sm:text-4xl font-black text-text-primary tracking-tight"
               >
                 {HOME_FEATURE_TEXTS.SECTION_NEWS_TITLE}
               </Title>
-              <Text className="text-text-secondary text-sm sm:text-base max-w-xl">
+              <Text className="text-text-secondary text-xs sm:text-base max-w-xl">
                 {HOME_FEATURE_TEXTS.SECTION_NEWS_SUBTITLE}
               </Text>
             </LayoutContainer>
@@ -170,20 +117,73 @@ export const HomeFeature = () => {
         </LayoutContainer>
       )}
 
-      {/* Outras Seções Institucionais */}
-      <LayoutContainer className="max-w-7xl mx-auto px-4 py-16 w-full">
-        <LayoutContainer className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <LayoutContainer className="bg-card border border-border rounded-2xl p-8 hover:border-primary/30 transition-colors">
-            <Title level="h3" className="text-2xl font-bold text-text-primary mb-4">
+      {/* 2. Segunda Seção: Hero Institucional do Clube (Sócio Áureo-Cerúleo & Alcatéia) */}
+      <LayoutContainer className="relative py-12 sm:py-20 px-4 flex items-center justify-center overflow-hidden border-t border-border/40">
+        {/* Background Overlay */}
+        <LayoutContainer className="absolute inset-0 bg-background z-0">
+          <LayoutContainer className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/40 to-background" />
+        </LayoutContainer>
+
+        <LayoutContainer className="relative z-10 max-w-4xl mx-auto px-4 text-center animate-in fade-in slide-in-from-bottom-6 duration-700 flex flex-col items-center">
+          <LayoutContainer className="mb-4 sm:mb-6 animate-in zoom-in duration-700 delay-150">
+            {settings?.clubLogoUrl ? (
+              <Image
+                src={settings.clubLogoUrl}
+                alt="Logo"
+                width={110}
+                height={110}
+                className="object-contain drop-shadow-2xl w-24 h-24 sm:w-28 sm:h-28"
+              />
+            ) : (
+              <ShieldPlaceholder size={100} className="drop-shadow-2xl opacity-80" />
+            )}
+          </LayoutContainer>
+
+          <LayoutContainer className="inline-block px-3.5 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary font-bold text-xs sm:text-sm mb-3 sm:mb-4 uppercase tracking-wider">
+            {HOME_FEATURE_TEXTS.BADGE}
+          </LayoutContainer>
+
+          <Title
+            level="h1"
+            className="text-3xl sm:text-5xl md:text-6xl font-black text-text-primary tracking-tighter mb-3 sm:mb-4 leading-tight"
+          >
+            {HOME_FEATURE_TEXTS.TITLE_PREFIX}{' '}
+            <span className="text-primary">{HOME_FEATURE_TEXTS.TITLE_HIGHLIGHT}</span>
+          </Title>
+
+          <Text className="text-sm sm:text-base md:text-lg text-text-secondary max-w-xl mx-auto mb-6 sm:mb-8 px-2">
+            {HOME_FEATURE_TEXTS.DESCRIPTION}
+          </Text>
+
+          <LayoutContainer className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full sm:w-auto px-4 max-w-xs sm:max-w-none mx-auto">
+            <Link href="/register" className="w-full sm:w-auto">
+              <Button variant="primary" size="lg" className="w-full sm:w-auto px-6 py-3 font-bold text-sm sm:text-base shadow-md">
+                {HOME_FEATURE_TEXTS.BUTTON_REGISTER}
+              </Button>
+            </Link>
+            <Link href="/login" className="w-full sm:w-auto">
+              <Button variant="secondary" size="lg" className="w-full sm:w-auto px-6 py-3 font-bold text-sm sm:text-base">
+                {HOME_FEATURE_TEXTS.BUTTON_LOGIN}
+              </Button>
+            </Link>
+          </LayoutContainer>
+        </LayoutContainer>
+      </LayoutContainer>
+
+      {/* 3. Terceira Seção: Outras Seções Institucionais (Próximo Jogo & Loja) */}
+      <LayoutContainer className="max-w-7xl mx-auto px-4 py-12 sm:py-16 w-full">
+        <LayoutContainer className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+          <LayoutContainer className="bg-card border border-border rounded-2xl p-6 sm:p-8 hover:border-primary/30 transition-colors">
+            <Title level="h3" className="text-xl sm:text-2xl font-bold text-text-primary mb-3 sm:mb-4">
               {HOME_FEATURE_TEXTS.SECTION_MATCH_TITLE}
             </Title>
-            <Text className="text-text-secondary">{HOME_FEATURE_TEXTS.SECTION_MATCH_DESC}</Text>
+            <Text className="text-text-secondary text-sm sm:text-base">{HOME_FEATURE_TEXTS.SECTION_MATCH_DESC}</Text>
           </LayoutContainer>
-          <LayoutContainer className="bg-card border border-border rounded-2xl p-8 hover:border-primary/30 transition-colors">
-            <Title level="h3" className="text-2xl font-bold text-text-primary mb-4">
+          <LayoutContainer className="bg-card border border-border rounded-2xl p-6 sm:p-8 hover:border-primary/30 transition-colors">
+            <Title level="h3" className="text-xl sm:text-2xl font-bold text-text-primary mb-3 sm:mb-4">
               {HOME_FEATURE_TEXTS.SECTION_STORE_TITLE}
             </Title>
-            <Text className="text-text-secondary">{HOME_FEATURE_TEXTS.SECTION_STORE_DESC}</Text>
+            <Text className="text-text-secondary text-sm sm:text-base">{HOME_FEATURE_TEXTS.SECTION_STORE_DESC}</Text>
           </LayoutContainer>
         </LayoutContainer>
       </LayoutContainer>
