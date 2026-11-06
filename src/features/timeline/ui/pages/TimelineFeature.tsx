@@ -1,13 +1,13 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
-import { LayoutContainer, Title, Text, Spinner, MembershipCtaCard } from '@/shared/ui/components';
+import { LayoutContainer, Title, Text, Spinner, Button, MembershipCtaCard } from '@/shared/ui/components';
 import { useTimeline } from '../../hooks/useTimeline';
 import { TimelineHero } from '../components/TimelineHero';
 import { TimelineCard } from '../components/TimelineCard';
 import { AppleYearWheelPicker } from '../components/AppleYearWheelPicker';
 import { TIMELINE_CONSTANTS } from '../../constants/timeline.constants';
-import { Shield } from 'lucide-react';
+import { Shield, RotateCcw } from 'lucide-react';
 
 export const TimelineFeature: React.FC = () => {
   const {
@@ -19,6 +19,8 @@ export const TimelineFeature: React.FC = () => {
     scrollToTop,
     isNavigatingRef,
     isLoading,
+    hasError,
+    reload,
   } = useTimeline();
 
   const timelineContainerRef = useRef<HTMLElement>(null);
@@ -90,7 +92,7 @@ export const TimelineFeature: React.FC = () => {
         onScrollToTimeline={handleScrollToTimeline}
       />
 
-      {/* Sticky Apple Watch Wheel Picker */}
+      {/* Sticky Apple Watch Wheel Picker (apenas se houver anos disponíveis) */}
       {availableYears.length > 0 && (
         <AppleYearWheelPicker
           years={availableYears}
@@ -106,14 +108,27 @@ export const TimelineFeature: React.FC = () => {
         className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 sm:mt-12 relative"
       >
         {events.length === 0 ? (
-          <LayoutContainer className="text-center py-20 p-8 rounded-3xl bg-surface border border-border">
-            <Shield className="w-16 h-16 text-text-muted mx-auto mb-4" />
+          <LayoutContainer className="text-center py-16 sm:py-20 p-8 rounded-3xl bg-surface/90 border border-border shadow-xs max-w-xl mx-auto flex flex-col items-center">
+            <LayoutContainer className="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-4 text-primary">
+              <Shield className="w-8 h-8" />
+            </LayoutContainer>
             <Title level="h3" className="text-xl font-bold text-text-primary mb-2">
-              {TIMELINE_CONSTANTS.EMPTY_TITLE}
+              {hasError ? TIMELINE_CONSTANTS.ERROR_TITLE : TIMELINE_CONSTANTS.EMPTY_TITLE}
             </Title>
-            <Text className="text-text-secondary max-w-md mx-auto">
-              {TIMELINE_CONSTANTS.EMPTY_DESC}
+            <Text className="text-text-secondary max-w-md mx-auto text-sm leading-relaxed mb-6">
+              {hasError ? TIMELINE_CONSTANTS.ERROR_DESC : TIMELINE_CONSTANTS.EMPTY_DESC}
             </Text>
+            {hasError && (
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={reload}
+                leftIcon={<RotateCcw className="w-4 h-4" />}
+                className="font-bold text-blue-950 px-5 py-2.5 shadow-sm hover:scale-105 transition-all cursor-pointer"
+              >
+                {TIMELINE_CONSTANTS.BTN_RETRY}
+              </Button>
+            )}
           </LayoutContainer>
         ) : (
           <LayoutContainer className="relative">
@@ -125,7 +140,7 @@ export const TimelineFeature: React.FC = () => {
               className="absolute top-0 bottom-0 w-1 bg-gradient-to-b from-primary via-primary/50 to-primary/10 rounded-full left-6 lg:left-1/2 -translate-x-1/2 pointer-events-none"
             />
 
-            {/* Lista Contínua de Marcos Históricos (Sem cortes de filtro) */}
+            {/* Lista Contínua de Marcos Históricos */}
             <LayoutContainer className="flex flex-col gap-10 sm:gap-14">
               {events.map((event, index) => {
                 const isEven = index % 2 === 0;

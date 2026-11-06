@@ -44,12 +44,25 @@ export interface GetTimelineResponse {
 
 export const timelineService = {
   getTimeline: async (): Promise<GetTimelineResponse> => {
-    const response = await api.get('/timeline');
-    return response.data;
+    try {
+      const response = await api.get('/timeline', { timeout: 45000 });
+      return response.data;
+    } catch (err: any) {
+      // Se for timeout de cold start do Render, tenta uma segunda vez com timeout ampliado
+      if (err?.code === 'ECONNABORTED' || err?.message?.includes('timeout')) {
+        try {
+          const retryRes = await api.get('/timeline', { timeout: 45000 });
+          return retryRes.data;
+        } catch {
+          // Continua para o throw tratado
+        }
+      }
+      throw err;
+    }
   },
 
   getCategories: async (): Promise<TimelineCategoryData[]> => {
-    const response = await api.get('/timeline/categories');
+    const response = await api.get('/timeline/categories', { timeout: 30000 });
     return response.data;
   },
 };

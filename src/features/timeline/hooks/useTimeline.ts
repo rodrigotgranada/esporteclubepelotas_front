@@ -2,11 +2,11 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { timelineService, TimelineEventData } from '../services/timeline.service';
-import { toast } from 'react-hot-toast';
 
 export const useTimeline = () => {
   const [events, setEvents] = useState<TimelineEventData[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [hasError, setHasError] = useState<boolean>(false);
   const [activeYear, setActiveYear] = useState<number | null>(null);
 
   // Trava de rolagem suave para impedir que o IntersectionObserver sobrescreva o ano enquanto o salto acontece
@@ -16,15 +16,20 @@ export const useTimeline = () => {
   const loadTimeline = useCallback(async () => {
     try {
       setIsLoading(true);
+      setHasError(false);
       const res = await timelineService.getTimeline();
-      const list = res.data || [];
+      const list = Array.isArray(res?.data) ? res.data : [];
       setEvents(list);
       if (list.length > 0) {
         setActiveYear((prev) => prev ?? list[0].year);
+      } else {
+        setActiveYear(null);
       }
-    } catch (err) {
-      console.error('Erro ao carregar linha do tempo:', err);
-      toast.error('Não foi possível carregar a história do Pelotas.');
+    } catch {
+      // Trata amigavelmente sem disparar toasts invasivos na tela de visualização pública
+      setEvents([]);
+      setActiveYear(null);
+      setHasError(true);
     } finally {
       setIsLoading(false);
     }
@@ -75,6 +80,7 @@ export const useTimeline = () => {
     scrollToTop,
     isNavigatingRef,
     isLoading,
+    hasError,
     reload: loadTimeline,
   };
 };
