@@ -132,3 +132,4 @@ export const TimelineCategoriesTable: React.FC<TimelineCategoriesTableProps> = (
     </LayoutContainer>
   );
 };
+

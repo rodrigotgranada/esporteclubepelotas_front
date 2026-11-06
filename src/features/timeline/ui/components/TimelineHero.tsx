@@ -3,19 +3,16 @@
 import React from 'react';
 import { LayoutContainer, Title, Text, Button } from '@/shared/ui/components';
 import { TIMELINE_CONSTANTS } from '../../constants/timeline.constants';
-import { Sparkles, Calendar, ArrowDown } from 'lucide-react';
-import Link from 'next/link';
+import { Sparkles, ArrowDown } from 'lucide-react';
 
 interface TimelineHeroProps {
-  availableYears: number[];
-  selectedYear: number | null;
-  onSelectYear: (year: number | null) => void;
+  totalMilestones: number;
+  onScrollToTimeline: () => void;
 }
 
 export const TimelineHero: React.FC<TimelineHeroProps> = ({
-  availableYears,
-  selectedYear,
-  onSelectYear,
+  totalMilestones,
+  onScrollToTimeline,
 }) => {
   return (
     <LayoutContainer className="relative overflow-hidden pt-12 pb-16 px-4 sm:px-6 lg:px-8 border-b border-border/60 bg-gradient-to-b from-primary/10 via-background to-background">
@@ -39,38 +36,20 @@ export const TimelineHero: React.FC<TimelineHeroProps> = ({
           {TIMELINE_CONSTANTS.HERO_DESCRIPTION}
         </Text>
 
-        {/* Quick jump pills */}
-        {availableYears.length > 0 && (
-          <LayoutContainer className="mt-8 flex flex-wrap items-center justify-center gap-2 max-w-3xl">
-            <Button
+        {/* Scroll Call to Action */}
+        {totalMilestones > 0 && (
+          <LayoutContainer className="mt-8 flex flex-col items-center gap-2">
+            <button
               type="button"
-              variant={selectedYear === null ? 'primary' : 'outline'}
-              size="sm"
-              onClick={() => onSelectYear(null)}
-              className="text-xs font-bold rounded-full px-4 h-8"
+              onClick={onScrollToTimeline}
+              className="group inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-surface border border-border/80 hover:border-primary/50 text-xs sm:text-sm font-bold text-text-secondary hover:text-text-primary shadow-xs transition-all cursor-pointer"
             >
-              Todos os Anos ({availableYears.length})
-            </Button>
-            {availableYears.map((year) => (
-              <Button
-                key={year}
-                type="button"
-                variant={selectedYear === year ? 'primary' : 'ghost'}
-                size="sm"
-                onClick={() => onSelectYear(year)}
-                className={`text-xs font-bold rounded-full px-3.5 h-8 ${
-                  selectedYear === year
-                    ? 'shadow-md shadow-primary/20'
-                    : 'bg-surface/60 border border-border/80 text-text-secondary hover:text-text-primary hover:border-primary/50'
-                }`}
-              >
-                {year}
-              </Button>
-            ))}
+              <span>Explorar {totalMilestones} marcos históricos</span>
+              <ArrowDown className="w-4 h-4 text-primary group-hover:translate-y-0.5 transition-transform" />
+            </button>
           </LayoutContainer>
         )}
       </LayoutContainer>
     </LayoutContainer>
   );
 };
-

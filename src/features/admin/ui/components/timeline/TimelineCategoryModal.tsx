@@ -164,3 +164,4 @@ export const TimelineCategoryModal: React.FC<TimelineCategoryModalProps> = ({
     </Modal>
   );
 };
+
