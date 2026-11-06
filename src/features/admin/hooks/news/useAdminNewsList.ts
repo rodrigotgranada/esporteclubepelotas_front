@@ -9,7 +9,8 @@ import {
 } from '../../services/admin-news.service';
 import { ADMIN_NEWS_TEXTS } from '../../constants/admin-news.constants';
 
-export const useAdminNewsList = () => {
+export const useAdminNewsList = (options?: { fixedIsYouth?: boolean }) => {
+  const fixedIsYouth = options?.fixedIsYouth;
   const [news, setNews] = useState<NewsArticleData[]>([]);
   const [categories, setCategories] = useState<NewsCategoryData[]>([]);
   const [total, setTotal] = useState(0);
@@ -55,6 +56,7 @@ export const useAdminNewsList = () => {
       if (statusFilter) params.status = statusFilter;
       if (featuredFilter === 'YES') params.isFeatured = true;
       if (featuredFilter === 'NO') params.isFeatured = false;
+      if (typeof fixedIsYouth === 'boolean') params.isYouth = fixedIsYouth;
 
       const res = await adminNewsService.getNews(params);
       setNews(res.data);
@@ -66,7 +68,7 @@ export const useAdminNewsList = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [page, limit, search, categoryFilter, statusFilter, featuredFilter]);
+  }, [page, limit, search, categoryFilter, statusFilter, featuredFilter, fixedIsYouth]);
 
   useEffect(() => {
     loadCategories();

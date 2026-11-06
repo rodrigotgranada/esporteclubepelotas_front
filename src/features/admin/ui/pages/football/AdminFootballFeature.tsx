@@ -25,24 +25,23 @@ import { SquadsTable } from '../../components/football/SquadsTable';
 import { AthleteEditorDrawer } from '../../components/football/AthleteEditorDrawer';
 import { SquadEditorDrawer } from '../../components/football/SquadEditorDrawer';
 import { SquadMembersDrawer } from '../../components/football/SquadMembersDrawer';
-import { YouthPortalSettingsTab } from '../../components/football/YouthPortalSettingsTab';
 
 export const AdminFootballFeature: React.FC = () => {
   const texts = ADMIN_FOOTBALL_CONSTANTS;
 
-  // Hooks de Listagem
-  const athletesList = useAdminAthletesList();
-  const squadsList = useAdminSquadsList();
+  // Hooks de Listagem (escopo Profissional, Feminino & Comissão)
+  const athletesList = useAdminAthletesList({ scope: 'PROFESSIONAL' });
+  const squadsList = useAdminSquadsList({ scope: 'PROFESSIONAL' });
 
   // Hooks de Drawers
-  const athleteDrawer = useAdminAthleteDrawer(() => athletesList.reload());
-  const squadDrawer = useAdminSquadDrawer(() => squadsList.reload());
+  const athleteDrawer = useAdminAthleteDrawer(() => athletesList.reload(), 'PROFESSIONAL');
+  const squadDrawer = useAdminSquadDrawer(() => squadsList.reload(), 'PROFESSIONAL');
   const squadMembersDrawer = useAdminSquadMembersDrawer(() => squadsList.reload());
 
   // Aba selecionada
   const [activeTabId, setActiveTabId] = useState<string>('athletes');
 
-  // Lista única de campeonatos existentes para sugerir vínculo rápido entre categorias
+  // Lista única de campeonatos profissionais/femininos existentes
   const existingCompetitions = useMemo(() => {
     const seen = new Map<string, string>();
     for (const sq of squadsList.squads) {
@@ -54,16 +53,15 @@ export const AdminFootballFeature: React.FC = () => {
     return Array.from(seen.values());
   }, [squadsList.squads]);
 
-  // Definição dos conteúdos das abas
   const tabs = [
     {
       id: 'athletes',
       label: texts.TABS.ATHLETES,
       content: (
         <LayoutContainer className="flex flex-col gap-6">
-          {/* Barra de Ações do Banco de Atletas */}
-          <LayoutContainer className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
-            <LayoutContainer className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-1 max-w-2xl">
+          {/* Barra de Ações do Banco de Profissionais */}
+          <LayoutContainer className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
+            <LayoutContainer className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-1 max-w-3xl">
               <LayoutContainer className="relative flex-1 min-w-[200px]">
                 <LayoutContainer className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none text-text-secondary z-10">
                   <Search className="w-4 h-4" />
@@ -80,6 +78,20 @@ export const AdminFootballFeature: React.FC = () => {
               </LayoutContainer>
 
               <LayoutContainer className="w-full sm:w-56 shrink-0">
+                <Select
+                  value={athletesList.athleteTypeFilter}
+                  onChange={(e) => {
+                    athletesList.setAthleteTypeFilter(e.target.value as any);
+                    athletesList.setPage(1);
+                  }}
+                >
+                  <Option value="">{texts.ATHLETES_TAB.FILTER_TYPE_ALL}</Option>
+                  <Option value="PROFESSIONAL">{texts.ATHLETES_TAB.FILTER_TYPE_PROFESSIONAL}</Option>
+                  <Option value="STAFF">{texts.ATHLETES_TAB.FILTER_TYPE_STAFF}</Option>
+                </Select>
+              </LayoutContainer>
+
+              <LayoutContainer className="w-full sm:w-52 shrink-0">
                 <Select
                   value={athletesList.retiredFilter}
                   onChange={(e) => {
@@ -124,7 +136,7 @@ export const AdminFootballFeature: React.FC = () => {
       label: texts.TABS.SQUADS,
       content: (
         <LayoutContainer className="flex flex-col gap-6">
-          {/* Barra de Ações de Elencos & Temporadas */}
+          {/* Barra de Ações de Elencos & Competições */}
           <LayoutContainer className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
             <LayoutContainer className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-1 max-w-2xl">
               <LayoutContainer className="relative flex-1 min-w-[200px]">
@@ -144,15 +156,15 @@ export const AdminFootballFeature: React.FC = () => {
               <LayoutContainer className="w-full sm:w-56 shrink-0">
                 <Select
                   value={squadsList.selectedCategory}
-                  onChange={(e) => squadsList.setSelectedCategory(e.target.value)}
+                  onChange={(e) => {
+                    squadsList.setSelectedCategory(e.target.value);
+                    squadsList.setPage(1);
+                  }}
                   className="w-full sm:w-56"
                 >
                   <Option value="">{texts.SQUADS_TAB.ALL_CATEGORIES}</Option>
                   <Option value="PROFESSIONAL">{FOOTBALL_CONSTANTS.CATEGORIES.PROFESSIONAL}</Option>
                   <Option value="FEMININE">{FOOTBALL_CONSTANTS.CATEGORIES.FEMININE}</Option>
-                  <Option value="SUB_20">{FOOTBALL_CONSTANTS.CATEGORIES.SUB_20}</Option>
-                  <Option value="SUB_17">{FOOTBALL_CONSTANTS.CATEGORIES.SUB_17}</Option>
-                  <Option value="SUB_15">{FOOTBALL_CONSTANTS.CATEGORIES.SUB_15}</Option>
                 </Select>
               </LayoutContainer>
             </LayoutContainer>
@@ -174,21 +186,12 @@ export const AdminFootballFeature: React.FC = () => {
             onEdit={squadDrawer.openEdit}
             onDelete={(squad) => squadsList.setSquadToDelete(squad)}
             onManageMembers={squadMembersDrawer.open}
-            onToggleCurrent={squadListActionToggle}
+            onToggleCurrent={(squad) => squadsList.handleToggleCurrent(squad)}
           />
         </LayoutContainer>
       ),
     },
-    {
-      id: 'youth-portal',
-      label: texts.TABS.YOUTH_PORTAL,
-      content: <YouthPortalSettingsTab />,
-    },
   ];
-
-  function squadListActionToggle(squad: any) {
-    squadsList.handleToggleCurrent(squad);
-  }
 
   return (
     <LayoutContainer className="flex flex-col gap-6 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full animate-in fade-in duration-200">
@@ -257,6 +260,7 @@ export const AdminFootballFeature: React.FC = () => {
         setPhotoUrl={athleteDrawer.setPhotoUrl}
         pendingPhotoFile={athleteDrawer.pendingPhotoFile}
         setPendingPhotoFile={athleteDrawer.setPendingPhotoFile}
+        allowedTypes={['PROFESSIONAL', 'STAFF']}
       />
 
       <SquadEditorDrawer
@@ -284,6 +288,7 @@ export const AdminFootballFeature: React.FC = () => {
         onAddStaff={squadDrawer.handleAddStaff}
         onRemoveStaff={squadDrawer.handleRemoveStaff}
         existingCompetitions={existingCompetitions}
+        allowedCategories={['PROFESSIONAL', 'FEMININE']}
       />
 
       <SquadMembersDrawer

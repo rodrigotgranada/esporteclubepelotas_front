@@ -6,13 +6,13 @@ import { adminFootballService } from '../../services/admin-football.service';
 import { AthleteData, PreferredFoot, AthleteGender, AthleteType } from '@/features/football/services/football.service';
 import { ADMIN_FOOTBALL_CONSTANTS } from '../../constants/admin-football.constants';
 
-export const useAdminAthleteDrawer = (onSuccess: () => void) => {
+export const useAdminAthleteDrawer = (onSuccess: () => void, defaultAthleteType: AthleteType = 'PROFESSIONAL') => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [editingAthleteId, setEditingAthleteId] = useState<string | null>(null);
 
   // Form Fields
   const [gender, setGender] = useState<AthleteGender>('MALE');
-  const [athleteType, setAthleteType] = useState<AthleteType>('PROFESSIONAL');
+  const [athleteType, setAthleteType] = useState<AthleteType>(defaultAthleteType);
   const [youthCategory, setYouthCategory] = useState<string>('');
   const [entryYear, setEntryYear] = useState<string>('');
   const [staffRole, setStaffRole] = useState<string>('Treinador');
@@ -40,9 +40,11 @@ export const useAdminAthleteDrawer = (onSuccess: () => void) => {
   const resetForm = () => {
     setEditingAthleteId(null);
     setGender('MALE');
-    setAthleteType('PROFESSIONAL');
-    setYouthCategory('');
-    setEntryYear('');
+    setAthleteType(defaultAthleteType);
+    setYouthCategory(defaultAthleteType === 'YOUTH' ? 'SUB_20' : '');
+    setEntryYear(defaultAthleteType === 'YOUTH' ? String(new Date().getFullYear()) : '');
+
+
     setStaffRole('Treinador');
     setName('');
     setNickname('');

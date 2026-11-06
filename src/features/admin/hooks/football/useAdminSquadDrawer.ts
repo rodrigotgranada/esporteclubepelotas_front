@@ -6,13 +6,13 @@ import { adminFootballService } from '../../services/admin-football.service';
 import { SquadCategory, SquadData, SquadStaffData } from '@/features/football/services/football.service';
 import { ADMIN_FOOTBALL_CONSTANTS } from '../../constants/admin-football.constants';
 
-export const useAdminSquadDrawer = (onSuccess: () => void) => {
+export const useAdminSquadDrawer = (onSuccess: () => void, defaultCategory: SquadCategory = 'PROFESSIONAL') => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [editingSquadId, setEditingSquadId] = useState<string | null>(null);
 
   // Form Fields
   const [year, setYear] = useState<number>(new Date().getFullYear());
-  const [category, setCategory] = useState<SquadCategory>('PROFESSIONAL');
+  const [category, setCategory] = useState<SquadCategory>(defaultCategory);
   const [seasonName, setSeasonName] = useState<string>('');
   const [coachName, setCoachName] = useState<string>('');
   const [isCurrent, setIsCurrent] = useState<boolean>(false);
@@ -28,7 +28,7 @@ export const useAdminSquadDrawer = (onSuccess: () => void) => {
   const resetForm = () => {
     setEditingSquadId(null);
     setYear(new Date().getFullYear());
-    setCategory('PROFESSIONAL');
+    setCategory(defaultCategory);
     setSeasonName('');
     setCoachName('');
     setIsCurrent(false);

@@ -71,6 +71,7 @@ export interface AthleteEditorDrawerProps {
   setPhotoUrl: (v: string) => void;
   pendingPhotoFile: File | null;
   setPendingPhotoFile: (f: File | null) => void;
+  allowedTypes?: AthleteType[];
 }
 
 export const AthleteEditorDrawer: React.FC<AthleteEditorDrawerProps> = ({
@@ -119,6 +120,7 @@ export const AthleteEditorDrawer: React.FC<AthleteEditorDrawerProps> = ({
   photoUrl,
   setPhotoUrl,
   setPendingPhotoFile,
+  allowedTypes,
 }) => {
   const texts = ADMIN_FOOTBALL_CONSTANTS.DRAWER_ATHLETE;
   const isStaff = athleteType === 'STAFF';
@@ -188,9 +190,11 @@ export const AthleteEditorDrawer: React.FC<AthleteEditorDrawerProps> = ({
               }}
               className="w-full"
             >
-              <Option value="PROFESSIONAL">{texts.TYPE_PROFESSIONAL}</Option>
-              <Option value="YOUTH">{texts.TYPE_YOUTH}</Option>
-              <Option value="STAFF">{texts.TYPE_STAFF}</Option>
+              {(!allowedTypes || allowedTypes.includes('PROFESSIONAL') || athleteType === 'PROFESSIONAL') && <Option value="PROFESSIONAL">{texts.TYPE_PROFESSIONAL}</Option>}
+              {(!allowedTypes || allowedTypes.includes('YOUTH') || athleteType === 'YOUTH') && <Option value="YOUTH">{texts.TYPE_YOUTH}</Option>}
+              {(!allowedTypes || allowedTypes.includes('STAFF') || athleteType === 'STAFF') && <Option value="STAFF">{texts.TYPE_STAFF}</Option>}
+
+
             </Select>
           </LayoutContainer>
         </LayoutContainer>

@@ -51,7 +51,7 @@ export const AdminNewsFeature = () => {
     openDuplicateModal,
     closeDuplicateModal,
     confirmDuplicate,
-  } = useAdminNewsList();
+  } = useAdminNewsList({ fixedIsYouth: false });
 
   return (
     <LayoutContainer className="flex flex-col gap-6 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full">

@@ -7,10 +7,11 @@ export const SIDEBAR_TEXTS = {
     USERS: 'Usuários',
     NEWS: 'Matérias',
     FOOTBALL: 'Futebol & Elenco',
+    YOUTH: 'Categorias de Base',
     IDOLS: 'Ídolos & Memorial',
     TIMELINE: 'História & Linha do Tempo',
     MODULES: 'Módulos do Sistema',
     ROLES: 'Cargos e Permissões',
     SETTINGS: 'Configurações',
-  }
+  },
 };

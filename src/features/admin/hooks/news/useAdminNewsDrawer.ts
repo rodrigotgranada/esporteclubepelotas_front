@@ -13,7 +13,7 @@ import { ADMIN_NEWS_TEXTS } from '../../constants/admin-news.constants';
 export const useAdminNewsDrawer = (
   articleId: string | null,
   isOpen: boolean,
-  onSuccess: () => void,
+  onSuccess: () => void, defaultIsYouth: boolean = false,
 ) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -45,8 +45,8 @@ export const useAdminNewsDrawer = (
   const [replaceMainModalOpen, setReplaceMainModalOpen] = useState(false);
   const [existingMainTitle, setExistingMainTitle] = useState('');
   const [isPinned, setIsPinned] = useState(false);
-  const [isYouth, setIsYouth] = useState(false);
-  const [showOnHomepage, setShowOnHomepage] = useState(true);
+  const [isYouth, setIsYouth] = useState(defaultIsYouth);
+  const [showOnHomepage, setShowOnHomepage] = useState(!defaultIsYouth);
   const [reporterName, setReporterName] = useState('');
   const [photographerName, setPhotographerName] = useState('');
   const [allowReactions, setAllowReactions] = useState(true);
@@ -170,8 +170,8 @@ export const useAdminNewsDrawer = (
     setIsFeatured(false);
     setFeaturedSlot('NONE');
     setIsPinned(false);
-    setIsYouth(false);
-    setShowOnHomepage(true);
+    setIsYouth(defaultIsYouth);
+    setShowOnHomepage(!defaultIsYouth);
     setReporterName('');
     setPhotographerName('');
     setAllowReactions(true);

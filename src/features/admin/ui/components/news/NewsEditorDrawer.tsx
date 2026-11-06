@@ -45,14 +45,14 @@ export interface NewsEditorDrawerProps {
   isOpen: boolean;
   onClose: () => void;
   articleId: string | null;
-  onSaveSuccess: () => void;
+  onSaveSuccess: () => void; defaultIsYouth?: boolean;
 }
 
 export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
   isOpen,
   onClose,
   articleId,
-  onSaveSuccess,
+  onSaveSuccess, defaultIsYouth = false,
 }) => {
   const { DRAWER: texts, STATUS_MAP, MODAL_REPLACE_MAIN: replaceMainTexts } = ADMIN_NEWS_TEXTS;
 
@@ -123,7 +123,7 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
     recoverDraft,
     discardDraft,
     handleSave,
-  } = useAdminNewsDrawer(articleId, isOpen, onSaveSuccess);
+  } = useAdminNewsDrawer(articleId, isOpen, onSaveSuccess, defaultIsYouth);
 
   const quickCat = useQuickCategoryModal(handleCategoryCreated);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);

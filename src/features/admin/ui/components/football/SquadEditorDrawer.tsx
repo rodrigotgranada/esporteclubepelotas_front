@@ -43,6 +43,7 @@ export interface SquadEditorDrawerProps {
   onAddStaff: () => void;
   onRemoveStaff: (index: number) => void;
   existingCompetitions?: string[];
+  allowedCategories?: SquadCategory[];
 }
 
 export const SquadEditorDrawer: React.FC<SquadEditorDrawerProps> = ({
@@ -70,6 +71,7 @@ export const SquadEditorDrawer: React.FC<SquadEditorDrawerProps> = ({
   onAddStaff,
   onRemoveStaff,
   existingCompetitions = [],
+  allowedCategories,
 }) => {
   const texts = ADMIN_FOOTBALL_CONSTANTS.DRAWER_SQUAD;
   const categoriesTexts = FOOTBALL_CONSTANTS.CATEGORIES;
@@ -110,11 +112,12 @@ export const SquadEditorDrawer: React.FC<SquadEditorDrawerProps> = ({
               onChange={(e) => setCategory(e.target.value as SquadCategory)}
               className="w-full"
             >
-              <Option value="PROFESSIONAL">{categoriesTexts.PROFESSIONAL_FULL}</Option>
-              <Option value="FEMININE">{categoriesTexts.FEMININE_FULL}</Option>
-              <Option value="SUB_20">{categoriesTexts.SUB_20_FULL}</Option>
-              <Option value="SUB_17">{categoriesTexts.SUB_17_FULL}</Option>
-              <Option value="SUB_15">{categoriesTexts.SUB_15_FULL}</Option>
+              {(!allowedCategories || allowedCategories.includes('PROFESSIONAL') || category === 'PROFESSIONAL') && <Option value="PROFESSIONAL">{categoriesTexts.PROFESSIONAL_FULL}</Option>}
+              {(!allowedCategories || allowedCategories.includes('FEMININE') || category === 'FEMININE') && <Option value="FEMININE">{categoriesTexts.FEMININE_FULL}</Option>}
+              {(!allowedCategories || allowedCategories.includes('SUB_20') || category === 'SUB_20') && <Option value="SUB_20">{categoriesTexts.SUB_20_FULL}</Option>}
+              {(!allowedCategories || allowedCategories.includes('SUB_17') || category === 'SUB_17') && <Option value="SUB_17">{categoriesTexts.SUB_17_FULL}</Option>}
+              {(!allowedCategories || allowedCategories.includes('SUB_15') || category === 'SUB_15') && <Option value="SUB_15">{categoriesTexts.SUB_15_FULL}</Option>}
+
             </Select>
           </LayoutContainer>
         </LayoutContainer>

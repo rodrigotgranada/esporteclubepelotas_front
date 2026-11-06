@@ -6,7 +6,12 @@ import { adminFootballService } from '../../services/admin-football.service';
 import { SquadData } from '@/features/football/services/football.service';
 import { ADMIN_FOOTBALL_CONSTANTS } from '../../constants/admin-football.constants';
 
-export const useAdminSquadsList = () => {
+export interface UseAdminSquadsListOptions {
+  scope?: 'PROFESSIONAL' | 'YOUTH';
+}
+
+export const useAdminSquadsList = (options?: UseAdminSquadsListOptions) => {
+  const scope = options?.scope;
   const [squads, setSquads] = useState<SquadData[]>([]);
   const [total, setTotal] = useState<number>(0);
   const [page, setPage] = useState<number>(1);
@@ -25,6 +30,7 @@ export const useAdminSquadsList = () => {
     try {
       setIsLoading(true);
       const params: any = { page, limit };
+      if (scope) params.scope = scope;
       if (search.trim()) params.search = search.trim();
       if (selectedCategory) params.category = selectedCategory;
       if (selectedYear) params.year = selectedYear;
@@ -39,7 +45,7 @@ export const useAdminSquadsList = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [page, limit, search, selectedCategory, selectedYear]);
+  }, [page, limit, scope, search, selectedCategory, selectedYear]);
 
   useEffect(() => {
     loadSquads();
@@ -100,4 +106,3 @@ export const useAdminSquadsList = () => {
     handleToggleCurrent,
   };
 };
-

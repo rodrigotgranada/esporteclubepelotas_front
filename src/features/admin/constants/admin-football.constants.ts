@@ -1,7 +1,7 @@
 export const ADMIN_FOOTBALL_CONSTANTS = {
   TITLE: 'Gestão de Futebol & Plantel',
   SUBTITLE:
-    'Gerencie o banco de atletas profissionais, comissão técnica e de base, além da montagem de elencos por competição e o portal da base.',
+    'Gerencie o banco de atletas profissionais, futebol feminino, comissão técnica e a montagem de elencos por competição.',
 
   TABS: {
     ATHLETES: 'Banco de Profissionais',
@@ -32,6 +32,9 @@ export const ADMIN_FOOTBALL_CONSTANTS = {
     FILTER_ACTIVE_ONLY: 'Em Atividade',
     FILTER_RETIRED_ONLY: 'Aposentados / Históricos',
     BADGE_RETIRED: 'Aposentado',
+    FILTER_TYPE_ALL: 'Profissionais & Comissão',
+    FILTER_TYPE_PROFESSIONAL: 'Apenas Atletas Profissionais',
+    FILTER_TYPE_STAFF: 'Apenas Comissão Técnica',
   },
 
   SQUADS_TAB: {

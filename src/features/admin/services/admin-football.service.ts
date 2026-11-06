@@ -24,7 +24,8 @@ export const adminFootballService = {
     isActive?: boolean;
     isRetired?: boolean;
     gender?: 'MALE' | 'FEMALE';
-    athleteType?: 'PROFESSIONAL' | 'YOUTH';
+    athleteType?: 'PROFESSIONAL' | 'YOUTH' | 'STAFF';
+    scope?: 'PROFESSIONAL' | 'YOUTH';
   }): Promise<GetAthletesResponse> => {
     const response = await api.get('/athletes/admin', { params });
     return response.data;
@@ -71,6 +72,7 @@ export const adminFootballService = {
     limit?: number;
     year?: number;
     category?: string;
+    scope?: 'PROFESSIONAL' | 'YOUTH';
     search?: string;
     isCurrent?: boolean;
   }): Promise<GetAdminSquadsResponse> => {
