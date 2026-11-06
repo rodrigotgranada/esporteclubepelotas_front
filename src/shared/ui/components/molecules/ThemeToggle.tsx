@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Sun, Moon, Monitor } from 'lucide-react';
-import { useThemeStore, ThemeMode } from '@/store/useThemeStore';
+import { useThemeStore } from '@/store/useThemeStore';
 import { LayoutContainer } from '../atoms/LayoutContainer';
 
 export interface ThemeToggleProps {
@@ -11,30 +11,27 @@ export interface ThemeToggleProps {
 
 export const ThemeToggle = ({ variant = 'dropdown' }: ThemeToggleProps) => {
   const { mode, setMode } = useThemeStore();
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    if (variant === 'expanded') return;
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [variant]);
+    setMounted(true);
+  }, []);
 
-  const renderCurrentIcon = () => {
-    if (mode === 'light') return <Sun size={18} />;
-    if (mode === 'dark') return <Moon size={18} />;
-    return <Monitor size={18} />;
+  const isDark =
+    mode === 'dark' ||
+    (mode === 'system' &&
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+  const handleToggle = () => {
+    setMode(isDark ? 'light' : 'dark');
   };
 
-  const handleSelect = (selectedMode: ThemeMode) => {
-    setMode(selectedMode);
-    setIsOpen(false);
-  };
+  if (!mounted) {
+    return (
+      <LayoutContainer className="w-10 h-10 rounded-full bg-surface/50 border border-border" />
+    );
+  }
 
   if (variant === 'expanded') {
     return (
@@ -42,7 +39,7 @@ export const ThemeToggle = ({ variant = 'dropdown' }: ThemeToggleProps) => {
         <button
           onClick={() => setMode('light')}
           className={`flex-1 py-2 flex justify-center items-center rounded-full transition-all duration-200 text-sm font-semibold gap-2 ${
-            mode === 'light' ? 'bg-surface text-primary shadow border border-border' : 'text-text-secondary hover:text-text-primary'
+            !isDark ? 'bg-surface text-primary shadow border border-border' : 'text-text-secondary hover:text-text-primary'
           }`}
         >
           <Sun size={16} /> <span className="hidden sm:inline">Claro</span>
@@ -58,7 +55,7 @@ export const ThemeToggle = ({ variant = 'dropdown' }: ThemeToggleProps) => {
         <button
           onClick={() => setMode('dark')}
           className={`flex-1 py-2 flex justify-center items-center rounded-full transition-all duration-200 text-sm font-semibold gap-2 ${
-            mode === 'dark' ? 'bg-surface text-primary shadow border border-border' : 'text-text-secondary hover:text-text-primary'
+            isDark ? 'bg-surface text-primary shadow border border-border' : 'text-text-secondary hover:text-text-primary'
           }`}
         >
           <Moon size={16} /> <span className="hidden sm:inline">Escuro</span>
@@ -68,44 +65,17 @@ export const ThemeToggle = ({ variant = 'dropdown' }: ThemeToggleProps) => {
   }
 
   return (
-    <LayoutContainer className="relative" ref={dropdownRef}>
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-10 h-10 flex items-center justify-center rounded-full bg-surface border border-border text-text-secondary hover:text-text-primary hover:border-primary transition-colors focus:outline-none cursor-pointer"
-        aria-label="Alternar Tema"
-        title="Alternar Tema"
-      >
-        {renderCurrentIcon()}
-      </button>
-
-      {isOpen && (
-        <LayoutContainer className="absolute right-0 mt-2 w-36 bg-surface border border-border rounded-xl shadow-lg overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-200">
-          <button
-            onClick={() => handleSelect('light')}
-            className={`w-full flex items-center gap-3 px-4 py-3 text-sm transition-colors ${
-              mode === 'light' ? 'bg-primary/10 text-primary font-bold' : 'text-text-secondary hover:bg-background hover:text-text-primary'
-            }`}
-          >
-            <Sun size={16} /> Claro
-          </button>
-          <button
-            onClick={() => handleSelect('dark')}
-            className={`w-full flex items-center gap-3 px-4 py-3 text-sm transition-colors ${
-              mode === 'dark' ? 'bg-primary/10 text-primary font-bold' : 'text-text-secondary hover:bg-background hover:text-text-primary'
-            }`}
-          >
-            <Moon size={16} /> Escuro
-          </button>
-          <button
-            onClick={() => handleSelect('system')}
-            className={`w-full flex items-center gap-3 px-4 py-3 text-sm transition-colors border-t border-border ${
-              mode === 'system' ? 'bg-primary/10 text-primary font-bold' : 'text-text-secondary hover:bg-background hover:text-text-primary'
-            }`}
-          >
-            <Monitor size={16} /> Sistema
-          </button>
-        </LayoutContainer>
+    <button
+      onClick={handleToggle}
+      className="w-10 h-10 flex items-center justify-center rounded-full bg-surface border border-border text-text-secondary hover:text-text-primary hover:border-primary transition-all duration-200 focus:outline-none cursor-pointer group"
+      aria-label={isDark ? 'Mudar para Modo Claro' : 'Mudar para Modo Escuro'}
+      title={isDark ? 'Mudar para Modo Claro' : 'Mudar para Modo Escuro'}
+    >
+      {isDark ? (
+        <Sun size={18} className="text-primary group-hover:rotate-45 transition-transform" />
+      ) : (
+        <Moon size={18} className="text-secondary group-hover:-rotate-12 transition-transform" />
       )}
-    </LayoutContainer>
+    </button>
   );
 };

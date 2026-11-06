@@ -8,12 +8,37 @@ export const YOUTH_CONSTANTS = {
     TAG_1: 'Metodologia de Elite',
     TAG_2: 'Formação Cidadã',
     TAG_3: 'Transição ao Profissional',
+    NAV_NEWS: 'Notícias da Base',
+    NAV_SQUADS: 'Elencos da Base',
+    NAV_METHOD: 'Metodologia',
+    NAV_PENEIRAS: 'Peneiras',
   },
 
   TABS: {
     SUB_20: 'Sub-20 (Júnior)',
     SUB_17: 'Sub-17 (Juvenil)',
     SUB_15: 'Sub-15 (Infantil)',
+  },
+
+  SQUADS_CTA: {
+    BADGE: 'Plantéis de Formação',
+    TITLE: 'Elencos Oficiais • Sub-20, Sub-17 e Sub-15',
+    DESC: 'Acesse a relação completa dos atletas das Crias da Boca do Lobo com posições táticas, fotos, fichas técnicas e comissão de treinadores.',
+    BTN: 'Ver Elencos da Base',
+    LINK: '/base/elencos',
+  },
+
+  PAGE_ELENCOS: {
+    TITLE: 'Elencos das Categorias de Base',
+    SUBTITLE: 'Plantéis oficiais e comissões técnicas das categorias Sub-20, Sub-17 e Sub-15 na Boca do Lobo.',
+    BACK: 'Voltar para a Base',
+  },
+
+  PAGE_NEWS: {
+    TITLE: 'Notícias & Cobertura da Base',
+    SUBTITLE: 'Acompanhe todos os jogos, gols, torneios e bastidores da formação de atletas do Esporte Clube Pelotas.',
+    BACK: 'Voltar para a Base',
+    SEARCH_PLACEHOLDER: 'Buscar matérias da base...',
   },
 
   SQUADS: {
@@ -42,7 +67,7 @@ export const YOUTH_CONSTANTS = {
   NEWS: {
     SECTION_TITLE: 'Notícias & Bastidores da Base',
     SECTION_SUBTITLE: 'Acompanhe a cobertura dos jogos, resultados das rodadas, torneios regionais e convocações.',
-    VIEW_ALL: 'Ver todas as matérias',
+    VIEW_ALL: 'Ver todas as matérias da base',
     EMPTY_TITLE: 'Nenhuma matéria da base publicada recentemente',
     EMPTY_DESC: 'Novas coberturas das categorias de formação serão publicadas em breve pela assessoria de imprensa do clube.',
     READ_MORE: 'Ler matéria completa',
@@ -99,4 +124,3 @@ export const YOUTH_CONSTANTS = {
     CONTACT_LOCAL: 'Estádio Boca do Lobo / CT da Base - Pelotas, RS',
   },
 };
-

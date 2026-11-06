@@ -17,9 +17,14 @@ import { NewsArticleData } from '@/features/admin/services/admin-news.service';
 export interface YouthNewsSectionProps {
   news: NewsArticleData[];
   isLoading: boolean;
+  viewAllHref?: string;
 }
 
-export const YouthNewsSection: React.FC<YouthNewsSectionProps> = ({ news, isLoading }) => {
+export const YouthNewsSection: React.FC<YouthNewsSectionProps> = ({
+  news,
+  isLoading,
+  viewAllHref = '/base/materias',
+}) => {
   const texts = YOUTH_CONSTANTS.NEWS;
 
   return (
@@ -38,8 +43,13 @@ export const YouthNewsSection: React.FC<YouthNewsSectionProps> = ({ news, isLoad
           </Text>
         </LayoutContainer>
 
-        <Link href="/noticias">
-          <Button variant="outline" size="sm" rightIcon={<ArrowRight className="w-3.5 h-3.5" />} className="font-bold text-xs">
+        <Link href={viewAllHref}>
+          <Button
+            variant="outline"
+            size="sm"
+            rightIcon={<ArrowRight className="w-3.5 h-3.5" />}
+            className="font-bold text-xs hover:border-primary/50"
+          >
             {texts.VIEW_ALL}
           </Button>
         </Link>
@@ -63,12 +73,13 @@ export const YouthNewsSection: React.FC<YouthNewsSectionProps> = ({ news, isLoad
           </Text>
         </LayoutContainer>
       ) : (
-        <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {news.map((item) => {
-            const formattedDate = item.publishedAt
+            const dateStr = item.publishedAt
               ? new Date(item.publishedAt).toLocaleDateString('pt-BR', {
                   day: '2-digit',
                   month: 'short',
+                  year: 'numeric',
                 })
               : '';
 
@@ -76,46 +87,42 @@ export const YouthNewsSection: React.FC<YouthNewsSectionProps> = ({ news, isLoad
               <Link
                 key={item._id || item.id}
                 href={`/noticias/${item.slug}`}
-                className="group flex flex-col rounded-2xl bg-surface border border-border overflow-hidden hover:border-primary/50 transition-all shadow-xs hover:shadow-md"
+                className="group flex flex-col rounded-2xl bg-surface border border-border/80 hover:border-primary/50 overflow-hidden shadow-xs hover:shadow-md transition-all duration-300 focus:outline-none"
               >
-                {/* Imagem de Capa 16:9 */}
-                <LayoutContainer className="relative aspect-video w-full overflow-hidden bg-surface-secondary">
-                  {item.coverImage ? (
-                    <SafeImage
-                      src={item.coverImage}
-                      alt={item.title}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  ) : (
-                    <LayoutContainer className="w-full h-full flex items-center justify-center text-text-muted">
-                      <Newspaper className="w-8 h-8 opacity-40" />
-                    </LayoutContainer>
-                  )}
-                  {formattedDate && (
-                    <LayoutContainer className="absolute bottom-2 left-2 px-2 py-0.5 rounded-md bg-surface/90 backdrop-blur-xs text-[10px] font-bold text-text-primary flex items-center gap-1 border border-border">
-                      <Calendar className="w-3 h-3 text-primary" />
-                      <Text as="span">{formattedDate}</Text>
-                    </LayoutContainer>
-                  )}
+                {/* Imagem de Capa */}
+                <LayoutContainer className="relative h-44 w-full bg-surface-secondary overflow-hidden">
+                  <SafeImage
+                    src={item.coverImage}
+                    alt={item.title}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <LayoutContainer className="absolute top-2 left-2">
+                    <Badge variant="primary" className="text-[10px] font-bold py-0.5 px-2">
+                      Base
+                    </Badge>
+                  </LayoutContainer>
                 </LayoutContainer>
 
-                {/* Conteúdo Textual */}
+                {/* Textos */}
                 <LayoutContainer className="p-4 flex flex-col flex-1 justify-between gap-3">
                   <LayoutContainer className="flex flex-col gap-1.5">
-                    <Title level="h3" className="text-sm font-bold text-text-primary line-clamp-2 group-hover:text-primary transition-colors leading-snug">
+                    <LayoutContainer className="flex items-center gap-1.5 text-[11px] text-text-secondary">
+                      <Calendar className="w-3.5 h-3.5" />
+                      <Text as="span">{dateStr}</Text>
+                    </LayoutContainer>
+
+                    <Title
+                      level="h3"
+                      className="text-sm font-bold text-text-primary group-hover:text-primary transition-colors line-clamp-2"
+                    >
                       {item.title}
                     </Title>
-                    {item.summary && (
-                      <Text as="p" className="text-xs text-text-secondary line-clamp-2 leading-relaxed">
-                        {item.summary}
-                      </Text>
-                    )}
                   </LayoutContainer>
 
-                  <LayoutContainer className="pt-2 border-t border-border/50 flex items-center justify-between text-[11px] font-bold text-primary group-hover:translate-x-1 transition-transform">
+                  <LayoutContainer className="flex items-center text-xs font-semibold text-primary pt-1 border-t border-border/40">
                     <Text as="span">{texts.READ_MORE}</Text>
-                    <ArrowRight className="w-3 h-3" />
+                    <ArrowRight className="w-3.5 h-3.5 ml-1 group-hover:translate-x-1 transition-transform" />
                   </LayoutContainer>
                 </LayoutContainer>
               </Link>
@@ -126,4 +133,3 @@ export const YouthNewsSection: React.FC<YouthNewsSectionProps> = ({ news, isLoad
     </LayoutContainer>
   );
 };
-

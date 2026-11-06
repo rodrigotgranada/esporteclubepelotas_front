@@ -288,6 +288,28 @@ export const PublicNavigationDrawer: React.FC<PublicNavigationDrawerProps> = ({
                   </LayoutContainer>
                 )}
               </LayoutContainer>
+
+              {/* Sub-atalhos das Categorias de Base */}
+              {footballActive && (
+                <LayoutContainer className="grid grid-cols-2 gap-2">
+                  <Link
+                    href="/base/elencos"
+                    onClick={onClose}
+                    className="px-3 py-2 rounded-lg bg-surface/50 hover:bg-surface border border-border/60 hover:border-primary/40 flex items-center justify-between text-xs font-medium text-text-secondary hover:text-primary transition-colors group"
+                  >
+                    <span>{PUBLIC_DRAWER_TEXTS.LINK_YOUTH_SQUADS}</span>
+                    <ChevronRight className="w-3 h-3 text-text-secondary/50 group-hover:text-primary group-hover:translate-x-0.5 transition-transform" />
+                  </Link>
+                  <Link
+                    href="/base/materias"
+                    onClick={onClose}
+                    className="px-3 py-2 rounded-lg bg-surface/50 hover:bg-surface border border-border/60 hover:border-primary/40 flex items-center justify-between text-xs font-medium text-text-secondary hover:text-primary transition-colors group"
+                  >
+                    <span>{PUBLIC_DRAWER_TEXTS.LINK_YOUTH_NEWS}</span>
+                    <ChevronRight className="w-3 h-3 text-text-secondary/50 group-hover:text-primary group-hover:translate-x-0.5 transition-transform" />
+                  </Link>
+                </LayoutContainer>
+              )}
             </LayoutContainer>
 
             {/* 4. Navigation Section: O Clube & Memória */}
