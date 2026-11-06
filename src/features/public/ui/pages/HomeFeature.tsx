@@ -71,39 +71,32 @@ export const HomeFeature = () => {
     <LayoutContainer className="flex flex-col">
       {/* 1. Primeira Seção: Vitrine Editorial de Notícias (Destaques & Bento Grid) */}
       {(featuredNews.length > 0 || latestNews.length > 0) && (
-        <LayoutContainer className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-14 w-full flex flex-col gap-8 sm:gap-10">
-          <LayoutContainer className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-            <LayoutContainer className="flex flex-col gap-1">
-              <LayoutContainer className="inline-block px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary font-bold text-xs uppercase tracking-wider w-fit">
-                {HOME_FEATURE_TEXTS.SECTION_NEWS_BADGE}
-              </LayoutContainer>
-              <Title
-                level="h2"
-                className="text-2xl sm:text-4xl font-black text-text-primary tracking-tight"
-              >
-                {HOME_FEATURE_TEXTS.SECTION_NEWS_TITLE}
-              </Title>
-              <Text className="text-text-secondary text-xs sm:text-base max-w-xl">
-                {HOME_FEATURE_TEXTS.SECTION_NEWS_SUBTITLE}
-              </Text>
-            </LayoutContainer>
-
-            <Link href="/noticias">
-              <Button variant="outline" size="sm" className="font-bold text-xs whitespace-nowrap">
-                {HOME_FEATURE_TEXTS.BUTTON_ALL_NEWS}
-              </Button>
-            </Link>
-          </LayoutContainer>
-
-          {/* Mosaico Bento Hero Grid (Destaques) */}
+        <LayoutContainer className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-10 pb-8 sm:pb-12 w-full flex flex-col gap-8 sm:gap-10">
+          {/* Mosaico Bento Hero Grid (Destaques da Capa - Cards Diretos e Elegantes) */}
           {featuredNews.length > 0 && <NewsBentoHero articles={featuredNews} />}
 
-          {/* Grid de Notícias Mais Recentes */}
+          {/* Grid de Notícias Mais Recentes ("Notícias do Lobo") */}
           {latestNews.length > 0 && (
-            <LayoutContainer className="flex flex-col gap-6 pt-6 border-t border-border/60">
-              <Title level="h3" className="text-xl sm:text-2xl font-bold text-text-primary">
-                {HOME_FEATURE_TEXTS.LATEST_NEWS_TITLE}
-              </Title>
+            <LayoutContainer
+              className={`flex flex-col gap-6 ${
+                featuredNews.length > 0 ? 'pt-8 border-t border-border/60' : ''
+              }`}
+            >
+              <LayoutContainer className="flex items-center justify-between gap-4">
+                <Title
+                  level="h2"
+                  className="text-2xl sm:text-3xl font-black text-text-primary tracking-tight"
+                >
+                  {HOME_FEATURE_TEXTS.SECTION_LATEST_NEWS_TITLE}
+                </Title>
+
+                <Link href="/noticias">
+                  <Button variant="outline" size="sm" className="font-bold text-xs whitespace-nowrap">
+                    {HOME_FEATURE_TEXTS.BUTTON_ALL_NEWS}
+                  </Button>
+                </Link>
+              </LayoutContainer>
+
               <LayoutContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {latestNews.map((article, idx) => (
                   <NewsCard

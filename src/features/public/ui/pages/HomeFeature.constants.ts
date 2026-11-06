@@ -12,6 +12,7 @@ export const HOME_FEATURE_TEXTS = {
   SECTION_NEWS_SUBTITLE: 'Acompanhe em primeira mão os jogos, contratações e comunicados oficiais do clube.',
   BUTTON_ALL_NEWS: 'Ver Todas as Notícias →',
   LATEST_NEWS_TITLE: 'Mais Recentes do Portal',
+  SECTION_LATEST_NEWS_TITLE: 'Notícias do Lobo',
   SECTION_IDOLS_BADGE: 'Memorial & Hall da Fama',
   SECTION_IDOLS_TITLE: 'Lendas da Boca do Lobo',
   SECTION_IDOLS_SUBTITLE:

@@ -366,7 +366,7 @@ export const PublicNavigationDrawer: React.FC<PublicNavigationDrawerProps> = ({
           </LayoutContainer>
 
           {/* Bottom Footer of Drawer (User Session / Auth + Clean Light/Dark Switch) */}
-          <LayoutContainer className="p-5 sm:p-6 border-t border-border/80 bg-surface/90 backdrop-blur-md flex flex-col gap-4 sticky bottom-0 z-20">
+          <LayoutContainer className="p-5 sm:p-6 border-t border-border/80 bg-surface/40 flex flex-col gap-4 mt-auto shrink-0 pb-8">
             {user ? (
               <LayoutContainer className="flex flex-col gap-3">
                 <LayoutContainer className="flex items-center gap-3">
