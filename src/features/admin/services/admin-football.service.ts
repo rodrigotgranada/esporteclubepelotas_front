@@ -22,6 +22,7 @@ export const adminFootballService = {
     search?: string;
     position?: string;
     isActive?: boolean;
+    isRetired?: boolean;
     gender?: 'MALE' | 'FEMALE';
     athleteType?: 'PROFESSIONAL' | 'YOUTH';
   }): Promise<GetAthletesResponse> => {

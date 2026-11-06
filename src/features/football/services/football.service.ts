@@ -59,6 +59,7 @@ export interface AthleteData {
   biography?: string | null;
   instagram?: string | null;
   isActive: boolean;
+  isRetired?: boolean;
   seasons?: AthleteSeasonHistory[];
   createdAt?: string | null;
   updatedAt?: string | null;

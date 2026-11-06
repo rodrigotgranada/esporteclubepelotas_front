@@ -19,6 +19,11 @@ import { ADMIN_FOOTBALL_CONSTANTS } from '../../../constants/admin-football.cons
 export interface AthletesTableProps {
   athletes: AthleteData[];
   isLoading: boolean;
+  page?: number;
+  totalPages?: number;
+  total?: number;
+  limit?: number;
+  onPageChange?: (newPage: number) => void;
   onEdit: (athlete: AthleteData) => void;
   onDelete: (athlete: AthleteData) => void;
 }
@@ -26,6 +31,11 @@ export interface AthletesTableProps {
 export const AthletesTable: React.FC<AthletesTableProps> = ({
   athletes,
   isLoading,
+  page = 1,
+  totalPages = 1,
+  total = 0,
+  limit = 15,
+  onPageChange,
   onEdit,
   onDelete,
 }) => {
@@ -102,9 +112,16 @@ export const AthletesTable: React.FC<AthletesTableProps> = ({
 
                 {/* Posição */}
                 <td className="py-3 px-4">
-                  <Badge variant="primary" size="sm" className="font-bold text-[10px] uppercase">
-                    {athlete.athleteType === 'STAFF' ? (athlete.staffRole || 'Comissão Técnica') : athlete.primaryPosition}
-                  </Badge>
+                  <LayoutContainer className="flex items-center gap-1.5 flex-wrap">
+                    <Badge variant="primary" size="sm" className="font-bold text-[10px] uppercase">
+                      {athlete.athleteType === 'STAFF' ? (athlete.staffRole || 'Comissão Técnica') : athlete.primaryPosition}
+                    </Badge>
+                    {athlete.isRetired && (
+                      <Badge variant="default" size="sm" className="font-bold text-[10px] uppercase text-text-muted">
+                        {texts.BADGE_RETIRED}
+                      </Badge>
+                    )}
+                  </LayoutContainer>
                 </td>
 
                 {/* Idade / Nascimento */}
@@ -182,9 +199,16 @@ export const AthletesTable: React.FC<AthletesTableProps> = ({
                 <Text as="span" className="font-extrabold text-sm text-text-primary">
                   {athlete.nickname || athlete.name}
                 </Text>
-                <Badge variant="primary" size="sm" className="w-fit text-[9px] uppercase font-bold py-0">
-                  {athlete.athleteType === 'STAFF' ? (athlete.staffRole || 'Comissão Técnica') : athlete.primaryPosition}
-                </Badge>
+                <LayoutContainer className="flex items-center gap-1.5 flex-wrap">
+                  <Badge variant="primary" size="sm" className="w-fit text-[9px] uppercase font-bold py-0">
+                    {athlete.athleteType === 'STAFF' ? (athlete.staffRole || 'Comissão Técnica') : athlete.primaryPosition}
+                  </Badge>
+                  {athlete.isRetired && (
+                    <Badge variant="default" size="sm" className="w-fit text-[9px] uppercase font-bold py-0 text-text-muted">
+                      {texts.BADGE_RETIRED}
+                    </Badge>
+                  )}
+                </LayoutContainer>
                 {athlete.age ? (
                   <Text as="span" className="text-[11px] text-text-muted">
                     {athlete.age} anos • {athlete.birthPlace || ''}
@@ -221,6 +245,40 @@ export const AthletesTable: React.FC<AthletesTableProps> = ({
           </LayoutContainer>
         ))}
       </LayoutContainer>
+
+      {/* Pagination Footer */}
+      {totalPages > 1 && onPageChange && (
+        <LayoutContainer className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 rounded-2xl bg-surface border border-border">
+          <Text as="p" className="text-xs text-text-muted">
+            {texts.PAGINATION_SHOWING} {(page - 1) * limit + 1} {texts.PAGINATION_TO}{' '}
+            {Math.min(page * limit, total)} {texts.PAGINATION_OF} {total} {texts.PAGINATION_ATHLETES}
+          </Text>
+
+          <LayoutContainer className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={page <= 1}
+              onClick={() => onPageChange(page - 1)}
+              className="text-xs px-3 py-1 font-bold disabled:opacity-40"
+            >
+              {texts.PAGINATION_PREV}
+            </Button>
+            <Text as="span" className="text-xs font-bold text-text-primary px-2">
+              {texts.PAGINATION_PAGE} {page} {texts.PAGINATION_OF} {totalPages}
+            </Text>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={page >= totalPages}
+              onClick={() => onPageChange(page + 1)}
+              className="text-xs px-3 py-1 font-bold disabled:opacity-40"
+            >
+              {texts.PAGINATION_NEXT}
+            </Button>
+          </LayoutContainer>
+        </LayoutContainer>
+      )}
     </LayoutContainer>
   );
 };

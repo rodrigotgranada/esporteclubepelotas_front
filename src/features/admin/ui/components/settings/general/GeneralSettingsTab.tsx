@@ -1,7 +1,6 @@
 import React, { useRef } from 'react';
-import { LayoutContainer, Title, Text, Button, Input, IconButton, Spinner } from '@/shared/ui/components';
-import { Pencil, Plus } from 'lucide-react';
-import Image from 'next/image';
+import { LayoutContainer, Title, Text, Button, Input, IconButton, Spinner, SafeImage } from '@/shared/ui/components';
+import { Pencil, Plus, X } from 'lucide-react';
 import { CropModal } from '@/shared/ui/components/molecules/CropModal';
 import { GENERAL_SETTINGS_TEXTS } from './GeneralSettingsTab.constants';
 import { useGeneralSettingsTab } from '@/features/admin/hooks/settings/useGeneralSettingsTab';
@@ -57,12 +56,13 @@ export const GeneralSettingsTab = () => {
           <LayoutContainer className="w-32 h-32 rounded-full bg-surface border-4 border-primary overflow-hidden relative shadow-xl group">
             {previewLogo ? (
               <>
-                <Image
+                <SafeImage
                   src={previewLogo}
                   alt="Club Logo"
                   fill
                   sizes="128px"
                   className="object-contain p-2"
+                  fallbackSrc="/pelotas-logo.png"
                 />
                 <LayoutContainer className="absolute inset-0 bg-black/60 rounded-full flex flex-row items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity gap-4">
                   <IconButton
@@ -99,15 +99,23 @@ export const GeneralSettingsTab = () => {
                       className={`relative w-12 h-12 rounded-lg border-2 ${previewLogo === url ? 'border-primary' : 'border-border'} overflow-hidden cursor-pointer bg-surface transition-transform hover:scale-105`}
                       onClick={() => handleSelectFromGallery(url)}
                     >
-                      <Image src={url} alt={`Gallery Logo ${idx}`} fill sizes="48px" className="object-contain p-1" />
+                      <SafeImage
+                        src={url}
+                        alt={`Gallery Logo ${idx}`}
+                        fill
+                        sizes="48px"
+                        className="object-contain p-1"
+                        fallbackSrc="/pelotas-logo.png"
+                      />
                     </LayoutContainer>
-                    <button
+                    <IconButton
+                      icon={<X size={12} />}
+                      variant="danger"
+                      size="sm"
                       onClick={(e) => { e.stopPropagation(); handleRemoveFromGallery(url); }}
-                      className="absolute -top-2 -right-2 bg-error text-white font-bold text-xs rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-sm hover:bg-error/90 z-10"
+                      className="absolute -top-2 -right-2 !w-5 !h-5 !p-0 bg-error text-white opacity-0 group-hover:opacity-100 transition-opacity shadow-sm hover:bg-error/90 z-10"
                       title={GENERAL_SETTINGS_TEXTS.GALLERY_REMOVE_TITLE}
-                    >
-                      &times;
-                    </button>
+                    />
                   </LayoutContainer>
                 ))}
               </LayoutContainer>

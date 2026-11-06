@@ -11,6 +11,8 @@ import {
   Option,
   Button,
   ImageCropper,
+  Switch,
+  Badge,
 } from '@/shared/ui/components';
 import { ADMIN_FOOTBALL_CONSTANTS } from '../../../constants/admin-football.constants';
 import { FOOTBALL_CONSTANTS } from '@/features/football/constants/football.constants';
@@ -63,6 +65,8 @@ export interface AthleteEditorDrawerProps {
   setBiography: (v: string) => void;
   instagram: string;
   setInstagram: (v: string) => void;
+  isRetired: boolean;
+  setIsRetired: (v: boolean) => void;
   photoUrl: string;
   setPhotoUrl: (v: string) => void;
   pendingPhotoFile: File | null;
@@ -110,6 +114,8 @@ export const AthleteEditorDrawer: React.FC<AthleteEditorDrawerProps> = ({
   setBiography,
   instagram,
   setInstagram,
+  isRetired,
+  setIsRetired,
   photoUrl,
   setPhotoUrl,
   setPendingPhotoFile,
@@ -429,6 +435,34 @@ export const AthleteEditorDrawer: React.FC<AthleteEditorDrawerProps> = ({
             className="w-full p-3 rounded-xl bg-background border border-border text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-primary transition-colors resize-y"
           />
         </LayoutContainer>
+
+        {/* Atleta Aposentado / Fora de Atividade (Apenas Atletas) */}
+        {!isStaff && (
+          <LayoutContainer className="p-4 rounded-2xl bg-surface border border-border flex flex-col gap-2">
+            <LayoutContainer className="flex items-center justify-between gap-4">
+              <LayoutContainer className="flex items-center gap-2">
+                <Text as="span" className="text-xs font-bold text-text-primary">
+                  {texts.FIELD_IS_RETIRED}
+                </Text>
+                {isRetired && (
+                  <Badge variant="default" size="sm" className="font-extrabold text-[10px] uppercase text-text-muted">
+                    {ADMIN_FOOTBALL_CONSTANTS.ATHLETES_TAB.BADGE_RETIRED}
+                  </Badge>
+                )}
+              </LayoutContainer>
+
+              <Switch
+                checked={isRetired}
+                onChange={setIsRetired}
+                aria-label={texts.FIELD_IS_RETIRED}
+              />
+            </LayoutContainer>
+
+            <Text as="p" className="text-xs text-text-muted leading-relaxed">
+              {texts.FIELD_IS_RETIRED_DESC}
+            </Text>
+          </LayoutContainer>
+        )}
 
         {/* Footer Actions */}
         <LayoutContainer className="flex items-center justify-end gap-3 pt-4 border-t border-border mt-4">

@@ -20,6 +20,7 @@ export const useAdminSquadMembersDrawer = (onSuccess: () => void) => {
   const [isLoadingAthletes, setIsLoadingAthletes] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [includeYouthAthletes, setIncludeYouthAthletes] = useState<boolean>(false);
+  const [includeRetiredAthletes, setIncludeRetiredAthletes] = useState<boolean>(false);
 
   // New Member Temp State
   const [selectedAthleteId, setSelectedAthleteId] = useState<string>('');
@@ -47,6 +48,7 @@ export const useAdminSquadMembersDrawer = (onSuccess: () => void) => {
     setSector('FORWARD');
     setRole('STARTER');
     setIncludeYouthAthletes(false);
+    setIncludeRetiredAthletes(false);
     setIsOpen(true);
     await loadAthletesBank();
   };
@@ -56,14 +58,20 @@ export const useAdminSquadMembersDrawer = (onSuccess: () => void) => {
     setSquad(null);
     setMembers([]);
     setIncludeYouthAthletes(false);
+    setIncludeRetiredAthletes(false);
   };
 
   const filteredAvailableAthletes = useMemo(() => {
     if (!squad) return availableAthletes;
 
+    const matchRetired = (a: AthleteData) => {
+      if (includeRetiredAthletes) return true;
+      return !a.isRetired;
+    };
+
     if (squad.category === 'FEMININE') {
       // Atletas femininas ou comissão técnica feminina
-      return availableAthletes.filter((a) => a.gender === 'FEMALE');
+      return availableAthletes.filter((a) => a.gender === 'FEMALE' && matchRetired(a));
     }
 
     if (squad.category === 'PROFESSIONAL') {
@@ -71,6 +79,7 @@ export const useAdminSquadMembersDrawer = (onSuccess: () => void) => {
       return availableAthletes.filter((a) => {
         const isMale = a.gender !== 'FEMALE';
         if (!isMale) return false;
+        if (!matchRetired(a)) return false;
         if (includeYouthAthletes) return true;
         return a.athleteType !== 'YOUTH';
       });
@@ -81,9 +90,9 @@ export const useAdminSquadMembersDrawer = (onSuccess: () => void) => {
     return availableAthletes.filter((a) => {
       const isMale = a.gender !== 'FEMALE';
       const isYouthOrStaff = a.athleteType === 'YOUTH' || a.athleteType === 'STAFF';
-      return isMale && isYouthOrStaff;
+      return isMale && isYouthOrStaff && matchRetired(a);
     });
-  }, [availableAthletes, squad, includeYouthAthletes]);
+  }, [availableAthletes, squad, includeYouthAthletes, includeRetiredAthletes]);
 
   const handleAddMember = () => {
     if (!selectedAthleteId) {
@@ -176,6 +185,8 @@ export const useAdminSquadMembersDrawer = (onSuccess: () => void) => {
     isSaving,
     includeYouthAthletes,
     setIncludeYouthAthletes,
+    includeRetiredAthletes,
+    setIncludeRetiredAthletes,
     open,
     close,
     save,

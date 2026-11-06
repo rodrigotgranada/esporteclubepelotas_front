@@ -15,6 +15,7 @@ export const useAdminAthletesList = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [search, setSearch] = useState<string>('');
   const [position, setPosition] = useState<string>('');
+  const [retiredFilter, setRetiredFilter] = useState<'ALL' | 'ACTIVE' | 'RETIRED'>('ALL');
 
   // Delete modal state
   const [athleteToDelete, setAthleteToDelete] = useState<AthleteData | null>(null);
@@ -26,6 +27,8 @@ export const useAdminAthletesList = () => {
       const params: any = { page, limit };
       if (search.trim()) params.search = search.trim();
       if (position.trim()) params.position = position.trim();
+      if (retiredFilter === 'ACTIVE') params.isRetired = false;
+      if (retiredFilter === 'RETIRED') params.isRetired = true;
 
       const res = await adminFootballService.getAthletes(params);
       setAthletes(res.data || []);
@@ -37,7 +40,7 @@ export const useAdminAthletesList = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [page, limit, search, position]);
+  }, [page, limit, search, position, retiredFilter]);
 
   useEffect(() => {
     loadAthletes();
@@ -63,12 +66,15 @@ export const useAdminAthletesList = () => {
     athletes,
     total,
     page,
+    limit,
     totalPages,
     isLoading,
     search,
     setSearch,
     position,
     setPosition,
+    retiredFilter,
+    setRetiredFilter,
     setPage,
     reload: loadAthletes,
     athleteToDelete,

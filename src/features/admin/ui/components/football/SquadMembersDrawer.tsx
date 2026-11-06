@@ -35,6 +35,8 @@ export interface SquadMembersDrawerProps {
   isSaving: boolean;
   includeYouthAthletes?: boolean;
   setIncludeYouthAthletes?: (v: boolean) => void;
+  includeRetiredAthletes?: boolean;
+  setIncludeRetiredAthletes?: (v: boolean) => void;
   onClose: () => void;
   onSave: () => void;
   selectedAthleteId: string;
@@ -58,6 +60,8 @@ export const SquadMembersDrawer: React.FC<SquadMembersDrawerProps> = ({
   isSaving,
   includeYouthAthletes = false,
   setIncludeYouthAthletes,
+  includeRetiredAthletes = false,
+  setIncludeRetiredAthletes,
   onClose,
   onSave,
   selectedAthleteId,
@@ -94,18 +98,33 @@ export const SquadMembersDrawer: React.FC<SquadMembersDrawerProps> = ({
               <Text as="span">{texts.ADD_ATHLETE}</Text>
             </Title>
 
-            {/* Toggle para incluir Atletas da Base no Elenco Profissional */}
-            {squad?.category === 'PROFESSIONAL' && setIncludeYouthAthletes && (
-              <Button
-                type="button"
-                variant={includeYouthAthletes ? 'primary' : 'outline'}
-                size="sm"
-                onClick={() => setIncludeYouthAthletes(!includeYouthAthletes)}
-                className="text-xs font-bold rounded-full transition-all"
-              >
-                {includeYouthAthletes ? `✓ ${texts.TOGGLE_INCLUDE_YOUTH_ACTIVE}` : `🌱 ${texts.TOGGLE_INCLUDE_YOUTH}`}
-              </Button>
-            )}
+            <LayoutContainer className="flex items-center gap-2 flex-wrap">
+              {/* Toggle para incluir Atletas da Base no Elenco Profissional */}
+              {squad?.category === 'PROFESSIONAL' && setIncludeYouthAthletes && (
+                <Button
+                  type="button"
+                  variant={includeYouthAthletes ? 'primary' : 'outline'}
+                  size="sm"
+                  onClick={() => setIncludeYouthAthletes(!includeYouthAthletes)}
+                  className="text-xs font-bold rounded-full transition-all"
+                >
+                  {includeYouthAthletes ? `✓ ${texts.TOGGLE_INCLUDE_YOUTH_ACTIVE}` : `🌱 ${texts.TOGGLE_INCLUDE_YOUTH}`}
+                </Button>
+              )}
+
+              {/* Toggle para incluir Atletas Aposentados / Históricos */}
+              {setIncludeRetiredAthletes && (
+                <Button
+                  type="button"
+                  variant={includeRetiredAthletes ? 'primary' : 'outline'}
+                  size="sm"
+                  onClick={() => setIncludeRetiredAthletes(!includeRetiredAthletes)}
+                  className="text-xs font-bold rounded-full transition-all"
+                >
+                  {includeRetiredAthletes ? `✓ ${texts.TOGGLE_INCLUDE_RETIRED_ACTIVE}` : `👴 ${texts.TOGGLE_INCLUDE_RETIRED}`}
+                </Button>
+              )}
+            </LayoutContainer>
           </LayoutContainer>
 
           {/* Avisos de Contexto e Regras de Negócio do Elenco */}
@@ -165,6 +184,7 @@ export const SquadMembersDrawer: React.FC<SquadMembersDrawerProps> = ({
                   return (
                     <Option key={id} value={id}>
                       {a.nickname || a.name} ({a.primaryPosition})
+                      {a.isRetired ? ` [${texts.RETIRED_BADGE}]` : ''}
                       {a.athleteType === 'YOUTH' ? ` [${texts.YOUTH_BADGE}${a.youthCategory ? ` - ${a.youthCategory}` : ''}]` : ''}
                       {isAllocated ? ' ✓ Já no elenco' : ''}
                     </Option>

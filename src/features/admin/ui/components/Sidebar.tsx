@@ -1,11 +1,10 @@
 import React from 'react';
 import Link from 'next/link';
 import { LogOut, LucideIcon, X } from 'lucide-react';
-import { LayoutContainer, Text, Button, ShieldPlaceholder, IconButton } from '@/shared/ui/components';
+import { LayoutContainer, Text, Button, ShieldPlaceholder, IconButton, SafeImage } from '@/shared/ui/components';
 import { useSidebar } from '../../hooks/useSidebar';
 import { SIDEBAR_TEXTS } from './Sidebar.constants';
 import { useSettingsStore } from '@/store/useSettingsStore';
-import Image from 'next/image';
 
 export const Sidebar = ({ isMobileMenuOpen, setIsMobileMenuOpen }: { isMobileMenuOpen?: boolean, setIsMobileMenuOpen?: (v: boolean) => void }) => {
   const { navItems, handleLogout, checkIsActive } = useSidebar();
@@ -21,7 +20,15 @@ export const Sidebar = ({ isMobileMenuOpen, setIsMobileMenuOpen }: { isMobileMen
       <LayoutContainer className="h-16 flex items-center justify-between px-6 border-b border-border">
         <LayoutContainer className="flex items-center gap-2">
           {settings?.clubLogoUrl ? (
-            <Image src={settings.clubLogoUrl} alt="Logo" width={32} height={32} className="object-contain" />
+            <LayoutContainer className="relative w-8 h-8 shrink-0">
+              <SafeImage
+                src={settings.clubLogoUrl}
+                alt="Logo"
+                fill
+                className="object-contain"
+                fallbackSrc="/pelotas-logo.png"
+              />
+            </LayoutContainer>
           ) : (
             <ShieldPlaceholder size={32} />
           )}

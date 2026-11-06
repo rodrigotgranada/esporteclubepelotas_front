@@ -34,6 +34,7 @@ export const SafeImage: React.FC<SafeImageProps> = ({
   }, [src, fallbackSrc]);
 
   const isSvg = typeof currentSrc === 'string' && currentSrc.endsWith('.svg');
+  const isDataUrl = typeof currentSrc === 'string' && currentSrc.startsWith('data:');
 
   return (
     <Image
@@ -42,7 +43,7 @@ export const SafeImage: React.FC<SafeImageProps> = ({
       src={currentSrc}
       alt={alt}
       className={className}
-      unoptimized={unoptimized ?? (isSvg || hasFailed)}
+      unoptimized={unoptimized ?? (isSvg || isDataUrl || hasFailed)}
       onError={() => {
         if (!hasFailed && currentSrc !== fallbackSrc) {
           setHasFailed(true);

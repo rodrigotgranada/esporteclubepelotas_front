@@ -28,6 +28,7 @@ export const useAdminAthleteDrawer = (onSuccess: () => void) => {
   const [pastClubsText, setPastClubsText] = useState<string>('');
   const [biography, setBiography] = useState<string>('');
   const [instagram, setInstagram] = useState<string>('');
+  const [isRetired, setIsRetired] = useState<boolean>(false);
 
   // Photo
   const [photoUrl, setPhotoUrl] = useState<string>('');
@@ -55,6 +56,7 @@ export const useAdminAthleteDrawer = (onSuccess: () => void) => {
     setPastClubsText('');
     setBiography('');
     setInstagram('');
+    setIsRetired(false);
     setPhotoUrl('');
     setPendingPhotoFile(null);
     setErrors({});
@@ -85,6 +87,7 @@ export const useAdminAthleteDrawer = (onSuccess: () => void) => {
     setPastClubsText((athlete.pastClubs || []).join(', '));
     setBiography(athlete.biography || '');
     setInstagram(athlete.instagram || '');
+    setIsRetired(Boolean(athlete.isRetired));
     setPhotoUrl(athlete.photoUrl || '');
     setIsOpen(true);
   };
@@ -142,6 +145,7 @@ export const useAdminAthleteDrawer = (onSuccess: () => void) => {
         weight: isStaff ? undefined : (weight ? Number(weight) : undefined),
         biography: biography.trim() || undefined,
         instagram: instagram.trim() ? instagram.replace('@', '').trim() : undefined,
+        isRetired: isStaff ? false : isRetired,
         photoUrl: photoUrl.trim() || undefined,
       };
 
@@ -213,6 +217,8 @@ export const useAdminAthleteDrawer = (onSuccess: () => void) => {
     setBiography,
     instagram,
     setInstagram,
+    isRetired,
+    setIsRetired,
     photoUrl,
     setPhotoUrl,
     pendingPhotoFile,

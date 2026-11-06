@@ -50,12 +50,30 @@ export const AdminFootballFeature: React.FC = () => {
         <LayoutContainer className="flex flex-col gap-6">
           {/* Barra de Ações do Banco de Atletas */}
           <LayoutContainer className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
-            <LayoutContainer className="flex-1 max-w-md relative">
-              <Input
-                value={athletesList.search}
-                onChange={(e) => athletesList.setSearch(e.target.value)}
-                placeholder={texts.ATHLETES_TAB.SEARCH_PLACEHOLDER}
-              />
+            <LayoutContainer className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-1 max-w-xl">
+              <LayoutContainer className="flex-1 relative">
+                <Input
+                  value={athletesList.search}
+                  onChange={(e) => {
+                    athletesList.setSearch(e.target.value);
+                    athletesList.setPage(1);
+                  }}
+                  placeholder={texts.ATHLETES_TAB.SEARCH_PLACEHOLDER}
+                />
+              </LayoutContainer>
+
+              <Select
+                value={athletesList.retiredFilter}
+                onChange={(e) => {
+                  athletesList.setRetiredFilter(e.target.value as any);
+                  athletesList.setPage(1);
+                }}
+                className="w-full sm:w-52"
+              >
+                <Option value="ALL">{texts.ATHLETES_TAB.FILTER_ALL_STATUS}</Option>
+                <Option value="ACTIVE">{texts.ATHLETES_TAB.FILTER_ACTIVE_ONLY}</Option>
+                <Option value="RETIRED">{texts.ATHLETES_TAB.FILTER_RETIRED_ONLY}</Option>
+              </Select>
             </LayoutContainer>
 
             <Button
@@ -72,6 +90,11 @@ export const AdminFootballFeature: React.FC = () => {
           <AthletesTable
             athletes={athletesList.athletes}
             isLoading={athletesList.isLoading}
+            page={athletesList.page}
+            totalPages={athletesList.totalPages}
+            total={athletesList.total}
+            limit={athletesList.limit}
+            onPageChange={athletesList.setPage}
             onEdit={athleteDrawer.openEdit}
             onDelete={(athlete) => athletesList.setAthleteToDelete(athlete)}
           />
@@ -189,6 +212,8 @@ export const AdminFootballFeature: React.FC = () => {
         setBiography={athleteDrawer.setBiography}
         instagram={athleteDrawer.instagram}
         setInstagram={athleteDrawer.setInstagram}
+        isRetired={athleteDrawer.isRetired}
+        setIsRetired={athleteDrawer.setIsRetired}
         photoUrl={athleteDrawer.photoUrl}
         setPhotoUrl={athleteDrawer.setPhotoUrl}
         pendingPhotoFile={athleteDrawer.pendingPhotoFile}
@@ -230,6 +255,8 @@ export const AdminFootballFeature: React.FC = () => {
         isSaving={squadMembersDrawer.isSaving}
         includeYouthAthletes={squadMembersDrawer.includeYouthAthletes}
         setIncludeYouthAthletes={squadMembersDrawer.setIncludeYouthAthletes}
+        includeRetiredAthletes={squadMembersDrawer.includeRetiredAthletes}
+        setIncludeRetiredAthletes={squadMembersDrawer.setIncludeRetiredAthletes}
         onClose={squadMembersDrawer.close}
         onSave={squadMembersDrawer.save}
         selectedAthleteId={squadMembersDrawer.selectedAthleteId}
