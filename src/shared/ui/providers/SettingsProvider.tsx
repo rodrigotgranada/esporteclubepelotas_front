@@ -11,9 +11,15 @@ export const SettingsProvider = ({ children }: { children: React.ReactNode }) =>
     const fetchSettings = async () => {
       try {
         const settings = await settingsApi.getSettings();
-        setSettings(settings);
-      } catch (error) {
-        console.error('Failed to fetch settings', error);
+        if (settings) {
+          setSettings(settings);
+        }
+      } catch (error: any) {
+        // Log com aviso não-bloqueante para não poluir o console com erro fatal quando a API estiver em cold start
+        console.warn(
+          'Configurações institucionais carregadas com padrões locais (servidor em inicialização):',
+          error?.message || error
+        );
       }
     };
     fetchSettings();

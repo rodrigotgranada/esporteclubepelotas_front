@@ -1,8 +1,53 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useThemeStore } from '@/store/useThemeStore';
 import { themeService, ThemeDocument, ThemePalette } from '@/services/theme.service';
+
+const DEFAULT_THEME: ThemeDocument = {
+  _id: 'default-pelotas-theme',
+  name: 'Tema Oficial Áureo-Cerúleo',
+  isActive: true,
+  isDefault: true,
+  light: {
+    primary: '#fbbf24',
+    secondary: '#1e3a8a',
+    background: '#fefdf0',
+    surface: '#ffffff',
+    header: '#ffffff',
+    card: '#ffffff',
+    drawer: '#ffffff',
+    table: '#ffffff',
+    buttonSecondary: '#1e3a8a',
+    buttonPrimaryText: '#1e3a8a',
+    buttonSecondaryText: '#ffffff',
+    textPrimary: '#0f172a',
+    textSecondary: '#475569',
+    border: '#e2e8f0',
+    success: '#22c55e',
+    error: '#ea580c',
+    warning: '#f59e0b',
+  },
+  dark: {
+    primary: '#fbbf24',
+    secondary: '#1e3a8a',
+    background: '#0b1a32',
+    surface: '#112344',
+    header: '#0d1e3a',
+    card: '#112344',
+    drawer: '#0d1e3a',
+    table: '#112344',
+    buttonSecondary: '#1e3a8a',
+    buttonPrimaryText: '#0b1a32',
+    buttonSecondaryText: '#ffffff',
+    textPrimary: '#f8fafc',
+    textSecondary: '#94a3b8',
+    border: '#1c2b48',
+    success: '#22c55e',
+    error: '#ea580c',
+    warning: '#f59e0b',
+  },
+};
 
 function getHeaderContrast(headerHex: string) {
   if (!headerHex || !headerHex.startsWith('#')) {
@@ -33,39 +78,21 @@ function getHeaderContrast(headerHex: string) {
 
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const { mode } = useThemeStore();
-  const [activeTheme, setActiveTheme] = useState<ThemeDocument | null>(null);
+  // Inicializa imediatamente com o tema padrão do Pelotas para que o toggle funcione mesmo antes da API responder
+  const [activeTheme, setActiveTheme] = useState<ThemeDocument>(DEFAULT_THEME);
 
-  useEffect(() => {
-    // Fetch active theme from backend
-    themeService.getActiveTheme()
-      .then(theme => {
-        if (theme) setActiveTheme(theme);
-      })
-      .catch(console.error);
-  }, []);
-
-  useEffect(() => {
-    if (!activeTheme) return;
-
+  const applyPalette = useCallback((palette: ThemePalette, resolvedMode: 'light' | 'dark') => {
     const root = document.documentElement;
-    let resolvedMode = mode;
 
-    if (mode === 'system') {
-      resolvedMode = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    }
-
-    const palette: ThemePalette = resolvedMode === 'dark' ? activeTheme.dark : activeTheme.light;
-
-    // Remove old classes and add current mode
     root.classList.remove('light', 'dark');
     root.classList.add(resolvedMode);
 
-    // Inject CSS variables
     root.style.setProperty('--color-primary', palette.primary);
     root.style.setProperty('--color-secondary', palette.secondary);
     root.style.setProperty('--color-background', palette.background);
     root.style.setProperty('--color-surface', palette.surface);
     root.style.setProperty('--color-header', palette.header);
+
     const headerContrast = getHeaderContrast(palette.header);
     root.style.setProperty('--color-header-text', headerContrast.text);
     root.style.setProperty('--color-header-text-muted', headerContrast.muted);
@@ -75,7 +102,8 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
     root.style.setProperty('--color-table', palette.table);
     root.style.setProperty('--color-button-secondary', palette.buttonSecondary);
 
-    const buttonPrimaryText = palette.buttonPrimaryText || (resolvedMode === 'light' ? (palette.secondary || '#1e3a8a') : '#000000');
+    const buttonPrimaryText =
+      palette.buttonPrimaryText || (resolvedMode === 'light' ? palette.secondary || '#1e3a8a' : '#0b1a32');
     const buttonSecondaryText = palette.buttonSecondaryText || '#ffffff';
     root.style.setProperty('--color-button-primary-text', buttonPrimaryText);
     root.style.setProperty('--color-button-secondary-text', buttonSecondaryText);
@@ -86,52 +114,48 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
     root.style.setProperty('--color-success', palette.success);
     root.style.setProperty('--color-error', palette.error);
     root.style.setProperty('--color-warning', palette.warning);
+  }, []);
 
-  }, [mode, activeTheme]);
-
-  // Listen to system preferences changes if 'system' is selected
   useEffect(() => {
-    if (mode !== 'system' || !activeTheme) return;
+    // Busca tema personalizado do backend com resiliência
+    themeService
+      .getActiveTheme()
+      .then((theme) => {
+        if (theme) setActiveTheme(theme);
+      })
+      .catch((err) => {
+        console.warn(
+          'Utilizando paleta Áureo-Cerúlea padrão (tema customizado indisponível ou servidor iniciando):',
+          err?.message || err
+        );
+      });
+  }, []);
+
+  useEffect(() => {
+    let resolvedMode: 'light' | 'dark' = mode === 'dark' ? 'dark' : 'light';
+
+    if (mode === 'system') {
+      resolvedMode = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    const palette: ThemePalette = resolvedMode === 'dark' ? activeTheme.dark : activeTheme.light;
+    applyPalette(palette, resolvedMode);
+  }, [mode, activeTheme, applyPalette]);
+
+  // Sincroniza preferências do sistema operacional se 'system' estiver ativo
+  useEffect(() => {
+    if (mode !== 'system') return;
 
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     const handleChange = (e: MediaQueryListEvent) => {
-      const root = document.documentElement;
-      const resolvedMode = e.matches ? 'dark' : 'light';
+      const resolvedMode: 'light' | 'dark' = e.matches ? 'dark' : 'light';
       const palette: ThemePalette = resolvedMode === 'dark' ? activeTheme.dark : activeTheme.light;
-
-      root.classList.remove('light', 'dark');
-      root.classList.add(resolvedMode);
-
-      root.style.setProperty('--color-primary', palette.primary);
-      root.style.setProperty('--color-secondary', palette.secondary);
-      root.style.setProperty('--color-background', palette.background);
-      root.style.setProperty('--color-surface', palette.surface);
-      root.style.setProperty('--color-header', palette.header);
-      const headerContrast = getHeaderContrast(palette.header);
-      root.style.setProperty('--color-header-text', headerContrast.text);
-      root.style.setProperty('--color-header-text-muted', headerContrast.muted);
-      root.style.setProperty('--color-header-border', headerContrast.border);
-      root.style.setProperty('--color-card', palette.card);
-      root.style.setProperty('--color-drawer', palette.drawer);
-      root.style.setProperty('--color-table', palette.table);
-      root.style.setProperty('--color-button-secondary', palette.buttonSecondary);
-
-      const buttonPrimaryText = palette.buttonPrimaryText || (resolvedMode === 'light' ? (palette.secondary || '#1e3a8a') : '#000000');
-      const buttonSecondaryText = palette.buttonSecondaryText || '#ffffff';
-      root.style.setProperty('--color-button-primary-text', buttonPrimaryText);
-      root.style.setProperty('--color-button-secondary-text', buttonSecondaryText);
-
-      root.style.setProperty('--color-text-primary', palette.textPrimary);
-      root.style.setProperty('--color-text-secondary', palette.textSecondary);
-      root.style.setProperty('--color-border', palette.border);
-      root.style.setProperty('--color-success', palette.success);
-      root.style.setProperty('--color-error', palette.error);
-      root.style.setProperty('--color-warning', palette.warning);
+      applyPalette(palette, resolvedMode);
     };
 
     mediaQuery.addEventListener('change', handleChange);
     return () => mediaQuery.removeEventListener('change', handleChange);
-  }, [mode, activeTheme]);
+  }, [mode, activeTheme, applyPalette]);
 
   return <>{children}</>;
 };
