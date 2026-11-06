@@ -61,3 +61,4 @@ export const ADMIN_TIMELINE_CONSTANTS = {
     SUCCESS_DELETE: 'Marco histórico inativado com sucesso!',
   },
 };
+

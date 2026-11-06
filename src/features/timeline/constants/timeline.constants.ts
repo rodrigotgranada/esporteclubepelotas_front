@@ -21,3 +21,4 @@ export const TIMELINE_CONSTANTS = {
   BTN_JOIN_CLUB: 'Faça Parte Dessa História',
   BTN_BACK_HOME: 'Voltar ao Início',
 };
+

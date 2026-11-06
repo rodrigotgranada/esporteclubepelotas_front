@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { LayoutContainer, Title, Text, Badge, SafeImage } from '@/shared/ui/components';
+import { LayoutContainer, Title, Text, Badge, SafeImage, DEFAULT_NEWS_COVER } from '@/shared/ui/components';
 import { TimelineEventData } from '../../services/timeline.service';
 import { TIMELINE_CONSTANTS } from '../../constants/timeline.constants';
 import { Calendar, Trophy, Landmark, Flag, Star, Sparkles } from 'lucide-react';
@@ -83,7 +83,8 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({ event, isEven }) => 
             fill
             sizes="(max-width: 768px) 100vw, 500px"
             className="object-cover transition-transform duration-500 hover:scale-105"
-            fallbackSrc="/pelotas-logo.png"
+            fallbackSrc={DEFAULT_NEWS_COVER}
+            unoptimized={Boolean(event.imageUrl && event.imageUrl.startsWith('http'))}
           />
         </LayoutContainer>
       )}
@@ -98,3 +99,4 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({ event, isEven }) => 
     </LayoutContainer>
   );
 };
+

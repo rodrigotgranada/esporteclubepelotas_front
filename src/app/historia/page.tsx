@@ -10,10 +10,11 @@ export const metadata: Metadata = {
     title: 'História & Linha do Tempo | Esporte Clube Pelotas',
     description:
       'Uma trajetória centenária de paixão, glórias e tradição gravada na alma do futebol gaúcho.',
-    images: ['/pelotas-logo.png'],
+    images: ['/images/pelotas-logo.png'],
   },
 };
 
 export default function HistoriaPage() {
   return <TimelineFeature />;
 }
+

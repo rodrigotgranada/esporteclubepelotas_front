@@ -62,7 +62,7 @@ export const GeneralSettingsTab = () => {
                   fill
                   sizes="128px"
                   className="object-contain p-2"
-                  fallbackSrc="/pelotas-logo.png"
+                  fallbackSrc="/images/pelotas-logo.png"
                 />
                 <LayoutContainer className="absolute inset-0 bg-black/60 rounded-full flex flex-row items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity gap-4">
                   <IconButton
@@ -105,7 +105,7 @@ export const GeneralSettingsTab = () => {
                         fill
                         sizes="48px"
                         className="object-contain p-1"
-                        fallbackSrc="/pelotas-logo.png"
+                        fallbackSrc="/images/pelotas-logo.png"
                       />
                     </LayoutContainer>
                     <IconButton

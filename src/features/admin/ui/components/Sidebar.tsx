@@ -26,7 +26,7 @@ export const Sidebar = ({ isMobileMenuOpen, setIsMobileMenuOpen }: { isMobileMen
                 alt="Logo"
                 fill
                 className="object-contain"
-                fallbackSrc="/pelotas-logo.png"
+                fallbackSrc="/images/pelotas-logo.png"
               />
             </LayoutContainer>
           ) : (

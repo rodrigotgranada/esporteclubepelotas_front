@@ -12,6 +12,7 @@ import {
   Badge,
   IconButton,
   SafeImage,
+  DEFAULT_NEWS_COVER,
   Text,
   Title,
   Spinner,
@@ -89,12 +90,13 @@ export const TimelineTable: React.FC<TimelineTableProps> = ({
                 <TableCell>
                   <LayoutContainer className="relative w-14 h-10 rounded-lg overflow-hidden bg-background border border-border/80">
                     <SafeImage
-                      src={event.imageUrl || '/pelotas-logo.png'}
+                      src={event.imageUrl || DEFAULT_NEWS_COVER}
                       alt={event.title}
                       fill
                       sizes="56px"
                       className="object-cover"
-                      fallbackSrc="/pelotas-logo.png"
+                      fallbackSrc={DEFAULT_NEWS_COVER}
+                      unoptimized={Boolean(event.imageUrl && event.imageUrl.startsWith('http'))}
                     />
                   </LayoutContainer>
                 </TableCell>

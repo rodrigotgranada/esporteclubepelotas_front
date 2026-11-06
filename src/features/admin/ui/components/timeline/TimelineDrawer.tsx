@@ -12,6 +12,7 @@ import {
   Switch,
   Button,
   SafeImage,
+  DEFAULT_NEWS_COVER,
 } from '@/shared/ui/components';
 import { Upload, X } from 'lucide-react';
 import { TimelineCategory } from '@/features/timeline/services/timeline.service';
@@ -182,7 +183,8 @@ export const TimelineDrawer: React.FC<TimelineDrawerProps> = ({
                 fill
                 sizes="(max-width: 600px) 100vw, 400px"
                 className="object-cover"
-                fallbackSrc="/pelotas-logo.png"
+                fallbackSrc={DEFAULT_NEWS_COVER}
+                unoptimized={Boolean(photoUrl && photoUrl.startsWith('http'))}
               />
               <LayoutContainer className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
                 <Button

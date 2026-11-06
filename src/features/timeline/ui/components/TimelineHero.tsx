@@ -73,3 +73,4 @@ export const TimelineHero: React.FC<TimelineHeroProps> = ({
     </LayoutContainer>
   );
 };
+
