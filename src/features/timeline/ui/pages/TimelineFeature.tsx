@@ -5,7 +5,7 @@ import { LayoutContainer, Title, Text, Spinner, Button } from '@/shared/ui/compo
 import { useTimeline } from '../../hooks/useTimeline';
 import { TimelineHero } from '../components/TimelineHero';
 import { TimelineCard } from '../components/TimelineCard';
-import { TimelineYearScroller } from '../components/TimelineYearScroller';
+import { AppleYearWheelPicker } from '../components/AppleYearWheelPicker';
 import { TIMELINE_CONSTANTS } from '../../constants/timeline.constants';
 import { Shield, Sparkles } from 'lucide-react';
 import Link from 'next/link';
@@ -80,9 +80,9 @@ export const TimelineFeature: React.FC = () => {
         onScrollToTimeline={handleScrollToTimeline}
       />
 
-      {/* Sticky Apple-style Horizontal Scroller */}
+      {/* Sticky Apple Watch Wheel Picker */}
       {availableYears.length > 0 && (
-        <TimelineYearScroller
+        <AppleYearWheelPicker
           years={availableYears}
           activeYear={activeYear}
           onSelectYear={scrollToYear}
