@@ -1,0 +1,23 @@
+export const TIMELINE_CONSTANTS = {
+  PAGE_TITLE: 'História & Linha do Tempo',
+  PAGE_SUBTITLE: 'Uma trajetória centenária de paixão, glórias e tradição gravada na alma do futebol gaúcho.',
+  HERO_BADGE: 'DESDE 11 DE OUTUBRO DE 1908',
+  HERO_TITLE_PREFIX: 'Mais de um século de',
+  HERO_TITLE_HIGHLIGHT: 'Paixão Áureo-Cerúlea',
+  HERO_DESCRIPTION:
+    'Conheça os fatos, conquistas e personagens eternos que forjaram a identidade do Esporte Clube Pelotas — o Lobo da Boca do Lobo.',
+  CATEGORIES: {
+    FOUNDATION: 'Fundação',
+    TITLE: 'Conquista / Título',
+    STADIUM: 'Boca do Lobo',
+    MILESTONE: 'Marco Histórico',
+    GLORY: 'Glória Eterna',
+  },
+  EMPTY_TITLE: 'Nenhum marco histórico registrado',
+  EMPTY_DESC: 'A história do Lobo está sendo documentada. Volte em breve para acompanhar a linha do tempo completa.',
+  LOADING_TEXT: 'Carregando linha do tempo...',
+  YEAR_LABEL: 'Ano de',
+  HIGHLIGHTED_BADGE: 'Momento Histórico Marcante',
+  BTN_JOIN_CLUB: 'Faça Parte Dessa História',
+  BTN_BACK_HOME: 'Voltar ao Início',
+};

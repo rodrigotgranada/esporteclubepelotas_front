@@ -8,6 +8,7 @@ export const SIDEBAR_TEXTS = {
     NEWS: 'Matérias',
     FOOTBALL: 'Futebol & Elenco',
     IDOLS: 'Ídolos & Memorial',
+    TIMELINE: 'História & Linha do Tempo',
     MODULES: 'Módulos do Sistema',
     ROLES: 'Cargos e Permissões',
     SETTINGS: 'Configurações',
