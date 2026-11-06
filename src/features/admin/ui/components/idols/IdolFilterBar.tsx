@@ -24,7 +24,7 @@ export const IdolFilterBar: React.FC<IdolFilterBarProps> = ({
     <LayoutContainer className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-4 rounded-2xl bg-surface border border-border shadow-xs">
       <LayoutContainer className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-1">
         {/* Search Input */}
-        <LayoutContainer className="relative flex-1">
+        <LayoutContainer className="relative flex-1 min-w-[200px]">
           <Input
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}

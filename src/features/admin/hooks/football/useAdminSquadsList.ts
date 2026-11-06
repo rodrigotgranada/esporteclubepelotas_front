@@ -13,6 +13,7 @@ export const useAdminSquadsList = () => {
   const [limit] = useState<number>(15);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [search, setSearch] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
 
@@ -24,6 +25,7 @@ export const useAdminSquadsList = () => {
     try {
       setIsLoading(true);
       const params: any = { page, limit };
+      if (search.trim()) params.search = search.trim();
       if (selectedCategory) params.category = selectedCategory;
       if (selectedYear) params.year = selectedYear;
 
@@ -37,7 +39,7 @@ export const useAdminSquadsList = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [page, limit, selectedCategory, selectedYear]);
+  }, [page, limit, search, selectedCategory, selectedYear]);
 
   useEffect(() => {
     loadSquads();
@@ -83,6 +85,8 @@ export const useAdminSquadsList = () => {
     page,
     totalPages,
     isLoading,
+    search,
+    setSearch,
     selectedCategory,
     setSelectedCategory,
     selectedYear,

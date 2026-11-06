@@ -27,7 +27,7 @@ export const UsersFilterBar = ({
     <LayoutContainer className="flex flex-col xl:flex-row justify-between gap-4 mt-8 w-full min-w-0">
       <LayoutContainer className="flex flex-col sm:flex-row gap-4 w-full flex-1">
         {/* Search */}
-        <LayoutContainer className="w-full sm:flex-1 relative">
+        <LayoutContainer className="w-full sm:flex-1 relative min-w-[200px]">
           <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 z-10" />
           <Input 
             type="text" 
@@ -40,7 +40,7 @@ export const UsersFilterBar = ({
 
         {/* Filters */}
         <LayoutContainer className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-          <LayoutContainer className="w-full sm:w-48">
+          <LayoutContainer className="w-full sm:w-48 shrink-0">
             <Select 
               value={roleFilter}
               onChange={(e) => setRoleFilter(e.target.value)}
@@ -57,7 +57,7 @@ export const UsersFilterBar = ({
             </Select>
           </LayoutContainer>
 
-          <LayoutContainer className="w-full sm:w-48">
+          <LayoutContainer className="w-full sm:w-48 shrink-0">
             <Select 
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}

@@ -6,11 +6,12 @@ import { ChevronDown, Check } from 'lucide-react';
 export interface SelectProps extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>, 'onChange'> {
   label?: string;
   error?: string;
+  containerClassName?: string;
   onChange?: (e: any) => void;
 }
 
 export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
-  ({ label, error, className = '', children, value, onChange, disabled, ...props }, ref) => {
+  ({ label, error, className = '', containerClassName = '', children, value, onChange, disabled, ...props }, ref) => {
     const [isOpen, setIsOpen] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
     
@@ -47,7 +48,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
     };
 
     return (
-      <div className="w-full" ref={containerRef}>
+      <div className={containerClassName || 'w-full'} ref={containerRef}>
         {label && (
           <label className="block text-xs font-semibold text-text-secondary mb-1.5 uppercase tracking-wide">
             {label}

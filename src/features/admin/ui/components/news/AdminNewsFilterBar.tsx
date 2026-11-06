@@ -42,7 +42,7 @@ export const AdminNewsFilterBar: React.FC<AdminNewsFilterBarProps> = ({
       {/* Search and Filters */}
       <LayoutContainer className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-1">
         {/* Search */}
-        <LayoutContainer className="relative flex-1">
+        <LayoutContainer className="relative flex-1 min-w-[200px]">
           <LayoutContainer className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none text-text-secondary z-10">
             <Search className="w-4 h-4" />
           </LayoutContainer>
@@ -55,7 +55,7 @@ export const AdminNewsFilterBar: React.FC<AdminNewsFilterBarProps> = ({
         </LayoutContainer>
 
         {/* Category Filter */}
-        <LayoutContainer className="w-full sm:w-48">
+        <LayoutContainer className="w-full sm:w-48 shrink-0">
           <Select
             value={categoryFilter}
             onChange={(e) => onCategoryFilterChange(e.target.value)}
@@ -70,7 +70,7 @@ export const AdminNewsFilterBar: React.FC<AdminNewsFilterBarProps> = ({
         </LayoutContainer>
 
         {/* Status Filter */}
-        <LayoutContainer className="w-full sm:w-44">
+        <LayoutContainer className="w-full sm:w-44 shrink-0">
           <Select
             value={statusFilter}
             onChange={(e) => onStatusFilterChange(e.target.value)}
@@ -84,7 +84,7 @@ export const AdminNewsFilterBar: React.FC<AdminNewsFilterBarProps> = ({
         </LayoutContainer>
 
         {/* Featured Filter */}
-        <LayoutContainer className="w-full sm:w-44">
+        <LayoutContainer className="w-full sm:w-44 shrink-0">
           <Select
             value={featuredFilter}
             onChange={(e) => onFeaturedFilterChange(e.target.value)}

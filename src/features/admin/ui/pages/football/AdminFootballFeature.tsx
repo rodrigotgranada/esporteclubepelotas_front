@@ -50,8 +50,11 @@ export const AdminFootballFeature: React.FC = () => {
         <LayoutContainer className="flex flex-col gap-6">
           {/* Barra de Ações do Banco de Atletas */}
           <LayoutContainer className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
-            <LayoutContainer className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-1 max-w-xl">
-              <LayoutContainer className="flex-1 relative">
+            <LayoutContainer className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-1 max-w-2xl">
+              <LayoutContainer className="relative flex-1 min-w-[200px]">
+                <LayoutContainer className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none text-text-secondary z-10">
+                  <Search className="w-4 h-4" />
+                </LayoutContainer>
                 <Input
                   value={athletesList.search}
                   onChange={(e) => {
@@ -59,21 +62,24 @@ export const AdminFootballFeature: React.FC = () => {
                     athletesList.setPage(1);
                   }}
                   placeholder={texts.ATHLETES_TAB.SEARCH_PLACEHOLDER}
+                  className="pl-9 w-full"
                 />
               </LayoutContainer>
 
-              <Select
+              <LayoutContainer className="w-full sm:w-56 shrink-0">
+                <Select
                 value={athletesList.retiredFilter}
                 onChange={(e) => {
                   athletesList.setRetiredFilter(e.target.value as any);
                   athletesList.setPage(1);
                 }}
-                className="w-full sm:w-52"
+
               >
                 <Option value="ALL">{texts.ATHLETES_TAB.FILTER_ALL_STATUS}</Option>
                 <Option value="ACTIVE">{texts.ATHLETES_TAB.FILTER_ACTIVE_ONLY}</Option>
                 <Option value="RETIRED">{texts.ATHLETES_TAB.FILTER_RETIRED_ONLY}</Option>
               </Select>
+              </LayoutContainer>
             </LayoutContainer>
 
             <Button
@@ -108,8 +114,23 @@ export const AdminFootballFeature: React.FC = () => {
         <LayoutContainer className="flex flex-col gap-6">
           {/* Barra de Ações de Elencos & Temporadas */}
           <LayoutContainer className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
-            <LayoutContainer className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-              <Select
+            <LayoutContainer className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-1 max-w-2xl">
+              <LayoutContainer className="relative flex-1 min-w-[200px]">
+                <LayoutContainer className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none text-text-secondary z-10">
+                  <Search className="w-4 h-4" />
+                </LayoutContainer>
+                <Input
+                  value={squadsList.search}
+                  onChange={(e) => {
+                    squadsList.setSearch(e.target.value);
+                    squadsList.setPage(1);
+                  }}
+                  placeholder="Buscar competição ou treinador..."
+                  className="pl-9 w-full"
+                />
+              </LayoutContainer>
+              <LayoutContainer className="w-full sm:w-56 shrink-0">
+                <Select
                 value={squadsList.selectedCategory}
                 onChange={(e) => squadsList.setSelectedCategory(e.target.value)}
                 className="w-full sm:w-56"
@@ -121,6 +142,7 @@ export const AdminFootballFeature: React.FC = () => {
                 <Option value="SUB_17">{FOOTBALL_CONSTANTS.CATEGORIES.SUB_17}</Option>
                 <Option value="SUB_15">{FOOTBALL_CONSTANTS.CATEGORIES.SUB_15}</Option>
               </Select>
+              </LayoutContainer>
             </LayoutContainer>
 
             <Button
