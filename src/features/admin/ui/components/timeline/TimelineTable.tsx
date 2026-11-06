@@ -107,8 +107,8 @@ export const TimelineTable: React.FC<TimelineTableProps> = ({
                   </LayoutContainer>
                 </TableCell>
                 <TableCell>
-                  <Badge variant="default" className="text-xs">
-                    {ADMIN_TIMELINE_CONSTANTS.CATEGORIES[event.category] || event.category}
+                  <Badge variant="default" className="text-xs font-semibold">
+                    {event.categoryName || ADMIN_TIMELINE_CONSTANTS.CATEGORIES[event.category] || event.category}
                   </Badge>
                 </TableCell>
                 <TableCell className="text-center">

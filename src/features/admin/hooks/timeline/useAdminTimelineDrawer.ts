@@ -3,8 +3,27 @@
 import { useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { adminTimelineService } from '../../services/admin-timeline.service';
-import { TimelineEventData, TimelineCategory } from '@/features/timeline/services/timeline.service';
+import { TimelineEventData } from '@/features/timeline/services/timeline.service';
 import { ADMIN_TIMELINE_CONSTANTS } from '../../constants/admin-timeline.constants';
+
+const MONTH_NAMES = [
+  'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+  'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+];
+
+export const formatPtBrDate = (dateIsoString: string): string => {
+  if (!dateIsoString) return '';
+  const parts = dateIsoString.split('-');
+  if (parts.length === 3) {
+    const day = parseInt(parts[2], 10);
+    const monthIdx = parseInt(parts[1], 10) - 1;
+    const year = parts[0];
+    if (!isNaN(day) && monthIdx >= 0 && monthIdx < 12) {
+      return `${day} de ${MONTH_NAMES[monthIdx]} de ${year}`;
+    }
+  }
+  return dateIsoString;
+};
 
 export const useAdminTimelineDrawer = (onSuccess: () => void) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -15,7 +34,9 @@ export const useAdminTimelineDrawer = (onSuccess: () => void) => {
   const [year, setYear] = useState<number>(1908);
   const [title, setTitle] = useState<string>('');
   const [description, setDescription] = useState<string>('');
-  const [category, setCategory] = useState<TimelineCategory>('MILESTONE');
+  const [categoryId, setCategoryId] = useState<string>('');
+  const [category, setCategory] = useState<string>('fundacao');
+  const [eventDate, setEventDate] = useState<string>('');
   const [dateFormatted, setDateFormatted] = useState<string>('');
   const [displayOrder, setDisplayOrder] = useState<number>(0);
   const [isHighlighted, setIsHighlighted] = useState<boolean>(false);
@@ -28,13 +49,27 @@ export const useAdminTimelineDrawer = (onSuccess: () => void) => {
     setYear(new Date().getFullYear());
     setTitle('');
     setDescription('');
-    setCategory('MILESTONE');
+    setCategoryId('');
+    setCategory('fundacao');
+    setEventDate('');
     setDateFormatted('');
     setDisplayOrder(0);
     setIsHighlighted(false);
     setIsActive(true);
     setPhotoUrl(null);
     setPendingPhotoFile(null);
+  };
+
+  const handleEventDateChange = (val: string) => {
+    setEventDate(val);
+    if (val && val.includes('-')) {
+      const parts = val.split('-');
+      const y = parseInt(parts[0], 10);
+      if (!isNaN(y)) {
+        setYear(y);
+      }
+      setDateFormatted(formatPtBrDate(val));
+    }
   };
 
   const openCreate = () => {
@@ -47,8 +82,10 @@ export const useAdminTimelineDrawer = (onSuccess: () => void) => {
     setYear(event.year);
     setTitle(event.title);
     setDescription(event.description);
-    setCategory(event.category);
-    setDateFormatted(event.dateFormatted || '');
+    setCategoryId(event.categoryId || '');
+    setCategory(event.category || 'fundacao');
+    setEventDate(event.eventDate || '');
+    setDateFormatted(event.dateFormatted || (event.eventDate ? formatPtBrDate(event.eventDate) : ''));
     setDisplayOrder(event.displayOrder || 0);
     setIsHighlighted(Boolean(event.isHighlighted));
     setIsActive(event.isActive !== false);
@@ -84,6 +121,8 @@ export const useAdminTimelineDrawer = (onSuccess: () => void) => {
         title: title.trim(),
         description: description.trim(),
         category,
+        categoryId: categoryId || undefined,
+        eventDate: eventDate || undefined,
         dateFormatted: dateFormatted.trim() || undefined,
         displayOrder: Number(displayOrder) || 0,
         isHighlighted,
@@ -122,8 +161,13 @@ export const useAdminTimelineDrawer = (onSuccess: () => void) => {
     setTitle,
     description,
     setDescription,
+    categoryId,
+    setCategoryId,
     category,
     setCategory,
+    eventDate,
+    setEventDate,
+    handleEventDateChange,
     dateFormatted,
     setDateFormatted,
     displayOrder,
@@ -142,4 +186,3 @@ export const useAdminTimelineDrawer = (onSuccess: () => void) => {
     save,
   };
 };
-

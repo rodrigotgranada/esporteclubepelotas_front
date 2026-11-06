@@ -14,22 +14,28 @@ import {
   SafeImage,
   DEFAULT_NEWS_COVER,
 } from '@/shared/ui/components';
-import { Upload, X } from 'lucide-react';
-import { TimelineCategory } from '@/features/timeline/services/timeline.service';
+import { Upload, X, Plus, Calendar } from 'lucide-react';
+import { TimelineCategoryData } from '@/features/timeline/services/timeline.service';
 import { ADMIN_TIMELINE_CONSTANTS } from '@/features/admin/constants/admin-timeline.constants';
 
 interface TimelineDrawerProps {
   isOpen: boolean;
   isSaving: boolean;
   isEditing: boolean;
+  categories: TimelineCategoryData[];
+  onOpenNewCategory?: () => void;
   year: number;
   setYear: (val: number) => void;
   title: string;
   setTitle: (val: string) => void;
   description: string;
   setDescription: (val: string) => void;
-  category: TimelineCategory;
-  setCategory: (val: TimelineCategory) => void;
+  category: string;
+  setCategory: (val: string) => void;
+  categoryId: string;
+  setCategoryId: (val: string) => void;
+  eventDate: string;
+  handleEventDateChange: (val: string) => void;
   dateFormatted: string;
   setDateFormatted: (val: string) => void;
   displayOrder: number;
@@ -50,6 +56,8 @@ export const TimelineDrawer: React.FC<TimelineDrawerProps> = ({
   isOpen,
   isSaving,
   isEditing,
+  categories,
+  onOpenNewCategory,
   year,
   setYear,
   title,
@@ -58,6 +66,10 @@ export const TimelineDrawer: React.FC<TimelineDrawerProps> = ({
   setDescription,
   category,
   setCategory,
+  categoryId,
+  setCategoryId,
+  eventDate,
+  handleEventDateChange,
   dateFormatted,
   setDateFormatted,
   displayOrder,
@@ -90,6 +102,16 @@ export const TimelineDrawer: React.FC<TimelineDrawerProps> = ({
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
+  const handleCategorySelect = (selectedSlugOrId: string) => {
+    setCategory(selectedSlugOrId);
+    const found = categories.find(
+      (c) => c.slug === selectedSlugOrId || c.id === selectedSlugOrId || c._id === selectedSlugOrId
+    );
+    if (found) {
+      setCategoryId(found.id || found._id || '');
+    }
+  };
+
   return (
     <Drawer
       isOpen={isOpen}
@@ -102,7 +124,52 @@ export const TimelineDrawer: React.FC<TimelineDrawerProps> = ({
           {texts.SUBTITLE}
         </Text>
 
-        {/* Row 1: Year and Category */}
+        {/* Row 1: DatePicker & Category */}
+        <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* DatePicker */}
+          <LayoutContainer className="flex flex-col">
+            <Input
+              label={texts.FIELD_DATE}
+              type="date"
+              value={eventDate}
+              onChange={(e) => handleEventDateChange(e.target.value)}
+            />
+            <Text className="text-[11px] text-text-secondary/70 mt-1">
+              {texts.FIELD_DATE_HELP}
+            </Text>
+          </LayoutContainer>
+
+          {/* Category Select with Quick Create Shortcut */}
+          <LayoutContainer className="flex flex-col">
+            <LayoutContainer className="flex items-center justify-between mb-1">
+              <Text className="text-xs font-semibold text-text-secondary">
+                {texts.FIELD_CATEGORY}
+              </Text>
+              {onOpenNewCategory && (
+                <button
+                  type="button"
+                  onClick={onOpenNewCategory}
+                  className="text-[11px] font-bold text-primary hover:underline flex items-center gap-1 cursor-pointer"
+                >
+                  <Plus className="w-3 h-3" />
+                  {texts.BTN_QUICK_CATEGORY}
+                </button>
+              )}
+            </LayoutContainer>
+            <Select
+              value={category}
+              onChange={(e) => handleCategorySelect(e.target.value)}
+            >
+              {categories.map((cat) => (
+                <Option key={cat.id || cat._id || cat.slug} value={cat.slug}>
+                  {cat.name}
+                </Option>
+              ))}
+            </Select>
+          </LayoutContainer>
+        </LayoutContainer>
+
+        {/* Row 2: Year and Formatted Date Preview */}
         <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Input
             label={texts.FIELD_YEAR}
@@ -110,39 +177,28 @@ export const TimelineDrawer: React.FC<TimelineDrawerProps> = ({
             value={year || ''}
             onChange={(e) => setYear(Number(e.target.value))}
             placeholder={texts.FIELD_YEAR_PLACEHOLDER}
+            required
           />
 
-          <LayoutContainer className="flex flex-col">
-            <Select
-              label={texts.FIELD_CATEGORY}
-              value={category}
-              onChange={(e) => setCategory(e.target.value as TimelineCategory)}
-            >
-              <Option value="FOUNDATION">{ADMIN_TIMELINE_CONSTANTS.CATEGORIES.FOUNDATION}</Option>
-              <Option value="TITLE">{ADMIN_TIMELINE_CONSTANTS.CATEGORIES.TITLE}</Option>
-              <Option value="STADIUM">{ADMIN_TIMELINE_CONSTANTS.CATEGORIES.STADIUM}</Option>
-              <Option value="MILESTONE">{ADMIN_TIMELINE_CONSTANTS.CATEGORIES.MILESTONE}</Option>
-              <Option value="GLORY">{ADMIN_TIMELINE_CONSTANTS.CATEGORIES.GLORY}</Option>
-            </Select>
-          </LayoutContainer>
-        </LayoutContainer>
-
-        {/* Row 2: Title */}
-        <Input
-          label={texts.FIELD_TITLE}
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder={texts.FIELD_TITLE_PLACEHOLDER}
-        />
-
-        {/* Row 3: Date Formatted and Display Order */}
-        <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Input
             label={texts.FIELD_DATE_FORMATTED}
             value={dateFormatted}
             onChange={(e) => setDateFormatted(e.target.value)}
             placeholder={texts.FIELD_DATE_PLACEHOLDER}
           />
+        </LayoutContainer>
+
+        {/* Row 3: Title & Display Order */}
+        <LayoutContainer className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <LayoutContainer className="sm:col-span-2">
+            <Input
+              label={texts.FIELD_TITLE}
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder={texts.FIELD_TITLE_PLACEHOLDER}
+              required
+            />
+          </LayoutContainer>
 
           <Input
             label={texts.FIELD_ORDER}
@@ -159,6 +215,7 @@ export const TimelineDrawer: React.FC<TimelineDrawerProps> = ({
           onChange={(e) => setDescription(e.target.value)}
           placeholder={texts.FIELD_DESCRIPTION_PLACEHOLDER}
           rows={5}
+          required
         />
 
         {/* Row 5: Photo Upload */}

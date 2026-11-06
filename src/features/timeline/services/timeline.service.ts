@@ -1,6 +1,18 @@
 import { api } from '@/services/api';
 
-export type TimelineCategory = 'FOUNDATION' | 'TITLE' | 'STADIUM' | 'MILESTONE' | 'GLORY';
+export interface TimelineCategoryData {
+  id: string;
+  _id?: string;
+  name: string;
+  slug: string;
+  icon: string;
+  description?: string | null;
+  displayOrder: number;
+  isActive: boolean;
+  eventsCount?: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
 
 export interface TimelineEventData {
   id: string;
@@ -8,8 +20,12 @@ export interface TimelineEventData {
   year: number;
   title: string;
   description: string;
-  category: TimelineCategory;
+  categoryId?: string | null;
+  category: string;
+  categoryName?: string;
+  categoryIcon?: string;
   imageUrl?: string | null;
+  eventDate?: string | null;
   dateFormatted?: string | null;
   displayOrder: number;
   isHighlighted: boolean;
@@ -29,6 +45,11 @@ export interface GetTimelineResponse {
 export const timelineService = {
   getTimeline: async (): Promise<GetTimelineResponse> => {
     const response = await api.get('/timeline');
+    return response.data;
+  },
+
+  getCategories: async (): Promise<TimelineCategoryData[]> => {
+    const response = await api.get('/timeline/categories');
     return response.data;
   },
 };

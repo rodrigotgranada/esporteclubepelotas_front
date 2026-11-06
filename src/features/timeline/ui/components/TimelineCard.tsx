@@ -4,33 +4,58 @@ import React from 'react';
 import { LayoutContainer, Title, Text, Badge, SafeImage, DEFAULT_NEWS_COVER } from '@/shared/ui/components';
 import { TimelineEventData } from '../../services/timeline.service';
 import { TIMELINE_CONSTANTS } from '../../constants/timeline.constants';
-import { Calendar, Trophy, Landmark, Flag, Star, Sparkles } from 'lucide-react';
+import { Calendar, Trophy, Landmark, Flag, Star, Sparkles, Medal, Shield, Heart } from 'lucide-react';
 
 interface TimelineCardProps {
   event: TimelineEventData;
   isEven: boolean; // true = left in desktop, false = right in desktop
 }
 
-const getCategoryIcon = (category: string) => {
-  switch (category) {
-    case 'FOUNDATION':
-      return <Flag className="w-3.5 h-3.5 text-primary" />;
-    case 'TITLE':
+const getCategoryIcon = (categorySlugOrIcon?: string) => {
+  const normalized = (categorySlugOrIcon || '').toLowerCase();
+  switch (normalized) {
+    case 'trophy':
+    case 'title':
+    case 'titulos':
       return <Trophy className="w-3.5 h-3.5 text-primary" />;
-    case 'STADIUM':
+    case 'landmark':
+    case 'stadium':
+    case 'estadio':
       return <Landmark className="w-3.5 h-3.5 text-primary" />;
-    case 'GLORY':
+    case 'star':
+    case 'glory':
+    case 'glorias':
       return <Star className="w-3.5 h-3.5 text-primary" />;
-    default:
+    case 'medal':
+    case 'homenagens':
+      return <Medal className="w-3.5 h-3.5 text-primary" />;
+    case 'shield':
+    case 'simbolos':
+      return <Shield className="w-3.5 h-3.5 text-primary" />;
+    case 'heart':
+    case 'torcida':
+      return <Heart className="w-3.5 h-3.5 text-primary" />;
+    case 'sparkles':
+    case 'milestone':
+    case 'marcos':
       return <Sparkles className="w-3.5 h-3.5 text-primary" />;
+    case 'flag':
+    case 'foundation':
+    case 'fundacao':
+    default:
+      return <Flag className="w-3.5 h-3.5 text-primary" />;
   }
 };
 
-const getCategoryLabel = (category: string) => {
+const getCategoryLabel = (event: TimelineEventData) => {
+  if (event.categoryName && event.categoryName.trim()) {
+    return event.categoryName;
+  }
+  const slugKey = (event.category || '').toUpperCase();
   return (
     TIMELINE_CONSTANTS.CATEGORIES[
-      category as keyof typeof TIMELINE_CONSTANTS.CATEGORIES
-    ] || category
+      slugKey as keyof typeof TIMELINE_CONSTANTS.CATEGORIES
+    ] || event.category || 'Marco Histórico'
   );
 };
 
@@ -54,14 +79,14 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({ event, isEven }) => 
       {/* Header Info */}
       <LayoutContainer className="flex items-center justify-between gap-3 flex-wrap mb-2">
         <LayoutContainer className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-surface border border-border text-xs font-semibold text-text-secondary">
-          {getCategoryIcon(event.category)}
-          <span>{getCategoryLabel(event.category)}</span>
+          {getCategoryIcon(event.categoryIcon || event.category)}
+          <span>{getCategoryLabel(event)}</span>
         </LayoutContainer>
 
-        {event.dateFormatted && (
+        {(event.dateFormatted || event.eventDate) && (
           <LayoutContainer className="inline-flex items-center gap-1 text-xs text-text-muted">
             <Calendar className="w-3.5 h-3.5 text-primary" />
-            <span>{event.dateFormatted}</span>
+            <span>{event.dateFormatted || event.eventDate}</span>
           </LayoutContainer>
         )}
       </LayoutContainer>
@@ -99,4 +124,3 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({ event, isEven }) => 
     </LayoutContainer>
   );
 };
-

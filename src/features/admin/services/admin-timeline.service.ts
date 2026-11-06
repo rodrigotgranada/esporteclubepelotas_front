@@ -1,12 +1,12 @@
 import { api } from '@/services/api';
-import { TimelineEventData, TimelineCategory } from '@/features/timeline/services/timeline.service';
+import { TimelineEventData, TimelineCategoryData } from '@/features/timeline/services/timeline.service';
 
 export interface QueryTimelineAdminParams {
   page?: number;
   limit?: number;
   search?: string;
   year?: number;
-  category?: TimelineCategory;
+  category?: string;
   isHighlighted?: boolean;
   isActive?: boolean;
 }
@@ -23,9 +23,11 @@ export interface CreateTimelineEventInput {
   year: number;
   title: string;
   description: string;
-  category: TimelineCategory;
+  categoryId?: string | null;
+  category?: string;
   imageUrl?: string;
-  dateFormatted?: string;
+  eventDate?: string | null;
+  dateFormatted?: string | null;
   displayOrder?: number;
   isHighlighted?: boolean;
   isActive?: boolean;
@@ -35,11 +37,31 @@ export interface UpdateTimelineEventInput {
   year?: number;
   title?: string;
   description?: string;
-  category?: TimelineCategory;
+  categoryId?: string | null;
+  category?: string;
   imageUrl?: string;
-  dateFormatted?: string;
+  eventDate?: string | null;
+  dateFormatted?: string | null;
   displayOrder?: number;
   isHighlighted?: boolean;
+  isActive?: boolean;
+}
+
+export interface CreateTimelineCategoryInput {
+  name: string;
+  slug?: string;
+  icon?: string;
+  description?: string;
+  displayOrder?: number;
+  isActive?: boolean;
+}
+
+export interface UpdateTimelineCategoryInput {
+  name?: string;
+  slug?: string;
+  icon?: string;
+  description?: string;
+  displayOrder?: number;
   isActive?: boolean;
 }
 
@@ -90,5 +112,25 @@ export const adminTimelineService = {
 
   deleteEvent: async (id: string): Promise<void> => {
     await api.delete(`/timeline/admin/${id}`);
+  },
+
+  // Categorias de Marcos
+  getCategories: async (): Promise<TimelineCategoryData[]> => {
+    const response = await api.get('/timeline/admin/categories');
+    return response.data;
+  },
+
+  createCategory: async (data: CreateTimelineCategoryInput): Promise<TimelineCategoryData> => {
+    const response = await api.post('/timeline/admin/categories', data);
+    return response.data;
+  },
+
+  updateCategory: async (id: string, data: UpdateTimelineCategoryInput): Promise<TimelineCategoryData> => {
+    const response = await api.put(`/timeline/admin/categories/${id}`, data);
+    return response.data;
+  },
+
+  deleteCategory: async (id: string): Promise<void> => {
+    await api.delete(`/timeline/admin/categories/${id}`);
   },
 };

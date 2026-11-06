@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-hot-toast';
 import { adminTimelineService } from '../../services/admin-timeline.service';
-import { TimelineEventData, TimelineCategory } from '@/features/timeline/services/timeline.service';
+import { TimelineEventData } from '@/features/timeline/services/timeline.service';
 import { ADMIN_TIMELINE_CONSTANTS } from '../../constants/admin-timeline.constants';
 
 export const useAdminTimelineList = () => {
@@ -28,7 +28,7 @@ export const useAdminTimelineList = () => {
       setIsLoading(true);
       const params: any = { page, limit };
       if (search.trim()) params.search = search.trim();
-      if (categoryFilter) params.category = categoryFilter as TimelineCategory;
+      if (categoryFilter) params.category = categoryFilter;
       if (highlightFilter === 'HIGHLIGHTED') params.isHighlighted = true;
 
       const res = await adminTimelineService.getEvents(params);
