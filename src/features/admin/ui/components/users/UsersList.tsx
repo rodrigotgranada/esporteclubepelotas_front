@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutContainer, Text, Button, Table, TableHeader, TableRow, TableHead, TableBody, TableCell, Badge, Spinner, Checkbox } from '@/shared/ui/components';
+import { LayoutContainer, Text, Button, Table, TableHeader, TableRow, TableHead, TableBody, TableCell, Badge, Spinner, Checkbox, isUnoptimizedImageUrl } from '@/shared/ui/components';
 import { Shield, ShieldAlert, CheckCircle } from 'lucide-react';
 import Image from 'next/image';
 import { UserAdminData } from '@/features/admin/services/admin.service';
@@ -100,7 +100,7 @@ export const UsersList = ({
                       <LayoutContainer className="flex items-center gap-3">
                         <LayoutContainer className="w-10 h-10 rounded-full bg-surface overflow-hidden relative border border-border flex items-center justify-center text-primary font-bold text-sm">
                           {user.avatarUrl ? (
-                            <Image src={user.avatarUrl} alt="Avatar" fill sizes="40px" className="object-cover" />
+                            <Image src={user.avatarUrl} alt="Avatar" fill sizes="40px" className="object-cover" unoptimized={isUnoptimizedImageUrl(user.avatarUrl)} />
                           ) : (
                             user.firstName[0]
                           )}

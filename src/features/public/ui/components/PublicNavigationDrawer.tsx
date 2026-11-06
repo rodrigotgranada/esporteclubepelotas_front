@@ -11,7 +11,7 @@ import {
   Title,
   Badge,
   Button,
-  ShieldPlaceholder,
+  ShieldPlaceholder, isUnoptimizedImageUrl,
 } from '@/shared/ui/components';
 import {
   X,
@@ -139,7 +139,7 @@ export const PublicNavigationDrawer: React.FC<PublicNavigationDrawerProps> = ({
                   alt={clubName}
                   width={42}
                   height={42}
-                  className="object-contain drop-shadow-sm group-hover:scale-105 transition-transform"
+                  className="object-contain drop-shadow-sm group-hover:scale-105 transition-transform" unoptimized={isUnoptimizedImageUrl(settings.clubLogoUrl)}
                 />
               ) : (
                 <ShieldPlaceholder size={42} />
@@ -414,7 +414,7 @@ export const PublicNavigationDrawer: React.FC<PublicNavigationDrawerProps> = ({
                         src={user.avatarUrl}
                         alt="Avatar"
                         fill
-                        sizes="40px"
+                        sizes="40px" unoptimized={isUnoptimizedImageUrl(user.avatarUrl)}
                         className="object-cover"
                       />
                     ) : (

@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutContainer, Text, Badge, Button } from '@/shared/ui/components';
+import { LayoutContainer, Text, Badge, Button, isUnoptimizedImageUrl } from '@/shared/ui/components';
 import { Shield, ShieldAlert, CheckCircle, ChevronRight, Ban, Unlock } from 'lucide-react';
 import Image from 'next/image';
 import { UserAdminData } from '@/features/admin/services/admin.service';
@@ -28,7 +28,7 @@ export const UserMobileCard = ({ user, onEditUser, onToggleStatus, currentUserRo
         <LayoutContainer className="flex items-center gap-3">
           <LayoutContainer className="w-12 h-12 rounded-full bg-background border border-border flex items-center justify-center text-primary font-bold overflow-hidden relative">
             {user.avatarUrl ? (
-              <Image src={user.avatarUrl} alt="Avatar" fill sizes="48px" className="object-cover" />
+              <Image src={user.avatarUrl} alt="Avatar" fill sizes="48px" className="object-cover" unoptimized={isUnoptimizedImageUrl(user.avatarUrl)} />
             ) : (
               user.firstName[0]
             )}

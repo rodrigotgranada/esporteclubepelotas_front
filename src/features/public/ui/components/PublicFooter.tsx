@@ -8,7 +8,7 @@ import {
   Text,
   Title,
   Badge,
-  ShieldPlaceholder,
+  ShieldPlaceholder, isUnoptimizedImageUrl,
 } from '@/shared/ui/components';
 import { useSettingsStore, SocialPlatform } from '@/store/useSettingsStore';
 import {
@@ -130,7 +130,7 @@ export const PublicFooter = () => {
                   alt={clubName}
                   width={52}
                   height={52}
-                  className="object-contain drop-shadow-xs group-hover:scale-105 transition-transform"
+                  className="object-contain drop-shadow-xs group-hover:scale-105 transition-transform" unoptimized={isUnoptimizedImageUrl(settings.clubLogoUrl)}
                 />
               ) : (
                 <ShieldPlaceholder size={52} />

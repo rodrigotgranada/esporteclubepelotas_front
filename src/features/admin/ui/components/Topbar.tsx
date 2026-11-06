@@ -1,7 +1,7 @@
 import React from 'react';
 import { Bell, Menu } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
-import { LayoutContainer, Text, IconButton } from '@/shared/ui/components';
+import { LayoutContainer, Text, IconButton, isUnoptimizedImageUrl } from '@/shared/ui/components';
 import Image from 'next/image';
 import { ThemeToggle } from '@/shared/ui/components/molecules/ThemeToggle';
 import { TOPBAR_TEXTS } from './Topbar.constants';
@@ -46,7 +46,7 @@ export const Topbar = ({ onMenuClick }: { onMenuClick?: () => void }) => {
           </LayoutContainer>
           <LayoutContainer className="w-10 h-10 rounded-full bg-surface border-2 border-primary overflow-hidden relative">
             {user?.avatarUrl ? (
-              <Image src={user.avatarUrl} alt="Avatar" fill sizes="40px" className="object-cover" />
+              <Image src={user.avatarUrl} alt="Avatar" fill sizes="40px" className="object-cover" unoptimized={isUnoptimizedImageUrl(user.avatarUrl)} />
             ) : (
               <LayoutContainer className="w-full h-full flex items-center justify-center text-primary font-bold">
                 {user?.firstName?.[0]}

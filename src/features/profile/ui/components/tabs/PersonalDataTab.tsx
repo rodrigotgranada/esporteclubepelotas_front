@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { LayoutContainer, Title, Text, Button, Input, ConfirmModal, IconButton, DateText } from '@/shared/ui/components';
+import { LayoutContainer, Title, Text, Button, Input, ConfirmModal, IconButton, DateText, isUnoptimizedImageUrl } from '@/shared/ui/components';
 import { User as UserIcon, Edit2, Check, Trash2, Plus, Pencil, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import { PROFILE_TEXTS } from '../../../constants';
@@ -90,7 +90,7 @@ export const PersonalDataTab = () => {
                   fill 
                   sizes="128px" 
                   priority 
-                  className="object-cover" 
+                  className="object-cover" unoptimized={isUnoptimizedImageUrl(pendingAvatarPreview || user.avatarUrl)}
                   onLoad={() => setIsImageLoading(false)}
                   onError={() => setIsImageLoading(false)}
                 />

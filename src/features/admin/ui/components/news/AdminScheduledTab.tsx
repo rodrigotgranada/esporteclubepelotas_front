@@ -18,7 +18,7 @@ import {
   Button,
   Badge,
   Spinner,
-  ConfirmModal,
+  ConfirmModal, isUnoptimizedImageUrl,
 } from '@/shared/ui/components';
 import { ADMIN_NEWS_TEXTS } from '../../../constants/admin-news.constants';
 import { useAdminScheduled } from '../../../hooks/news/useAdminScheduled';
@@ -179,7 +179,7 @@ export const AdminScheduledTab: React.FC<AdminScheduledTabProps> = ({
                         alt={article.title}
                         fill
                         className="object-cover"
-                        sizes="(max-width: 640px) 100vw, 176px"
+                        sizes="(max-width: 640px) 100vw, 176px" unoptimized={isUnoptimizedImageUrl(article.coverImage)}
                       />
                     ) : (
                       <LayoutContainer className="w-full h-full flex items-center justify-center text-text-muted bg-surface/80">

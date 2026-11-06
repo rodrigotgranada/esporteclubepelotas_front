@@ -13,7 +13,7 @@ import {
   Text,
   Button,
   Badge,
-  CropModal,
+  CropModal, isUnoptimizedImageUrl,
 } from '@/shared/ui/components';
 import { ADMIN_NEWS_TEXTS } from '../../../constants/admin-news.constants';
 
@@ -103,7 +103,7 @@ export const NewsEditorGallerySection: React.FC<NewsEditorGallerySectionProps> =
             >
               <Image
                 src={url}
-                alt={`Foto galeria ${idx + 1}`}
+                alt={`Foto galeria ${idx + 1}`} unoptimized={isUnoptimizedImageUrl(url)}
                 fill
                 sizes="(max-width: 640px) 50vw, 25vw"
                 className="object-cover transition-transform group-hover:scale-105"
@@ -141,7 +141,7 @@ export const NewsEditorGallerySection: React.FC<NewsEditorGallerySectionProps> =
             >
               <Image
                 src={previewUrl}
-                alt={`Nova foto ${idx + 1}`}
+                alt={`Nova foto ${idx + 1}`} unoptimized={isUnoptimizedImageUrl(previewUrl)}
                 fill
                 sizes="(max-width: 640px) 50vw, 25vw"
                 className="object-cover transition-transform group-hover:scale-105"

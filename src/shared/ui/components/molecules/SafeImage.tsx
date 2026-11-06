@@ -14,6 +14,16 @@ export const DEFAULT_IDOL_COVER = '/images/default-idol-cover.svg';
 const SYNTHETIC_UNSPLASH_REGEX = /^https?:\/\/images\.unsplash\.com\/photo-\d+(\?|$)/i;
 const KNOWN_DEAD_IMAGE_TOKENS = ['photo-1508098682722', 'photo-1517649763962'];
 
+export function isUnoptimizedImageUrl(url?: string | null): boolean {
+  if (!url || typeof url !== 'string') return false;
+  const trimmed = url.trim();
+  return (
+    trimmed.startsWith('data:') ||
+    trimmed.startsWith('blob:') ||
+    /\.svg(\?|$)/i.test(trimmed)
+  );
+}
+
 function isUsableImageSrc(url?: string | null): url is string {
   if (!url) return false;
   const trimmed = url.trim();
@@ -46,9 +56,6 @@ export const SafeImage: React.FC<SafeImageProps> = ({
     }
   }, [src, fallbackSrc]);
 
-  const isSvg = typeof currentSrc === 'string' && currentSrc.endsWith('.svg');
-  const isDataUrl = typeof currentSrc === 'string' && currentSrc.startsWith('data:');
-
   return (
     <Image
       {...props}
@@ -56,7 +63,7 @@ export const SafeImage: React.FC<SafeImageProps> = ({
       src={currentSrc}
       alt={alt}
       className={className}
-      unoptimized={unoptimized ?? (isSvg || isDataUrl || hasFailed)}
+      unoptimized={unoptimized ?? (isUnoptimizedImageUrl(currentSrc) || hasFailed)}
       onError={() => {
         if (!hasFailed && currentSrc !== fallbackSrc) {
           setHasFailed(true);

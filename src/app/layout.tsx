@@ -22,14 +22,17 @@ export async function generateMetadata(): Promise<Metadata> {
     const res = await fetch(`${apiUrl}/settings`, { next: { revalidate: 60 }, signal: AbortSignal.timeout(3000) });
     if (res.ok) {
       const data = await res.json();
+      const logoUrl = typeof data.clubLogoUrl === 'string' && data.clubLogoUrl.trim() ? data.clubLogoUrl.trim() : null;
+      const icons = logoUrl
+        ? logoUrl.startsWith('data:')
+          ? { icon: logoUrl }
+          : { icon: logoUrl, shortcut: logoUrl, apple: logoUrl }
+        : { icon: "/favicon.ico", shortcut: "/favicon.ico", apple: "/favicon.ico" };
+
       return {
         title: data.clubName || "Esporte Clube Pelotas",
         description: "Portal Oficial do Clube",
-        icons: {
-          icon: data.clubLogoUrl || "/favicon.ico",
-          shortcut: data.clubLogoUrl || "/favicon.ico",
-          apple: data.clubLogoUrl || "/favicon.ico",
-        }
+        icons,
       };
     }
   } catch (error) {

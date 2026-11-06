@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
-import { LayoutContainer, Button, ShieldPlaceholder } from '@/shared/ui/components';
+import { LayoutContainer, Button, ShieldPlaceholder, isUnoptimizedImageUrl } from '@/shared/ui/components';
 import { Menu, User, Settings, LogOut } from 'lucide-react';
 import { ThemeToggle } from '@/shared/ui/components/molecules/ThemeToggle';
 import { useSettingsStore } from '@/store/useSettingsStore';
@@ -73,7 +73,7 @@ export const PublicHeader = () => {
                   alt={settings?.clubName || PUBLIC_HEADER_TEXTS.LOGO_FULL}
                   width={38}
                   height={38}
-                  className="object-contain drop-shadow-sm group-hover:scale-105 transition-transform"
+                  className="object-contain drop-shadow-sm group-hover:scale-105 transition-transform" unoptimized={isUnoptimizedImageUrl(settings.clubLogoUrl)}
                 />
               ) : (
                 <ShieldPlaceholder size={38} />
@@ -94,7 +94,7 @@ export const PublicHeader = () => {
                   alt={settings?.clubName || PUBLIC_HEADER_TEXTS.LOGO_FULL}
                   width={46}
                   height={46}
-                  className="object-contain drop-shadow-sm group-hover:scale-105 transition-transform"
+                  className="object-contain drop-shadow-sm group-hover:scale-105 transition-transform" unoptimized={isUnoptimizedImageUrl(settings.clubLogoUrl)}
                 />
               ) : (
                 <ShieldPlaceholder size={46} />
@@ -124,7 +124,7 @@ export const PublicHeader = () => {
                         src={user.avatarUrl}
                         alt="Avatar"
                         fill
-                        sizes="36px"
+                        sizes="36px" unoptimized={isUnoptimizedImageUrl(user.avatarUrl)}
                         className="object-cover"
                       />
                     ) : (

@@ -8,7 +8,7 @@ import {
   Title,
   Text,
   Button,
-  ShieldPlaceholder,
+  ShieldPlaceholder, isUnoptimizedImageUrl,
 } from '@/shared/ui/components';
 import { HOME_FEATURE_TEXTS } from './HomeFeature.constants';
 import { useSettingsStore } from '@/store/useSettingsStore';
@@ -123,7 +123,7 @@ export const HomeFeature = () => {
                 alt="Logo"
                 width={110}
                 height={110}
-                className="object-contain drop-shadow-2xl w-24 h-24 sm:w-28 sm:h-28"
+                className="object-contain drop-shadow-2xl w-24 h-24 sm:w-28 sm:h-28" unoptimized={isUnoptimizedImageUrl(settings.clubLogoUrl)}
               />
             ) : (
               <ShieldPlaceholder size={100} className="drop-shadow-2xl opacity-80" />
