@@ -223,3 +223,12 @@ input[type="range"] {
   border-radius: 3px !important;
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.8) !important;
 }
+
+/* Hide scrollbar utility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

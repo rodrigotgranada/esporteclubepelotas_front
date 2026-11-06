@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { timelineService, TimelineEventData } from '../services/timeline.service';
 import { toast } from 'react-hot-toast';
 
@@ -9,14 +9,18 @@ export const useTimeline = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [activeYear, setActiveYear] = useState<number | null>(null);
 
+  // Trava de rolagem suave para impedir que o IntersectionObserver sobrescreva o ano enquanto o salto acontece
+  const isNavigatingRef = useRef(false);
+  const navigationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   const loadTimeline = useCallback(async () => {
     try {
       setIsLoading(true);
       const res = await timelineService.getTimeline();
       const list = res.data || [];
       setEvents(list);
-      if (list.length > 0 && activeYear === null) {
-        setActiveYear(list[0].year);
+      if (list.length > 0) {
+        setActiveYear((prev) => prev ?? list[0].year);
       }
     } catch (err) {
       console.error('Erro ao carregar linha do tempo:', err);
@@ -24,29 +28,43 @@ export const useTimeline = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [activeYear]);
+  }, []);
 
   useEffect(() => {
     loadTimeline();
   }, [loadTimeline]);
 
-  // Unique years for the Apple-style scroller
+  // Lista única ordenada de anos disponíveis para a roleta Apple
   const availableYears = Array.from(new Set(events.map((e) => e.year))).sort((a, b) => a - b);
 
-  const scrollToYear = (year: number) => {
+  const scrollToYear = useCallback((year: number) => {
     setActiveYear(year);
+
+    // Ativa a trava temporária para evitar feedback loop com o Scroll Spy
+    isNavigatingRef.current = true;
+    if (navigationTimeoutRef.current) clearTimeout(navigationTimeoutRef.current);
+    navigationTimeoutRef.current = setTimeout(() => {
+      isNavigatingRef.current = false;
+    }, 850);
+
     const targetEl = document.getElementById(`timeline-year-${year}`);
     if (targetEl) {
-      targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-  };
+  }, []);
 
-  const scrollToTop = () => {
+  const scrollToTop = useCallback(() => {
+    isNavigatingRef.current = true;
+    if (navigationTimeoutRef.current) clearTimeout(navigationTimeoutRef.current);
+    navigationTimeoutRef.current = setTimeout(() => {
+      isNavigatingRef.current = false;
+    }, 850);
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
     if (availableYears.length > 0) {
       setActiveYear(availableYears[0]);
     }
-  };
+  }, [availableYears]);
 
   return {
     events,
@@ -55,6 +73,7 @@ export const useTimeline = () => {
     setActiveYear,
     scrollToYear,
     scrollToTop,
+    isNavigatingRef,
     isLoading,
     reload: loadTimeline,
   };

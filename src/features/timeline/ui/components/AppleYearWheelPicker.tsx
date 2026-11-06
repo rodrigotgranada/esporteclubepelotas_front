@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useRef, useEffect, useState, useCallback } from 'react';
-import { LayoutContainer, Title, Text, Button } from '@/shared/ui/components';
-import { ChevronUp, ChevronDown, ChevronLeft, ChevronRight, Clock, ArrowUp, Sparkles } from 'lucide-react';
+import { LayoutContainer, Text, IconButton } from '@/shared/ui/components';
+import { ChevronLeft, ChevronRight, ArrowUp } from 'lucide-react';
 
 interface AppleYearWheelPickerProps {
   years: number[];
@@ -19,132 +19,166 @@ export const AppleYearWheelPicker: React.FC<AppleYearWheelPickerProps> = ({
   onSelectYear,
   onScrollToTop,
 }) => {
-  const wheelRef = useRef<HTMLDivElement>(null);
-  const isProgrammaticScrollRef = useRef(false);
-  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const wheelRef = useRef<HTMLElement>(null);
+
+  // Flags para controle mútuo estrito entre gesto do usuário e sincronização programática
+  const isUserInteractingRef = useRef(false);
+  const isProgrammaticWheelScrollRef = useRef(false);
+  const interactionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const programmaticScrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const debounceSelectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const [currentIndex, setCurrentIndex] = useState<number>(0);
-  const [isPickerOpen, setIsPickerOpen] = useState<boolean>(false);
 
-  // Sincroniza o index atual quando o activeYear vindo da página muda (Scroll Spy da timeline)
+  // Marca que o usuário está ativamente interagindo com a roleta (toque, drag ou rodinha do mouse)
+  const markUserInteracting = useCallback(() => {
+    isUserInteractingRef.current = true;
+    if (interactionTimeoutRef.current) clearTimeout(interactionTimeoutRef.current);
+    interactionTimeoutRef.current = setTimeout(() => {
+      isUserInteractingRef.current = false;
+    }, 400);
+  }, []);
+
+  // Sincroniza a posição do tambor quando o activeYear muda devido à rolagem da página
   useEffect(() => {
     if (!activeYear || years.length === 0) return;
+    // Se o usuário estiver com o dedo/mouse na roleta, não sobrescreve
+    if (isUserInteractingRef.current) return;
+
     const idx = years.indexOf(activeYear);
     if (idx !== -1 && idx !== currentIndex) {
       setCurrentIndex(idx);
-      // Se não foi o usuário rolando o tambor diretamente, alinha o tambor suavemente
-      if (!isProgrammaticScrollRef.current && wheelRef.current) {
+
+      // Marca como rolagem programática para que o evento onScroll não dispare onSelectYear de volta
+      isProgrammaticWheelScrollRef.current = true;
+      if (wheelRef.current) {
         wheelRef.current.scrollTo({
           top: idx * ITEM_HEIGHT,
           behavior: 'smooth',
         });
       }
+
+      if (programmaticScrollTimeoutRef.current) clearTimeout(programmaticScrollTimeoutRef.current);
+      programmaticScrollTimeoutRef.current = setTimeout(() => {
+        isProgrammaticWheelScrollRef.current = false;
+      }, 450);
     }
   }, [activeYear, years, currentIndex]);
 
-  // Listener de scroll do tambor da Apple (quando o usuário gira a rodinha)
+  // Listener de scroll do tambor da Apple (quando o usuário gira ou solta o tambor)
   const handleWheelScroll = useCallback(() => {
     if (!wheelRef.current) return;
+
+    // Se foi uma rolagem disparada por código (da página ou dos botões), ignora absolutamente
+    if (isProgrammaticWheelScrollRef.current) return;
+
     const scrollTop = wheelRef.current.scrollTop;
     const rawIndex = Math.round(scrollTop / ITEM_HEIGHT);
     const clampedIndex = Math.max(0, Math.min(years.length - 1, rawIndex));
 
-    if (clampedIndex !== currentIndex) {
-      setCurrentIndex(clampedIndex);
+    // Atualiza o índice visual imediatamente no tambor
+    setCurrentIndex(clampedIndex);
 
-      // Marca como rolagem programática para a página descer até o ano
-      isProgrammaticScrollRef.current = true;
-      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
-
-      scrollTimeoutRef.current = setTimeout(() => {
+    // Se o usuário interagiu com a roleta, debounced dispara o scroll da página até o ano escolhido
+    if (isUserInteractingRef.current) {
+      if (debounceSelectTimeoutRef.current) clearTimeout(debounceSelectTimeoutRef.current);
+      debounceSelectTimeoutRef.current = setTimeout(() => {
         onSelectYear(years[clampedIndex]);
-        isProgrammaticScrollRef.current = false;
-      }, 150);
+      }, 200);
     }
-  }, [years, currentIndex, onSelectYear]);
+  }, [years, onSelectYear]);
 
-  // Navegação pelos botões passo a passo
-  const stepYear = (direction: 'prev' | 'next') => {
-    if (years.length === 0) return;
-    let newIndex = direction === 'next' ? currentIndex + 1 : currentIndex - 1;
-    newIndex = Math.max(0, Math.min(years.length - 1, newIndex));
+  // Pular direto para um ano ao clicar no item do tambor
+  const handleItemClick = useCallback(
+    (idx: number) => {
+      if (idx === currentIndex) return;
+      setCurrentIndex(idx);
 
-    if (newIndex !== currentIndex) {
-      setCurrentIndex(newIndex);
+      isProgrammaticWheelScrollRef.current = true;
       if (wheelRef.current) {
         wheelRef.current.scrollTo({
-          top: newIndex * ITEM_HEIGHT,
+          top: idx * ITEM_HEIGHT,
           behavior: 'smooth',
         });
       }
-      onSelectYear(years[newIndex]);
-    }
-  };
 
-  // Pular direto para um ano ao clicar no item
-  const handleItemClick = (idx: number) => {
-    if (idx === currentIndex) return;
-    setCurrentIndex(idx);
-    if (wheelRef.current) {
-      wheelRef.current.scrollTo({
-        top: idx * ITEM_HEIGHT,
-        behavior: 'smooth',
-      });
-    }
-    onSelectYear(years[idx]);
-  };
+      onSelectYear(years[idx]);
+
+      if (programmaticScrollTimeoutRef.current) clearTimeout(programmaticScrollTimeoutRef.current);
+      programmaticScrollTimeoutRef.current = setTimeout(() => {
+        isProgrammaticWheelScrollRef.current = false;
+      }, 450);
+    },
+    [currentIndex, onSelectYear, years]
+  );
+
+  // Navegação passo a passo pelos botões anterior / próximo
+  const stepYear = useCallback(
+    (direction: 'prev' | 'next') => {
+      if (years.length === 0) return;
+      const newIndex = direction === 'next' ? currentIndex + 1 : currentIndex - 1;
+      const clampedIndex = Math.max(0, Math.min(years.length - 1, newIndex));
+      if (clampedIndex !== currentIndex) {
+        handleItemClick(clampedIndex);
+      }
+    },
+    [currentIndex, handleItemClick, years]
+  );
 
   if (!years || years.length === 0) return null;
-
-  const currentYearDisplay = years[currentIndex] || activeYear || years[0];
 
   return (
     <LayoutContainer className="sticky top-16 sm:top-20 z-30 w-full flex justify-center px-4 py-2 pointer-events-none">
       {/* Dynamic Floating Apple Watch Wheel Capsule */}
       <LayoutContainer className="pointer-events-auto flex items-center gap-2 sm:gap-3 bg-surface/95 backdrop-blur-xl border border-primary/40 rounded-full px-3 py-1.5 sm:px-4 sm:py-2 shadow-2xl shadow-primary/10 transition-all duration-300">
         
-        {/* Botão Retornar ao Início */}
+        {/* Botão Retornar ao Início da Linha */}
         {onScrollToTop && (
-          <button
-            type="button"
+          <IconButton
+            icon={<ArrowUp className="w-4 h-4" />}
+            size="sm"
+            variant="secondary"
             onClick={onScrollToTop}
             title="Voltar ao início da Linha do Tempo"
-            className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-background/80 hover:bg-surface border border-border/80 hover:border-primary/50 text-text-secondary hover:text-primary flex items-center justify-center transition-all cursor-pointer shrink-0"
-          >
-            <ArrowUp className="w-4 h-4" />
-          </button>
+            aria-label="Voltar ao início da Linha do Tempo"
+            className="!w-8 !h-8 sm:!w-9 sm:!h-9 border border-border/80 hover:border-primary/50 text-text-secondary hover:text-primary shrink-0"
+          />
         )}
 
-        {/* Botão Anterior (Passo no tempo para trás) */}
-        <button
-          type="button"
+        {/* Botão Anterior (Marco anterior) */}
+        <IconButton
+          icon={<ChevronLeft className="w-4 h-4" />}
+          size="sm"
+          variant="secondary"
           onClick={() => stepYear('prev')}
           disabled={currentIndex <= 0}
           title="Marco anterior"
-          className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-background/80 hover:bg-surface disabled:opacity-30 disabled:hover:bg-background/80 border border-border/80 hover:border-primary/50 text-text-secondary hover:text-primary flex items-center justify-center transition-all cursor-pointer shrink-0"
-        >
-          <ChevronLeft className="w-4 h-4" />
-        </button>
+          aria-label="Marco anterior"
+          className="!w-8 !h-8 sm:!w-9 sm:!h-9 border border-border/80 hover:border-primary/50 text-text-secondary hover:text-primary shrink-0"
+        />
 
-        {/* Central Drum Wheel Apple Clock */}
-        <LayoutContainer className="relative flex items-center justify-center w-36 sm:w-44 h-12 sm:h-14 overflow-hidden rounded-xl bg-background/60 border border-primary/20 select-none group">
-          {/* Top Fade Gradient */}
+        {/* Tambor Central Estilo Relógio / Apple Watch */}
+        <LayoutContainer className="relative flex items-center justify-center w-36 sm:w-44 h-[52px] overflow-hidden rounded-xl bg-background/80 border border-primary/30 select-none">
+          {/* Gradiente Superior de Fade */}
           <LayoutContainer
             aria-hidden="true"
-            className="absolute top-0 left-0 right-0 h-3.5 bg-gradient-to-b from-background to-transparent z-10 pointer-events-none"
+            className="absolute top-0 left-0 right-0 h-3 bg-gradient-to-b from-background to-transparent z-10 pointer-events-none"
           />
 
-          {/* Central Target Lens / Seleção Ativa com Linhas de Relógio */}
+          {/* Lente Central de Foco / Seleção Ativa com Bordas de Relógio */}
           <LayoutContainer
             aria-hidden="true"
-            className="absolute left-1 right-1 top-1/2 -translate-y-1/2 h-[34px] rounded-lg bg-primary/10 border-y border-primary/40 pointer-events-none z-0"
+            className="absolute left-1 right-1 top-1/2 -translate-y-1/2 h-[38px] rounded-lg bg-primary/15 border-y border-primary/50 pointer-events-none z-0"
           />
 
-          {/* Vertical Wheel Drum (Snap Vertical da Apple) */}
-          <div
+          {/* Tambor Vertical Rolável com Snap Nativo */}
+          <LayoutContainer
             ref={wheelRef}
             onScroll={handleWheelScroll}
-            className="w-full h-full overflow-y-auto scrollbar-none snap-y snap-mandatory py-[10px]"
+            onPointerDown={markUserInteracting}
+            onTouchStart={markUserInteracting}
+            onWheel={markUserInteracting}
+            className="w-full h-full overflow-y-auto no-scrollbar snap-y snap-mandatory py-1 z-1"
             style={{
               scrollSnapType: 'y mandatory',
               scrollBehavior: 'smooth',
@@ -153,45 +187,46 @@ export const AppleYearWheelPicker: React.FC<AppleYearWheelPickerProps> = ({
             {years.map((y, idx) => {
               const isSelected = idx === currentIndex;
               return (
-                <div
+                <LayoutContainer
                   key={y}
                   onClick={() => handleItemClick(idx)}
                   className={`h-[44px] flex items-center justify-center snap-center cursor-pointer transition-all duration-200 ${
                     isSelected
                       ? 'scale-110 font-black text-primary text-base sm:text-lg tracking-wider'
-                      : 'opacity-40 hover:opacity-80 text-text-secondary text-xs sm:text-sm font-semibold'
+                      : 'opacity-35 hover:opacity-75 text-text-secondary text-xs sm:text-sm font-semibold'
                   }`}
                   style={{
                     height: `${ITEM_HEIGHT}px`,
                   }}
                 >
-                  <span className="flex items-center gap-1">
+                  <Text as="span" className="flex items-center gap-1">
                     {y}
-                  </span>
-                </div>
+                  </Text>
+                </LayoutContainer>
               );
             })}
-          </div>
+          </LayoutContainer>
 
-          {/* Bottom Fade Gradient */}
+          {/* Gradiente Inferior de Fade */}
           <LayoutContainer
             aria-hidden="true"
-            className="absolute bottom-0 left-0 right-0 h-3.5 bg-gradient-to-t from-background to-transparent z-10 pointer-events-none"
+            className="absolute bottom-0 left-0 right-0 h-3 bg-gradient-to-t from-background to-transparent z-10 pointer-events-none"
           />
         </LayoutContainer>
 
-        {/* Botão Próximo (Passo no tempo para frente) */}
-        <button
-          type="button"
+        {/* Botão Próximo (Próximo marco) */}
+        <IconButton
+          icon={<ChevronRight className="w-4 h-4" />}
+          size="sm"
+          variant="secondary"
           onClick={() => stepYear('next')}
           disabled={currentIndex >= years.length - 1}
           title="Próximo marco"
-          className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-background/80 hover:bg-surface disabled:opacity-30 disabled:hover:bg-background/80 border border-border/80 hover:border-primary/50 text-text-secondary hover:text-primary flex items-center justify-center transition-all cursor-pointer shrink-0"
-        >
-          <ChevronRight className="w-4 h-4" />
-        </button>
+          aria-label="Próximo marco"
+          className="!w-8 !h-8 sm:!w-9 sm:!h-9 border border-border/80 hover:border-primary/50 text-text-secondary hover:text-primary shrink-0"
+        />
 
-        {/* Contador Informativo (Ex: 5 de 12 marcos) */}
+        {/* Indicador Numérico de Posição (Ex: 5 de 9) */}
         <LayoutContainer className="hidden md:flex flex-col items-start pl-1 pr-2 border-l border-border/60">
           <Text className="text-[10px] font-bold text-text-secondary/70 uppercase tracking-wider">
             Marco Histórico

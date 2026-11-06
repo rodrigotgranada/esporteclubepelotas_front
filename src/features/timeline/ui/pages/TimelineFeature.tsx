@@ -18,40 +18,51 @@ export const TimelineFeature: React.FC = () => {
     setActiveYear,
     scrollToYear,
     scrollToTop,
+    isNavigatingRef,
     isLoading,
   } = useTimeline();
 
-  const timelineContainerRef = useRef<HTMLDivElement>(null);
+  const timelineContainerRef = useRef<HTMLElement>(null);
 
-  // Scroll Spy: Detect which year milestone is currently near the center of the viewport
+  // Scroll Spy: Detecta qual marco histórico está atualmente em foco na tela
   useEffect(() => {
     if (availableYears.length === 0) return;
 
     const observerCallback: IntersectionObserverCallback = (entries) => {
-      entries.forEach((entry) => {
+      // Se estiver ocorrendo um salto acionado pelo usuário (botão ou roleta), ignora marcos intermediários
+      if (isNavigatingRef.current) return;
+
+      let bestEntry: IntersectionObserverEntry | null = null;
+      for (const entry of entries) {
         if (entry.isIntersecting) {
-          const yearAttr = entry.target.getAttribute('data-year');
-          if (yearAttr) {
-            const y = Number(yearAttr);
-            if (!isNaN(y)) {
-              setActiveYear(y);
-            }
+          if (!bestEntry || entry.intersectionRatio > bestEntry.intersectionRatio) {
+            bestEntry = entry;
           }
         }
-      });
+      }
+
+      if (bestEntry) {
+        const yearAttr = bestEntry.target.getAttribute('data-year');
+        if (yearAttr) {
+          const y = Number(yearAttr);
+          if (!isNaN(y)) {
+            setActiveYear(y);
+          }
+        }
+      }
     };
 
     const observer = new IntersectionObserver(observerCallback, {
       root: null,
       rootMargin: '-20% 0px -40% 0px',
-      threshold: 0.2,
+      threshold: [0.1, 0.3, 0.5],
     });
 
     const milestoneEls = document.querySelectorAll('.timeline-milestone-item');
     milestoneEls.forEach((el) => observer.observe(el));
 
     return () => observer.disconnect();
-  }, [availableYears, events, setActiveYear]);
+  }, [availableYears, events, setActiveYear, isNavigatingRef]);
 
   const handleScrollToTimeline = () => {
     if (availableYears.length > 0) {
@@ -69,7 +80,7 @@ export const TimelineFeature: React.FC = () => {
     );
   }
 
-  // Set to track the first event of each year for assigning unique anchor IDs
+  // Set para rastrear o primeiro evento de cada ano e atribuir âncora de salto única
   const seenYears = new Set<number>();
 
   return (
@@ -108,14 +119,14 @@ export const TimelineFeature: React.FC = () => {
         ) : (
           <LayoutContainer className="relative">
             {/* The Vertical Spine Line */}
-            {/* Mobile: line is pinned to the left at left-6 (24px) */}
-            {/* Desktop (lg): line is in the exact center at left-1/2 */}
+            {/* Mobile: linha fixada à esquerda em left-6 (24px) */}
+            {/* Desktop (lg): linha centralizada exatamente no meio em left-1/2 */}
             <LayoutContainer
               aria-hidden="true"
               className="absolute top-0 bottom-0 w-1 bg-gradient-to-b from-primary via-primary/50 to-primary/10 rounded-full left-6 lg:left-1/2 -translate-x-1/2 pointer-events-none"
             />
 
-            {/* List of Milestones (Always Continuous / No Filtering Cutoffs) */}
+            {/* Lista Contínua de Marcos Históricos (Sem cortes de filtro) */}
             <LayoutContainer className="flex flex-col gap-10 sm:gap-14">
               {events.map((event, index) => {
                 const isEven = index % 2 === 0;
@@ -131,14 +142,20 @@ export const TimelineFeature: React.FC = () => {
                     data-year={event.year}
                     className="timeline-milestone-item relative flex items-center w-full scroll-mt-32 sm:scroll-mt-36"
                   >
-                    {/* Node / Marker on the Line */}
-                    {/* Mobile: positioned at left-6 */}
-                    {/* Desktop (lg): positioned at left-1/2 */}
-                    <button
-                      type="button"
+                    {/* Marcador de Ano sobre a Linha do Tempo */}
+                    {/* Mobile: posicionado em left-6 */}
+                    {/* Desktop (lg): posicionado em left-1/2 */}
+                    <LayoutContainer
+                      role="button"
+                      tabIndex={0}
                       onClick={() => scrollToYear(event.year)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          scrollToYear(event.year);
+                        }
+                      }}
                       title={`Ir para o ano ${event.year}`}
-                      className={`absolute z-20 flex items-center justify-center rounded-full font-black text-xs sm:text-sm tracking-wider shadow-lg transition-transform hover:scale-110 cursor-pointer left-6 lg:left-1/2 -translate-x-1/2 ${
+                      className={`absolute z-20 flex items-center justify-center rounded-full font-black text-xs sm:text-sm tracking-wider shadow-lg transition-transform hover:scale-110 cursor-pointer left-6 lg:left-1/2 -translate-x-1/2 select-none ${
                         event.isHighlighted
                           ? 'w-12 h-12 sm:w-14 sm:h-14 bg-primary text-blue-950 ring-4 ring-primary/30 font-black'
                           : activeYear === event.year
@@ -146,12 +163,12 @@ export const TimelineFeature: React.FC = () => {
                           : 'w-10 h-10 sm:w-12 sm:h-12 bg-surface border-2 border-primary text-primary ring-2 ring-primary/20'
                       }`}
                     >
-                      <span>{event.year}</span>
-                    </button>
+                      <Text as="span">{event.year}</Text>
+                    </LayoutContainer>
 
-                    {/* Content Card Container */}
-                    {/* Mobile: indented to the right (pl-14 sm:pl-16) taking full width */}
-                    {/* Desktop (lg): takes half-width (w-[calc(50%-2.5rem)]) alternating left or right */}
+                    {/* Container do Card de Conteúdo */}
+                    {/* Mobile: recuo para a direita (pl-14 sm:pl-16) ocupando largura cheia */}
+                    {/* Desktop (lg): ocupa metade da largura alternando esquerda ou direita */}
                     <LayoutContainer
                       className={`w-full pl-14 sm:pl-16 lg:pl-0 lg:w-[calc(50%-2.5rem)] ${
                         isEven ? 'lg:mr-auto' : 'lg:ml-auto'
