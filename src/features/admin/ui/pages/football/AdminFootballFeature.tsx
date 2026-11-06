@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { UserPlus, Plus, Search, Shield, Filter } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import { UserPlus, Plus, Search } from 'lucide-react';
 import {
   LayoutContainer,
   Title,
@@ -25,6 +25,7 @@ import { SquadsTable } from '../../components/football/SquadsTable';
 import { AthleteEditorDrawer } from '../../components/football/AthleteEditorDrawer';
 import { SquadEditorDrawer } from '../../components/football/SquadEditorDrawer';
 import { SquadMembersDrawer } from '../../components/football/SquadMembersDrawer';
+import { YouthPortalSettingsTab } from '../../components/football/YouthPortalSettingsTab';
 
 export const AdminFootballFeature: React.FC = () => {
   const texts = ADMIN_FOOTBALL_CONSTANTS;
@@ -40,6 +41,18 @@ export const AdminFootballFeature: React.FC = () => {
 
   // Aba selecionada
   const [activeTabId, setActiveTabId] = useState<string>('athletes');
+
+  // Lista única de campeonatos existentes para sugerir vínculo rápido entre categorias
+  const existingCompetitions = useMemo(() => {
+    const seen = new Map<string, string>();
+    for (const sq of squadsList.squads) {
+      const name = sq.seasonName?.trim();
+      if (name && !seen.has(name.toLowerCase())) {
+        seen.set(name.toLowerCase(), name);
+      }
+    }
+    return Array.from(seen.values());
+  }, [squadsList.squads]);
 
   // Definição dos conteúdos das abas
   const tabs = [
@@ -68,17 +81,16 @@ export const AdminFootballFeature: React.FC = () => {
 
               <LayoutContainer className="w-full sm:w-56 shrink-0">
                 <Select
-                value={athletesList.retiredFilter}
-                onChange={(e) => {
-                  athletesList.setRetiredFilter(e.target.value as any);
-                  athletesList.setPage(1);
-                }}
-
-              >
-                <Option value="ALL">{texts.ATHLETES_TAB.FILTER_ALL_STATUS}</Option>
-                <Option value="ACTIVE">{texts.ATHLETES_TAB.FILTER_ACTIVE_ONLY}</Option>
-                <Option value="RETIRED">{texts.ATHLETES_TAB.FILTER_RETIRED_ONLY}</Option>
-              </Select>
+                  value={athletesList.retiredFilter}
+                  onChange={(e) => {
+                    athletesList.setRetiredFilter(e.target.value as any);
+                    athletesList.setPage(1);
+                  }}
+                >
+                  <Option value="ALL">{texts.ATHLETES_TAB.FILTER_ALL_STATUS}</Option>
+                  <Option value="ACTIVE">{texts.ATHLETES_TAB.FILTER_ACTIVE_ONLY}</Option>
+                  <Option value="RETIRED">{texts.ATHLETES_TAB.FILTER_RETIRED_ONLY}</Option>
+                </Select>
               </LayoutContainer>
             </LayoutContainer>
 
@@ -125,23 +137,23 @@ export const AdminFootballFeature: React.FC = () => {
                     squadsList.setSearch(e.target.value);
                     squadsList.setPage(1);
                   }}
-                  placeholder="Buscar competição ou treinador..."
+                  placeholder={texts.SQUADS_TAB.SEARCH_PLACEHOLDER}
                   className="pl-9 w-full"
                 />
               </LayoutContainer>
               <LayoutContainer className="w-full sm:w-56 shrink-0">
                 <Select
-                value={squadsList.selectedCategory}
-                onChange={(e) => squadsList.setSelectedCategory(e.target.value)}
-                className="w-full sm:w-56"
-              >
-                <Option value="">Todas as Categorias</Option>
-                <Option value="PROFESSIONAL">{FOOTBALL_CONSTANTS.CATEGORIES.PROFESSIONAL}</Option>
-                <Option value="FEMININE">{FOOTBALL_CONSTANTS.CATEGORIES.FEMININE}</Option>
-                <Option value="SUB_20">{FOOTBALL_CONSTANTS.CATEGORIES.SUB_20}</Option>
-                <Option value="SUB_17">{FOOTBALL_CONSTANTS.CATEGORIES.SUB_17}</Option>
-                <Option value="SUB_15">{FOOTBALL_CONSTANTS.CATEGORIES.SUB_15}</Option>
-              </Select>
+                  value={squadsList.selectedCategory}
+                  onChange={(e) => squadsList.setSelectedCategory(e.target.value)}
+                  className="w-full sm:w-56"
+                >
+                  <Option value="">{texts.SQUADS_TAB.ALL_CATEGORIES}</Option>
+                  <Option value="PROFESSIONAL">{FOOTBALL_CONSTANTS.CATEGORIES.PROFESSIONAL}</Option>
+                  <Option value="FEMININE">{FOOTBALL_CONSTANTS.CATEGORIES.FEMININE}</Option>
+                  <Option value="SUB_20">{FOOTBALL_CONSTANTS.CATEGORIES.SUB_20}</Option>
+                  <Option value="SUB_17">{FOOTBALL_CONSTANTS.CATEGORIES.SUB_17}</Option>
+                  <Option value="SUB_15">{FOOTBALL_CONSTANTS.CATEGORIES.SUB_15}</Option>
+                </Select>
               </LayoutContainer>
             </LayoutContainer>
 
@@ -166,6 +178,11 @@ export const AdminFootballFeature: React.FC = () => {
           />
         </LayoutContainer>
       ),
+    },
+    {
+      id: 'youth-portal',
+      label: texts.TABS.YOUTH_PORTAL,
+      content: <YouthPortalSettingsTab />,
     },
   ];
 
@@ -266,6 +283,7 @@ export const AdminFootballFeature: React.FC = () => {
         setNewStaffName={squadDrawer.setNewStaffName}
         onAddStaff={squadDrawer.handleAddStaff}
         onRemoveStaff={squadDrawer.handleRemoveStaff}
+        existingCompetitions={existingCompetitions}
       />
 
       <SquadMembersDrawer

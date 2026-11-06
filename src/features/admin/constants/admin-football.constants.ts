@@ -1,11 +1,12 @@
 export const ADMIN_FOOTBALL_CONSTANTS = {
   TITLE: 'Gestão de Futebol & Plantel',
   SUBTITLE:
-    'Gerencie o banco de atletas profissionais, comissão técnica e de base, além da montagem de elencos por competição.',
+    'Gerencie o banco de atletas profissionais, comissão técnica e de base, além da montagem de elencos por competição e o portal da base.',
 
   TABS: {
     ATHLETES: 'Banco de Profissionais',
     SQUADS: 'Elencos & Competições',
+    YOUTH_PORTAL: 'Portal da Base (/base)',
   },
 
   ATHLETES_TAB: {
@@ -35,7 +36,8 @@ export const ADMIN_FOOTBALL_CONSTANTS = {
 
   SQUADS_TAB: {
     BTN_NEW: 'Novo Elenco / Competição',
-    SEARCH_PLACEHOLDER: 'Filtrar competição...',
+    SEARCH_PLACEHOLDER: 'Buscar competição ou treinador...',
+    ALL_CATEGORIES: 'Todas as Categorias',
     COLUMN_YEAR: 'Temporada',
     COLUMN_CATEGORY: 'Categoria',
     COLUMN_NAME: 'Competição / Nome',
@@ -46,7 +48,7 @@ export const ADMIN_FOOTBALL_CONSTANTS = {
     ACTION_MANAGE_MEMBERS: 'Montar Elenco (Plantel)',
     CURRENT_TAG: 'Elenco Atual',
     EMPTY_TITLE: 'Nenhum elenco cadastrado',
-    EMPTY_DESC: 'Crie uma competição (ex: Gauchão Série A 2026) e adicione os atletas e comissão.',
+    EMPTY_DESC: 'Crie uma competição (ex: Gauchão 2026) e adicione os atletas e comissão.',
   },
 
   DRAWER_ATHLETE: {
@@ -83,7 +85,7 @@ export const ADMIN_FOOTBALL_CONSTANTS = {
     FIELD_PRIMARY_POSITION_PLACEHOLDER: 'Ex: Centroavante, Goleiro, Zagueiro',
     FIELD_SECONDARY_POSITIONS: 'Posições Secundárias (separadas por vírgula)',
     FIELD_SECONDARY_POSITIONS_PLACEHOLDER: 'Ex: Segundo Atacante, Ponta',
-    FIELD_PAST_CLUBS: 'Clubes Anteriores (separados por vírgula)',
+    FIELD_PAST_CLUBS: 'Clubes Anteriores (separadas por vírgula)',
     FIELD_PAST_CLUBS_PLACEHOLDER: 'Ex: Internacional, Ypiranga, Juventude',
     FIELD_BIOGRAPHY: 'Resumo da Trajetória',
     FIELD_BIOGRAPHY_PLACEHOLDER: 'Breve histórico, títulos ou características do profissional...',
@@ -104,12 +106,19 @@ export const ADMIN_FOOTBALL_CONSTANTS = {
     TITLE_EDIT: 'Editar Dados do Elenco',
     FIELD_YEAR: 'Ano da Edição',
     FIELD_CATEGORY: 'Categoria',
-    FIELD_SEASON_NAME: 'Nome da Competição / Elenco',
-    FIELD_SEASON_NAME_PLACEHOLDER: 'Ex: Gauchão Série A 2026, Copa FGF 2026',
+    FIELD_SEASON_NAME: 'Nome da Competição / Campeonato',
+    FIELD_SEASON_NAME_PLACEHOLDER: 'Ex: Gauchão 2026, Copa FGF 2026',
+    EXISTING_COMPETITIONS_HINT:
+      'Campeonatos já cadastrados (clique para vincular categorias ao mesmo campeonato):',
     FIELD_COACH: 'Treinador Principal (Opcional - pode ser alocado no plantel)',
     FIELD_COACH_PLACEHOLDER: 'Ex: Leocir Dall’Astra',
     FIELD_IS_CURRENT: 'Marcar como Elenco Principal em Disputa',
     FIELD_IS_CURRENT_DESC: 'Exibido como padrão na página de elenco e na home do clube.',
+    STAFF_TITLE: 'Comissão Técnica',
+    STAFF_ROLE_PLACEHOLDER: 'Cargo (ex: Preparador Físico)',
+    STAFF_NAME_PLACEHOLDER: 'Nome do profissional',
+    BTN_ADD_STAFF: 'Adicionar',
+    BTN_CANCEL: 'Cancelar',
     BTN_SAVE: 'Salvar Elenco',
     BTN_SAVING: 'Salvando...',
     SUCCESS_CREATE: 'Elenco criado com sucesso!',
@@ -144,6 +153,56 @@ export const ADMIN_FOOTBALL_CONSTANTS = {
     EMPTY_MEMBERS: 'Nenhum membro alocado neste elenco ainda.',
     TOTAL_MEMBERS: 'profissionais inscritos neste elenco',
     SUCCESS_UPDATE: 'Membros do elenco atualizados com sucesso!',
+  },
+
+  YOUTH_PORTAL_TAB: {
+    LOADING: 'Carregando configurações do Portal da Base...',
+    PILLARS_TITLE: 'Pilares do Futebol de Base',
+    PILLARS_SUBTITLE:
+      'Cadastre de 0 a 4 cards de metodologia na página /base. Se deixar 0 cards, a seção ficará oculta automaticamente no portal.',
+    PILLARS_COUNT_SUFFIX: 'de 4 cards',
+    BTN_ADD_PILLAR: 'Adicionar Card de Pilar',
+    MAX_PILLARS_REACHED: 'Limite máximo de 4 cards atingido',
+    EMPTY_PILLARS:
+      'Nenhum card de pilar cadastrado. A seção "Pilares do Futebol de Base" permanecerá oculta no portal público até que ao menos 1 card seja adicionado.',
+    PILLAR_CARD_LABEL: 'Card de Pilar',
+    PILLAR_TITLE_LABEL: 'Título do Card',
+    PILLAR_TITLE_PLACEHOLDER: 'Ex: DNA Competitivo Áureo-Cerúleo',
+    PILLAR_DESC_LABEL: 'Texto Descritivo Padronizado',
+    PILLAR_DESC_PLACEHOLDER:
+      'Descreva de forma objetiva este pilar da formação de atletas na Boca do Lobo...',
+    BTN_REMOVE_PILLAR: 'Remover Card',
+    MOVE_UP_ARIA: 'Mover item para cima',
+    MOVE_DOWN_ARIA: 'Mover item para baixo',
+
+    CRITERIA_TITLE: 'Peneiras & Captação • Critérios e Documentação Obrigatória',
+    CRITERIA_SUBTITLE:
+      'Alimente a lista de documentos e critérios exigidos para avaliações. Cada item aparece em formato de lista na seção de Peneiras.',
+    CRITERIA_INPUT_PLACEHOLDER:
+      'Ex: Atestado médico cardiológico de aptidão física original (emitido nos últimos 6 meses)...',
+    BTN_ADD_CRITERION: 'Adicionar Critério',
+    EMPTY_CRITERIA: 'Nenhum critério ou documento obrigatório cadastrado na lista.',
+    REMOVE_CRITERION_ARIA: 'Remover critério',
+
+    CONTACT_TITLE: 'Departamento de Futebol de Base • Contato Oficial',
+    CONTACT_SUBTITLE:
+      'Configure o texto informativo e os canais oficiais de contato exibidos no card da Coordenação de Base.',
+    FIELD_CONTACT_BADGE: 'Título do Selo do Card',
+    FIELD_CONTACT_BADGE_PLACEHOLDER: 'Ex: Departamento de Futebol de Base',
+    FIELD_CONTACT_DESC: 'Texto Informativo sobre Avaliações',
+    FIELD_CONTACT_DESC_PLACEHOLDER:
+      'Ex: As datas oficiais de avaliações abertas e peneiras são divulgadas periodicamente nos canais oficiais do clube...',
+    FIELD_CONTACT_EMAIL: 'E-mail de Contato da Coordenação',
+    FIELD_CONTACT_EMAIL_PLACEHOLDER: 'Ex: base@esporteclubepelotas.com.br',
+    FIELD_CONTACT_PHONE: 'Telefone / WhatsApp de Contato (Opcional)',
+    FIELD_CONTACT_PHONE_PLACEHOLDER: 'Ex: (53) 99999-9999',
+
+    BTN_SAVE: 'Salvar Configurações do Portal da Base',
+    BTN_SAVING: 'Salvando alterações...',
+    SUCCESS_SAVE: 'Configurações do Portal da Base salvas com sucesso!',
+    ERROR_LOAD: 'Não foi possível carregar as configurações da base.',
+    ERROR_SAVE: 'Erro ao salvar configurações do Portal da Base.',
+    ERROR_EMPTY_PILLAR: 'Preencha o título e o texto de todos os cards de pilares adicionados (ou remova o card em branco).',
   },
 
   DELETE_MODAL: {

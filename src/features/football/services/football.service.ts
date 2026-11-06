@@ -102,6 +102,15 @@ export interface SquadData {
   updatedAt?: string | null;
 }
 
+export interface GetSquadsResponse {
+  data: SquadData[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+  isModuleActive: boolean;
+}
+
 export interface SeasonsFilterResponse {
   years: number[];
   categories: string[];
@@ -118,9 +127,39 @@ export interface GetAthletesResponse {
   isModuleActive: boolean;
 }
 
+export interface YouthPillarItem {
+  title: string;
+  description: string;
+}
+
+export interface YouthPortalConfig {
+  pillars: YouthPillarItem[];
+  peneirasCriteria: string[];
+  contactTitle?: string | null;
+  contactDescription?: string | null;
+  contactEmail?: string | null;
+  contactPhone?: string | null;
+}
+
 export const footballService = {
   getSeasons: async (): Promise<SeasonsFilterResponse> => {
     const response = await api.get('/squads/seasons');
+    return response.data;
+  },
+
+  getSquads: async (params?: {
+    page?: number;
+    limit?: number;
+    year?: number;
+    category?: SquadCategory;
+    isCurrent?: boolean;
+  }): Promise<GetSquadsResponse> => {
+    const response = await api.get('/squads', { params });
+    return response.data;
+  },
+
+  getSquadById: async (id: string): Promise<SquadData> => {
+    const response = await api.get(`/squads/id/${id}`);
     return response.data;
   },
 
@@ -134,6 +173,11 @@ export const footballService = {
     category = 'PROFESSIONAL',
   ): Promise<SquadData> => {
     const response = await api.get(`/squads/${year}/${category}`);
+    return response.data;
+  },
+
+  getYouthPortalConfig: async (): Promise<YouthPortalConfig> => {
+    const response = await api.get('/squads/youth-config');
     return response.data;
   },
 

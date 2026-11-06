@@ -3,7 +3,7 @@ import {
   AthleteData,
   GetAthletesResponse,
   SquadData,
-  SquadMemberData,
+  YouthPortalConfig,
 } from '@/features/football/services/football.service';
 
 export interface GetAdminSquadsResponse {
@@ -71,6 +71,7 @@ export const adminFootballService = {
     limit?: number;
     year?: number;
     category?: string;
+    search?: string;
     isCurrent?: boolean;
   }): Promise<GetAdminSquadsResponse> => {
     const response = await api.get('/squads/admin', { params });
@@ -125,5 +126,17 @@ export const adminFootballService = {
     });
     return response.data;
   },
-};
 
+  // --- Portal da Base (/base) ---
+  getYouthPortalConfig: async (): Promise<YouthPortalConfig> => {
+    const response = await api.get('/squads/admin/youth-config');
+    return response.data;
+  },
+
+  updateYouthPortalConfig: async (
+    data: YouthPortalConfig,
+  ): Promise<YouthPortalConfig> => {
+    const response = await api.put('/squads/admin/youth-config', data);
+    return response.data;
+  },
+};
