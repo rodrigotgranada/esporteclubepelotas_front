@@ -20,5 +20,6 @@ export const TIMELINE_CONSTANTS = {
   HIGHLIGHTED_BADGE: 'Momento Histórico Marcante',
   BTN_JOIN_CLUB: 'Faça Parte Dessa História',
   BTN_BACK_HOME: 'Voltar ao Início',
+  CTA_TITLE: 'O Esporte Clube Pelotas é Tradição Centenária',
+  CTA_DESC: 'Seja sócio do Lobo e ajude a escrever as próximas páginas douradas da nossa história na Boca do Lobo.',
 };
-

@@ -1,14 +1,13 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
-import { LayoutContainer, Title, Text, Spinner, Button } from '@/shared/ui/components';
+import { LayoutContainer, Title, Text, Spinner, MembershipCtaCard } from '@/shared/ui/components';
 import { useTimeline } from '../../hooks/useTimeline';
 import { TimelineHero } from '../components/TimelineHero';
 import { TimelineCard } from '../components/TimelineCard';
 import { AppleYearWheelPicker } from '../components/AppleYearWheelPicker';
 import { TIMELINE_CONSTANTS } from '../../constants/timeline.constants';
-import { Shield, Sparkles } from 'lucide-react';
-import Link from 'next/link';
+import { Shield } from 'lucide-react';
 
 export const TimelineFeature: React.FC = () => {
   const {
@@ -188,21 +187,13 @@ export const TimelineFeature: React.FC = () => {
           </LayoutContainer>
         )}
 
-        {/* Footer CTA */}
-        <LayoutContainer className="mt-20 p-8 sm:p-12 rounded-3xl bg-gradient-to-r from-primary/10 via-surface to-primary/10 border border-primary/30 text-center max-w-4xl mx-auto shadow-md">
-          <Sparkles className="w-8 h-8 text-primary mx-auto mb-3" />
-          <Title level="h3" className="text-2xl sm:text-3xl font-black text-text-primary mb-3">
-            O Esporte Clube Pelotas é Tradição Centenária
-          </Title>
-          <Text className="text-text-secondary max-w-xl mx-auto mb-6 text-sm sm:text-base">
-            Seja sócio do Lobo e ajude a escrever as próximas páginas douradas da nossa história na Boca do Lobo.
-          </Text>
-          <Link href="/socio">
-            <Button variant="primary" size="lg" className="font-bold shadow-lg shadow-primary/20">
-              {TIMELINE_CONSTANTS.BTN_JOIN_CLUB}
-            </Button>
-          </Link>
-        </LayoutContainer>
+        {/* Footer Membership CTA (Oculta automaticamente caso o usuário autenticado já seja Sócio) */}
+        <MembershipCtaCard
+          title={TIMELINE_CONSTANTS.CTA_TITLE}
+          description={TIMELINE_CONSTANTS.CTA_DESC}
+          buttonText={TIMELINE_CONSTANTS.BTN_JOIN_CLUB}
+          className="mt-20 max-w-4xl mx-auto"
+        />
       </LayoutContainer>
     </LayoutContainer>
   );
