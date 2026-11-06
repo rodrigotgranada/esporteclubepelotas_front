@@ -68,10 +68,10 @@ export const HomeFeature = () => {
   }, []);
 
   return (
-    <LayoutContainer className="flex flex-col">
+    <LayoutContainer className="flex flex-col bg-transparent">
       {/* 1. Primeira Seção: Vitrine Editorial de Notícias (Destaques & Bento Grid) */}
       {(featuredNews.length > 0 || latestNews.length > 0) && (
-        <LayoutContainer className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-10 pb-8 sm:pb-12 w-full flex flex-col gap-8 sm:gap-10">
+        <LayoutContainer className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-10 pb-8 sm:pb-12 w-full flex flex-col gap-8 sm:gap-10 bg-transparent">
           {/* Mosaico Bento Hero Grid (Destaques da Capa - Cards Diretos e Elegantes) */}
           {featuredNews.length > 0 && <NewsBentoHero articles={featuredNews} />}
 
@@ -111,11 +111,9 @@ export const HomeFeature = () => {
       )}
 
       {/* 2. Segunda Seção: Hero Institucional do Clube (Sócio Áureo-Cerúleo & Alcatéia) */}
-      <LayoutContainer className="relative py-12 sm:py-20 px-4 flex items-center justify-center overflow-hidden border-t border-border/40">
-        {/* Background Overlay */}
-        <LayoutContainer className="absolute inset-0 bg-background z-0">
-          <LayoutContainer className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/40 to-background" />
-        </LayoutContainer>
+      <LayoutContainer className="relative py-12 sm:py-20 px-4 flex items-center justify-center overflow-hidden border-t border-border/40 bg-transparent">
+        {/* Glow sutil e transparente para destacar a marca d'água */}
+        <LayoutContainer className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/[0.02] to-transparent pointer-events-none z-0" />
 
         <LayoutContainer className="relative z-10 max-w-4xl mx-auto px-4 text-center animate-in fade-in slide-in-from-bottom-6 duration-700 flex flex-col items-center">
           <LayoutContainer className="mb-4 sm:mb-6 animate-in zoom-in duration-700 delay-150">
@@ -164,15 +162,15 @@ export const HomeFeature = () => {
       </LayoutContainer>
 
       {/* 3. Terceira Seção: Outras Seções Institucionais (Próximo Jogo & Loja) */}
-      <LayoutContainer className="max-w-7xl mx-auto px-4 py-12 sm:py-16 w-full">
+      <LayoutContainer className="max-w-7xl mx-auto px-4 py-12 sm:py-16 w-full bg-transparent">
         <LayoutContainer className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
-          <LayoutContainer className="bg-card border border-border rounded-2xl p-6 sm:p-8 hover:border-primary/30 transition-colors">
+          <LayoutContainer className="bg-surface/85 backdrop-blur-xs border border-border rounded-2xl p-6 sm:p-8 hover:border-primary/30 transition-colors shadow-xs">
             <Title level="h3" className="text-xl sm:text-2xl font-bold text-text-primary mb-3 sm:mb-4">
               {HOME_FEATURE_TEXTS.SECTION_MATCH_TITLE}
             </Title>
             <Text className="text-text-secondary text-sm sm:text-base">{HOME_FEATURE_TEXTS.SECTION_MATCH_DESC}</Text>
           </LayoutContainer>
-          <LayoutContainer className="bg-card border border-border rounded-2xl p-6 sm:p-8 hover:border-primary/30 transition-colors">
+          <LayoutContainer className="bg-surface/85 backdrop-blur-xs border border-border rounded-2xl p-6 sm:p-8 hover:border-primary/30 transition-colors shadow-xs">
             <Title level="h3" className="text-xl sm:text-2xl font-bold text-text-primary mb-3 sm:mb-4">
               {HOME_FEATURE_TEXTS.SECTION_STORE_TITLE}
             </Title>
