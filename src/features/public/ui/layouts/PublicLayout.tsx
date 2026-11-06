@@ -17,7 +17,10 @@ export const PublicLayout = ({ children }: { children: React.ReactNode }) => {
   }, [user, router]);
 
   return (
-    <LayoutContainer className="min-h-screen bg-background text-text-primary flex flex-col relative overflow-x-hidden">
+    <LayoutContainer
+      className="min-h-screen bg-background text-text-primary flex flex-col relative overflow-x-clip"
+      style={{ overflowX: 'clip' }}
+    >
       {/* Marca d'água monumental do distintivo do Pelotas estilizado no fundo global */}
       <PelotasWatermarkBackground />
 
