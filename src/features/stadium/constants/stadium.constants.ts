@@ -87,6 +87,11 @@ export const FALLBACK_STADIUM_DATA: StadiumData = {
 <p>Com o passar dos anos e a consolidação do Pelotas como potência do futebol do interior, o estádio ganhou reformas estruturais que transformaram o Parque Barbosa Leão em um autêntico caldeirão. As arquibancadas foram aproximadas do retângulo de jogo, criando uma atmosfera de pressão acústica e visual sem igual na região.</p>
 <p>A alcunha popular <strong>"Boca do Lobo"</strong> surgiu de forma espontânea na crônica desportiva e na boca do povo: entrar naquele estádio significava adentrar a toca da fera. Adversários acostumados a jogar em descampados encontravam em Pelotas uma torcida apaixonada, barulhenta e pulsante a poucos metros das linhas laterais. Visitar o Pelotas era ser devorado pela pressão da torcida áureo-cerúlea. O apelido foi abraçado com orgulho pela nação azul e amarela e hoje é a mais célebre identidade do clube.</p>
 
+<figure class="stadium-story-image my-8">
+  <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=1200&q=80" alt="Gramado da Boca do Lobo sob os refletores históricos" />
+  <figcaption>O gramado centenário da Boca do Lobo: solo sagrado onde o Pelotas construiu sua hegemonia no interior gaúcho.</figcaption>
+</figure>
+
 <h2>O Pioneirismo da Iluminação Noturna (1930)</h2>
 <p>O ano de 1930 marcou para sempre a história do Esporte Clube Pelotas e da Boca do Lobo. Além de sagrar-se Campeão Gaúcho com uma campanha lendária, o clube inaugurou os imponentes refletores para partidas noturnas, um feito vanguardista que colocou Pelotas na liderança tecnológica do futebol sul-brasileiro, sendo o primeiro estádio do interior do estado a receber iluminação elétrica permanente.</p>
 <p>A estreia dos jogos sob as luzes da Boca do Lobo parou a cidade. Famílias inteiras trajando seus melhores vestidos e ternos ocuparam os pavilhões sociais para testemunhar o espetáculo noturno. A noite pelotense nunca mais foi a mesma: o futebol passava a ser a grande celebração sob os céus do Rio Grande.</p>
@@ -94,6 +99,11 @@ export const FALLBACK_STADIUM_DATA: StadiumData = {
 <h2>Palco de Craques Mundiais e Noites Inesquecíveis</h2>
 <p>Ao longo de mais de um século, o gramado da Boca do Lobo foi testemunha de momentos que figuram nas mais nobres páginas da história do futebol brasileiro. Grandes esquadrões nacionais e internacionais desfilaram pelo estádio: a Seleção Brasileira, o lendário Santos de Pelé nas décadas de 60, expedições de clubes europeus e os duelos memoráveis contra Grêmio e Internacional.</p>
 <p>Mas é no clássico Bra-Pel que a Boca do Lobo atinge seu clímax de intensidade. Considerado por especialistas como uma das maiores e mais ferrenhas rivalidades do continente, o clássico municipal transforma o estádio em um mar de bandeiras azuis e amarelas, fumaça, cantos que não cessam e uma atmosfera eletrizante que transcende o esporte.</p>
+
+<figure class="stadium-story-image my-8">
+  <img src="https://images.unsplash.com/photo-1522778119026-d647f0596c20?auto=format&fit=crop&w=1200&q=80" alt="Arquibancadas do Estádio Boca do Lobo" />
+  <figcaption>Arquibancadas lotadas em tarde de clássico: a força incondicional da torcida áureo-cerúlea na Avenida Bento Gonçalves.</figcaption>
+</figure>
 
 <h2>Patrimônio Histórico, Caldeirão Moderno e o Futuro</h2>
 <p>Hoje, o Estádio Boca do Lobo é muito mais do que um local de jogos: é um patrimônio imaterial da cidade de Pelotas. Com capacidade para mais de 20 mil torcedores, o estádio abriga a Loja Oficial Lobo Mania, a secretaria executiva, academia, departamento médico e as categorias de base do clube.</p>

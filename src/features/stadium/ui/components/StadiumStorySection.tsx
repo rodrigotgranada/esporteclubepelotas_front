@@ -57,6 +57,10 @@ export const StadiumStorySection: React.FC<StadiumStorySectionProps> = ({
                 [&>h3]:text-xl [&>h3]:font-bold [&>h3]:text-text-primary [&>h3]:mt-6 [&>h3]:mb-3
                 [&>p]:text-text-secondary [&>p]:text-base [&>p]:sm:text-lg [&>p]:leading-relaxed [&>p]:mb-6
                 [&>blockquote]:p-6 [&>blockquote]:sm:p-8 [&>blockquote]:rounded-2xl [&>blockquote]:bg-surface [&>blockquote]:border-l-4 [&>blockquote]:border-primary [&>blockquote]:text-text-primary [&>blockquote]:font-serif [&>blockquote]:italic [&>blockquote]:my-8 [&>blockquote]:text-lg [&>blockquote]:sm:text-xl [&>blockquote]:shadow-sm
+                [&>figure]:my-8 [&>figure]:rounded-2xl [&>figure]:overflow-hidden [&>figure]:border [&>figure]:border-border/80 [&>figure]:bg-surface/50 [&>figure]:p-2 sm:[&>figure]:p-3 [&>figure]:shadow-md
+                [&>figure>img]:w-full [&>figure>img]:max-h-[520px] [&>figure>img]:object-cover [&>figure>img]:rounded-xl
+                [&>figure>figcaption]:text-xs [&>figure>figcaption]:sm:text-sm [&>figure>figcaption]:text-text-secondary [&>figure>figcaption]:text-center [&>figure>figcaption]:italic [&>figure>figcaption]:mt-2.5 [&>figure>figcaption]:px-2
+                [&>img]:w-full [&>img]:max-h-[520px] [&>img]:object-cover [&>img]:rounded-2xl [&>img]:my-8 [&>img]:border [&>img]:border-border/80 [&>img]:shadow-md
                 [&>strong]:text-text-primary [&>strong]:font-bold"
               dangerouslySetInnerHTML={{ __html: contentHtml || '' }}
             />
