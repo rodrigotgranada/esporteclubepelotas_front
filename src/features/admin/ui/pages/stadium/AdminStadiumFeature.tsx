@@ -27,8 +27,10 @@ export const AdminStadiumFeature: React.FC = () => {
     coverPreviewUrl,
     handleSelectCoverFile,
     handleAddGalleryImage,
+    handleUpdateGalleryImage,
     handleRemoveGalleryImage,
     handleAddFact,
+    handleUpdateFact,
     handleRemoveFact,
     onSubmit,
   } = useAdminStadium();
@@ -134,6 +136,7 @@ export const AdminStadiumFeature: React.FC = () => {
           <StadiumGalleryManager
             gallery={form.watch('gallery') || []}
             onAddImage={handleAddGalleryImage}
+            onUpdateImage={handleUpdateGalleryImage}
             onRemoveImage={handleRemoveGalleryImage}
           />
         )}
@@ -142,6 +145,7 @@ export const AdminStadiumFeature: React.FC = () => {
           <StadiumFactsManager
             facts={form.watch('facts') || []}
             onAddFact={handleAddFact}
+            onUpdateFact={handleUpdateFact}
             onRemoveFact={handleRemoveFact}
           />
         )}

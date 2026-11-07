@@ -28,10 +28,12 @@ import { NewsBlockFloatingMenu } from './NewsBlockFloatingMenu';
 import { NewsImageInsertModal } from './NewsImageInsertModal';
 
 export interface NewsBlockEditorProps {
-  content?: Record<string, any>;
+  content?: Record<string, any> | string;
   onChange: (json: Record<string, any>) => void;
   editable?: boolean;
   className?: string;
+  onUploadImage?: (file: File | Blob) => Promise<{ url: string }>;
+  placeholder?: string;
 }
 
 export const NewsBlockEditor: React.FC<NewsBlockEditorProps> = ({
@@ -39,6 +41,8 @@ export const NewsBlockEditor: React.FC<NewsBlockEditorProps> = ({
   onChange,
   editable = true,
   className = '',
+  onUploadImage,
+  placeholder,
 }) => {
   const { EDITOR: texts } = ADMIN_NEWS_TEXTS;
   const editorWrapperRef = useRef<HTMLDivElement>(null);
@@ -55,6 +59,22 @@ export const NewsBlockEditor: React.FC<NewsBlockEditorProps> = ({
   const [cropSourceImage, setCropSourceImage] = useState<string | null>(null);
   const [isCropModalOpen, setIsCropModalOpen] = useState(false);
 
+  const resolveInitialContent = (input?: Record<string, any> | string) => {
+    if (!input) return undefined;
+    if (typeof input === 'string') {
+      const trimmed = input.trim();
+      if (trimmed.startsWith('{') && trimmed.includes('"type":"doc"')) {
+        try {
+          return JSON.parse(trimmed);
+        } catch {
+          return input;
+        }
+      }
+      return input;
+    }
+    return Object.keys(input).length > 0 ? input : undefined;
+  };
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -63,14 +83,14 @@ export const NewsBlockEditor: React.FC<NewsBlockEditorProps> = ({
         },
       }),
       Placeholder.configure({
-        placeholder: texts.PLACEHOLDER,
+        placeholder: placeholder || texts.PLACEHOLDER,
       }),
       NewsCustomImageExtension.configure({
         inline: false,
         allowBase64: false,
       }),
     ],
-    content: content && Object.keys(content).length > 0 ? content : undefined,
+    content: resolveInitialContent(content),
     editable,
     immediatelyRender: false,
     onUpdate: ({ editor: ed }) => {
@@ -86,11 +106,30 @@ export const NewsBlockEditor: React.FC<NewsBlockEditorProps> = ({
 
   // Sync external content update
   useEffect(() => {
-    if (editor && content && Object.keys(content).length > 0) {
-      const currentJson = JSON.stringify(editor.getJSON());
-      const newJson = JSON.stringify(content);
-      if (currentJson !== newJson) {
-        editor.commands.setContent(content);
+    if (editor && content) {
+      if (typeof content === 'string') {
+        const trimmed = content.trim();
+        if (trimmed.startsWith('{') && trimmed.includes('"type":"doc"')) {
+          try {
+            const parsed = JSON.parse(trimmed);
+            const currentJson = JSON.stringify(editor.getJSON());
+            if (currentJson !== JSON.stringify(parsed)) {
+              editor.commands.setContent(parsed);
+            }
+          } catch {
+            // ignore malformed JSON
+          }
+        } else {
+          if (editor.getHTML() !== content && editor.getText().trim() === '') {
+            editor.commands.setContent(content);
+          }
+        }
+      } else if (Object.keys(content).length > 0) {
+        const currentJson = JSON.stringify(editor.getJSON());
+        const newJson = JSON.stringify(content);
+        if (currentJson !== newJson) {
+          editor.commands.setContent(content);
+        }
       }
     }
   }, [content, editor]);
@@ -221,7 +260,9 @@ export const NewsBlockEditor: React.FC<NewsBlockEditorProps> = ({
     if (!editor) return;
     const loadingToast = toast.loading(ADMIN_NEWS_TEXTS.TOAST.UPLOADING_CONTENT_IMAGE);
     try {
-      const { url } = await adminNewsService.uploadContentImage(croppedBlob);
+      const { url } = await (onUploadImage
+        ? onUploadImage(croppedBlob)
+        : adminNewsService.uploadContentImage(croppedBlob));
       const verifiedUrl = verifyUploadedUrl(url, ADMIN_NEWS_TEXTS.TOAST.ERROR_CONTENT_IMAGE_UPLOAD);
       editor.chain().focus().setImage({ src: verifiedUrl }).run();
       toast.dismiss(loadingToast);
@@ -244,7 +285,9 @@ export const NewsBlockEditor: React.FC<NewsBlockEditorProps> = ({
       try {
         const response = await fetch(cropSourceImage);
         const blob = await response.blob();
-        const { url } = await adminNewsService.uploadContentImage(blob);
+        const { url } = await (onUploadImage
+          ? onUploadImage(blob)
+          : adminNewsService.uploadContentImage(blob));
         const verifiedUrl = verifyUploadedUrl(url, ADMIN_NEWS_TEXTS.TOAST.ERROR_CONTENT_IMAGE_UPLOAD);
         editor.chain().focus().setImage({ src: verifiedUrl }).run();
         toast.dismiss(loadingToast);

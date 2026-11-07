@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import {
   LayoutContainer,
@@ -10,6 +10,7 @@ import {
   Input,
   Button,
   SafeImage,
+  CropModal,
 } from '@/shared/ui/components';
 import { UpdateStadiumFormData } from '@/features/stadium/schemas/stadium.schema';
 import { ADMIN_STADIUM_TEXTS } from '../../../constants/admin-stadium.constants';
@@ -27,13 +28,40 @@ export const StadiumGeneralForm: React.FC<StadiumGeneralFormProps> = ({
   onSelectCoverFile,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isCropModalOpen, setIsCropModalOpen] = useState(false);
+  const [cropSourceImage, setCropSourceImage] = useState<string>('');
+  const [originalFile, setOriginalFile] = useState<File | null>(null);
+
   const { register, formState: { errors }, watch, setValue } = form;
   const isActive = watch('isActive');
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      onSelectCoverFile(e.target.files[0]);
+      const file = e.target.files[0];
+      setOriginalFile(file);
+      setCropSourceImage(URL.createObjectURL(file));
+      setIsCropModalOpen(true);
+      e.target.value = '';
     }
+  };
+
+  const handleCropSave = (croppedBlob: Blob) => {
+    const croppedFile = new File(
+      [croppedBlob],
+      `stadium-cover-${Date.now()}.png`,
+      { type: croppedBlob.type || 'image/png' }
+    );
+    onSelectCoverFile(croppedFile);
+    setIsCropModalOpen(false);
+    setCropSourceImage('');
+  };
+
+  const handleUseOriginal = () => {
+    if (originalFile) {
+      onSelectCoverFile(originalFile);
+    }
+    setIsCropModalOpen(false);
+    setCropSourceImage('');
   };
 
   return (
@@ -202,6 +230,29 @@ export const StadiumGeneralForm: React.FC<StadiumGeneralFormProps> = ({
           </Button>
         </LayoutContainer>
       </LayoutContainer>
+
+      {/* Modal de Recorte da Capa (16:9 Panorâmica) */}
+      {isCropModalOpen && cropSourceImage && (
+        <CropModal
+          isOpen={isCropModalOpen}
+          imageSrc={cropSourceImage}
+          onClose={() => {
+            setIsCropModalOpen(false);
+            setCropSourceImage('');
+          }}
+          onCropSave={handleCropSave}
+          onUseOriginal={handleUseOriginal}
+          aspect={16 / 9}
+          aspectOptions={[
+            { label: '16:9 Panorâmica (Recomendado)', value: 16 / 9 },
+            { label: 'Livre', value: undefined },
+            { label: '4:3', value: 4 / 3 },
+          ]}
+          texts={{
+            title: 'Ajustar Imagem de Capa do Estádio',
+          }}
+        />
+      )}
     </LayoutContainer>
   );
 };

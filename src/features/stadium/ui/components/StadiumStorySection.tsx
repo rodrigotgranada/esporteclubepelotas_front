@@ -1,11 +1,12 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import Link from 'next/link';
 import { LayoutContainer, Title, Text, Badge, Button } from '@/shared/ui/components';
 import { STADIUM_TEXTS } from '../../constants/stadium.constants';
 import { StadiumFact } from '../../types/stadium.types';
 import { BookOpen, Clock, History, Award, ArrowRight } from 'lucide-react';
+import { NewsRenderer } from '@/features/news/ui/components/NewsRenderer';
 
 interface StadiumStorySectionProps {
   contentHtml?: string;
@@ -16,6 +17,22 @@ export const StadiumStorySection: React.FC<StadiumStorySectionProps> = ({
   contentHtml,
   facts = [],
 }) => {
+  const tiptapJson = useMemo(() => {
+    if (!contentHtml || typeof contentHtml !== 'string') return null;
+    const trimmed = contentHtml.trim();
+    if (trimmed.startsWith('{') && trimmed.includes('"type":"doc"')) {
+      try {
+        const parsed = JSON.parse(trimmed);
+        if (parsed && parsed.type === 'doc' && Array.isArray(parsed.content)) {
+          return parsed;
+        }
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  }, [contentHtml]);
+
   return (
     <LayoutContainer as="section" className="w-full py-12 sm:py-16 bg-background">
       <LayoutContainer className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -50,20 +67,24 @@ export const StadiumStorySection: React.FC<StadiumStorySectionProps> = ({
         <LayoutContainer className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
           {/* Coluna Principal: O Corpo da Matéria Grandona (8 colunas) */}
           <LayoutContainer className="lg:col-span-8">
-            <LayoutContainer
-              as="article"
-              className="stadium-article-content max-w-none 
-                [&>h2]:text-2xl [&>h2]:sm:text-3xl [&>h2]:font-extrabold [&>h2]:text-text-primary [&>h2]:mt-10 [&>h2]:mb-4 [&>h2]:border-b [&>h2]:border-border/60 [&>h2]:pb-3
-                [&>h3]:text-xl [&>h3]:font-bold [&>h3]:text-text-primary [&>h3]:mt-6 [&>h3]:mb-3
-                [&>p]:text-text-secondary [&>p]:text-base [&>p]:sm:text-lg [&>p]:leading-relaxed [&>p]:mb-6
-                [&>blockquote]:p-6 [&>blockquote]:sm:p-8 [&>blockquote]:rounded-2xl [&>blockquote]:bg-surface [&>blockquote]:border-l-4 [&>blockquote]:border-primary [&>blockquote]:text-text-primary [&>blockquote]:font-serif [&>blockquote]:italic [&>blockquote]:my-8 [&>blockquote]:text-lg [&>blockquote]:sm:text-xl [&>blockquote]:shadow-sm
-                [&>figure]:my-8 [&>figure]:rounded-2xl [&>figure]:overflow-hidden [&>figure]:border [&>figure]:border-border/80 [&>figure]:bg-surface/50 [&>figure]:p-2 sm:[&>figure]:p-3 [&>figure]:shadow-md
-                [&>figure>img]:w-full [&>figure>img]:max-h-[520px] [&>figure>img]:object-cover [&>figure>img]:rounded-xl
-                [&>figure>figcaption]:text-xs [&>figure>figcaption]:sm:text-sm [&>figure>figcaption]:text-text-secondary [&>figure>figcaption]:text-center [&>figure>figcaption]:italic [&>figure>figcaption]:mt-2.5 [&>figure>figcaption]:px-2
-                [&>img]:w-full [&>img]:max-h-[520px] [&>img]:object-cover [&>img]:rounded-2xl [&>img]:my-8 [&>img]:border [&>img]:border-border/80 [&>img]:shadow-md
-                [&>strong]:text-text-primary [&>strong]:font-bold"
-              dangerouslySetInnerHTML={{ __html: contentHtml || '' }}
-            />
+            {tiptapJson ? (
+              <NewsRenderer content={tiptapJson} className="stadium-tiptap-content" />
+            ) : (
+              <LayoutContainer
+                as="article"
+                className="stadium-article-content max-w-none 
+                  [&>h2]:text-2xl [&>h2]:sm:text-3xl [&>h2]:font-extrabold [&>h2]:text-text-primary [&>h2]:mt-10 [&>h2]:mb-4 [&>h2]:border-b [&>h2]:border-border/60 [&>h2]:pb-3
+                  [&>h3]:text-xl [&>h3]:font-bold [&>h3]:text-text-primary [&>h3]:mt-6 [&>h3]:mb-3
+                  [&>p]:text-text-secondary [&>p]:text-base [&>p]:sm:text-lg [&>p]:leading-relaxed [&>p]:mb-6
+                  [&>blockquote]:p-6 [&>blockquote]:sm:p-8 [&>blockquote]:rounded-2xl [&>blockquote]:bg-surface [&>blockquote]:border-l-4 [&>blockquote]:border-primary [&>blockquote]:text-text-primary [&>blockquote]:font-serif [&>blockquote]:italic [&>blockquote]:my-8 [&>blockquote]:text-lg [&>blockquote]:sm:text-xl [&>blockquote]:shadow-sm
+                  [&>figure]:my-8 [&>figure]:rounded-2xl [&>figure]:overflow-hidden [&>figure]:border [&>figure]:border-border/80 [&>figure]:bg-surface/50 [&>figure]:p-2 sm:[&>figure]:p-3 [&>figure]:shadow-md
+                  [&>figure>img]:w-full [&>figure>img]:max-h-[520px] [&>figure>img]:object-cover [&>figure>img]:rounded-xl
+                  [&>figure>figcaption]:text-xs [&>figure>figcaption]:sm:text-sm [&>figure>figcaption]:text-text-secondary [&>figure>figcaption]:text-center [&>figure>figcaption]:italic [&>figure>figcaption]:mt-2.5 [&>figure>figcaption]:px-2
+                  [&>img]:w-full [&>img]:max-h-[520px] [&>img]:object-cover [&>img]:rounded-2xl [&>img]:my-8 [&>img]:border [&>img]:border-border/80 [&>img]:shadow-md
+                  [&>strong]:text-text-primary [&>strong]:font-bold"
+                dangerouslySetInnerHTML={{ __html: contentHtml || '' }}
+              />
+            )}
           </LayoutContainer>
 
           {/* Coluna Lateral: Linha do Tempo de Destaques & CTA Sócio (4 colunas) */}

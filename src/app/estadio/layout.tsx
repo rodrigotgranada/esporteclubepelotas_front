@@ -8,3 +8,4 @@ export default function EstadioLayout({
 }) {
   return <PublicLayout>{children}</PublicLayout>;
 }
+

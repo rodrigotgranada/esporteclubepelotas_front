@@ -104,7 +104,7 @@ export const useAdminStadium = () => {
     setCoverPreviewUrl(objectUrl);
   };
 
-  const handleAddGalleryImage = async (file: File, caption: string) => {
+  const handleAddGalleryImage = async (file: File | Blob, caption: string) => {
     try {
       const uploadRes = await stadiumService.uploadGalleryImage(file);
       const currentGallery = form.getValues('gallery') || [];
@@ -114,31 +114,50 @@ export const useAdminStadium = () => {
         order: currentGallery.length + 1,
       };
       form.setValue('gallery', [...currentGallery, newPhoto], { shouldDirty: true });
-      toast.success('Foto adicionada ao acervo!');
+      toast.success(ADMIN_STADIUM_TEXTS.GALLERY.SUCCESS_UPLOAD);
     } catch (err) {
       console.error('Erro ao subir foto da galeria:', err);
       toast.error(ADMIN_STADIUM_TEXTS.FEEDBACK.UPLOAD_GALLERY_ERROR);
     }
   };
 
+  const handleUpdateGalleryImage = (index: number, updated: Partial<StadiumGalleryImage>) => {
+    const currentGallery = form.getValues('gallery') || [];
+    const updatedGallery = currentGallery.map((item, idx) => {
+      if (idx === index) {
+        return { ...item, ...updated };
+      }
+      return item;
+    });
+    form.setValue('gallery', updatedGallery, { shouldDirty: true });
+    toast.success(ADMIN_STADIUM_TEXTS.GALLERY.SUCCESS_UPDATE);
+  };
+
   const handleRemoveGalleryImage = (index: number) => {
     const currentGallery = form.getValues('gallery') || [];
     const updated = currentGallery.filter((_, idx) => idx !== index);
     form.setValue('gallery', updated, { shouldDirty: true });
-    toast.success('Foto removida da galeria.');
+    toast.success(ADMIN_STADIUM_TEXTS.GALLERY.SUCCESS_DELETE);
   };
 
   const handleAddFact = (fact: StadiumFact) => {
     const currentFacts = form.getValues('facts') || [];
     form.setValue('facts', [...currentFacts, fact], { shouldDirty: true });
-    toast.success('Marco histórico adicionado!');
+    toast.success(ADMIN_STADIUM_TEXTS.FACTS.SUCCESS_ADD);
+  };
+
+  const handleUpdateFact = (index: number, updatedFact: StadiumFact) => {
+    const currentFacts = form.getValues('facts') || [];
+    const updatedFacts = currentFacts.map((item, idx) => (idx === index ? updatedFact : item));
+    form.setValue('facts', updatedFacts, { shouldDirty: true });
+    toast.success(ADMIN_STADIUM_TEXTS.FACTS.SUCCESS_UPDATE);
   };
 
   const handleRemoveFact = (index: number) => {
     const currentFacts = form.getValues('facts') || [];
     const updated = currentFacts.filter((_, idx) => idx !== index);
     form.setValue('facts', updated, { shouldDirty: true });
-    toast.success('Marco histórico removido.');
+    toast.success(ADMIN_STADIUM_TEXTS.FACTS.SUCCESS_DELETE);
   };
 
   const onSubmit = form.handleSubmit(async (data: UpdateStadiumFormData) => {
@@ -192,8 +211,10 @@ export const useAdminStadium = () => {
     coverPreviewUrl,
     handleSelectCoverFile,
     handleAddGalleryImage,
+    handleUpdateGalleryImage,
     handleRemoveGalleryImage,
     handleAddFact,
+    handleUpdateFact,
     handleRemoveFact,
     onSubmit,
   };

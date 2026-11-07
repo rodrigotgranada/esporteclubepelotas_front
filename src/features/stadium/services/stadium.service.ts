@@ -17,18 +17,26 @@ export const stadiumService = {
     return response.data;
   },
 
-  uploadCover: async (file: File): Promise<{ url: string }> => {
+  uploadCover: async (file: File | Blob): Promise<{ url: string }> => {
     const formData = new FormData();
-    formData.append('file', file);
+    const uploadFile =
+      file instanceof File
+        ? file
+        : new File([file], `stadium-cover-${Date.now()}.png`, { type: file.type || 'image/png' });
+    formData.append('file', uploadFile);
     const response = await api.post<{ url: string }>('/admin/stadium/upload-cover', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
     return response.data;
   },
 
-  uploadGalleryImage: async (file: File): Promise<{ url: string }> => {
+  uploadGalleryImage: async (file: File | Blob): Promise<{ url: string }> => {
     const formData = new FormData();
-    formData.append('file', file);
+    const uploadFile =
+      file instanceof File
+        ? file
+        : new File([file], `stadium-gallery-${Date.now()}.png`, { type: file.type || 'image/png' });
+    formData.append('file', uploadFile);
     const response = await api.post<{ url: string }>('/admin/stadium/upload-gallery', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
