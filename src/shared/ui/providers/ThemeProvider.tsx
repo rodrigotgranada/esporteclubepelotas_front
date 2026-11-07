@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useThemeStore } from '@/store/useThemeStore';
 import { themeService, ThemeDocument, ThemePalette } from '@/services/theme.service';
+import { useRealtimeEvents } from '@/shared/hooks/useRealtimeEvents';
 
 const DEFAULT_THEME: ThemeDocument = {
   _id: 'default-pelotas-theme',
@@ -78,7 +79,6 @@ function getHeaderContrast(headerHex: string) {
 
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const { mode } = useThemeStore();
-  // Inicializa imediatamente com o tema padrão do Pelotas para que o toggle funcione mesmo antes da API responder
   const [activeTheme, setActiveTheme] = useState<ThemeDocument>(DEFAULT_THEME);
 
   const applyPalette = useCallback((palette: ThemePalette, resolvedMode: 'light' | 'dark') => {
@@ -116,20 +116,27 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
     root.style.setProperty('--color-warning', palette.warning);
   }, []);
 
-  useEffect(() => {
-    // Busca tema personalizado do backend com resiliência
-    themeService
-      .getActiveTheme()
-      .then((theme) => {
-        if (theme) setActiveTheme(theme);
-      })
-      .catch((err) => {
-        console.warn(
-          'Utilizando paleta Áureo-Cerúlea padrão (tema customizado indisponível ou servidor iniciando):',
-          err?.message || err
-        );
-      });
+  const fetchActiveTheme = useCallback(async () => {
+    try {
+      const theme = await themeService.getActiveTheme();
+      if (theme) {
+        setActiveTheme(theme);
+      }
+    } catch (err: any) {
+      console.warn(
+        'Utilizando paleta Áureo-Cerúlea padrão (tema customizado indisponível ou servidor iniciando):',
+        err?.message || err,
+      );
+    }
   }, []);
+
+  useEffect(() => {
+    fetchActiveTheme();
+  }, [fetchActiveTheme]);
+
+  useRealtimeEvents('themes', () => {
+    fetchActiveTheme();
+  });
 
   useEffect(() => {
     let resolvedMode: 'light' | 'dark' = mode === 'dark' ? 'dark' : 'light';
@@ -142,7 +149,6 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
     applyPalette(palette, resolvedMode);
   }, [mode, activeTheme, applyPalette]);
 
-  // Sincroniza preferências do sistema operacional se 'system' estiver ativo
   useEffect(() => {
     if (mode !== 'system') return;
 

@@ -1,39 +1,27 @@
 'use client';
 
 import React from 'react';
-import { LayoutContainer, Text, Title, Input, Textarea } from '@/shared/ui/components';
+import { UseFormReturn } from 'react-hook-form';
+import {
+  LayoutContainer,
+  Title,
+  Input,
+  Textarea,
+  FormField,
+} from '@/shared/ui/components';
 import { ADMIN_IDOLS_TEXTS } from '../../../constants/admin-idols.constants';
+import { IdolFormData } from '@/features/admin/schemas';
 
 export interface IdolCoachFieldsProps {
-  coachMatches: number | '';
-  setCoachMatches: (val: number | '') => void;
-  coachWins: number | '';
-  setCoachWins: (val: number | '') => void;
-  coachDraws: number | '';
-  setCoachDraws: (val: number | '') => void;
-  coachLosses: number | '';
-  setCoachLosses: (val: number | '') => void;
-  coachTitlesText: string;
-  setCoachTitlesText: (val: string) => void;
-  tacticalStyle: string;
-  setTacticalStyle: (val: string) => void;
+  form: UseFormReturn<IdolFormData, any, any>;
 }
 
-export const IdolCoachFields: React.FC<IdolCoachFieldsProps> = ({
-  coachMatches,
-  setCoachMatches,
-  coachWins,
-  setCoachWins,
-  coachDraws,
-  setCoachDraws,
-  coachLosses,
-  setCoachLosses,
-  coachTitlesText,
-  setCoachTitlesText,
-  tacticalStyle,
-  setTacticalStyle,
-}) => {
+export const IdolCoachFields: React.FC<IdolCoachFieldsProps> = ({ form }) => {
   const texts = ADMIN_IDOLS_TEXTS.DRAWER;
+  const {
+    register,
+    formState: { errors },
+  } = form;
 
   return (
     <LayoutContainer className="flex flex-col gap-4 p-5 rounded-2xl bg-surface/50 border border-border shadow-xs animate-in fade-in duration-200">
@@ -42,77 +30,71 @@ export const IdolCoachFields: React.FC<IdolCoachFieldsProps> = ({
       </Title>
 
       <LayoutContainer className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <LayoutContainer className="flex flex-col gap-1.5">
-          <Text as="span" className="text-xs font-semibold text-text-secondary">
-            {texts.LABEL_COACH_MATCHES}
-          </Text>
+        <FormField
+          label={texts.LABEL_COACH_MATCHES}
+          error={errors.coachMatches?.message}
+        >
           <Input
             type="number"
-            value={coachMatches}
-            onChange={(e) => setCoachMatches(e.target.value ? Number(e.target.value) : '')}
+            {...register('coachMatches')}
             placeholder="0"
           />
-        </LayoutContainer>
+        </FormField>
 
-        <LayoutContainer className="flex flex-col gap-1.5">
-          <Text as="span" className="text-xs font-semibold text-text-secondary">
-            {texts.LABEL_COACH_WINS}
-          </Text>
+        <FormField
+          label={texts.LABEL_COACH_WINS}
+          error={errors.coachWins?.message}
+        >
           <Input
             type="number"
-            value={coachWins}
-            onChange={(e) => setCoachWins(e.target.value ? Number(e.target.value) : '')}
+            {...register('coachWins')}
             placeholder="0"
           />
-        </LayoutContainer>
+        </FormField>
 
-        <LayoutContainer className="flex flex-col gap-1.5">
-          <Text as="span" className="text-xs font-semibold text-text-secondary">
-            {texts.LABEL_COACH_DRAWS}
-          </Text>
+        <FormField
+          label={texts.LABEL_COACH_DRAWS}
+          error={errors.coachDraws?.message}
+        >
           <Input
             type="number"
-            value={coachDraws}
-            onChange={(e) => setCoachDraws(e.target.value ? Number(e.target.value) : '')}
+            {...register('coachDraws')}
             placeholder="0"
           />
-        </LayoutContainer>
+        </FormField>
 
-        <LayoutContainer className="flex flex-col gap-1.5">
-          <Text as="span" className="text-xs font-semibold text-text-secondary">
-            {texts.LABEL_COACH_LOSSES}
-          </Text>
+        <FormField
+          label={texts.LABEL_COACH_LOSSES}
+          error={errors.coachLosses?.message}
+        >
           <Input
             type="number"
-            value={coachLosses}
-            onChange={(e) => setCoachLosses(e.target.value ? Number(e.target.value) : '')}
+            {...register('coachLosses')}
             placeholder="0"
           />
-        </LayoutContainer>
+        </FormField>
       </LayoutContainer>
 
-      <LayoutContainer className="flex flex-col gap-1.5">
-        <Text as="span" className="text-xs font-semibold text-text-secondary">
-          {texts.LABEL_TACTICAL_STYLE}
-        </Text>
+      <FormField
+        label={texts.LABEL_TACTICAL_STYLE}
+        error={errors.tacticalStyle?.message}
+      >
         <Input
-          value={tacticalStyle}
-          onChange={(e) => setTacticalStyle(e.target.value)}
+          {...register('tacticalStyle')}
           placeholder={texts.PLACEHOLDER_TACTICAL_STYLE}
         />
-      </LayoutContainer>
+      </FormField>
 
-      <LayoutContainer className="flex flex-col gap-1.5">
-        <Text as="span" className="text-xs font-semibold text-text-secondary">
-          {texts.LABEL_TITLES}
-        </Text>
+      <FormField
+        label={texts.LABEL_TITLES}
+        error={errors.coachTitlesText?.message}
+      >
         <Textarea
-          value={coachTitlesText}
-          onChange={(e) => setCoachTitlesText(e.target.value)}
+          {...register('coachTitlesText')}
           placeholder={texts.PLACEHOLDER_TITLES}
           rows={3}
         />
-      </LayoutContainer>
+      </FormField>
     </LayoutContainer>
   );
 };

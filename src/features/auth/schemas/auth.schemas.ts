@@ -56,3 +56,30 @@ export const resetPasswordSchema = z.object({
 });
 
 export type ResetPasswordForm = z.infer<typeof resetPasswordSchema>;
+
+export const changeTemporaryPasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1, 'A senha temporária é obrigatória'),
+    newPassword: z.string().min(6, 'A nova senha deve ter no mínimo 6 caracteres'),
+    confirmPassword: z.string().min(1, 'A confirmação de senha é obrigatória'),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: 'As senhas não coincidem',
+    path: ['confirmPassword'],
+  })
+  .refine((data) => data.newPassword !== data.currentPassword, {
+    message: 'A nova senha não pode ser igual à senha temporária',
+    path: ['newPassword'],
+  });
+
+export type ChangeTemporaryPasswordForm = z.infer<typeof changeTemporaryPasswordSchema>;
+
+export const verifyEmailSchema = z.object({
+  code: z
+    .string()
+    .length(6, 'O código deve conter 6 dígitos')
+    .regex(/^\d{6}$/, 'O código deve conter apenas dígitos'),
+});
+
+export type VerifyEmailForm = z.infer<typeof verifyEmailSchema>;
+

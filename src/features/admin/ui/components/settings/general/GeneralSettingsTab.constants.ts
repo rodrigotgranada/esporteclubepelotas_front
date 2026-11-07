@@ -1,13 +1,20 @@
 export const GENERAL_SETTINGS_TEXTS = {
   TITLE: 'Geral',
+  LOADING: 'Carregando configurações...',
   BUTTON_SAVE: 'Salvar Alterações',
+  BUTTON_UPLOADING_LOGO: 'Enviando escudo...',
+  BUTTON_SAVING: 'Salvando no banco...',
   TOAST_SUCCESS: 'Configurações gerais atualizadas!',
   TOAST_ERROR: 'Erro ao salvar as configurações.',
   LABEL_CLUB_NAME: 'Nome do Clube',
   LABEL_AVATAR: 'Escudo Principal',
   AVATAR_FORMATS: '(PNG, SVG, JPG)',
+  LOGO_ALT: 'Escudo do Clube',
+  GALLERY_ALT_PREFIX: 'Escudo da galeria',
   BUTTON_EDIT_LOGO: 'Editar Logo',
   BUTTON_ADD_LOGO: 'Adicionar Logo',
+  BUTTON_REMOVE_LOGO: 'Remover Logo',
+  PLACEHOLDER_CLUB_NAME: 'Ex: Esporte Clube Pelotas',
   GALLERY_TITLE: 'Galeria de Escudos',
-  GALLERY_REMOVE_TITLE: 'Remover da Galeria'
+  GALLERY_REMOVE_TITLE: 'Remover da Galeria',
 };

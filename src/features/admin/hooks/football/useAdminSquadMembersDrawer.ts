@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useMemo } from 'react';
 import { toast } from 'react-hot-toast';
+import { useTransactionalSave } from '@/shared/hooks';
 import { adminFootballService } from '../../services/admin-football.service';
 import {
   AthleteData,
@@ -18,11 +19,11 @@ export const useAdminSquadMembersDrawer = (onSuccess: () => void) => {
   const [members, setMembers] = useState<SquadMemberData[]>([]);
   const [availableAthletes, setAvailableAthletes] = useState<AthleteData[]>([]);
   const [isLoadingAthletes, setIsLoadingAthletes] = useState<boolean>(false);
-  const [isSaving, setIsSaving] = useState<boolean>(false);
   const [includeYouthAthletes, setIncludeYouthAthletes] = useState<boolean>(false);
   const [includeRetiredAthletes, setIncludeRetiredAthletes] = useState<boolean>(false);
 
-  // New Member Temp State
+  const { isSaving, runTransactionalSave } = useTransactionalSave();
+
   const [selectedAthleteId, setSelectedAthleteId] = useState<string>('');
   const [jerseyNumber, setJerseyNumber] = useState<string>('');
   const [sector, setSector] = useState<SquadSector>('FORWARD');
@@ -64,29 +65,19 @@ export const useAdminSquadMembersDrawer = (onSuccess: () => void) => {
   const filteredAvailableAthletes = useMemo(() => {
     if (!squad) return availableAthletes;
 
-    const matchRetired = (a: AthleteData) => {
-      if (includeRetiredAthletes) return true;
-      return !a.isRetired;
-    };
+    const matchRetired = (a: AthleteData) => (includeRetiredAthletes ? true : !a.isRetired);
 
     if (squad.category === 'FEMININE') {
-      // Atletas femininas ou comissão técnica feminina
       return availableAthletes.filter((a) => a.gender === 'FEMALE' && matchRetired(a));
     }
 
     if (squad.category === 'PROFESSIONAL') {
-      // Atletas masculinos profissionais ou comissão técnica (STAFF)
       return availableAthletes.filter((a) => {
-        const isMale = a.gender !== 'FEMALE';
-        if (!isMale) return false;
-        if (!matchRetired(a)) return false;
-        if (includeYouthAthletes) return true;
-        return a.athleteType !== 'YOUTH';
+        if (a.gender === 'FEMALE' || !matchRetired(a)) return false;
+        return includeYouthAthletes ? true : a.athleteType !== 'YOUTH';
       });
     }
 
-    // Se for categoria de base (SUB_20, SUB_17, SUB_15):
-    // Bloqueia atletas profissionais em campo, mas permite comissão técnica (STAFF)
     return availableAthletes.filter((a) => {
       const isMale = a.gender !== 'FEMALE';
       const isYouthOrStaff = a.athleteType === 'YOUTH' || a.athleteType === 'STAFF';
@@ -103,17 +94,12 @@ export const useAdminSquadMembersDrawer = (onSuccess: () => void) => {
     const athleteObj = availableAthletes.find((a) => (a.id || a._id) === selectedAthleteId);
     const isStaff = sector === 'STAFF' || athleteObj?.athleteType === 'STAFF';
 
-    let num: number | null = null;
-    if (jerseyNumber) {
-      num = Number(jerseyNumber);
-    }
-
+    const num = jerseyNumber ? Number(jerseyNumber) : null;
     if (!isStaff && (!num || num < 1)) {
       toast.error('Informe um número de camisa válido para o atleta.');
       return;
     }
 
-    // Check if athlete already in squad
     const existingIndex = members.findIndex(
       (m) => (m.athleteId || m.athlete?._id || m.athlete?.id) === selectedAthleteId,
     );
@@ -133,12 +119,10 @@ export const useAdminSquadMembersDrawer = (onSuccess: () => void) => {
       const updated = [...members];
       updated[existingIndex] = newMember;
       setMembers(updated);
-      toast.success('Registro já estava no elenco; dados atualizados!');
     } else {
       setMembers([...members, newMember]);
     }
 
-    // Reset input fields
     setSelectedAthleteId('');
     setJerseyNumber('');
   };
@@ -150,30 +134,31 @@ export const useAdminSquadMembersDrawer = (onSuccess: () => void) => {
   };
 
   const save = async () => {
-    if (!squad) return;
+    if (!squad || isSaving) return;
 
-    try {
-      setIsSaving(true);
-      const squadId = squad.id || squad._id;
-
-      const membersPayload = members.map((m, idx) => ({
-        athleteId: (m.athleteId || m.athlete?.id || m.athlete?._id || "") as string,
-        jerseyNumber: m.jerseyNumber || null,
-        sector: m.sector,
-        role: m.role || 'STARTER',
-        order: idx + 1,
-      }));
-
-      await adminFootballService.setSquadMembers(squadId, membersPayload);
-      toast.success(ADMIN_FOOTBALL_CONSTANTS.DRAWER_MEMBERS.SUCCESS_UPDATE);
-      close();
-      onSuccess();
-    } catch (err: any) {
-      console.error('Erro ao salvar membros do elenco:', err);
-      toast.error(err?.response?.data?.message || 'Erro ao salvar membros do elenco.');
-    } finally {
-      setIsSaving(false);
-    }
+    await runTransactionalSave({
+      hasPendingMedia: false,
+      saveToDb: async () => {
+        const squadId = squad.id || squad._id;
+        const membersPayload = members.map((m, idx) => ({
+          athleteId: (m.athleteId || m.athlete?.id || m.athlete?._id || '') as string,
+          jerseyNumber: m.jerseyNumber || null,
+          sector: m.sector,
+          role: m.role || 'STARTER',
+          order: idx + 1,
+        }));
+        return adminFootballService.setSquadMembers(squadId, membersPayload);
+      },
+      onConfirmed: () => {
+        toast.success(ADMIN_FOOTBALL_CONSTANTS.DRAWER_MEMBERS.SUCCESS_UPDATE);
+        close();
+        onSuccess();
+      },
+      onError: (err: any) => {
+        console.error('Erro ao salvar membros do elenco:', err);
+        toast.error(err?.response?.data?.message || 'Erro ao salvar membros do elenco.');
+      },
+    });
   };
 
   return {

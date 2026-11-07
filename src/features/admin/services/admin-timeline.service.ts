@@ -76,6 +76,18 @@ export const adminTimelineService = {
     return response.data;
   },
 
+  uploadPhotoMedia: async (file: File, folderId?: string): Promise<string> => {
+    const formData = new FormData();
+    formData.append('photo', file);
+    if (folderId) {
+      formData.append('folderId', folderId);
+    }
+    const response = await api.post('/timeline/admin/upload-photo', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data?.url || response.data;
+  },
+
   createEvent: async (data: CreateTimelineEventInput, photoFile?: File): Promise<TimelineEventData> => {
     if (photoFile) {
       const formData = new FormData();

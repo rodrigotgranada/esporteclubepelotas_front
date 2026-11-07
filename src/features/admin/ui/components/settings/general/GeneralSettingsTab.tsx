@@ -1,5 +1,15 @@
 import React, { useRef } from 'react';
-import { LayoutContainer, Title, Text, Button, Input, IconButton, Spinner, SafeImage } from '@/shared/ui/components';
+import {
+  LayoutContainer,
+  Title,
+  Text,
+  Button,
+  Input,
+  IconButton,
+  Spinner,
+  SafeImage,
+  FormField,
+} from '@/shared/ui/components';
 import { Pencil, Plus, X } from 'lucide-react';
 import { CropModal } from '@/shared/ui/components/molecules/CropModal';
 import { GENERAL_SETTINGS_TEXTS } from './GeneralSettingsTab.constants';
@@ -7,10 +17,9 @@ import { useGeneralSettingsTab } from '@/features/admin/hooks/settings/useGenera
 
 export const GeneralSettingsTab = () => {
   const {
+    form,
     isSaving,
     isFetching,
-    clubName,
-    setClubName,
     previewLogo,
     gallery,
     isCropModalOpen,
@@ -23,6 +32,11 @@ export const GeneralSettingsTab = () => {
     handleRemoveFromGallery,
     handleSave,
   } = useGeneralSettingsTab();
+
+  const {
+    register,
+    formState: { errors },
+  } = form;
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -37,7 +51,9 @@ export const GeneralSettingsTab = () => {
   return (
     <LayoutContainer className="animate-in fade-in duration-300">
       <LayoutContainer className="flex items-center justify-between mb-8">
-        <Title level="h2" className="text-xl font-bold text-text-primary">{GENERAL_SETTINGS_TEXTS.TITLE}</Title>
+        <Title level="h2" className="text-xl font-bold text-text-primary">
+          {GENERAL_SETTINGS_TEXTS.TITLE}
+        </Title>
         <Button variant="primary" size="sm" onClick={handleSave} isLoading={isSaving}>
           {GENERAL_SETTINGS_TEXTS.BUTTON_SAVE}
         </Button>
@@ -46,13 +62,14 @@ export const GeneralSettingsTab = () => {
       <LayoutContainer className="flex flex-col md:flex-row gap-8 items-start">
         {/* Avatar Area */}
         <LayoutContainer className="flex-shrink-0 flex flex-col items-center max-w-[200px]">
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileChange}
-            accept="image/png, image/jpeg, image/webp, image/svg+xml"
-            className="hidden"
-          />
+          <LayoutContainer className="hidden">
+            <Input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              accept="image/png, image/jpeg, image/webp, image/svg+xml"
+            />
+          </LayoutContainer>
           <LayoutContainer className="w-32 h-32 rounded-full bg-surface border-4 border-primary overflow-hidden relative shadow-xl group">
             {previewLogo ? (
               <>
@@ -86,12 +103,18 @@ export const GeneralSettingsTab = () => {
               </LayoutContainer>
             )}
           </LayoutContainer>
-          <Text className="text-text-secondary text-xs mt-3 text-center mb-6">{GENERAL_SETTINGS_TEXTS.LABEL_AVATAR}<br />{GENERAL_SETTINGS_TEXTS.AVATAR_FORMATS}</Text>
+          <Text className="text-text-secondary text-xs mt-3 text-center mb-6">
+            {GENERAL_SETTINGS_TEXTS.LABEL_AVATAR}
+            <br />
+            {GENERAL_SETTINGS_TEXTS.AVATAR_FORMATS}
+          </Text>
 
           {/* Gallery */}
           {gallery.length > 0 && (
             <LayoutContainer className="w-full border-t border-border pt-4 mt-2 flex flex-col items-center">
-              <Text className="text-xs font-bold text-text-secondary mb-3">{GENERAL_SETTINGS_TEXTS.GALLERY_TITLE}</Text>
+              <Text className="text-xs font-bold text-text-secondary mb-3">
+                {GENERAL_SETTINGS_TEXTS.GALLERY_TITLE}
+              </Text>
               <LayoutContainer className="flex flex-wrap gap-2 justify-center">
                 {gallery.map((url, idx) => (
                   <LayoutContainer key={idx} className="relative group">
@@ -101,20 +124,22 @@ export const GeneralSettingsTab = () => {
                     >
                       <SafeImage
                         src={url}
-                        alt={`Gallery Logo ${idx}`}
+                        alt={`Escudo Histórico ${idx + 1}`}
                         fill
                         sizes="48px"
                         className="object-contain p-1"
-                        fallbackSrc="/images/pelotas-logo.png"
                       />
                     </LayoutContainer>
                     <IconButton
                       icon={<X size={12} />}
-                      variant="danger"
+                      variant="ghost"
                       size="sm"
-                      onClick={(e) => { e.stopPropagation(); handleRemoveFromGallery(url); }}
-                      className="absolute -top-2 -right-2 !w-5 !h-5 !p-0 bg-error text-white opacity-0 group-hover:opacity-100 transition-opacity shadow-sm hover:bg-error/90 z-10"
-                      title={GENERAL_SETTINGS_TEXTS.GALLERY_REMOVE_TITLE}
+                      className="absolute -top-1 -right-1 bg-surface border border-border rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity text-text-secondary hover:text-[#ea580c] shadow-xs"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRemoveFromGallery(url);
+                      }}
+                      title={GENERAL_SETTINGS_TEXTS.BUTTON_REMOVE_LOGO}
                     />
                   </LayoutContainer>
                 ))}
@@ -123,17 +148,22 @@ export const GeneralSettingsTab = () => {
           )}
         </LayoutContainer>
 
-        {/* Data Fields */}
-        <LayoutContainer className="flex-1 grid grid-cols-1 gap-6 w-full max-w-md">
-          <Input
+        {/* Inputs Area */}
+        <LayoutContainer className="flex-1 w-full space-y-4">
+          <FormField
             label={GENERAL_SETTINGS_TEXTS.LABEL_CLUB_NAME}
-            value={clubName || ''}
-            onChange={(e) => setClubName(e.target.value)}
-          />
+            error={errors.clubName?.message}
+          >
+            <Input
+              {...register('clubName')}
+              placeholder={GENERAL_SETTINGS_TEXTS.PLACEHOLDER_CLUB_NAME}
+            />
+          </FormField>
         </LayoutContainer>
       </LayoutContainer>
 
-      {cropImageSrc && (
+      {/* Crop Modal */}
+      {isCropModalOpen && cropImageSrc && (
         <CropModal
           isOpen={isCropModalOpen}
           imageSrc={cropImageSrc}

@@ -30,6 +30,7 @@ export async function generateMetadata(): Promise<Metadata> {
         : { icon: "/favicon.ico", shortcut: "/favicon.ico", apple: "/favicon.ico" };
 
       return {
+        metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://esporteclubepelotas.com.br'),
         title: data.clubName || "Esporte Clube Pelotas",
         description: "Portal Oficial do Clube",
         icons,
@@ -40,6 +41,7 @@ export async function generateMetadata(): Promise<Metadata> {
   }
   
   return {
+    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://esporteclubepelotas.com.br'),
     title: "Esporte Clube Pelotas",
     description: "Portal Oficial do Clube",
     icons: {

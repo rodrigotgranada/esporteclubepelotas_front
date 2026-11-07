@@ -122,7 +122,7 @@ export const TimelineFeature: React.FC = () => {
               <Button
                 variant="primary"
                 size="sm"
-                onClick={reload}
+                onClick={() => reload()}
                 leftIcon={<RotateCcw className="w-4 h-4" />}
                 className="font-bold text-blue-950 px-5 py-2.5 shadow-sm hover:scale-105 transition-all cursor-pointer"
               >

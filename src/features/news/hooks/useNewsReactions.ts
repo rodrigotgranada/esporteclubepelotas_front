@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import toast from 'react-hot-toast';
 import { PUBLIC_NEWS_TEXTS } from '../constants/news.constants';
 import { newsService, ReactionType } from '../services/news.service';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useRealtimeEvents } from '@/shared/hooks/useRealtimeEvents';
 
 export const useNewsReactions = (
   slug: string,
@@ -24,6 +25,29 @@ export const useNewsReactions = (
   });
   const [userReaction, setUserReaction] = useState<ReactionType | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const inFlightRef = useRef(false);
+
+  const syncArticleReactions = useCallback(async () => {
+    try {
+      const article = await newsService.getNewsBySlug(slug);
+      if (article?.reactions) {
+        setReactions({
+          wolf: article.reactions.wolf || 0,
+          fire: article.reactions.fire || 0,
+          clap: article.reactions.clap || 0,
+          heart: article.reactions.heart || 0,
+        });
+      }
+    } catch {
+      // Silencioso em background
+    }
+  }, [slug]);
+
+  useRealtimeEvents('news-reactions', (event) => {
+    if (!event.entityId || event.entityId === slug) {
+      syncArticleReactions();
+    }
+  });
 
   useEffect(() => {
     let isMounted = true;
@@ -76,32 +100,10 @@ export const useNewsReactions = (
       return;
     }
 
-    if (isSubmitting) return;
+    if (inFlightRef.current || isSubmitting) return;
 
-    const previousReaction = userReaction;
-    const isTogglingOff = previousReaction === type;
-    const nextReaction: ReactionType | null = isTogglingOff ? null : type;
-
-    setReactions((prev) => {
-      const updated = { ...prev };
-      if (previousReaction) {
-        updated[previousReaction] = Math.max(0, updated[previousReaction] - 1);
-      }
-      if (nextReaction) {
-        updated[nextReaction] = (updated[nextReaction] || 0) + 1;
-      }
-      return updated;
-    });
-    setUserReaction(nextReaction);
-
-    if (typeof window !== 'undefined') {
-      if (nextReaction) {
-        localStorage.setItem(`pelotas_reaction_${slug}`, nextReaction);
-      } else {
-        localStorage.removeItem(`pelotas_reaction_${slug}`);
-        toast(PUBLIC_NEWS_TEXTS.REACTION_TOGGLED_OFF, { icon: '🐺' });
-      }
-    }
+    const wasTogglingOff = userReaction === type;
+    inFlightRef.current = true;
 
     try {
       setIsSubmitting(true);
@@ -109,19 +111,25 @@ export const useNewsReactions = (
       if (res?.reactions) {
         setReactions(res.reactions);
       }
-      setUserReaction(res?.userReaction ?? null);
+      const confirmedReaction = res?.userReaction ?? null;
+      setUserReaction(confirmedReaction);
+
       if (typeof window !== 'undefined') {
-        if (res?.userReaction) {
-          localStorage.setItem(`pelotas_reaction_${slug}`, res.userReaction);
+        if (confirmedReaction) {
+          localStorage.setItem(`pelotas_reaction_${slug}`, confirmedReaction);
         } else {
           localStorage.removeItem(`pelotas_reaction_${slug}`);
         }
       }
+
+      if (wasTogglingOff && !confirmedReaction) {
+        toast(PUBLIC_NEWS_TEXTS.REACTION_TOGGLED_OFF, { icon: '🐺' });
+      }
     } catch (err: any) {
       const msg = err?.response?.data?.message || 'Erro ao registrar reação.';
       toast.error(msg);
-      setUserReaction(previousReaction);
     } finally {
+      inFlightRef.current = false;
       setIsSubmitting(false);
     }
   };
@@ -133,4 +141,3 @@ export const useNewsReactions = (
     handleReact,
   };
 };
-

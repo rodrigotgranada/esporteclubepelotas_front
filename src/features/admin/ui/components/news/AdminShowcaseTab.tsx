@@ -116,7 +116,7 @@ export const AdminShowcaseTab: React.FC = () => {
               type="button"
               variant="outline"
               size="sm"
-              onClick={refresh}
+              onClick={() => refresh()}
               leftIcon={<RotateCcw className="w-3.5 h-3.5" />}
               className="text-xs font-semibold"
             >
@@ -216,7 +216,7 @@ export const AdminShowcaseTab: React.FC = () => {
 
                 <LayoutContainer className="flex items-center gap-2 text-[11px] text-white/60 pt-1">
                   <GripVertical className="w-3.5 h-3.5 text-primary" />
-                  <span>Arraste este card para trocar com outro destaque</span>
+                  <Text as="span">{texts.DRAG_CARD_SWAP_HINT}</Text>
                 </LayoutContainer>
               </LayoutContainer>
             </LayoutContainer>

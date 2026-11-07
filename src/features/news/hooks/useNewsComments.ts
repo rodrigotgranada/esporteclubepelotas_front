@@ -1,10 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import toast from 'react-hot-toast';
 import { PUBLIC_NEWS_TEXTS } from '../constants/news.constants';
 import { newsService, NewsCommentData } from '../services/news.service';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useRealtimeEvents } from '@/shared/hooks/useRealtimeEvents';
+import { commentSchema, CommentFormData } from '../schemas/comment.schema';
 
 export const useNewsComments = (slug: string) => {
   const { user } = useAuthStore();
@@ -14,36 +18,53 @@ export const useNewsComments = (slug: string) => {
   const [hasMore, setHasMore] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [newComment, setNewComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const inFlightRef = useRef(false);
 
-  const isUserActive = Boolean(user && user.status === 'ACTIVE' && user.isActive !== false);
+  const form = useForm<CommentFormData>({
+    resolver: zodResolver(commentSchema),
+    defaultValues: {
+      content: '',
+    },
+  });
 
-  useEffect(() => {
-    let isMounted = true;
-    setIsLoading(true);
-    setPage(1);
+  const isUserActive = Boolean(
+    user && user.status === 'ACTIVE' && user.isActive !== false,
+  );
 
-    newsService
-      .getComments(slug, 1, 10)
-      .then((res) => {
-        if (isMounted) {
-          const list = Array.isArray(res?.data) ? res.data : [];
-          setComments(list);
-          setTotal(res?.total ?? list.length);
-          setHasMore(Boolean(res?.hasMore));
+  const loadInitialComments = useCallback(
+    async (options?: { silent?: boolean }) => {
+      try {
+        if (!options?.silent) {
+          setIsLoading(true);
+        }
+        const res = await newsService.getComments(slug, 1, 10);
+        const list = Array.isArray(res?.data) ? res.data : [];
+        setComments(list);
+        setPage(1);
+        setTotal(res?.total ?? list.length);
+        setHasMore(Boolean(res?.hasMore));
+      } catch {
+        // Silencioso em background
+      } finally {
+        if (!options?.silent) {
           setIsLoading(false);
         }
-      })
-      .catch(() => {
-        if (isMounted) setIsLoading(false);
-      });
+      }
+    },
+    [slug],
+  );
 
-    return () => {
-      isMounted = false;
-    };
-  }, [slug]);
+  useEffect(() => {
+    loadInitialComments();
+  }, [loadInitialComments]);
+
+  useRealtimeEvents('news-comments', (event) => {
+    if (!event.entityId || event.entityId === slug) {
+      loadInitialComments({ silent: true });
+    }
+  });
 
   const handleLoadMore = async () => {
     if (isLoadingMore || !hasMore) return;
@@ -56,7 +77,7 @@ export const useNewsComments = (slug: string) => {
 
       setComments((prev) => [...prev, ...nextList]);
       setPage(nextPage);
-      setTotal(res?.total ?? (comments.length + nextList.length));
+      setTotal(res?.total ?? comments.length + nextList.length);
       setHasMore(Boolean(res?.hasMore));
     } catch {
       toast.error('Erro ao carregar mais comentários.');
@@ -65,8 +86,7 @@ export const useNewsComments = (slug: string) => {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = form.handleSubmit(async (data: CommentFormData) => {
     if (!user) {
       toast.error(PUBLIC_NEWS_TEXTS.COMMENTS_LOGIN_TITLE);
       return;
@@ -77,25 +97,34 @@ export const useNewsComments = (slug: string) => {
       return;
     }
 
-    const trimmed = newComment.trim();
-    if (!trimmed) return;
+    const trimmed = data.content.trim();
+    if (!trimmed || inFlightRef.current || isSubmitting) return;
 
+    inFlightRef.current = true;
     try {
       setIsSubmitting(true);
       const created = await newsService.addComment(slug, trimmed);
-      setComments((prev) => [created, ...prev]);
+      setComments((prev) => {
+        const createdId = created._id || created.id;
+        if (createdId && prev.some((c) => (c._id || c.id) === createdId)) {
+          return prev;
+        }
+        return [created, ...prev];
+      });
       setTotal((prev) => prev + 1);
-      setNewComment('');
+      form.reset({ content: '' });
       toast.success(PUBLIC_NEWS_TEXTS.COMMENTS_POST_SUCCESS);
     } catch (err: any) {
       const msg = err?.response?.data?.message || 'Erro ao publicar comentário.';
       toast.error(msg);
     } finally {
+      inFlightRef.current = false;
       setIsSubmitting(false);
     }
-  };
+  });
 
   const handleDelete = async (commentId: string) => {
+    if (deletingId) return;
     if (!window.confirm(PUBLIC_NEWS_TEXTS.COMMENTS_DELETE_CONFIRM)) return;
 
     try {
@@ -112,6 +141,7 @@ export const useNewsComments = (slug: string) => {
   };
 
   return {
+    form,
     user,
     isUserActive,
     comments,
@@ -119,8 +149,6 @@ export const useNewsComments = (slug: string) => {
     hasMore,
     isLoading,
     isLoadingMore,
-    newComment,
-    setNewComment,
     isSubmitting,
     deletingId,
     handleSubmit,

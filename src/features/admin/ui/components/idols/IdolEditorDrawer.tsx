@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { Controller } from 'react-hook-form';
 import {
   Drawer,
   LayoutContainer,
@@ -14,8 +15,9 @@ import {
   Spinner,
   ImageCropper,
   Textarea,
+  FormField,
 } from '@/shared/ui/components';
-import { Save, X, Star } from 'lucide-react';
+import { Save, Star } from 'lucide-react';
 import { ADMIN_IDOLS_TEXTS } from '../../../constants/admin-idols.constants';
 import { useAdminIdolDrawer } from '../../../hooks/idols/useAdminIdolDrawer';
 import { IdolPlayerFields } from './IdolPlayerFields';
@@ -42,89 +44,34 @@ export const IdolEditorDrawer: React.FC<IdolEditorDrawerProps> = ({
   const texts = ADMIN_IDOLS_TEXTS.DRAWER;
 
   const {
+    form,
     isLoading,
     isSaving,
-    name,
-    setName,
-    nickname,
-    setNickname,
-    slug,
-    setSlug,
-    category,
-    setCategory,
-    photoUrl,
+    savingLabel,
     handleCropSave,
     handlePhotoRemove,
-    startYear,
-    setStartYear,
-    endYear,
-    setEndYear,
-    periods,
     handleAddPeriod,
     handleUpdatePeriod,
     handleRemovePeriod,
-    galleryItems,
     handleAddGalleryItems,
     handleUpdateGalleryCaption,
     handleRemoveGalleryItem,
-    isActiveInClub,
-    setIsActiveInClub,
-    birthDate,
-    setBirthDate,
-    deathDate,
-    setDeathDate,
-    birthPlace,
-    setBirthPlace,
-    quote,
-    setQuote,
-    biography,
-    setBiography,
-    isFeatured,
-    setIsFeatured,
-    order,
-    setOrder,
-    // Player
-    position,
-    setPosition,
-    preferredFoot,
-    setPreferredFoot,
-    historicJerseyNumber,
-    setHistoricJerseyNumber,
-    matchesCount,
-    setMatchesCount,
-    goalsCount,
-    setGoalsCount,
-    titlesText,
-    setTitlesText,
-    memorableMatch,
-    setMemorableMatch,
-    // Coach
-    coachMatches,
-    setCoachMatches,
-    coachWins,
-    setCoachWins,
-    coachDraws,
-    setCoachDraws,
-    coachLosses,
-    setCoachLosses,
-    coachTitlesText,
-    setCoachTitlesText,
-    tacticalStyle,
-    setTacticalStyle,
-    // Staff
-    roleName,
-    setRoleName,
-    yearsOfDedication,
-    setYearsOfDedication,
-    backstageStory,
-    setBackstageStory,
-    // Fan
-    stadiumSector,
-    setStadiumSector,
-    trademark,
-    setTrademark,
     handleSave,
   } = useAdminIdolDrawer(idolId, isOpen, onSaveSuccess);
+
+  const {
+    register,
+    control,
+    watch,
+    formState: { errors },
+  } = form;
+
+  const category = watch('category');
+  const photoUrl = watch('photoUrl');
+  const periods = watch('periods') || [];
+  const galleryItems = watch('galleryItems') || [];
+  const isActiveInClub = watch('isActiveInClub');
+  const isFeatured = watch('isFeatured');
 
   return (
     <Drawer
@@ -137,70 +84,69 @@ export const IdolEditorDrawer: React.FC<IdolEditorDrawerProps> = ({
         <LayoutContainer className="flex flex-col items-center justify-center p-16">
           <Spinner className="w-8 h-8 text-primary mb-3" />
           <Text as="p" className="text-text-secondary font-medium">
-            Carregando dados do ídolo...
+            {texts.LOADING_DATA}
           </Text>
         </LayoutContainer>
       ) : (
         <LayoutContainer className="flex flex-col gap-6 pb-8">
-          {/* Section: Category & Basic Identification */}
           <LayoutContainer className="flex flex-col gap-4 p-5 rounded-2xl bg-surface border border-border shadow-xs">
             <Title level="h3" className="text-sm font-black text-text-primary uppercase tracking-wider">
               {texts.SECTION_BASIC}
             </Title>
 
             <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <LayoutContainer className="flex flex-col gap-1.5">
-                <Text as="span" className="text-xs font-semibold text-text-secondary">
-                  {texts.LABEL_CATEGORY}
-                </Text>
-                <Select
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value as IdolCategory)}
-                >
-                  <Option value="PLAYER">{ADMIN_IDOLS_TEXTS.CATEGORIES.PLAYER}</Option>
-                  <Option value="COACH">{ADMIN_IDOLS_TEXTS.CATEGORIES.COACH}</Option>
-                  <Option value="STAFF">{ADMIN_IDOLS_TEXTS.CATEGORIES.STAFF}</Option>
-                  <Option value="FAN">{ADMIN_IDOLS_TEXTS.CATEGORIES.FAN}</Option>
-                </Select>
-              </LayoutContainer>
+              <FormField
+                label={texts.LABEL_CATEGORY}
+                name="category"
+                control={control}
+                error={errors.category?.message}
+                render={({ field }) => (
+                  <Select
+                    value={field.value}
+                    onChange={(e) => field.onChange(e.target.value as IdolCategory)}
+                    className="w-full"
+                  >
+                    <Option value="PLAYER">{ADMIN_IDOLS_TEXTS.CATEGORIES.PLAYER}</Option>
+                    <Option value="COACH">{ADMIN_IDOLS_TEXTS.CATEGORIES.COACH}</Option>
+                    <Option value="STAFF">{ADMIN_IDOLS_TEXTS.CATEGORIES.STAFF}</Option>
+                    <Option value="FAN">{ADMIN_IDOLS_TEXTS.CATEGORIES.FAN}</Option>
+                  </Select>
+                )}
+              />
 
-              <LayoutContainer className="flex flex-col gap-1.5">
-                <Text as="span" className="text-xs font-semibold text-text-secondary">
-                  {texts.LABEL_NAME} *
-                </Text>
+              <FormField
+                label={`${texts.LABEL_NAME} *`}
+                error={errors.name?.message}
+              >
                 <Input
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  {...register('name')}
                   placeholder={texts.PLACEHOLDER_NAME}
                 />
-              </LayoutContainer>
+              </FormField>
             </LayoutContainer>
 
             <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <LayoutContainer className="flex flex-col gap-1.5">
-                <Text as="span" className="text-xs font-semibold text-text-secondary">
-                  {texts.LABEL_NICKNAME}
-                </Text>
+              <FormField
+                label={texts.LABEL_NICKNAME}
+                error={errors.nickname?.message}
+              >
                 <Input
-                  value={nickname}
-                  onChange={(e) => setNickname(e.target.value)}
+                  {...register('nickname')}
                   placeholder={texts.PLACEHOLDER_NICKNAME}
                 />
-              </LayoutContainer>
+              </FormField>
 
-              <LayoutContainer className="flex flex-col gap-1.5">
-                <Text as="span" className="text-xs font-semibold text-text-secondary">
-                  {texts.LABEL_SLUG}
-                </Text>
+              <FormField
+                label={texts.LABEL_SLUG}
+                error={errors.slug?.message}
+              >
                 <Input
-                  value={slug}
-                  onChange={(e) => setSlug(e.target.value)}
+                  {...register('slug')}
                   placeholder={texts.PLACEHOLDER_SLUG}
                 />
-              </LayoutContainer>
+              </FormField>
             </LayoutContainer>
 
-            {/* Photo Cropper (Vertical 3:4) */}
             <LayoutContainer className="flex flex-col gap-2 pt-2">
               <Text as="span" className="text-xs font-semibold text-text-secondary">
                 {texts.LABEL_PHOTO}
@@ -214,109 +160,59 @@ export const IdolEditorDrawer: React.FC<IdolEditorDrawerProps> = ({
                 initialImage={photoUrl}
                 onCropSave={handleCropSave}
                 onImageRemove={handlePhotoRemove}
-                placeholderLabel="Clique para carregar e recortar a foto em 3:4"
+                placeholderLabel={texts.PHOTO_CROP_PLACEHOLDER}
                 className="w-full max-w-sm mx-auto"
               />
             </LayoutContainer>
           </LayoutContainer>
 
-          {/* Dynamic Category Specific Fields */}
-          {category === 'PLAYER' && (
-            <IdolPlayerFields
-              position={position}
-              setPosition={setPosition}
-              preferredFoot={preferredFoot}
-              setPreferredFoot={setPreferredFoot}
-              historicJerseyNumber={historicJerseyNumber}
-              setHistoricJerseyNumber={setHistoricJerseyNumber}
-              matchesCount={matchesCount}
-              setMatchesCount={setMatchesCount}
-              goalsCount={goalsCount}
-              setGoalsCount={setGoalsCount}
-              titlesText={titlesText}
-              setTitlesText={setTitlesText}
-              memorableMatch={memorableMatch}
-              setMemorableMatch={setMemorableMatch}
-            />
-          )}
+          {category === 'PLAYER' && <IdolPlayerFields form={form} />}
+          {category === 'COACH' && <IdolCoachFields form={form} />}
+          {category === 'STAFF' && <IdolStaffFields form={form} />}
+          {category === 'FAN' && <IdolFanFields form={form} />}
 
-          {category === 'COACH' && (
-            <IdolCoachFields
-              coachMatches={coachMatches}
-              setCoachMatches={setCoachMatches}
-              coachWins={coachWins}
-              setCoachWins={setCoachWins}
-              coachDraws={coachDraws}
-              setCoachDraws={setCoachDraws}
-              coachLosses={coachLosses}
-              setCoachLosses={setCoachLosses}
-              coachTitlesText={coachTitlesText}
-              setCoachTitlesText={setCoachTitlesText}
-              tacticalStyle={tacticalStyle}
-              setTacticalStyle={setTacticalStyle}
-            />
-          )}
-
-          {category === 'STAFF' && (
-            <IdolStaffFields
-              roleName={roleName}
-              setRoleName={setRoleName}
-              yearsOfDedication={yearsOfDedication}
-              setYearsOfDedication={setYearsOfDedication}
-              backstageStory={backstageStory}
-              setBackstageStory={setBackstageStory}
-            />
-          )}
-
-          {category === 'FAN' && (
-            <IdolFanFields
-              stadiumSector={stadiumSector}
-              setStadiumSector={setStadiumSector}
-              trademark={trademark}
-              setTrademark={setTrademark}
-            />
-          )}
-
-          {/* Section: Period & Personal Dates */}
           <LayoutContainer className="flex flex-col gap-4 p-5 rounded-2xl bg-surface border border-border shadow-xs">
             <Title level="h3" className="text-sm font-black text-text-primary uppercase tracking-wider">
-              Período & Origem
+              {texts.SECTION_PERIOD_ORIGIN}
             </Title>
 
             <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <LayoutContainer className="flex flex-col gap-1.5">
-                <Text as="span" className="text-xs font-semibold text-text-secondary">
-                  {texts.LABEL_START_YEAR} *
-                </Text>
+              <FormField
+                label={`${texts.LABEL_START_YEAR} *`}
+                error={errors.startYear?.message}
+              >
                 <Input
                   type="number"
-                  value={startYear}
-                  onChange={(e) => setStartYear(e.target.value ? Number(e.target.value) : '')}
+                  {...register('startYear')}
                   placeholder={texts.PLACEHOLDER_START_YEAR}
                 />
-              </LayoutContainer>
+              </FormField>
 
-              <LayoutContainer className="flex flex-col gap-1.5">
-                <Text as="span" className="text-xs font-semibold text-text-secondary">
-                  {texts.LABEL_END_YEAR}
-                </Text>
+              <FormField
+                label={texts.LABEL_END_YEAR}
+                error={errors.endYear?.message}
+              >
                 <Input
                   type="number"
                   disabled={isActiveInClub}
-                  value={endYear}
-                  onChange={(e) => setEndYear(e.target.value ? Number(e.target.value) : '')}
+                  {...register('endYear')}
                   placeholder={texts.PLACEHOLDER_END_YEAR}
                 />
-              </LayoutContainer>
+              </FormField>
             </LayoutContainer>
 
-            <Checkbox
-              checked={isActiveInClub}
-              onChange={(e) => setIsActiveInClub(e.target.checked)}
-              label={texts.CHECKBOX_ACTIVE_IN_CLUB}
+            <Controller
+              control={control}
+              name="isActiveInClub"
+              render={({ field }) => (
+                <Checkbox
+                  checked={field.value}
+                  onChange={(e) => field.onChange(e.target.checked)}
+                  label={texts.CHECKBOX_ACTIVE_IN_CLUB}
+                />
+              )}
             />
 
-            {/* Multiple Periods Editor */}
             <IdolPeriodsEditor
               periods={periods}
               onAdd={handleAddPeriod}
@@ -325,72 +221,65 @@ export const IdolEditorDrawer: React.FC<IdolEditorDrawerProps> = ({
             />
 
             <LayoutContainer className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
-              <LayoutContainer className="flex flex-col gap-1.5">
-                <Text as="span" className="text-xs font-semibold text-text-secondary">
-                  {texts.LABEL_BIRTH_DATE}
-                </Text>
+              <FormField
+                label={texts.LABEL_BIRTH_DATE}
+                error={errors.birthDate?.message}
+              >
                 <Input
                   type="date"
-                  value={birthDate}
-                  onChange={(e) => setBirthDate(e.target.value)}
+                  {...register('birthDate')}
                 />
-              </LayoutContainer>
+              </FormField>
 
-              <LayoutContainer className="flex flex-col gap-1.5">
-                <Text as="span" className="text-xs font-semibold text-text-secondary">
-                  {texts.LABEL_DEATH_DATE}
-                </Text>
+              <FormField
+                label={texts.LABEL_DEATH_DATE}
+                error={errors.deathDate?.message}
+              >
                 <Input
                   type="date"
-                  value={deathDate}
-                  onChange={(e) => setDeathDate(e.target.value)}
+                  {...register('deathDate')}
                 />
-              </LayoutContainer>
+              </FormField>
 
-              <LayoutContainer className="flex flex-col gap-1.5">
-                <Text as="span" className="text-xs font-semibold text-text-secondary">
-                  {texts.LABEL_BIRTH_PLACE}
-                </Text>
+              <FormField
+                label={texts.LABEL_BIRTH_PLACE}
+                error={errors.birthPlace?.message}
+              >
                 <Input
-                  value={birthPlace}
-                  onChange={(e) => setBirthPlace(e.target.value)}
+                  {...register('birthPlace')}
                   placeholder={texts.PLACEHOLDER_BIRTH_PLACE}
                 />
-              </LayoutContainer>
+              </FormField>
             </LayoutContainer>
           </LayoutContainer>
 
-          {/* Section: Quote & Biography */}
           <LayoutContainer className="flex flex-col gap-4 p-5 rounded-2xl bg-surface border border-border shadow-xs">
             <Title level="h3" className="text-sm font-black text-text-primary uppercase tracking-wider">
               {texts.SECTION_BIO}
             </Title>
 
-            <LayoutContainer className="flex flex-col gap-1.5">
-              <Text as="span" className="text-xs font-semibold text-text-secondary">
-                {texts.LABEL_QUOTE}
-              </Text>
+            <FormField
+              label={texts.LABEL_QUOTE}
+              error={errors.quote?.message}
+            >
               <Input
-                value={quote}
-                onChange={(e) => setQuote(e.target.value)}
+                {...register('quote')}
                 placeholder={texts.PLACEHOLDER_QUOTE}
               />
-            </LayoutContainer>
+            </FormField>
 
-            <LayoutContainer className="flex flex-col gap-1.5">
-              <Text as="span" className="text-xs font-semibold text-text-secondary">
-                {texts.LABEL_BIOGRAPHY} *
-              </Text>
+            <FormField
+              label={`${texts.LABEL_BIOGRAPHY} *`}
+              error={errors.biography?.message}
+            >
               <Textarea
-                value={biography}
-                onChange={(e) => setBiography(e.target.value)}
+                {...register('biography')}
                 placeholder={texts.PLACEHOLDER_BIOGRAPHY}
                 rows={6}
               />
-            </LayoutContainer>
+            </FormField>
           </LayoutContainer>
 
-          {/* Section: Historical Gallery with Captions */}
           <IdolGalleryEditor
             idolId={idolId}
             items={galleryItems}
@@ -399,7 +288,6 @@ export const IdolEditorDrawer: React.FC<IdolEditorDrawerProps> = ({
             onAddItems={handleAddGalleryItems}
           />
 
-          {/* Section: Visibility & Ordering */}
           <LayoutContainer className="flex flex-col gap-4 p-5 rounded-2xl bg-surface border border-border shadow-xs">
             <LayoutContainer className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <LayoutContainer className="flex items-center gap-3">
@@ -409,33 +297,39 @@ export const IdolEditorDrawer: React.FC<IdolEditorDrawerProps> = ({
                     {texts.LABEL_FEATURED}
                   </Text>
                   <Text as="span" className="text-xs text-text-muted">
-                    Exibe este ídolo com destaque especial no topo do Memorial público
+                    {texts.FEATURED_DESC}
                   </Text>
                 </LayoutContainer>
               </LayoutContainer>
-              <Checkbox
-                label="Destacar"
-                checked={isFeatured}
-                onChange={(e) => setIsFeatured(e.target.checked)}
+              <Controller
+                control={control}
+                name="isFeatured"
+                render={({ field }) => (
+                  <Checkbox
+                    label={texts.CHECKBOX_FEATURED}
+                    checked={field.value}
+                    onChange={(e) => field.onChange(e.target.checked)}
+                  />
+                )}
               />
             </LayoutContainer>
 
             <LayoutContainer className="flex flex-col gap-1.5 pt-3 border-t border-border">
-              <Text as="span" className="text-xs font-semibold text-text-secondary">
-                {texts.LABEL_ORDER}
-              </Text>
-              <Input
-                type="number"
-                min={0}
-                value={order}
-                onChange={(e) => setOrder(Number(e.target.value))}
-                placeholder="0"
-                className="max-w-xs"
-              />
+              <FormField
+                label={texts.LABEL_ORDER}
+                error={errors.order?.message}
+              >
+                <Input
+                  type="number"
+                  min={0}
+                  {...register('order')}
+                  placeholder="0"
+                  className="max-w-xs"
+                />
+              </FormField>
             </LayoutContainer>
           </LayoutContainer>
 
-          {/* Drawer Footer Actions */}
           <LayoutContainer className="flex items-center justify-end gap-3 pt-4 border-t border-border">
             <Button
               type="button"
@@ -453,7 +347,7 @@ export const IdolEditorDrawer: React.FC<IdolEditorDrawerProps> = ({
               leftIcon={<Save className="w-4 h-4" />}
               className="font-bold"
             >
-              {isSaving ? texts.BUTTON_SAVING : texts.BUTTON_SAVE}
+              {isSaving ? savingLabel || texts.BUTTON_SAVING : texts.BUTTON_SAVE}
             </Button>
           </LayoutContainer>
         </LayoutContainer>

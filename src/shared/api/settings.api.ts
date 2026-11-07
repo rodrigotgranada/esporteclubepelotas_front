@@ -7,6 +7,17 @@ export const settingsApi = {
     return response.data;
   },
 
+  uploadLogoMedia: async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append('logo', file);
+    const response = await api.post('/settings/upload-logo', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data?.url || response.data;
+  },
+
   updateSettings: async (data: any, file?: File): Promise<Settings> => {
     const formData = new FormData();
     formData.append('data', JSON.stringify(data));
@@ -15,5 +26,5 @@ export const settingsApi = {
     }
     const response = await api.put('/settings', formData);
     return response.data;
-  }
+  },
 };

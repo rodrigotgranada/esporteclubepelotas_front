@@ -1,23 +1,21 @@
 'use client';
 
 import React from 'react';
-import { LayoutContainer, Text, Title, Input } from '@/shared/ui/components';
+import { UseFormReturn } from 'react-hook-form';
+import { LayoutContainer, Title, Input, FormField } from '@/shared/ui/components';
 import { ADMIN_IDOLS_TEXTS } from '../../../constants/admin-idols.constants';
+import { IdolFormData } from '@/features/admin/schemas';
 
 export interface IdolFanFieldsProps {
-  stadiumSector: string;
-  setStadiumSector: (val: string) => void;
-  trademark: string;
-  setTrademark: (val: string) => void;
+  form: UseFormReturn<IdolFormData, any, any>;
 }
 
-export const IdolFanFields: React.FC<IdolFanFieldsProps> = ({
-  stadiumSector,
-  setStadiumSector,
-  trademark,
-  setTrademark,
-}) => {
+export const IdolFanFields: React.FC<IdolFanFieldsProps> = ({ form }) => {
   const texts = ADMIN_IDOLS_TEXTS.DRAWER;
+  const {
+    register,
+    formState: { errors },
+  } = form;
 
   return (
     <LayoutContainer className="flex flex-col gap-4 p-5 rounded-2xl bg-surface/50 border border-border shadow-xs animate-in fade-in duration-200">
@@ -25,27 +23,25 @@ export const IdolFanFields: React.FC<IdolFanFieldsProps> = ({
         {texts.SECTION_FAN}
       </Title>
 
-      <LayoutContainer className="flex flex-col gap-1.5">
-        <Text as="span" className="text-xs font-semibold text-text-secondary">
-          {texts.LABEL_STADIUM_SECTOR}
-        </Text>
+      <FormField
+        label={texts.LABEL_STADIUM_SECTOR}
+        error={errors.stadiumSector?.message}
+      >
         <Input
-          value={stadiumSector}
-          onChange={(e) => setStadiumSector(e.target.value)}
+          {...register('stadiumSector')}
           placeholder={texts.PLACEHOLDER_STADIUM_SECTOR}
         />
-      </LayoutContainer>
+      </FormField>
 
-      <LayoutContainer className="flex flex-col gap-1.5">
-        <Text as="span" className="text-xs font-semibold text-text-secondary">
-          {texts.LABEL_TRADEMARK}
-        </Text>
+      <FormField
+        label={texts.LABEL_TRADEMARK}
+        error={errors.trademark?.message}
+      >
         <Input
-          value={trademark}
-          onChange={(e) => setTrademark(e.target.value)}
+          {...register('trademark')}
           placeholder={texts.PLACEHOLDER_TRADEMARK}
         />
-      </LayoutContainer>
+      </FormField>
     </LayoutContainer>
   );
 };

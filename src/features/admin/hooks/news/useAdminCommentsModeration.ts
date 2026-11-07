@@ -7,6 +7,10 @@ import {
   AdminCommentData,
 } from '../../services/admin-news.service';
 import { ADMIN_NEWS_TEXTS } from '../../constants/admin-news.constants';
+import { useRealtimeEvents } from '@/shared/hooks/useRealtimeEvents';
+
+const resolveCommentId = (comment: AdminCommentData): string =>
+  comment._id || (comment as any).id || '';
 
 export const useAdminCommentsModeration = () => {
   const [comments, setComments] = useState<AdminCommentData[]>([]);
@@ -28,9 +32,11 @@ export const useAdminCommentsModeration = () => {
   // Status updating state
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
-  const loadComments = useCallback(async () => {
+  const loadComments = useCallback(async (options?: { silent?: boolean }) => {
     try {
-      setIsLoading(true);
+      if (!options?.silent) {
+        setIsLoading(true);
+      }
       const params: Record<string, string | number> = {
         page,
         limit,
@@ -40,21 +46,29 @@ export const useAdminCommentsModeration = () => {
       if (statusFilter) params.status = statusFilter;
 
       const res = await adminNewsService.getComments(params);
-      setComments(res.data);
-      setTotal(res.total);
-      setTotalPages(res.totalPages || Math.ceil(res.total / limit) || 1);
+      setComments(res.data || []);
+      setTotal(res.total || 0);
+      setTotalPages(res.totalPages || Math.ceil((res.total || 0) / limit) || 1);
     } catch (err: unknown) {
       console.error('Failed to load comments', err);
-      const apiErr = err as { response?: { data?: { message?: string } } };
-      toast.error(apiErr?.response?.data?.message || 'Erro ao carregar comentários');
+      if (!options?.silent) {
+        const apiErr = err as { response?: { data?: { message?: string } } };
+        toast.error(apiErr?.response?.data?.message || 'Erro ao carregar comentários');
+      }
     } finally {
-      setIsLoading(false);
+      if (!options?.silent) {
+        setIsLoading(false);
+      }
     }
   }, [page, limit, search, statusFilter]);
 
   useEffect(() => {
     loadComments();
   }, [loadComments]);
+
+  useRealtimeEvents('news-comments', () => {
+    loadComments({ silent: true });
+  });
 
   const handleSearchChange = (query: string) => {
     setSearch(query);
@@ -67,13 +81,15 @@ export const useAdminCommentsModeration = () => {
   };
 
   const handleToggleStatus = async (comment: AdminCommentData) => {
+    const commentId = resolveCommentId(comment);
+    if (!commentId || updatingId) return;
     const newStatus = comment.status === 'ACTIVE' ? 'HIDDEN' : 'ACTIVE';
     try {
-      setUpdatingId(comment._id);
-      await adminNewsService.updateCommentStatus(comment._id, newStatus);
+      setUpdatingId(commentId);
+      await adminNewsService.updateCommentStatus(commentId, newStatus);
       toast.success(ADMIN_NEWS_TEXTS.COMMENTS_MODERATION.TOAST_STATUS_SUCCESS);
       setComments((prev) =>
-        prev.map((c) => (c._id === comment._id ? { ...c, status: newStatus } : c)),
+        prev.map((c) => (resolveCommentId(c) === commentId ? { ...c, status: newStatus } : c)),
       );
     } catch (err: unknown) {
       console.error('Failed to update comment status', err);
@@ -96,13 +112,17 @@ export const useAdminCommentsModeration = () => {
   };
 
   const confirmDelete = async () => {
-    if (!commentToDelete) return;
+    if (!commentToDelete || isDeleting) return;
+    const commentId = resolveCommentId(commentToDelete);
+    if (!commentId) return;
+
     try {
       setIsDeleting(true);
-      await adminNewsService.deleteComment(commentToDelete._id);
+      await adminNewsService.deleteComment(commentId);
       toast.success(ADMIN_NEWS_TEXTS.COMMENTS_MODERATION.TOAST_DELETE_SUCCESS);
-      closeDeleteModal();
-      loadComments();
+      setDeleteModalOpen(false);
+      setCommentToDelete(null);
+      await loadComments({ silent: true });
     } catch (err: unknown) {
       console.error('Failed to delete comment', err);
       const apiErr = err as { response?: { data?: { message?: string } } };
@@ -134,4 +154,3 @@ export const useAdminCommentsModeration = () => {
     refresh: loadComments,
   };
 };
-

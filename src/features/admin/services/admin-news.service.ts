@@ -174,6 +174,30 @@ export const adminNewsService = {
     return response.data;
   },
 
+  uploadCoverMedia: async (file: File, folderId?: string): Promise<{ url: string }> => {
+    const formData = new FormData();
+    formData.append('cover', file);
+    if (folderId) {
+      formData.append('folderId', folderId);
+    }
+    const response = await api.post('/news/admin/upload-cover', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data;
+  },
+
+  uploadGalleryMedia: async (files: File[], folderId?: string): Promise<{ urls: string[] }> => {
+    const formData = new FormData();
+    files.forEach((f) => formData.append('gallery', f));
+    if (folderId) {
+      formData.append('folderId', folderId);
+    }
+    const response = await api.post('/news/admin/upload-gallery', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data;
+  },
+
   uploadContentImage: async (file: File | Blob): Promise<{ url: string }> => {
     const formData = new FormData();
     const uploadFile =

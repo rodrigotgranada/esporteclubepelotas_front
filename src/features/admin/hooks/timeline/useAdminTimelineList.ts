@@ -5,6 +5,7 @@ import { toast } from 'react-hot-toast';
 import { adminTimelineService } from '../../services/admin-timeline.service';
 import { TimelineEventData } from '@/features/timeline/services/timeline.service';
 import { ADMIN_TIMELINE_CONSTANTS } from '../../constants/admin-timeline.constants';
+import { useRealtimeEvents } from '@/shared/hooks/useRealtimeEvents';
 
 export const useAdminTimelineList = () => {
   const [events, setEvents] = useState<TimelineEventData[]>([]);
@@ -23,9 +24,11 @@ export const useAdminTimelineList = () => {
   const [eventToDelete, setEventToDelete] = useState<TimelineEventData | null>(null);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
-  const loadEvents = useCallback(async () => {
+  const loadEvents = useCallback(async (options?: { silent?: boolean }) => {
     try {
-      setIsLoading(true);
+      if (!options?.silent) {
+        setIsLoading(true);
+      }
       const params: any = { page, limit };
       if (search.trim()) params.search = search.trim();
       if (categoryFilter) params.category = categoryFilter;
@@ -37,9 +40,13 @@ export const useAdminTimelineList = () => {
       setTotalPages(res.totalPages || 1);
     } catch (err) {
       console.error('Erro ao carregar marcos históricos:', err);
-      toast.error('Não foi possível carregar a lista de marcos históricos.');
+      if (!options?.silent) {
+        toast.error('Não foi possível carregar a lista de marcos históricos.');
+      }
     } finally {
-      setIsLoading(false);
+      if (!options?.silent) {
+        setIsLoading(false);
+      }
     }
   }, [page, limit, search, categoryFilter, highlightFilter]);
 
@@ -47,17 +54,21 @@ export const useAdminTimelineList = () => {
     loadEvents();
   }, [loadEvents]);
 
+  useRealtimeEvents('timeline', () => {
+    loadEvents({ silent: true });
+  });
+
   const handleDelete = async () => {
-    if (!eventToDelete) return;
+    if (!eventToDelete || isDeleting) return;
     try {
       setIsDeleting(true);
       await adminTimelineService.deleteEvent(eventToDelete.id || eventToDelete._id || '');
       toast.success(ADMIN_TIMELINE_CONSTANTS.DELETE_MODAL.SUCCESS_DELETE);
       setEventToDelete(null);
-      await loadEvents();
-    } catch (err) {
+      await loadEvents({ silent: true });
+    } catch (err: any) {
       console.error('Erro ao inativar marco histórico:', err);
-      toast.error('Erro ao inativar marco histórico.');
+      toast.error(err?.response?.data?.message || 'Erro ao inativar marco histórico.');
     } finally {
       setIsDeleting(false);
     }
@@ -84,4 +95,3 @@ export const useAdminTimelineList = () => {
     handleDelete,
   };
 };
-

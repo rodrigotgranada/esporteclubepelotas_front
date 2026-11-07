@@ -1,118 +1,139 @@
 'use client';
 
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'react-hot-toast';
+import { useTransactionalSave } from '@/shared/hooks';
 import { adminFootballService } from '../../services/admin-football.service';
 import { SquadCategory, SquadData, SquadStaffData } from '@/features/football/services/football.service';
 import { ADMIN_FOOTBALL_CONSTANTS } from '../../constants/admin-football.constants';
+import { squadSchema, SquadFormData } from '../../schemas/football/squad.schema';
 
-export const useAdminSquadDrawer = (onSuccess: () => void, defaultCategory: SquadCategory = 'PROFESSIONAL') => {
+export const useAdminSquadDrawer = (
+  onSuccess: () => void,
+  defaultCategory: SquadCategory = 'PROFESSIONAL',
+) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [editingSquadId, setEditingSquadId] = useState<string | null>(null);
 
-  // Form Fields
-  const [year, setYear] = useState<number>(new Date().getFullYear());
-  const [category, setCategory] = useState<SquadCategory>(defaultCategory);
-  const [seasonName, setSeasonName] = useState<string>('');
-  const [coachName, setCoachName] = useState<string>('');
-  const [isCurrent, setIsCurrent] = useState<boolean>(false);
-  const [staff, setStaff] = useState<SquadStaffData[]>([]);
+  const { isSaving, runTransactionalSave } = useTransactionalSave();
 
-  // Staff adding temp state
+  const form = useForm<SquadFormData>({
+    resolver: zodResolver(squadSchema),
+    defaultValues: {
+      year: new Date().getFullYear(),
+      category: defaultCategory,
+      seasonName: `Temporada ${new Date().getFullYear()}`,
+      coachName: '',
+      isCurrent: false,
+      staff: [],
+    },
+  });
+
   const [newStaffRole, setNewStaffRole] = useState<string>('');
   const [newStaffName, setNewStaffName] = useState<string>('');
 
-  const [isSaving, setIsSaving] = useState<boolean>(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
-
-  const resetForm = () => {
+  const resetForm = (targetCat: SquadCategory = defaultCategory) => {
     setEditingSquadId(null);
-    setYear(new Date().getFullYear());
-    setCategory(defaultCategory);
-    setSeasonName('');
-    setCoachName('');
-    setIsCurrent(false);
-    setStaff([]);
     setNewStaffRole('');
     setNewStaffName('');
-    setErrors({});
+    form.reset({
+      year: new Date().getFullYear(),
+      category: targetCat,
+      seasonName: `Temporada ${new Date().getFullYear()}`,
+      coachName: '',
+      isCurrent: false,
+      staff: [],
+    });
   };
 
   const openCreate = () => {
-    resetForm();
-    setSeasonName(`Temporada ${new Date().getFullYear()}`);
+    resetForm(defaultCategory);
     setIsOpen(true);
   };
 
   const openEdit = (squad: SquadData) => {
-    resetForm();
     setEditingSquadId(squad.id || squad._id);
-    setYear(squad.year);
-    setCategory(squad.category);
-    setSeasonName(squad.seasonName);
-    setCoachName(squad.coachName || '');
-    setIsCurrent(!!squad.isCurrent);
-    setStaff(squad.staff || []);
+    setNewStaffRole('');
+    setNewStaffName('');
+    form.reset({
+      year: squad.year,
+      category: squad.category,
+      seasonName: squad.seasonName,
+      coachName: squad.coachName || '',
+      isCurrent: !!squad.isCurrent,
+      staff: squad.staff || [],
+    });
     setIsOpen(true);
   };
 
   const close = () => {
     setIsOpen(false);
-    resetForm();
+    resetForm(defaultCategory);
   };
 
   const handleAddStaff = () => {
     if (!newStaffRole.trim() || !newStaffName.trim()) return;
-    setStaff([...staff, { role: newStaffRole.trim(), name: newStaffName.trim() }]);
+    const currentStaff = form.getValues('staff') || [];
+    form.setValue('staff', [
+      ...currentStaff,
+      { role: newStaffRole.trim(), name: newStaffName.trim() },
+    ]);
     setNewStaffRole('');
     setNewStaffName('');
   };
 
   const handleRemoveStaff = (index: number) => {
-    setStaff(staff.filter((_, idx) => idx !== index));
+    const currentStaff = form.getValues('staff') || [];
+    form.setValue(
+      'staff',
+      currentStaff.filter((_, idx) => idx !== index),
+    );
   };
 
-  const validate = (): boolean => {
-    const newErrors: Record<string, string> = {};
-    if (!year || year < 1908) newErrors.year = 'Ano inválido.';
-    if (!seasonName.trim()) newErrors.seasonName = 'O nome da temporada é obrigatório.';
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+  const save = form.handleSubmit(async (data) => {
+    if (isSaving) return;
 
-  const save = async () => {
-    if (!validate()) return;
+    await runTransactionalSave({
+      hasPendingMedia: false,
+      saveToDb: async () => {
+        const payload: any = {
+          year: Number(data.year),
+          category: data.category,
+          seasonName: data.seasonName.trim(),
+          coachName: data.coachName.trim() || undefined,
+          isCurrent: data.isCurrent,
+          staff: data.staff,
+        };
 
-    try {
-      setIsSaving(true);
-      const payload: any = {
-        year: Number(year),
-        category,
-        seasonName: seasonName.trim(),
-        coachName: coachName.trim() || undefined,
-        isCurrent,
-        staff,
-      };
+        const saved = editingSquadId
+          ? await adminFootballService.updateSquad(editingSquadId, payload)
+          : await adminFootballService.createSquad(payload);
 
-      if (editingSquadId) {
-        await adminFootballService.updateSquad(editingSquadId, payload);
-        toast.success(ADMIN_FOOTBALL_CONSTANTS.DRAWER_SQUAD.SUCCESS_UPDATE);
-      } else {
-        await adminFootballService.createSquad(payload);
-        toast.success(ADMIN_FOOTBALL_CONSTANTS.DRAWER_SQUAD.SUCCESS_CREATE);
-      }
-
-      close();
-      onSuccess();
-    } catch (err: any) {
-      console.error('Erro ao salvar elenco:', err);
-      toast.error(err?.response?.data?.message || 'Erro ao salvar elenco.');
-    } finally {
-      setIsSaving(false);
-    }
-  };
+        if (!saved || (!saved.id && !saved._id)) {
+          throw new Error('Falha ao confirmar gravação da temporada/elenco.');
+        }
+        return saved;
+      },
+      onConfirmed: () => {
+        toast.success(
+          editingSquadId
+            ? ADMIN_FOOTBALL_CONSTANTS.DRAWER_SQUAD.SUCCESS_UPDATE
+            : ADMIN_FOOTBALL_CONSTANTS.DRAWER_SQUAD.SUCCESS_CREATE,
+        );
+        close();
+        onSuccess();
+      },
+      onError: (err: any) => {
+        console.error('Erro ao salvar elenco:', err);
+        toast.error(err?.response?.data?.message || err?.message || 'Erro ao salvar elenco.');
+      },
+    });
+  });
 
   return {
+    form,
     isOpen,
     isEditing: !!editingSquadId,
     openCreate,
@@ -120,18 +141,6 @@ export const useAdminSquadDrawer = (onSuccess: () => void, defaultCategory: Squa
     close,
     save,
     isSaving,
-    errors,
-    year,
-    setYear,
-    category,
-    setCategory,
-    seasonName,
-    setSeasonName,
-    coachName,
-    setCoachName,
-    isCurrent,
-    setIsCurrent,
-    staff,
     newStaffRole,
     setNewStaffRole,
     newStaffName,
@@ -140,4 +149,3 @@ export const useAdminSquadDrawer = (onSuccess: () => void, defaultCategory: Squa
     handleRemoveStaff,
   };
 };
-

@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { Controller } from 'react-hook-form';
 import {
   LayoutContainer,
   Text,
@@ -8,6 +9,7 @@ import {
   Button,
   Input,
   Checkbox,
+  FormField,
 } from '@/shared/ui/components';
 import {
   Phone,
@@ -24,33 +26,30 @@ import { useContactsSettingsTab } from '@/features/admin/hooks/settings/useConta
 
 export const ContactsSettingsTab = () => {
   const {
+    form,
     isLoading,
-    openingHours,
-    phones,
-    emails,
-    navigationLinks,
-    stadiumName,
-    setStadiumName,
-    stadiumAddress,
-    setStadiumAddress,
-    googleMapsEmbedUrl,
-    setGoogleMapsEmbedUrl,
-    copyrightText,
-    setCopyrightText,
-    handleHourChange,
-    handleAddHour,
-    handleRemoveHour,
-    handlePhoneChange,
-    handleAddPhone,
-    handleRemovePhone,
-    handleEmailChange,
-    handleAddEmail,
-    handleRemoveEmail,
-    handleNavChange,
-    handleAddNav,
-    handleRemoveNav,
+    addOpeningHour,
+    removeOpeningHour,
+    addPhone,
+    removePhone,
+    addEmail,
+    removeEmail,
+    addNavigationLink,
+    removeNavigationLink,
     handleSave,
   } = useContactsSettingsTab();
+
+  const {
+    register,
+    control,
+    watch,
+    formState: { errors },
+  } = form;
+
+  const openingHours = watch('openingHours') || [];
+  const contactPhones = watch('contactPhones') || [];
+  const contactEmails = watch('contactEmails') || [];
+  const footerNavigationLinks = watch('footerNavigationLinks') || [];
 
   return (
     <LayoutContainer className="max-w-4xl bg-surface border border-border rounded-2xl p-6 sm:p-8 flex flex-col gap-8">
@@ -59,7 +58,7 @@ export const ContactsSettingsTab = () => {
         <Title level="h2" className="text-xl font-bold text-text-primary">
           {CONTACTS_SETTINGS_TEXTS.TITLE}
         </Title>
-        <Text className="text-sm text-text-secondary mt-1">
+        <Text as="p" className="text-sm text-text-secondary mt-1">
           {CONTACTS_SETTINGS_TEXTS.DESCRIPTION}
         </Text>
       </LayoutContainer>
@@ -77,7 +76,7 @@ export const ContactsSettingsTab = () => {
           <Button
             variant="outline"
             size="sm"
-            onClick={handleAddHour}
+            onClick={addOpeningHour}
             leftIcon={<Plus className="w-4 h-4" />}
             className="shrink-0"
           >
@@ -85,46 +84,48 @@ export const ContactsSettingsTab = () => {
           </Button>
         </LayoutContainer>
 
-        <Text className="text-xs text-text-secondary">
+        <Text as="p" className="text-xs text-text-secondary">
           {CONTACTS_SETTINGS_TEXTS.SECTION_HOURS_DESC}
         </Text>
 
         {openingHours.length === 0 ? (
           <LayoutContainer className="p-6 text-center border border-dashed border-border rounded-xl">
-            <Text className="text-sm text-text-secondary">
+            <Text as="p" className="text-sm text-text-secondary">
               {CONTACTS_SETTINGS_TEXTS.EMPTY_HOURS}
             </Text>
           </LayoutContainer>
         ) : (
           <LayoutContainer className="flex flex-col gap-3">
-            {openingHours.map((item, idx) => (
+            {openingHours.map((_, idx) => (
               <LayoutContainer
                 key={idx}
                 className="bg-background border border-border rounded-xl p-4 flex flex-col sm:flex-row sm:items-center gap-4"
               >
                 <LayoutContainer className="w-full sm:w-1/3">
-                  <Input
-                    placeholder={CONTACTS_SETTINGS_TEXTS.FIELD_HOUR_DEPT_PLACEHOLDER}
-                    value={item.department}
-                    onChange={(e) => handleHourChange(idx, 'department', e.target.value)}
-                    className="text-sm"
-                  />
+                  <FormField error={errors.openingHours?.[idx]?.department?.message}>
+                    <Input
+                      placeholder={CONTACTS_SETTINGS_TEXTS.FIELD_HOUR_DEPT_PLACEHOLDER}
+                      {...register(`openingHours.${idx}.department` as const)}
+                      className="text-sm"
+                    />
+                  </FormField>
                 </LayoutContainer>
 
                 <LayoutContainer className="flex-1">
-                  <Input
-                    placeholder={CONTACTS_SETTINGS_TEXTS.FIELD_HOUR_SCHEDULE_PLACEHOLDER}
-                    value={item.schedule}
-                    onChange={(e) => handleHourChange(idx, 'schedule', e.target.value)}
-                    className="text-sm"
-                  />
+                  <FormField error={errors.openingHours?.[idx]?.schedule?.message}>
+                    <Input
+                      placeholder={CONTACTS_SETTINGS_TEXTS.FIELD_HOUR_SCHEDULE_PLACEHOLDER}
+                      {...register(`openingHours.${idx}.schedule` as const)}
+                      className="text-sm"
+                    />
+                  </FormField>
                 </LayoutContainer>
 
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-error hover:bg-error/10 p-2 h-auto self-end sm:self-center"
-                  onClick={() => handleRemoveHour(idx)}
+                  className="text-[#ea580c] hover:bg-[#ea580c]/10 p-2 h-auto self-end sm:self-center"
+                  onClick={() => removeOpeningHour(idx)}
                   title={CONTACTS_SETTINGS_TEXTS.BTN_REMOVE}
                 >
                   <Trash2 className="w-4 h-4" />
@@ -148,7 +149,7 @@ export const ContactsSettingsTab = () => {
           <Button
             variant="outline"
             size="sm"
-            onClick={handleAddPhone}
+            onClick={addPhone}
             leftIcon={<Plus className="w-4 h-4" />}
             className="shrink-0"
           >
@@ -156,56 +157,64 @@ export const ContactsSettingsTab = () => {
           </Button>
         </LayoutContainer>
 
-        <Text className="text-xs text-text-secondary">
+        <Text as="p" className="text-xs text-text-secondary">
           {CONTACTS_SETTINGS_TEXTS.SECTION_PHONES_DESC}
         </Text>
 
-        {phones.length === 0 ? (
+        {contactPhones.length === 0 ? (
           <LayoutContainer className="p-6 text-center border border-dashed border-border rounded-xl">
-            <Text className="text-sm text-text-secondary">
+            <Text as="p" className="text-sm text-text-secondary">
               {CONTACTS_SETTINGS_TEXTS.EMPTY_PHONES}
             </Text>
           </LayoutContainer>
         ) : (
           <LayoutContainer className="flex flex-col gap-3">
-            {phones.map((phone, idx) => (
+            {contactPhones.map((_, idx) => (
               <LayoutContainer
                 key={idx}
                 className="bg-background border border-border rounded-xl p-4 flex flex-col sm:flex-row sm:items-center gap-4"
               >
                 <LayoutContainer className="w-full sm:w-1/3">
-                  <Input
-                    placeholder={CONTACTS_SETTINGS_TEXTS.FIELD_PHONE_LABEL_PLACEHOLDER}
-                    value={phone.label}
-                    onChange={(e) => handlePhoneChange(idx, 'label', e.target.value)}
-                    className="text-sm"
-                  />
+                  <FormField error={errors.contactPhones?.[idx]?.label?.message}>
+                    <Input
+                      placeholder={CONTACTS_SETTINGS_TEXTS.FIELD_PHONE_LABEL_PLACEHOLDER}
+                      {...register(`contactPhones.${idx}.label` as const)}
+                      className="text-sm"
+                    />
+                  </FormField>
                 </LayoutContainer>
 
                 <LayoutContainer className="w-full sm:w-1/3">
-                  <Input
-                    placeholder={CONTACTS_SETTINGS_TEXTS.FIELD_PHONE_NUMBER_PLACEHOLDER}
-                    value={phone.number}
-                    onChange={(e) => handlePhoneChange(idx, 'number', e.target.value)}
-                    className="text-sm"
-                  />
+                  <FormField error={errors.contactPhones?.[idx]?.number?.message}>
+                    <Input
+                      placeholder={CONTACTS_SETTINGS_TEXTS.FIELD_PHONE_NUMBER_PLACEHOLDER}
+                      {...register(`contactPhones.${idx}.number` as const)}
+                      className="text-sm"
+                    />
+                  </FormField>
                 </LayoutContainer>
 
                 <LayoutContainer className="flex items-center justify-between sm:justify-start gap-4 flex-1">
                   <LayoutContainer className="flex items-center gap-2">
                     <FaWhatsapp className="w-4 h-4 text-emerald-500" />
-                    <Checkbox
-                      label={CONTACTS_SETTINGS_TEXTS.FIELD_IS_WHATSAPP}
-                      checked={!!phone.isWhatsapp}
-                      onChange={(e) => handlePhoneChange(idx, 'isWhatsapp', e.target.checked)}
+                    <Controller
+                      control={control}
+                      name={`contactPhones.${idx}.isWhatsapp` as const}
+                      render={({ field }) => (
+                        <Checkbox
+                          label={CONTACTS_SETTINGS_TEXTS.FIELD_IS_WHATSAPP}
+                          checked={Boolean(field.value)}
+                          onChange={(e) => field.onChange(e.target.checked)}
+                        />
+                      )}
                     />
                   </LayoutContainer>
 
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-error hover:bg-error/10 p-2 h-auto ml-auto"
-                    onClick={() => handleRemovePhone(idx)}
+                    className="text-[#ea580c] hover:bg-[#ea580c]/10 p-2 h-auto ml-auto"
+                    onClick={() => removePhone(idx)}
                     title={CONTACTS_SETTINGS_TEXTS.BTN_REMOVE}
                   >
                     <Trash2 className="w-4 h-4" />
@@ -230,7 +239,7 @@ export const ContactsSettingsTab = () => {
           <Button
             variant="outline"
             size="sm"
-            onClick={handleAddEmail}
+            onClick={addEmail}
             leftIcon={<Plus className="w-4 h-4" />}
             className="shrink-0"
           >
@@ -238,47 +247,49 @@ export const ContactsSettingsTab = () => {
           </Button>
         </LayoutContainer>
 
-        <Text className="text-xs text-text-secondary">
+        <Text as="p" className="text-xs text-text-secondary">
           {CONTACTS_SETTINGS_TEXTS.SECTION_EMAILS_DESC}
         </Text>
 
-        {emails.length === 0 ? (
+        {contactEmails.length === 0 ? (
           <LayoutContainer className="p-6 text-center border border-dashed border-border rounded-xl">
-            <Text className="text-sm text-text-secondary">
+            <Text as="p" className="text-sm text-text-secondary">
               {CONTACTS_SETTINGS_TEXTS.EMPTY_EMAILS}
             </Text>
           </LayoutContainer>
         ) : (
           <LayoutContainer className="flex flex-col gap-3">
-            {emails.map((emailItem, idx) => (
+            {contactEmails.map((_, idx) => (
               <LayoutContainer
                 key={idx}
                 className="bg-background border border-border rounded-xl p-4 flex flex-col sm:flex-row sm:items-center gap-4"
               >
                 <LayoutContainer className="w-full sm:w-1/3">
-                  <Input
-                    placeholder={CONTACTS_SETTINGS_TEXTS.FIELD_EMAIL_LABEL_PLACEHOLDER}
-                    value={emailItem.label}
-                    onChange={(e) => handleEmailChange(idx, 'label', e.target.value)}
-                    className="text-sm"
-                  />
+                  <FormField error={errors.contactEmails?.[idx]?.label?.message}>
+                    <Input
+                      placeholder={CONTACTS_SETTINGS_TEXTS.FIELD_EMAIL_LABEL_PLACEHOLDER}
+                      {...register(`contactEmails.${idx}.label` as const)}
+                      className="text-sm"
+                    />
+                  </FormField>
                 </LayoutContainer>
 
                 <LayoutContainer className="flex-1">
-                  <Input
-                    type="email"
-                    placeholder={CONTACTS_SETTINGS_TEXTS.FIELD_EMAIL_PLACEHOLDER}
-                    value={emailItem.email}
-                    onChange={(e) => handleEmailChange(idx, 'email', e.target.value)}
-                    className="text-sm"
-                  />
+                  <FormField error={errors.contactEmails?.[idx]?.email?.message}>
+                    <Input
+                      type="email"
+                      placeholder={CONTACTS_SETTINGS_TEXTS.FIELD_EMAIL_PLACEHOLDER}
+                      {...register(`contactEmails.${idx}.email` as const)}
+                      className="text-sm"
+                    />
+                  </FormField>
                 </LayoutContainer>
 
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-error hover:bg-error/10 p-2 h-auto self-end sm:self-center"
-                  onClick={() => handleRemoveEmail(idx)}
+                  className="text-[#ea580c] hover:bg-[#ea580c]/10 p-2 h-auto self-end sm:self-center"
+                  onClick={() => removeEmail(idx)}
                   title={CONTACTS_SETTINGS_TEXTS.BTN_REMOVE}
                 >
                   <Trash2 className="w-4 h-4" />
@@ -302,7 +313,7 @@ export const ContactsSettingsTab = () => {
           <Button
             variant="outline"
             size="sm"
-            onClick={handleAddNav}
+            onClick={addNavigationLink}
             leftIcon={<Plus className="w-4 h-4" />}
             className="shrink-0"
           >
@@ -310,59 +321,73 @@ export const ContactsSettingsTab = () => {
           </Button>
         </LayoutContainer>
 
-        <Text className="text-xs text-text-secondary">
+        <Text as="p" className="text-xs text-text-secondary">
           {CONTACTS_SETTINGS_TEXTS.SECTION_NAV_DESC}
         </Text>
 
-        {navigationLinks.length === 0 ? (
+        {footerNavigationLinks.length === 0 ? (
           <LayoutContainer className="p-6 text-center border border-dashed border-border rounded-xl">
-            <Text className="text-sm text-text-secondary">
+            <Text as="p" className="text-sm text-text-secondary">
               {CONTACTS_SETTINGS_TEXTS.EMPTY_NAV}
             </Text>
           </LayoutContainer>
         ) : (
           <LayoutContainer className="flex flex-col gap-3">
-            {navigationLinks.map((navItem, idx) => (
+            {footerNavigationLinks.map((_, idx) => (
               <LayoutContainer
                 key={idx}
                 className="bg-background border border-border rounded-xl p-4 flex flex-col md:flex-row md:items-center gap-4 transition-all"
               >
                 <LayoutContainer className="w-full md:w-1/3">
-                  <Input
-                    placeholder={CONTACTS_SETTINGS_TEXTS.FIELD_NAV_LABEL_PLACEHOLDER}
-                    value={navItem.label}
-                    onChange={(e) => handleNavChange(idx, 'label', e.target.value)}
-                    className="text-sm"
-                  />
+                  <FormField error={errors.footerNavigationLinks?.[idx]?.label?.message}>
+                    <Input
+                      placeholder={CONTACTS_SETTINGS_TEXTS.FIELD_NAV_LABEL_PLACEHOLDER}
+                      {...register(`footerNavigationLinks.${idx}.label` as const)}
+                      className="text-sm"
+                    />
+                  </FormField>
                 </LayoutContainer>
 
                 <LayoutContainer className="w-full md:w-1/3">
-                  <Input
-                    placeholder={CONTACTS_SETTINGS_TEXTS.FIELD_NAV_URL_PLACEHOLDER}
-                    value={navItem.url}
-                    onChange={(e) => handleNavChange(idx, 'url', e.target.value)}
-                    className="text-sm font-mono"
-                  />
+                  <FormField error={errors.footerNavigationLinks?.[idx]?.url?.message}>
+                    <Input
+                      placeholder={CONTACTS_SETTINGS_TEXTS.FIELD_NAV_URL_PLACEHOLDER}
+                      {...register(`footerNavigationLinks.${idx}.url` as const)}
+                      className="text-sm font-mono"
+                    />
+                  </FormField>
                 </LayoutContainer>
 
                 <LayoutContainer className="flex items-center gap-4 flex-1">
-                  <Checkbox
-                    label={CONTACTS_SETTINGS_TEXTS.FIELD_NAV_IS_VISIBLE}
-                    checked={navItem.isVisible !== false}
-                    onChange={(e) => handleNavChange(idx, 'isVisible', e.target.checked)}
+                  <Controller
+                    control={control}
+                    name={`footerNavigationLinks.${idx}.isVisible` as const}
+                    render={({ field }) => (
+                      <Checkbox
+                        label={CONTACTS_SETTINGS_TEXTS.FIELD_NAV_IS_VISIBLE}
+                        checked={field.value !== false}
+                        onChange={(e) => field.onChange(e.target.checked)}
+                      />
+                    )}
                   />
 
-                  <Checkbox
-                    label={CONTACTS_SETTINGS_TEXTS.FIELD_NAV_IS_EXTERNAL}
-                    checked={!!navItem.isExternal}
-                    onChange={(e) => handleNavChange(idx, 'isExternal', e.target.checked)}
+                  <Controller
+                    control={control}
+                    name={`footerNavigationLinks.${idx}.isExternal` as const}
+                    render={({ field }) => (
+                      <Checkbox
+                        label={CONTACTS_SETTINGS_TEXTS.FIELD_NAV_IS_EXTERNAL}
+                        checked={Boolean(field.value)}
+                        onChange={(e) => field.onChange(e.target.checked)}
+                      />
+                    )}
                   />
 
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-error hover:bg-error/10 p-2 h-auto ml-auto"
-                    onClick={() => handleRemoveNav(idx)}
+                    className="text-[#ea580c] hover:bg-[#ea580c]/10 p-2 h-auto ml-auto"
+                    onClick={() => removeNavigationLink(idx)}
                     title={CONTACTS_SETTINGS_TEXTS.BTN_REMOVE}
                   >
                     <Trash2 className="w-4 h-4" />
@@ -383,62 +408,56 @@ export const ContactsSettingsTab = () => {
           </Title>
         </LayoutContainer>
 
-        <Text className="text-xs text-text-secondary">
+        <Text as="p" className="text-xs text-text-secondary">
           {CONTACTS_SETTINGS_TEXTS.SECTION_STADIUM_DESC}
         </Text>
 
         <LayoutContainer className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <LayoutContainer className="flex flex-col gap-1.5">
-            <Text className="text-xs font-bold text-text-primary">
-              {CONTACTS_SETTINGS_TEXTS.FIELD_STADIUM_NAME}
-            </Text>
+          <FormField
+            label={CONTACTS_SETTINGS_TEXTS.FIELD_STADIUM_NAME}
+            error={errors.stadiumName?.message}
+          >
             <Input
               placeholder={CONTACTS_SETTINGS_TEXTS.FIELD_STADIUM_NAME_PLACEHOLDER}
-              value={stadiumName}
-              onChange={(e) => setStadiumName(e.target.value)}
+              {...register('stadiumName')}
               className="text-sm"
             />
-          </LayoutContainer>
+          </FormField>
 
-          <LayoutContainer className="flex flex-col gap-1.5">
-            <Text className="text-xs font-bold text-text-primary">
-              {CONTACTS_SETTINGS_TEXTS.FIELD_STADIUM_ADDRESS}
-            </Text>
+          <FormField
+            label={CONTACTS_SETTINGS_TEXTS.FIELD_STADIUM_ADDRESS}
+            error={errors.stadiumAddress?.message}
+          >
             <Input
               placeholder={CONTACTS_SETTINGS_TEXTS.FIELD_STADIUM_ADDRESS_PLACEHOLDER}
-              value={stadiumAddress}
-              onChange={(e) => setStadiumAddress(e.target.value)}
+              {...register('stadiumAddress')}
               className="text-sm"
             />
-          </LayoutContainer>
+          </FormField>
         </LayoutContainer>
 
-        <LayoutContainer className="flex flex-col gap-1.5">
-          <Text className="text-xs font-bold text-text-primary">
-            {CONTACTS_SETTINGS_TEXTS.FIELD_MAPS_EMBED}
-          </Text>
+        <FormField
+          label={CONTACTS_SETTINGS_TEXTS.FIELD_MAPS_EMBED}
+          description={CONTACTS_SETTINGS_TEXTS.FIELD_MAPS_EMBED_HINT}
+          error={errors.googleMapsEmbedUrl?.message}
+        >
           <Input
             placeholder="https://maps.google.com/maps?q=..."
-            value={googleMapsEmbedUrl}
-            onChange={(e) => setGoogleMapsEmbedUrl(e.target.value)}
+            {...register('googleMapsEmbedUrl')}
             className="text-sm font-mono"
           />
-          <Text className="text-[11px] text-text-secondary">
-            {CONTACTS_SETTINGS_TEXTS.FIELD_MAPS_EMBED_HINT}
-          </Text>
-        </LayoutContainer>
+        </FormField>
 
-        <LayoutContainer className="flex flex-col gap-1.5">
-          <Text className="text-xs font-bold text-text-primary">
-            {CONTACTS_SETTINGS_TEXTS.FIELD_COPYRIGHT}
-          </Text>
+        <FormField
+          label={CONTACTS_SETTINGS_TEXTS.FIELD_COPYRIGHT}
+          error={errors.copyrightText?.message}
+        >
           <Input
             placeholder={CONTACTS_SETTINGS_TEXTS.FIELD_COPYRIGHT_PLACEHOLDER}
-            value={copyrightText}
-            onChange={(e) => setCopyrightText(e.target.value)}
+            {...register('copyrightText')}
             className="text-sm"
           />
-        </LayoutContainer>
+        </FormField>
       </LayoutContainer>
 
       {/* Save Button */}

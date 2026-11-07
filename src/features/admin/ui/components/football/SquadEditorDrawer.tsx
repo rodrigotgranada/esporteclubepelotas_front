@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { UseFormReturn, Controller } from 'react-hook-form';
 import { Plus, Trash2 } from 'lucide-react';
 import {
   Drawer,
@@ -13,10 +14,12 @@ import {
   Button,
   Checkbox,
   Spinner,
+  FormField,
 } from '@/shared/ui/components';
 import { ADMIN_FOOTBALL_CONSTANTS } from '../../../constants/admin-football.constants';
 import { FOOTBALL_CONSTANTS } from '@/features/football/constants/football.constants';
-import { SquadCategory, SquadStaffData } from '@/features/football/services/football.service';
+import { SquadCategory } from '@/features/football/services/football.service';
+import { SquadFormData } from '../../../schemas/football/squad.schema';
 
 export interface SquadEditorDrawerProps {
   isOpen: boolean;
@@ -24,18 +27,7 @@ export interface SquadEditorDrawerProps {
   onClose: () => void;
   onSave: () => void;
   isSaving: boolean;
-  errors: Record<string, string>;
-  year: number;
-  setYear: (v: number) => void;
-  category: SquadCategory;
-  setCategory: (v: SquadCategory) => void;
-  seasonName: string;
-  setSeasonName: (v: string) => void;
-  coachName: string;
-  setCoachName: (v: string) => void;
-  isCurrent: boolean;
-  setIsCurrent: (v: boolean) => void;
-  staff: SquadStaffData[];
+  form: UseFormReturn<SquadFormData, any, any>;
   newStaffRole: string;
   setNewStaffRole: (v: string) => void;
   newStaffName: string;
@@ -52,18 +44,7 @@ export const SquadEditorDrawer: React.FC<SquadEditorDrawerProps> = ({
   onClose,
   onSave,
   isSaving,
-  errors,
-  year,
-  setYear,
-  category,
-  setCategory,
-  seasonName,
-  setSeasonName,
-  coachName,
-  setCoachName,
-  isCurrent,
-  setIsCurrent,
-  staff,
+  form,
   newStaffRole,
   setNewStaffRole,
   newStaffName,
@@ -75,6 +56,11 @@ export const SquadEditorDrawer: React.FC<SquadEditorDrawerProps> = ({
 }) => {
   const texts = ADMIN_FOOTBALL_CONSTANTS.DRAWER_SQUAD;
   const categoriesTexts = FOOTBALL_CONSTANTS.CATEGORIES;
+  const { register, control, watch, setValue, formState: { errors } } = form;
+
+  const currentCategory = watch('category');
+  const currentSeasonName = watch('seasonName');
+  const staff = watch('staff') || [];
 
   return (
     <Drawer
@@ -86,58 +72,51 @@ export const SquadEditorDrawer: React.FC<SquadEditorDrawerProps> = ({
       <LayoutContainer className="flex flex-col gap-6 p-6">
         {/* Ano & Categoria */}
         <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <LayoutContainer className="flex flex-col gap-1.5">
-            <Text as="span" className="text-xs font-bold text-text-primary">
-              {texts.FIELD_YEAR} *
-            </Text>
+          <FormField label={`${texts.FIELD_YEAR} *`} error={errors.year?.message}>
             <Input
               type="number"
-              value={year}
-              onChange={(e) => setYear(Number(e.target.value))}
-              className={errors.year ? 'border-[#ea580c]' : ''}
+              {...register('year')}
             />
-            {errors.year && (
-              <Text as="span" className="text-[11px] text-[#ea580c] font-medium">
-                {errors.year}
-              </Text>
+          </FormField>
+
+          <FormField
+            control={control}
+            name="category"
+            label={`${texts.FIELD_CATEGORY} *`}
+            render={({ field }) => (
+              <Select
+                value={field.value}
+                onChange={(e) => field.onChange(e.target.value as SquadCategory)}
+                className="w-full"
+              >
+                {(!allowedCategories || allowedCategories.includes('PROFESSIONAL') || currentCategory === 'PROFESSIONAL') && (
+                  <Option value="PROFESSIONAL">{categoriesTexts.PROFESSIONAL_FULL}</Option>
+                )}
+                {(!allowedCategories || allowedCategories.includes('FEMININE') || currentCategory === 'FEMININE') && (
+                  <Option value="FEMININE">{categoriesTexts.FEMININE_FULL}</Option>
+                )}
+                {(!allowedCategories || allowedCategories.includes('SUB_20') || currentCategory === 'SUB_20') && (
+                  <Option value="SUB_20">{categoriesTexts.SUB_20_FULL}</Option>
+                )}
+                {(!allowedCategories || allowedCategories.includes('SUB_17') || currentCategory === 'SUB_17') && (
+                  <Option value="SUB_17">{categoriesTexts.SUB_17_FULL}</Option>
+                )}
+                {(!allowedCategories || allowedCategories.includes('SUB_15') || currentCategory === 'SUB_15') && (
+                  <Option value="SUB_15">{categoriesTexts.SUB_15_FULL}</Option>
+                )}
+              </Select>
             )}
-          </LayoutContainer>
-
-          <LayoutContainer className="flex flex-col gap-1.5">
-            <Text as="span" className="text-xs font-bold text-text-primary">
-              {texts.FIELD_CATEGORY} *
-            </Text>
-            <Select
-              value={category}
-              onChange={(e) => setCategory(e.target.value as SquadCategory)}
-              className="w-full"
-            >
-              {(!allowedCategories || allowedCategories.includes('PROFESSIONAL') || category === 'PROFESSIONAL') && <Option value="PROFESSIONAL">{categoriesTexts.PROFESSIONAL_FULL}</Option>}
-              {(!allowedCategories || allowedCategories.includes('FEMININE') || category === 'FEMININE') && <Option value="FEMININE">{categoriesTexts.FEMININE_FULL}</Option>}
-              {(!allowedCategories || allowedCategories.includes('SUB_20') || category === 'SUB_20') && <Option value="SUB_20">{categoriesTexts.SUB_20_FULL}</Option>}
-              {(!allowedCategories || allowedCategories.includes('SUB_17') || category === 'SUB_17') && <Option value="SUB_17">{categoriesTexts.SUB_17_FULL}</Option>}
-              {(!allowedCategories || allowedCategories.includes('SUB_15') || category === 'SUB_15') && <Option value="SUB_15">{categoriesTexts.SUB_15_FULL}</Option>}
-
-            </Select>
-          </LayoutContainer>
+          />
         </LayoutContainer>
 
         {/* Nome da Temporada / Competição */}
         <LayoutContainer className="flex flex-col gap-1.5">
-          <Text as="span" className="text-xs font-bold text-text-primary">
-            {texts.FIELD_SEASON_NAME} *
-          </Text>
-          <Input
-            value={seasonName}
-            onChange={(e) => setSeasonName(e.target.value)}
-            placeholder={texts.FIELD_SEASON_NAME_PLACEHOLDER}
-            className={errors.seasonName ? 'border-[#ea580c]' : ''}
-          />
-          {errors.seasonName && (
-            <Text as="span" className="text-[11px] text-[#ea580c] font-medium">
-              {errors.seasonName}
-            </Text>
-          )}
+          <FormField label={`${texts.FIELD_SEASON_NAME} *`} error={errors.seasonName?.message}>
+            <Input
+              {...register('seasonName')}
+              placeholder={texts.FIELD_SEASON_NAME_PLACEHOLDER}
+            />
+          </FormField>
 
           {existingCompetitions.length > 0 && (
             <LayoutContainer className="flex flex-col gap-1.5 pt-1">
@@ -146,14 +125,14 @@ export const SquadEditorDrawer: React.FC<SquadEditorDrawerProps> = ({
               </Text>
               <LayoutContainer className="flex flex-wrap gap-1.5">
                 {existingCompetitions.slice(0, 8).map((comp) => {
-                  const isSelected = seasonName.trim().toLowerCase() === comp.toLowerCase();
+                  const isSelected = (currentSeasonName || '').trim().toLowerCase() === comp.toLowerCase();
                   return (
                     <Button
                       key={comp}
                       type="button"
                       size="sm"
                       variant={isSelected ? 'primary' : 'outline'}
-                      onClick={() => setSeasonName(comp)}
+                      onClick={() => setValue('seasonName', comp)}
                       className="text-[11px] py-1 px-2.5 h-auto rounded-full font-bold"
                     >
                       {comp}
@@ -166,24 +145,26 @@ export const SquadEditorDrawer: React.FC<SquadEditorDrawerProps> = ({
         </LayoutContainer>
 
         {/* Treinador Principal */}
-        <LayoutContainer className="flex flex-col gap-1.5">
-          <Text as="span" className="text-xs font-bold text-text-primary">
-            {texts.FIELD_COACH}
-          </Text>
+        <FormField label={texts.FIELD_COACH} error={errors.coachName?.message}>
           <Input
-            value={coachName}
-            onChange={(e) => setCoachName(e.target.value)}
+            {...register('coachName')}
             placeholder={texts.FIELD_COACH_PLACEHOLDER}
           />
-        </LayoutContainer>
+        </FormField>
 
         {/* Marcar como Elenco Atual Checkbox */}
         <LayoutContainer className="p-4 rounded-2xl bg-surface border border-border">
-          <Checkbox
-            label={texts.FIELD_IS_CURRENT}
-            description={texts.FIELD_IS_CURRENT_DESC}
-            checked={isCurrent}
-            onChange={(e) => setIsCurrent(e.target.checked)}
+          <Controller
+            control={control}
+            name="isCurrent"
+            render={({ field }) => (
+              <Checkbox
+                label={texts.FIELD_IS_CURRENT}
+                description={texts.FIELD_IS_CURRENT_DESC}
+                checked={field.value}
+                onChange={(e) => field.onChange(e.target.checked)}
+              />
+            )}
           />
         </LayoutContainer>
 

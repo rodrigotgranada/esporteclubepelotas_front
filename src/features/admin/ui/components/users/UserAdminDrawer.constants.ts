@@ -37,6 +37,7 @@ export const USER_ADMIN_DRAWER_TEXTS = {
     MUST_CHANGE_PASSWORD: 'Senha provisória (obrigar troca no próximo login)',
     MUST_CHANGE_PASSWORD_HINT: 'Se marcado, o usuário será obrigado a cadastrar uma nova senha definitiva assim que fizer login.',
     ROLE_SELF_DISABLED_HINT: 'Você não pode alterar seu próprio nível de acesso pelo painel.',
+    ROLE_NO_PERMISSION_HINT: 'Você não tem permissão para alterar o cargo deste usuário.',
     DELETE_USER_SELF_DISABLED_HINT: 'Não é possível excluir o próprio usuário logado pelo painel.',
   },
   BUTTONS: {
@@ -47,10 +48,21 @@ export const USER_ADMIN_DRAWER_TEXTS = {
     RESEND_EMAIL: 'Reenviar Verificação de E-mail',
     RESET_PASSWORD: 'Enviar Link de Recuperação de Senha por E-mail',
     DELETE_USER: 'Excluir Usuário (Soft Delete)',
+    UPLOADING_AVATAR: 'Enviando avatar...',
+    SAVING_USER: 'Salvando no banco...',
   },
   FEEDBACK: {
     PASSWORD_GENERATED: 'Senha provisória gerada! A opção de troca obrigatória foi ativada.',
     PASSWORD_COPIED: 'Senha copiada para a área de transferência!',
     PASSWORD_COPIED_FAILED: 'Não foi possível copiar a senha automaticamente.',
+  },
+  MODALS: {
+    CONFIRM_DELETE: (name: string) =>
+      `Tem certeza de que deseja inativar o usuário "${name}"? Esta ação removerá os acessos administrativos da conta.`,
+    CONFIRM_RESET_PASSWORD:
+      'Deseja enviar um link de redefinição de senha para o e-mail cadastrado deste usuário?',
+    CONFIRM_RESEND_VERIFICATION:
+      'Deseja reenviar o e-mail de ativação e confirmação cadastral para este usuário?',
+    CONFIRM_SAVE: 'Deseja confirmar as alterações cadastrais deste usuário?',
   },
 };

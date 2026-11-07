@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import toast from 'react-hot-toast';
+import { useRealtimeEvents } from '@/shared/hooks';
 import {
   adminNewsService,
   NewsArticleData,
@@ -23,23 +24,33 @@ export const useAdminScheduled = (onArticleUpdated?: () => void) => {
   const [articleToDelete, setArticleToDelete] = useState<NewsArticleData | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const fetchScheduled = useCallback(async () => {
+  const fetchScheduled = useCallback(async (opts?: { silent?: boolean }) => {
     try {
-      setIsLoading(true);
+      if (!opts?.silent) {
+        setIsLoading(true);
+      }
       const res = await adminNewsService.getScheduledNews();
       setScheduledArticles(res.data || []);
       setTotal(res.total || 0);
     } catch (err) {
       console.error('Erro ao carregar matérias agendadas:', err);
-      toast.error('Erro ao carregar fila de matérias agendadas.');
+      if (!opts?.silent) {
+        toast.error(ADMIN_NEWS_TEXTS.TOAST.ERROR_GENERIC);
+      }
     } finally {
-      setIsLoading(false);
+      if (!opts?.silent) {
+        setIsLoading(false);
+      }
     }
   }, []);
 
   useEffect(() => {
     fetchScheduled();
   }, [fetchScheduled]);
+
+  useRealtimeEvents('news', () => {
+    fetchScheduled({ silent: true });
+  });
 
   // Publicar Agora Handlers
   const openPublishModal = (article: NewsArticleData) => {
@@ -62,7 +73,7 @@ export const useAdminScheduled = (onArticleUpdated?: () => void) => {
       await adminNewsService.publishNow(id);
       toast.success(ADMIN_NEWS_TEXTS.SCHEDULED.TOAST_PUBLISH_SUCCESS);
       closePublishModal();
-      await fetchScheduled();
+      await fetchScheduled({ silent: true });
       if (onArticleUpdated) {
         onArticleUpdated();
       }
@@ -95,15 +106,15 @@ export const useAdminScheduled = (onArticleUpdated?: () => void) => {
     try {
       setIsDeleting(true);
       await adminNewsService.deleteNews(id);
-      toast.success('Matéria agendada excluída com sucesso.');
+      toast.success(ADMIN_NEWS_TEXTS.TOAST.SUCCESS_DELETE);
       closeDeleteModal();
-      await fetchScheduled();
+      await fetchScheduled({ silent: true });
       if (onArticleUpdated) {
         onArticleUpdated();
       }
     } catch (err: any) {
       console.error('Erro ao excluir matéria agendada:', err);
-      toast.error('Erro ao excluir matéria agendada.');
+      toast.error(ADMIN_NEWS_TEXTS.TOAST.ERROR_GENERIC);
     } finally {
       setIsDeleting(false);
     }
@@ -171,4 +182,3 @@ export const useAdminScheduled = (onArticleUpdated?: () => void) => {
     getTimeRemaining,
   };
 };
-

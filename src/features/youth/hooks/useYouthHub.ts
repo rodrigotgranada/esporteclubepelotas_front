@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useRealtimeEvents } from '@/shared/hooks';
 import {
   footballService,
   YouthPortalConfig,
@@ -52,9 +53,11 @@ export const useYouthHub = () => {
   const [youthConfig, setYouthConfig] = useState<YouthPortalConfig | null>(null);
   const [isLoadingConfig, setIsLoadingConfig] = useState<boolean>(true);
 
-  const loadYouthNews = useCallback(async () => {
+  const loadYouthNews = useCallback(async (opts?: { silent?: boolean }) => {
     try {
-      setIsLoadingNews(true);
+      if (!opts?.silent) {
+        setIsLoadingNews(true);
+      }
       const res = await newsService.getNews({ limit: 12, isYouth: true });
       const articles = res.data || [];
 
@@ -71,15 +74,21 @@ export const useYouthHub = () => {
       setNews(filtered.length > 0 ? filtered.slice(0, 4) : articles.slice(0, 4));
     } catch (err) {
       console.warn('[useYouthHub] Falha temporária ao carregar notícias da base:', err);
-      setNews([]);
+      if (!opts?.silent) {
+        setNews([]);
+      }
     } finally {
-      setIsLoadingNews(false);
+      if (!opts?.silent) {
+        setIsLoadingNews(false);
+      }
     }
   }, []);
 
-  const loadYouthConfig = useCallback(async () => {
+  const loadYouthConfig = useCallback(async (opts?: { silent?: boolean }) => {
     try {
-      setIsLoadingConfig(true);
+      if (!opts?.silent) {
+        setIsLoadingConfig(true);
+      }
       const data = await footballService.getYouthPortalConfig();
       setYouthConfig(data);
     } catch (err) {
@@ -87,9 +96,13 @@ export const useYouthHub = () => {
         '[useYouthHub] Usando configuração padrão da base enquanto o servidor sincroniza:',
         err,
       );
-      setYouthConfig(FALLBACK_YOUTH_CONFIG);
+      if (!opts?.silent) {
+        setYouthConfig(FALLBACK_YOUTH_CONFIG);
+      }
     } finally {
-      setIsLoadingConfig(false);
+      if (!opts?.silent) {
+        setIsLoadingConfig(false);
+      }
     }
   }, []);
 
@@ -97,6 +110,14 @@ export const useYouthHub = () => {
     loadYouthNews();
     loadYouthConfig();
   }, [loadYouthNews, loadYouthConfig]);
+
+  useRealtimeEvents('news', () => {
+    loadYouthNews({ silent: true });
+  });
+
+  useRealtimeEvents('youth-config', () => {
+    loadYouthConfig({ silent: true });
+  });
 
   return {
     news,

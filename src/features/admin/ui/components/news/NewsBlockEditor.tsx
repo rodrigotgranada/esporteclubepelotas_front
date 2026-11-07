@@ -19,7 +19,8 @@ import {
   Sparkles,
   Image as ImageIcon,
 } from 'lucide-react';
-import { LayoutContainer, IconButton, CropModal } from '@/shared/ui/components';
+import { LayoutContainer, IconButton, Text, CropModal } from '@/shared/ui/components';
+import { verifyUploadedUrl } from '@/shared/hooks';
 import toast from 'react-hot-toast';
 import { adminNewsService } from '../../../services/admin-news.service';
 import { ADMIN_NEWS_TEXTS } from '../../../constants/admin-news.constants';
@@ -66,7 +67,7 @@ export const NewsBlockEditor: React.FC<NewsBlockEditorProps> = ({
       }),
       NewsCustomImageExtension.configure({
         inline: false,
-        allowBase64: true,
+        allowBase64: false,
       }),
     ],
     content: content && Object.keys(content).length > 0 ? content : undefined,
@@ -215,29 +216,22 @@ export const NewsBlockEditor: React.FC<NewsBlockEditorProps> = ({
     setIsCropModalOpen(true);
   };
 
-  // When crop is confirmed, upload image and insert public storage URL into editor
+  // When crop is confirmed, upload image and insert verified public storage URL into editor
   const handleCropSave = async (croppedBlob: Blob) => {
     if (!editor) return;
-    const loadingToast = toast.loading('Processando e enviando imagem...');
+    const loadingToast = toast.loading(ADMIN_NEWS_TEXTS.TOAST.UPLOADING_CONTENT_IMAGE);
     try {
       const { url } = await adminNewsService.uploadContentImage(croppedBlob);
-      editor.chain().focus().setImage({ src: url }).run();
+      const verifiedUrl = verifyUploadedUrl(url, ADMIN_NEWS_TEXTS.TOAST.ERROR_CONTENT_IMAGE_UPLOAD);
+      editor.chain().focus().setImage({ src: verifiedUrl }).run();
       toast.dismiss(loadingToast);
-      toast.success('Imagem inserida com sucesso!');
-    } catch (err) {
-      console.error('Failed to upload cropped image', err);
-      // Fallback: If upload fails (e.g. offline dev), fallback to data URL
-      const reader = new FileReader();
-      reader.onload = () => {
-        if (typeof reader.result === 'string') {
-          editor.chain().focus().setImage({ src: reader.result }).run();
-        }
-      };
-      reader.readAsDataURL(croppedBlob);
-      toast.dismiss(loadingToast);
-    } finally {
+      toast.success(ADMIN_NEWS_TEXTS.TOAST.SUCCESS_CONTENT_IMAGE_UPLOADED);
       setIsCropModalOpen(false);
       setCropSourceImage(null);
+    } catch (err) {
+      console.error('Failed to upload cropped image', err);
+      toast.dismiss(loadingToast);
+      toast.error(ADMIN_NEWS_TEXTS.TOAST.ERROR_CONTENT_IMAGE_UPLOAD);
     }
   };
 
@@ -246,23 +240,26 @@ export const NewsBlockEditor: React.FC<NewsBlockEditorProps> = ({
     if (!editor || !cropSourceImage) return;
 
     if (cropSourceImage.startsWith('data:') || cropSourceImage.startsWith('blob:')) {
-      const loadingToast = toast.loading('Processando e enviando imagem original...');
+      const loadingToast = toast.loading(ADMIN_NEWS_TEXTS.TOAST.UPLOADING_CONTENT_IMAGE);
       try {
         const response = await fetch(cropSourceImage);
         const blob = await response.blob();
         const { url } = await adminNewsService.uploadContentImage(blob);
-        editor.chain().focus().setImage({ src: url }).run();
+        const verifiedUrl = verifyUploadedUrl(url, ADMIN_NEWS_TEXTS.TOAST.ERROR_CONTENT_IMAGE_UPLOAD);
+        editor.chain().focus().setImage({ src: verifiedUrl }).run();
         toast.dismiss(loadingToast);
-        toast.success('Imagem inserida com sucesso!');
+        toast.success(ADMIN_NEWS_TEXTS.TOAST.SUCCESS_CONTENT_IMAGE_UPLOADED);
+        setIsCropModalOpen(false);
+        setCropSourceImage(null);
       } catch (err) {
         console.error('Failed to upload original image', err);
-        editor.chain().focus().setImage({ src: cropSourceImage }).run();
         toast.dismiss(loadingToast);
+        toast.error(ADMIN_NEWS_TEXTS.TOAST.ERROR_CONTENT_IMAGE_UPLOAD);
       }
-    } else {
-      editor.chain().focus().setImage({ src: cropSourceImage }).run();
+      return;
     }
 
+    editor.chain().focus().setImage({ src: cropSourceImage }).run();
     setIsCropModalOpen(false);
     setCropSourceImage(null);
   };
@@ -421,34 +418,36 @@ export const NewsBlockEditor: React.FC<NewsBlockEditorProps> = ({
             className="absolute left-2.5 z-40 flex items-center gap-0.5 select-none transition-all duration-150"
           >
             {/* (+) Button: Inserts new block below */}
-            <button
+            <IconButton
               type="button"
+              variant="ghost"
+              size="sm"
               onClick={handleAddClick}
               title={texts.BLOCK_ADD_TOOLTIP}
               aria-label={texts.BLOCK_ADD_TOOLTIP}
-              className={`w-6 h-6 rounded-md flex items-center justify-center transition-colors cursor-pointer ${
+              className={`!w-6 !h-6 !p-0 rounded-md flex items-center justify-center transition-colors cursor-pointer ${
                 isMenuOpen && menuMode === 'add_below'
                   ? 'bg-primary text-black font-bold shadow-xs'
                   : 'hover:bg-drawer text-text-secondary hover:text-primary'
               }`}
-            >
-              <Plus className="w-3.5 h-3.5" />
-            </button>
+              icon={<Plus className="w-3.5 h-3.5" />}
+            />
 
             {/* (⋮⋮) Handle: Options for current line */}
-            <button
+            <IconButton
               type="button"
+              variant="ghost"
+              size="sm"
               onClick={handleGripClick}
               title={texts.BLOCK_HANDLE_TOOLTIP}
               aria-label={texts.BLOCK_HANDLE_TOOLTIP}
-              className={`w-6 h-6 rounded-md flex items-center justify-center transition-colors cursor-pointer ${
+              className={`!w-6 !h-6 !p-0 rounded-md flex items-center justify-center transition-colors cursor-pointer ${
                 isMenuOpen && menuMode === 'transform'
                   ? 'bg-primary text-black font-bold shadow-xs'
                   : 'hover:bg-drawer text-text-secondary hover:text-text-primary'
               }`}
-            >
-              <GripVertical className="w-3.5 h-3.5" />
-            </button>
+              icon={<GripVertical className="w-3.5 h-3.5" />}
+            />
 
             {/* Floating Dropdown Menu */}
             {isMenuOpen && (
@@ -472,7 +471,7 @@ export const NewsBlockEditor: React.FC<NewsBlockEditorProps> = ({
       {/* Helpful Hint Bar at Bottom */}
       <LayoutContainer className="px-4 py-2 border-t border-border bg-drawer/50 rounded-b-xl flex items-center gap-2 text-[11px] text-text-secondary">
         <Sparkles className="w-3 h-3 text-primary shrink-0" />
-        <span>{texts.HINT_EDITOR_NOTION}</span>
+        <Text as="span">{texts.HINT_EDITOR_NOTION}</Text>
       </LayoutContainer>
 
       {/* 1. Modal to Choose Image Source (File or Web URL) */}

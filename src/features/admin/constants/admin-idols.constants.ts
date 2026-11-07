@@ -43,6 +43,7 @@ export const ADMIN_IDOLS_TEXTS = {
     PLACEHOLDER_SLUG: 'Ex: flavio-minuano',
     LABEL_PHOTO: 'Foto Principal (Retrato)',
     PHOTO_HINT: 'Envie uma foto nítida. O sistema permite recorte vertical e remoção de fundo por IA.',
+    PHOTO_CROP_PLACEHOLDER: 'Ajuste e recorte o retrato do ídolo',
     LABEL_START_YEAR: 'Ano de Início no Clube',
     PLACEHOLDER_START_YEAR: 'Ex: 1961',
     LABEL_END_YEAR: 'Ano de Fim',
@@ -58,6 +59,8 @@ export const ADMIN_IDOLS_TEXTS = {
     LABEL_BIOGRAPHY: 'Biografia Completa',
     PLACEHOLDER_BIOGRAPHY: 'Conte a trajetória detalhada, partidas célebres, início da relação com o clube...',
     LABEL_FEATURED: 'Destacar no topo da galeria do Memorial',
+    FEATURED_DESC: 'Exibe o ídolo com destaque especial no topo do Memorial',
+    CHECKBOX_FEATURED: 'Destacar no Memorial',
     LABEL_ORDER: 'Ordem de Exibição (menor número = maior prioridade)',
 
     // Player Specific Fields
@@ -104,6 +107,7 @@ export const ADMIN_IDOLS_TEXTS = {
     // Gallery with Captions
     SECTION_GALLERY: 'Galeria de Fotos Históricas & Legendas',
     GALLERY_HINT: 'Adicione fotos históricas de época, jornais e momentos marcantes com legendas personalizadas.',
+    GALLERY_EMPTY: 'Nenhuma foto adicionada à galeria até o momento.',
     LABEL_PHOTO_CAPTION: 'Legenda da foto',
     PLACEHOLDER_PHOTO_CAPTION: 'Ex: Comemorando título citadino de 1964 na Boca do Lobo',
     BTN_REMOVE_PHOTO: 'Remover foto da galeria',
@@ -111,15 +115,19 @@ export const ADMIN_IDOLS_TEXTS = {
 
     // Multiple Periods
     SECTION_PERIODS: 'Passagens pelo Pelotas (Períodos)',
+    SECTION_PERIOD_ORIGIN: 'Passagem Principal / Primeira Passagem',
     BTN_ADD_PERIOD: '+ Adicionar Outra Passagem',
     BTN_REMOVE_PERIOD: 'Remover passagem',
     LABEL_PERIOD_LABEL: 'Identificação da passagem (opcional)',
     PLACEHOLDER_PERIOD_LABEL: 'Ex: Retorno ao clube, Segunda passagem',
+    LOADING_DATA: 'Carregando dados do ídolo...',
 
     // Buttons & Actions
     BUTTON_CANCEL: 'Cancelar',
     BUTTON_SAVE: 'Salvar Ídolo',
     BUTTON_SAVING: 'Salvando...',
+    BUTTON_UPLOADING_MEDIA: 'Enviando mídias...',
+    BUTTON_SAVING_DB: 'Salvando no banco...',
   },
 
   MODAL_DELETE: {
@@ -134,6 +142,7 @@ export const ADMIN_IDOLS_TEXTS = {
     SUCCESS_UPDATE: 'Dados do ídolo atualizados com sucesso!',
     SUCCESS_DELETE: 'Ídolo removido com sucesso.',
     ERROR_SAVE: 'Erro ao salvar ídolo. Verifique os campos.',
+    ERROR_PHOTO_UPLOAD: 'Falha ao enviar a foto do ídolo.',
+    ERROR_GALLERY_UPLOAD: 'Falha ao enviar as fotos da galeria do ídolo.',
   },
 };
-

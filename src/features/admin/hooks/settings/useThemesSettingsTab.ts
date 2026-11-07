@@ -1,7 +1,8 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { themeService, ThemeDocument } from '@/services/theme.service';
 import toast from 'react-hot-toast';
 import { SETTINGS_TEXTS } from '../../constants/settings.constants';
+import { useRealtimeEvents } from '@/shared/hooks/useRealtimeEvents';
 
 export const useThemesSettingsTab = () => {
   const [themes, setThemes] = useState<ThemeDocument[]>([]);
@@ -9,49 +10,62 @@ export const useThemesSettingsTab = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [themeToEdit, setThemeToEdit] = useState<ThemeDocument | undefined>();
   const [previewTheme, setPreviewTheme] = useState<ThemeDocument | undefined>();
+  const mutatingRef = useRef(false);
 
-  const fetchThemes = useCallback(async () => {
+  const fetchThemes = useCallback(async (options?: { silent?: boolean }) => {
     try {
-      setIsLoading(true);
+      if (!options?.silent) {
+        setIsLoading(true);
+      }
       const data = await themeService.getThemes();
       setThemes(data);
-      if (data.length > 0 && !previewTheme) {
-        setPreviewTheme(data.find((t: any) => t.isActive) || data[0]);
+      if (data.length > 0) {
+        setPreviewTheme((prev) => prev || data.find((t: any) => t.isActive) || data[0]);
       }
-    } catch (error: any) {
-      toast.error(SETTINGS_TEXTS.THEMES.ERROR_FETCH);
+    } catch {
+      if (!options?.silent) {
+        toast.error(SETTINGS_TEXTS.THEMES.ERROR_FETCH);
+      }
     } finally {
-      setIsLoading(false);
+      if (!options?.silent) {
+        setIsLoading(false);
+      }
     }
-  }, [previewTheme]);
+  }, []);
 
   useEffect(() => {
     fetchThemes();
   }, [fetchThemes]);
 
+  useRealtimeEvents('themes', () => {
+    fetchThemes({ silent: true });
+  });
+
   const handleActivate = async (id: string) => {
+    if (mutatingRef.current) return;
+    mutatingRef.current = true;
     try {
       await themeService.activateTheme(id);
       toast.success(SETTINGS_TEXTS.THEMES.SUCCESS_ACTIVATE);
-      await fetchThemes();
-      setTimeout(() => {
-        window.location.href = window.location.pathname;
-      }, 1000);
-    } catch (error: any) {
+      await fetchThemes({ silent: true });
+    } catch {
       toast.error(SETTINGS_TEXTS.THEMES.ERROR_ACTIVATE);
+    } finally {
+      mutatingRef.current = false;
     }
   };
 
   const handleDeactivate = async (id: string) => {
+    if (mutatingRef.current) return;
+    mutatingRef.current = true;
     try {
       await themeService.deactivateTheme(id);
       toast.success(SETTINGS_TEXTS.THEMES.SUCCESS_DEACTIVATE);
-      await fetchThemes();
-      setTimeout(() => {
-        window.location.href = window.location.pathname;
-      }, 1000);
-    } catch (error: any) {
+      await fetchThemes({ silent: true });
+    } catch {
       toast.error(SETTINGS_TEXTS.THEMES.ERROR_DEACTIVATE);
+    } finally {
+      mutatingRef.current = false;
     }
   };
 
@@ -66,7 +80,7 @@ export const useThemesSettingsTab = () => {
   };
 
   const handleSaveSuccess = () => {
-    fetchThemes();
+    fetchThemes({ silent: true });
     handleCloseDrawer();
   };
 

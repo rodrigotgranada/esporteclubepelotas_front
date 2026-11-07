@@ -69,6 +69,20 @@ export const adminService = {
     return response.data;
   },
 
+  uploadUserAvatarMedia: async (file: File, folderId?: string): Promise<string> => {
+    const formData = new FormData();
+    formData.append('avatar', file);
+    if (folderId) {
+      formData.append('folderId', folderId);
+    }
+    const response = await api.post('/users/admin/upload-avatar', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data?.url || response.data;
+  },
+
   softDeleteUser: async (id: string): Promise<void> => {
     await api.delete(`/users/admin/${id}`);
   },
@@ -104,5 +118,5 @@ export const adminService = {
   updateSystemModuleStatus: async (id: string, isActive: boolean): Promise<any> => {
     const response = await api.patch(`/admin/modules/${id}/status`, { isActive });
     return response.data;
-  }
+  },
 };

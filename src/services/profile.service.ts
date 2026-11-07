@@ -22,7 +22,7 @@ export const updateProfile = async (data: UpdateProfilePayload): Promise<User> =
 export const updateAvatar = async (file: File): Promise<{ url: string }> => {
   const formData = new FormData();
   formData.append('file', file);
-  
+
   const response = await api.put<{ url: string }>('/users/me/avatar', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
@@ -37,9 +37,18 @@ export const deleteAccount = async (password: string): Promise<void> => {
   });
 };
 
-export const requestProfileChange = async (type: 'email' | 'phone', newValue: string, currentPassword: string): Promise<{ success: boolean; user: User }> => {
-  const response = await api.post<{ success: boolean; user: User }>('/users/profile/request-change', { type, newValue, currentPassword });
-  return response.data;
+export const requestProfileChange = async (
+  type: 'email' | 'phone',
+  newValue: string,
+  currentPassword: string,
+): Promise<{ success: boolean; user: User }> => {
+  const response = await api.post<{ success: boolean; user: User } | User>(
+    '/users/profile/request-change',
+    { type, newValue, currentPassword },
+  );
+  const data: any = response.data;
+  const resolvedUser: User = data && 'user' in data ? data.user : data;
+  return { success: true, user: resolvedUser };
 };
 
 export const confirmProfileChange = async (type: 'email' | 'phone', code: string): Promise<User> => {

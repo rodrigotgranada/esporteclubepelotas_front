@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { UseFormReturn } from 'react-hook-form';
 import {
   Modal,
   LayoutContainer,
@@ -9,16 +10,15 @@ import {
   Form,
   Input,
   Button,
+  FormField,
 } from '@/shared/ui/components';
 import { ADMIN_NEWS_TEXTS } from '../../../constants/admin-news.constants';
+import { QuickCategoryFormData } from '@/features/admin/schemas';
 
 export interface QuickCategoryModalProps {
   isOpen: boolean;
   onClose: () => void;
-  name: string;
-  setName: (val: string) => void;
-  description: string;
-  setDescription: (val: string) => void;
+  form: UseFormReturn<QuickCategoryFormData, any, any>;
   isLoading: boolean;
   onSubmit: (e?: React.FormEvent) => void;
 }
@@ -26,14 +26,15 @@ export interface QuickCategoryModalProps {
 export const QuickCategoryModal: React.FC<QuickCategoryModalProps> = ({
   isOpen,
   onClose,
-  name,
-  setName,
-  description,
-  setDescription,
+  form,
   isLoading,
   onSubmit,
 }) => {
   const { MODAL_CATEGORY: texts } = ADMIN_NEWS_TEXTS;
+  const {
+    register,
+    formState: { errors },
+  } = form;
 
   return (
     <Modal
@@ -50,31 +51,28 @@ export const QuickCategoryModal: React.FC<QuickCategoryModalProps> = ({
           {texts.DESC}
         </Text>
 
-        <LayoutContainer className="flex flex-col gap-1.5">
-          <Text as="span" className="text-xs font-semibold text-text-primary uppercase tracking-wider">
-            {texts.LABEL_NAME} *
-          </Text>
+        <FormField
+          label={`${texts.LABEL_NAME} *`}
+          error={errors.name?.message}
+        >
           <Input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            {...register('name')}
             placeholder={texts.PLACEHOLDER_NAME}
-            required
             autoFocus
           />
-        </LayoutContainer>
+        </FormField>
 
-        <LayoutContainer className="flex flex-col gap-1.5">
-          <Text as="span" className="text-xs font-semibold text-text-primary uppercase tracking-wider">
-            {texts.LABEL_DESC}
-          </Text>
+        <FormField
+          label={texts.LABEL_DESC}
+          error={errors.description?.message}
+        >
           <Input
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            {...register('description')}
             placeholder={texts.PLACEHOLDER_DESC}
           />
-        </LayoutContainer>
+        </FormField>
 
-        <LayoutContainer className="flex items-center justify-end gap-3 pt-3 border-t border-border mt-2">
+        <LayoutContainer className="flex items-center justify-end gap-3 mt-4 pt-4 border-t border-border">
           <Button
             type="button"
             variant="ghost"
@@ -87,7 +85,7 @@ export const QuickCategoryModal: React.FC<QuickCategoryModalProps> = ({
             type="submit"
             variant="primary"
             isLoading={isLoading}
-            disabled={!name.trim() || isLoading}
+            className="font-bold"
           >
             {texts.BUTTON_SUBMIT}
           </Button>

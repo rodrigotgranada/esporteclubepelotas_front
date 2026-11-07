@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useAuthStore } from '@/store/useAuthStore';
 import { authRepository } from '../repositories';
 import { Toast } from '@/shared/ui/components';
+import { verifyEmailSchema, VerifyEmailForm } from '../schemas/auth.schemas';
 
 export function maskEmail(email: string) {
   if (!email) return '';
@@ -16,34 +19,39 @@ export const useVerifyEmail = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const setAuth = useAuthStore((state) => state.setAuth);
-  const pendingVerificationEmail = useAuthStore((state) => state.pendingVerificationEmail);
-  
+  const pendingVerificationEmail = useAuthStore(
+    (state) => state.pendingVerificationEmail,
+  );
+
   const [email, setEmail] = useState('');
-  const [code, setCode] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isResending, setIsResending] = useState(false);
 
   const user = useAuthStore((state) => state.user);
-  
+
+  const form = useForm<VerifyEmailForm>({
+    resolver: zodResolver(verifyEmailSchema),
+    defaultValues: {
+      code: '',
+    },
+  });
+
   useEffect(() => {
     if (user && user.email) {
       setEmail(user.email);
     } else if (pendingVerificationEmail) {
       setEmail(pendingVerificationEmail);
     } else if (typeof window !== 'undefined') {
-      const match = window.document.cookie.match(new RegExp('(^| )pendingVerificationEmail=([^;]+)'));
+      const match = window.document.cookie.match(
+        new RegExp('(^| )pendingVerificationEmail=([^;]+)'),
+      );
       if (match) {
         setEmail(decodeURIComponent(match[2]));
       }
     }
   }, [user, pendingVerificationEmail]);
 
-  const onSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (code.length !== 6) {
-      Toast.warning('O código deve conter 6 dígitos.');
-      return;
-    }
+  const onSubmit = form.handleSubmit(async (data: VerifyEmailForm) => {
     if (!email) {
       Toast.error('O e-mail é obrigatório. Por favor, volte ao login.');
       return;
@@ -51,17 +59,25 @@ export const useVerifyEmail = () => {
 
     setIsSubmitting(true);
     try {
-      const response = await authRepository.verifyEmail({ email, code });
-      const { accessToken, user } = response;
-      
-      setAuth(accessToken, user);
-      
+      const response = await authRepository.verifyEmail({
+        email,
+        code: data.code,
+      });
+      const { accessToken, user: authUser } = response;
+
+      setAuth(accessToken, authUser);
+
       Toast.success('E-mail verificado com sucesso!');
       const returnUrl = searchParams.get('returnUrl') || '/';
       router.push(returnUrl);
     } catch (error: unknown) {
-      const err = error as { response?: { status?: number, data?: { message?: string } } };
-      if (err.response?.data?.message === 'Invalid confirmation code' || err.response?.data?.message === 'Invalid or expired confirmation code') {
+      const err = error as {
+        response?: { status?: number; data?: { message?: string } };
+      };
+      if (
+        err.response?.data?.message === 'Invalid confirmation code' ||
+        err.response?.data?.message === 'Invalid or expired confirmation code'
+      ) {
         Toast.error('Código inválido ou expirado. Verifique o e-mail enviado.');
       } else if (err.response?.data?.message === 'User is already verified') {
         Toast.warning('Este usuário já foi verificado. Faça login normalmente.');
@@ -73,7 +89,7 @@ export const useVerifyEmail = () => {
     } finally {
       setIsSubmitting(false);
     }
-  };
+  });
 
   const handleResendCode = async () => {
     if (!email) {
@@ -98,9 +114,8 @@ export const useVerifyEmail = () => {
   };
 
   return {
+    form,
     email,
-    code,
-    setCode,
     isSubmitting,
     isResending,
     onSubmit,

@@ -1,61 +1,60 @@
-import { useState, useEffect } from 'react';
-
+import { useEffect, useState } from 'react';
+import { useForm, UseFormReturn } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'react-hot-toast';
 import { ROLE_ADMIN_DRAWER_TEXTS } from '../ui/components/roles/RoleAdminDrawer.constants';
 import { adminService } from '../services/admin.service';
+import { roleAdminSchema, RoleAdminFormData } from '../schemas/roles/role-admin.schema';
+
+const defaultRoleValues: RoleAdminFormData = {
+  name: '',
+  label: '',
+  description: '',
+  permissions: [],
+};
 
 export const useRoleAdminDrawer = (role: any, onSaveSuccess: () => void) => {
-  const [formData, setFormData] = useState({
-    name: '',
-    label: '',
-    description: '',
-    permissions: [] as string[]
-  });
   const [isLoading, setIsLoading] = useState(false);
+
+  const form = useForm<RoleAdminFormData>({
+    resolver: zodResolver(roleAdminSchema),
+    defaultValues: defaultRoleValues,
+  });
 
   useEffect(() => {
     if (role) {
-      setFormData({
-        name: role.name,
+      form.reset({
+        name: role.name || '',
         label: role.label || '',
         description: role.description || '',
-        permissions: role.permissions || []
+        permissions: role.permissions || [],
       });
     } else {
-      setFormData({
-        name: '',
-        label: '',
-        description: '',
-        permissions: []
-      });
+      form.reset(defaultRoleValues);
     }
-  }, [role]);
-
-  const updateField = (field: string, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
+  }, [role, form]);
 
   const handleTogglePermission = (permissionKey: string) => {
-    setFormData(prev => {
-      const perms = prev.permissions;
-      if (perms.includes(permissionKey)) {
-        return { ...prev, permissions: perms.filter(p => p !== permissionKey) };
-      } else {
-        return { ...prev, permissions: [...perms, permissionKey] };
-      }
-    });
+    const current = form.getValues('permissions') || [];
+    if (current.includes(permissionKey)) {
+      form.setValue(
+        'permissions',
+        current.filter((p) => p !== permissionKey),
+      );
+    } else {
+      form.setValue('permissions', [...current, permissionKey]);
+    }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = form.handleSubmit(async (data: RoleAdminFormData) => {
     setIsLoading(true);
 
     try {
       if (role) {
-        await adminService.updateRole(role._id, formData);
+        await adminService.updateRole(role._id, data);
         toast.success(ROLE_ADMIN_DRAWER_TEXTS.MESSAGES.SUCCESS_UPDATE);
       } else {
-        await adminService.createRole(formData);
+        await adminService.createRole(data);
         toast.success(ROLE_ADMIN_DRAWER_TEXTS.MESSAGES.SUCCESS_CREATE);
       }
       onSaveSuccess();
@@ -64,13 +63,12 @@ export const useRoleAdminDrawer = (role: any, onSaveSuccess: () => void) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  });
 
   return {
-    formData,
+    form,
     isLoading,
-    updateField,
     handleTogglePermission,
-    handleSubmit
+    handleSubmit,
   };
 };

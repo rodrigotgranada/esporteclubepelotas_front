@@ -1,4 +1,5 @@
 import React from 'react';
+import { Controller } from 'react-hook-form';
 import {
   Drawer,
   Text,
@@ -7,6 +8,7 @@ import {
   Input,
   ColorInput,
   Form,
+  FormField,
   ConfirmModal,
   Badge,
 } from '@/shared/ui/components';
@@ -31,19 +33,12 @@ export const ThemeAdminDrawer = ({
   theme,
 }: ThemeAdminDrawerProps) => {
   const {
-    formData,
+    form,
     isLoading,
-    isCampaign,
-    campaignColor,
-    startDateStr,
-    setStartDateStr,
-    endDateStr,
-    setEndDateStr,
     showAdvanced,
     setShowAdvanced,
     isDeleteModalOpen,
     setIsDeleteModalOpen,
-    handleChange,
     handleCampaignColorChange,
     handleSelectPreset,
     handleToggleMode,
@@ -51,17 +46,27 @@ export const ThemeAdminDrawer = ({
     handleDelete,
   } = useThemeAdminDrawer(theme, onSuccess, onClose);
 
+  const isCampaign = form.watch('isCampaign');
+  const campaignColor = form.watch('campaignColor');
+  const lightPalette = form.watch('light');
+  const darkPalette = form.watch('dark');
+
   const renderColorInput = (label: string, field: string, mode: 'light' | 'dark') => {
-    const value =
-      formData[mode]?.[field as keyof typeof formData.light] || '#000000';
+    const fieldName = `${mode}.${field}` as any;
     return (
-      <LayoutContainer className="mb-2">
-        <ColorInput
-          label={label}
-          value={value}
-          onChange={(e) => handleChange(field, e.target.value, mode)}
-        />
-      </LayoutContainer>
+      <Controller
+        name={fieldName}
+        control={form.control}
+        render={({ field: f }) => (
+          <LayoutContainer className="mb-2">
+            <ColorInput
+              label={label}
+              value={f.value || '#000000'}
+              onChange={(e) => f.onChange(e.target.value)}
+            />
+          </LayoutContainer>
+        )}
+      />
     );
   };
 
@@ -144,37 +149,57 @@ export const ThemeAdminDrawer = ({
             )}
 
             {/* Name Input */}
-            <LayoutContainer>
-              <Input
-                label={SETTINGS_TEXTS.THEMES.FIELD_NAME_LABEL}
-                placeholder={SETTINGS_TEXTS.THEMES.FIELD_NAME_PLACEHOLDER}
-                value={formData.name || ''}
-                onChange={(e) => handleChange('name', e.target.value)}
-                required
-              />
-            </LayoutContainer>
+            <FormField
+              name="name"
+              control={form.control}
+              label={SETTINGS_TEXTS.THEMES.FIELD_NAME_LABEL}
+              required
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  placeholder={SETTINGS_TEXTS.THEMES.FIELD_NAME_PLACEHOLDER}
+                  required
+                />
+              )}
+            />
 
             {/* Campaign Specific Inputs: Seed Color & Dates */}
             {isCampaign && (
               <LayoutContainer className="space-y-4">
-                <ColorInput
-                  label={SETTINGS_TEXTS.THEMES.FIELD_CAMPAIGN_COLOR}
-                  value={campaignColor}
-                  onChange={(e) => handleCampaignColorChange(e.target.value)}
+                <Controller
+                  name="campaignColor"
+                  control={form.control}
+                  render={({ field: f }) => (
+                    <ColorInput
+                      label={SETTINGS_TEXTS.THEMES.FIELD_CAMPAIGN_COLOR}
+                      value={f.value || campaignColor || '#ec4899'}
+                      onChange={(e) => handleCampaignColorChange(e.target.value)}
+                    />
+                  )}
                 />
 
                 <LayoutContainer className="grid grid-cols-2 gap-3">
-                  <Input
+                  <FormField
+                    name="startDate"
+                    control={form.control}
                     label={SETTINGS_TEXTS.THEMES.FIELD_START_DATE}
-                    type="date"
-                    value={startDateStr}
-                    onChange={(e) => setStartDateStr(e.target.value)}
+                    render={({ field }) => (
+                      <Input
+                        type="date"
+                        {...field}
+                      />
+                    )}
                   />
-                  <Input
+                  <FormField
+                    name="endDate"
+                    control={form.control}
                     label={SETTINGS_TEXTS.THEMES.FIELD_END_DATE}
-                    type="date"
-                    value={endDateStr}
-                    onChange={(e) => setEndDateStr(e.target.value)}
+                    render={({ field }) => (
+                      <Input
+                        type="date"
+                        {...field}
+                      />
+                    )}
                   />
                 </LayoutContainer>
                 <Text className="text-xs text-text-secondary italic">
@@ -190,20 +215,20 @@ export const ThemeAdminDrawer = ({
                     <LayoutContainer
                       className="flex-1 p-2.5 rounded-lg border border-border flex items-center justify-between"
                       style={{
-                        backgroundColor: formData.light?.background,
-                        color: formData.light?.textPrimary,
+                        backgroundColor: lightPalette?.background,
+                        color: lightPalette?.textPrimary,
                       }}
                     >
                       <Text
                         className="text-xs font-bold"
-                        style={{ color: formData.light?.primary }}
+                        style={{ color: lightPalette?.primary }}
                       >
                         Claro
                       </Text>
                       <LayoutContainer
                         className="px-2 py-0.5 rounded text-[10px] font-bold"
                         style={{
-                          backgroundColor: formData.light?.primary,
+                          backgroundColor: lightPalette?.primary,
                           color: '#ffffff',
                         }}
                       >
@@ -214,20 +239,20 @@ export const ThemeAdminDrawer = ({
                     <LayoutContainer
                       className="flex-1 p-2.5 rounded-lg border border-border flex items-center justify-between"
                       style={{
-                        backgroundColor: formData.dark?.background,
-                        color: formData.dark?.textPrimary,
+                        backgroundColor: darkPalette?.background,
+                        color: darkPalette?.textPrimary,
                       }}
                     >
                       <Text
                         className="text-xs font-bold"
-                        style={{ color: formData.dark?.primary }}
+                        style={{ color: darkPalette?.primary }}
                       >
                         Escuro
                       </Text>
                       <LayoutContainer
                         className="px-2 py-0.5 rounded text-[10px] font-bold"
                         style={{
-                          backgroundColor: formData.dark?.primary,
+                          backgroundColor: darkPalette?.primary,
                           color: '#ffffff',
                         }}
                       >

@@ -1,29 +1,40 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { adminService } from '../services/admin.service';
 import { toast } from 'react-hot-toast';
+import { useRealtimeEvents } from '@/shared/hooks/useRealtimeEvents';
 
 export const useRolesList = () => {
   const [roles, setRoles] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState<any | null>(null);
 
-  const loadRoles = async () => {
+  const loadRoles = useCallback(async (options?: { silent?: boolean }) => {
     try {
-      setIsLoading(true);
+      if (!options?.silent) {
+        setIsLoading(true);
+      }
       const res = await adminService.getRoles();
-      setRoles(res);
+      setRoles(res || []);
     } catch (error: any) {
       console.error('Erro ao carregar cargos:', error?.message);
-      toast.error('Erro ao carregar cargos e permissões');
+      if (!options?.silent) {
+        toast.error('Erro ao carregar cargos e permissões');
+      }
     } finally {
-      setIsLoading(false);
+      if (!options?.silent) {
+        setIsLoading(false);
+      }
     }
-  };
+  }, []);
 
   useEffect(() => {
     loadRoles();
-  }, []);
+  }, [loadRoles]);
+
+  useRealtimeEvents('roles', () => {
+    loadRoles({ silent: true });
+  });
 
   const handleAddRole = () => {
     setSelectedRole(null);
@@ -43,6 +54,6 @@ export const useRolesList = () => {
     selectedRole,
     loadRoles,
     handleAddRole,
-    handleEditRole
+    handleEditRole,
   };
 };

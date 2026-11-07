@@ -1,6 +1,15 @@
 import React from 'react';
-import { Drawer, PasswordInput, Button, LayoutContainer, Form, PhoneInput, Text } from '@/shared/ui/components';
-import { Input } from '@/shared/ui/components';
+import {
+  Drawer,
+  PasswordInput,
+  Button,
+  LayoutContainer,
+  Form,
+  PhoneInput,
+  Text,
+  Input,
+  FormField,
+} from '@/shared/ui/components';
 import { PROFILE_TEXTS } from '@/features/profile/constants';
 import { useChangeContactDrawer } from '@/features/profile/hooks/useChangeContactDrawer';
 import { Info } from 'lucide-react';
@@ -9,52 +18,85 @@ interface ChangeContactDrawerProps {
   isOpen: boolean;
   onClose: () => void;
   type: 'email' | 'phone';
-  onSubmit: (newValue: string, currentPassword: string) => Promise<void>;
+  onSubmit: (newValue: string, currentPassword: string) => Promise<boolean | void>;
   isLoading: boolean;
 }
 
-export const ChangeContactDrawer = ({ isOpen, onClose, type, onSubmit, isLoading }: ChangeContactDrawerProps) => {
-  const {
-    newValue,
-    setNewValue,
-    currentPassword,
-    setCurrentPassword,
-    handleSubmit,
-  } = useChangeContactDrawer({ isOpen, type, onSubmit, isLoading });
+export const ChangeContactDrawer = ({
+  isOpen,
+  onClose,
+  type,
+  onSubmit,
+  isLoading,
+}: ChangeContactDrawerProps) => {
+  const { form, handleSubmit } = useChangeContactDrawer({
+    isOpen,
+    type,
+    onSubmit,
+    isLoading,
+  });
 
   const isEmail = type === 'email';
-  const title = isEmail ? PROFILE_TEXTS.CHANGE_EMAIL_DRAWER_TITLE : PROFILE_TEXTS.CHANGE_PHONE_DRAWER_TITLE;
-  const label = isEmail ? PROFILE_TEXTS.CHANGE_EMAIL_LABEL : PROFILE_TEXTS.CHANGE_PHONE_LABEL;
-  const placeholder = isEmail ? PROFILE_TEXTS.CHANGE_EMAIL_PLACEHOLDER : PROFILE_TEXTS.CHANGE_PHONE_PLACEHOLDER;
+  const title = isEmail
+    ? PROFILE_TEXTS.CHANGE_EMAIL_DRAWER_TITLE
+    : PROFILE_TEXTS.CHANGE_PHONE_DRAWER_TITLE;
+  const label = isEmail
+    ? PROFILE_TEXTS.CHANGE_EMAIL_LABEL
+    : PROFILE_TEXTS.CHANGE_PHONE_LABEL;
+  const placeholder = isEmail
+    ? PROFILE_TEXTS.CHANGE_EMAIL_PLACEHOLDER
+    : PROFILE_TEXTS.CHANGE_PHONE_PLACEHOLDER;
 
   return (
-    <Drawer isOpen={isOpen} onClose={onClose} title={title}>
+    <Drawer
+      isOpen={isOpen}
+      onClose={() => {
+        if (!isLoading) onClose();
+      }}
+      title={title}
+    >
       <Form onSubmit={handleSubmit} className="flex flex-col flex-1 mt-4">
         <LayoutContainer className="flex-1 space-y-4">
           {isEmail ? (
-            <Input
+            <FormField
+              name="newValue"
+              control={form.control}
               label={label}
-              placeholder={placeholder}
-              value={newValue}
-              onChange={(e) => setNewValue(e.target.value)}
               required
-              type="email"
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  placeholder={placeholder}
+                  type="email"
+                />
+              )}
             />
           ) : (
-            <PhoneInput
+            <FormField
+              name="newValue"
+              control={form.control}
               label={label}
-              placeholder={placeholder}
-              value={newValue}
-              onChange={(e) => setNewValue(e.target.value)}
               required
+              render={({ field }) => (
+                <PhoneInput
+                  {...field}
+                  placeholder={placeholder}
+                />
+              )}
             />
           )}
-          <PasswordInput
+
+          <FormField
+            name="currentPassword"
+            control={form.control}
             label={PROFILE_TEXTS.CHANGE_CURRENT_PASSWORD_LABEL}
-            placeholder={PROFILE_TEXTS.CHANGE_CURRENT_PASSWORD_PLACEHOLDER}
-            value={currentPassword}
-            onChange={(e) => setCurrentPassword(e.target.value)}
             required
+            render={({ field }) => (
+              <PasswordInput
+                {...field}
+                placeholder={PROFILE_TEXTS.CHANGE_CURRENT_PASSWORD_PLACEHOLDER}
+              />
+            )}
           />
 
           {!isEmail && (
@@ -68,10 +110,23 @@ export const ChangeContactDrawer = ({ isOpen, onClose, type, onSubmit, isLoading
         </LayoutContainer>
 
         <LayoutContainer className="mt-8 pt-6 border-t border-white/10 flex gap-3">
-          <Button type="button" variant="outline" size="md" className="flex-1" onClick={onClose}>
+          <Button
+            type="button"
+            variant="outline"
+            size="md"
+            className="flex-1"
+            onClick={onClose}
+            disabled={isLoading}
+          >
             {PROFILE_TEXTS.ADDRESSES_BUTTON_CANCEL}
           </Button>
-          <Button type="submit" variant="primary" size="md" className="flex-1" isLoading={isLoading}>
+          <Button
+            type="submit"
+            variant="primary"
+            size="md"
+            className="flex-1"
+            isLoading={isLoading}
+          >
             {PROFILE_TEXTS.CHANGE_BUTTON_REQUEST}
           </Button>
         </LayoutContainer>

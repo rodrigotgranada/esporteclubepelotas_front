@@ -1,7 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useForm, UseFormReturn } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import toast from 'react-hot-toast';
+import {
+  useTransactionalSave,
+  stripBlobUrl,
+  sanitizeMediaUrlList,
+  verifyUploadedUrl,
+} from '@/shared/hooks';
 import {
   adminNewsService,
   NewsArticleData,
@@ -9,28 +17,61 @@ import {
   NewsStatusType,
 } from '../../services/admin-news.service';
 import { ADMIN_NEWS_TEXTS } from '../../constants/admin-news.constants';
+import { newsArticleSchema, NewsArticleFormData } from '../../schemas/news/news.schema';
+
+const AUTOSAVE_KEY = 'ecp_news_draft_autosave';
+
+const defaultNewsValues: NewsArticleFormData = {
+  title: '',
+  subtitle: '',
+  slug: '',
+  summary: '',
+  categoryId: '',
+  tags: [],
+  coverImage: null,
+  coverCaption: '',
+  gallery: [],
+  content: {},
+  youtubeVideoUrl: '',
+  isFeatured: false,
+  featuredSlot: 'NONE',
+  isPinned: false,
+  isYouth: false,
+  showOnHomepage: true,
+  reporterName: '',
+  photographerName: '',
+  allowReactions: true,
+  allowComments: true,
+  status: 'DRAFT',
+  publishedAt: '',
+};
 
 export const useAdminNewsDrawer = (
   articleId: string | null,
   isOpen: boolean,
-  onSuccess: () => void, defaultIsYouth: boolean = false,
+  onSuccess: () => void,
+  defaultIsYouth: boolean = false,
 ) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
   const [categories, setCategories] = useState<NewsCategoryData[]>([]);
 
-  // Form states
-  const [title, setTitle] = useState('');
-  const [subtitle, setSubtitle] = useState('');
-  const [slug, setSlug] = useState('');
-  const [summary, setSummary] = useState('');
-  const [categoryId, setCategoryId] = useState('');
-  const [tags, setTags] = useState<string[]>([]);
+  const { isSaving, savingStage, savingLabel, runTransactionalSave } = useTransactionalSave({
+    uploadingMedia: ADMIN_NEWS_TEXTS.DRAWER.BUTTON_UPLOADING_MEDIA,
+    savingDb: ADMIN_NEWS_TEXTS.DRAWER.BUTTON_SAVING_DB,
+  });
+
+  const form = useForm<NewsArticleFormData>({
+    resolver: zodResolver(newsArticleSchema),
+    defaultValues: {
+      ...defaultNewsValues,
+      isYouth: defaultIsYouth,
+      showOnHomepage: !defaultIsYouth,
+    },
+  });
+
+  // Media & aux states
   const [tagInput, setTagInput] = useState('');
-  const [coverImage, setCoverImage] = useState<string | null>(null);
   const [coverFile, setCoverFile] = useState<Blob | null>(null);
-  const [coverCaption, setCoverCaption] = useState('');
-  const [gallery, setGallery] = useState<string[]>([]);
   const [galleryFiles, setGalleryFiles] = useState<File[]>([]);
   const [galleryPreviews, setGalleryPreviews] = useState<string[]>([]);
   const [galleryCropItem, setGalleryCropItem] = useState<{
@@ -38,40 +79,26 @@ export const useAdminNewsDrawer = (
     index: number;
     src: string;
   } | null>(null);
-  const [content, setContent] = useState<Record<string, any>>({});
-  const [youtubeVideoUrl, setYoutubeVideoUrl] = useState('');
-  const [isFeatured, setIsFeatured] = useState(false);
-  const [featuredSlot, setFeaturedSlot] = useState<'MAIN' | 'SECONDARY' | 'NONE'>('NONE');
+
+  // Modals & draft alerts
   const [replaceMainModalOpen, setReplaceMainModalOpen] = useState(false);
   const [existingMainTitle, setExistingMainTitle] = useState('');
-  const [isPinned, setIsPinned] = useState(false);
-  const [isYouth, setIsYouth] = useState(defaultIsYouth);
-  const [showOnHomepage, setShowOnHomepage] = useState(!defaultIsYouth);
-  const [reporterName, setReporterName] = useState('');
-  const [photographerName, setPhotographerName] = useState('');
-  const [allowReactions, setAllowReactions] = useState(true);
-  const [allowComments, setAllowComments] = useState(true);
-  const [status, setStatus] = useState<NewsStatusType>('DRAFT');
-  const [publishedAt, setPublishedAt] = useState('');
   const [hasRecoverableDraft, setHasRecoverableDraft] = useState(false);
-  const AUTOSAVE_KEY = 'ecp_news_draft_autosave';
-
-  // Quick category modal inside drawer
   const [quickCategoryOpen, setQuickCategoryOpen] = useState(false);
 
-  const loadCategories = async () => {
+  const loadCategories = useCallback(async () => {
     try {
       const data = await adminNewsService.getCategories();
       setCategories(data);
-      if (data.length > 0 && !categoryId) {
-        setCategoryId(data[0]._id || data[0].slug);
+      if (data.length > 0 && !form.getValues('categoryId')) {
+        form.setValue('categoryId', data[0]._id || data[0].slug);
       }
     } catch (err) {
       console.error('Failed to load categories', err);
     }
-  };
+  }, [form]);
 
-  // Verifica se há rascunho recuperável no localStorage ao abrir para criar nova matéria
+  // LocalStorage autosave check
   useEffect(() => {
     if (isOpen && !articleId && typeof window !== 'undefined') {
       try {
@@ -90,54 +117,44 @@ export const useAdminNewsDrawer = (
     }
   }, [isOpen, articleId]);
 
-  // Autosave contínuo para localStorage durante a digitação
+  // LocalStorage autosave timer
   useEffect(() => {
     if (!isOpen || articleId || typeof window === 'undefined') return;
 
-    if (!title && (!content || Object.keys(content).length === 0)) return;
+    const subscription = form.watch((values) => {
+      if (!values.title && (!values.content || Object.keys(values.content).length === 0)) return;
 
-    const timeout = setTimeout(() => {
-      try {
-        const draftData = {
-          title,
-          subtitle,
-          slug,
-          summary,
-          categoryId,
-          tags,
-          content,
-          reporterName,
-          photographerName,
-          savedAt: new Date().toISOString(),
-        };
-        localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(draftData));
-      } catch (err) {
-        console.error('Error saving draft locally', err);
-      }
-    }, 2000);
+      const timeout = setTimeout(() => {
+        try {
+          localStorage.setItem(
+            AUTOSAVE_KEY,
+            JSON.stringify({
+              ...values,
+              savedAt: new Date().toISOString(),
+            }),
+          );
+        } catch (err) {
+          console.error('Error saving draft locally', err);
+        }
+      }, 2000);
 
-    return () => clearTimeout(timeout);
-  }, [title, subtitle, slug, summary, categoryId, tags, content, reporterName, photographerName, isOpen, articleId]);
+      return () => clearTimeout(timeout);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [isOpen, articleId, form]);
 
   const recoverDraft = () => {
     if (typeof window === 'undefined') return;
     try {
       const savedStr = localStorage.getItem(AUTOSAVE_KEY);
-      if (savedStr) {
-        const d = JSON.parse(savedStr);
-        if (d.title) setTitle(d.title);
-        if (d.subtitle) setSubtitle(d.subtitle);
-        if (d.slug) setSlug(d.slug);
-        if (d.summary) setSummary(d.summary);
-        if (d.categoryId) setCategoryId(d.categoryId);
-        if (d.tags) setTags(d.tags);
-        if (d.content) setContent(d.content);
-        if (d.reporterName) setReporterName(d.reporterName);
-        if (d.photographerName) setPhotographerName(d.photographerName);
-        if (typeof d.isYouth === "boolean") setIsYouth(d.isYouth);
-        setHasRecoverableDraft(false);
-        toast.success('Rascunho recuperado com sucesso!');
-      }
+      if (!savedStr) return;
+      const d = JSON.parse(savedStr);
+      form.reset({
+        ...defaultNewsValues,
+        ...d,
+      });
+      setHasRecoverableDraft(false);
     } catch (err) {
       console.error('Failed to recover draft', err);
     }
@@ -150,111 +167,95 @@ export const useAdminNewsDrawer = (
     setHasRecoverableDraft(false);
   };
 
-  const resetForm = () => {
-    setTitle('');
-    setSubtitle('');
-    setSlug('');
-    setSummary('');
-    setCategoryId(categories[0]?._id || '');
-    setTags([]);
-    setTagInput('');
-    setCoverImage(null);
+  const resetForm = useCallback(() => {
+    form.reset({
+      ...defaultNewsValues,
+      isYouth: defaultIsYouth,
+      showOnHomepage: !defaultIsYouth,
+      categoryId: categories[0]?._id || '',
+    });
     setCoverFile(null);
-    setCoverCaption('');
-    setGallery([]);
     setGalleryFiles([]);
     setGalleryPreviews([]);
     setGalleryCropItem(null);
-    setContent({});
-    setYoutubeVideoUrl('');
-    setIsFeatured(false);
-    setFeaturedSlot('NONE');
-    setIsPinned(false);
-    setIsYouth(defaultIsYouth);
-    setShowOnHomepage(!defaultIsYouth);
-    setReporterName('');
-    setPhotographerName('');
-    setAllowReactions(true);
-    setAllowComments(true);
-    setStatus('DRAFT');
-    setPublishedAt('');
-  };
+    setTagInput('');
+  }, [form, defaultIsYouth, categories]);
 
   useEffect(() => {
-    if (isOpen) {
-      loadCategories();
-      if (articleId) {
-        // Load existing article
-        setIsLoading(true);
-        adminNewsService
-          .getNewsById(articleId)
-          .then((art) => {
-            setTitle(art.title || '');
-            setSubtitle(art.subtitle || '');
-            setSlug(art.slug || '');
-            setSummary(art.summary || '');
-            const catId = typeof art.category === 'object' && art.category ? art.category._id : art.category;
-            setCategoryId(catId || '');
-            setTags(art.tags || []);
-            setCoverImage(art.coverImage || null);
-            setCoverFile(null);
-            setCoverCaption(art.coverCaption || '');
-            setGallery(art.gallery || []);
-            setGalleryFiles([]);
-            setGalleryPreviews([]);
-            setContent(art.content || {});
-            setYoutubeVideoUrl(art.youtubeVideoUrl || '');
-            setIsFeatured(!!art.isFeatured);
-            setFeaturedSlot(art.featuredSlot || (art.isFeatured ? 'MAIN' : 'NONE'));
-            setIsPinned(Boolean(art.isPinned));
-            setIsYouth(Boolean(art.isYouth));
-            setShowOnHomepage(art.showOnHomepage ?? true);
-            setReporterName(art.reporterName || '');
-            setPhotographerName(art.photographerName || '');
-            setAllowReactions(art.allowReactions ?? true);
-            setAllowComments(art.allowComments ?? true);
-            setStatus(art.status || 'DRAFT');
-            if (art.publishedAt) {
-              // format to datetime-local input YYYY-MM-DDTHH:mm
-              const d = new Date(art.publishedAt);
-              setPublishedAt(d.toISOString().slice(0, 16));
-            } else {
-              setPublishedAt('');
-            }
-          })
-          .catch((err) => {
-            console.error('Failed to load article', err);
-            toast.error(ADMIN_NEWS_TEXTS.TOAST.ERROR_GENERIC);
-          })
-          .finally(() => {
-            setIsLoading(false);
-          });
-      } else {
-        resetForm();
-      }
+    if (!isOpen) return;
+    loadCategories();
+    if (!articleId) {
+      resetForm();
+      return;
     }
-  }, [isOpen, articleId]);
+
+    setIsLoading(true);
+    adminNewsService
+      .getNewsById(articleId)
+      .then((art) => {
+        const catId = typeof art.category === 'object' && art.category ? art.category._id : art.category;
+        form.reset({
+          title: art.title || '',
+          subtitle: art.subtitle || '',
+          slug: art.slug || '',
+          summary: art.summary || '',
+          categoryId: catId || '',
+          tags: art.tags || [],
+          coverImage: art.coverImage || null,
+          coverCaption: art.coverCaption || '',
+          gallery: art.gallery || [],
+          content: art.content || {},
+          youtubeVideoUrl: art.youtubeVideoUrl || '',
+          isFeatured: !!art.isFeatured,
+          featuredSlot: art.featuredSlot || (art.isFeatured ? 'MAIN' : 'NONE'),
+          isPinned: Boolean(art.isPinned),
+          isYouth: Boolean(art.isYouth),
+          showOnHomepage: art.showOnHomepage ?? true,
+          reporterName: art.reporterName || '',
+          photographerName: art.photographerName || '',
+          allowReactions: art.allowReactions ?? true,
+          allowComments: art.allowComments ?? true,
+          status: art.status || 'DRAFT',
+          publishedAt: art.publishedAt ? new Date(art.publishedAt).toISOString().slice(0, 16) : '',
+        });
+        setCoverFile(null);
+        setGalleryFiles([]);
+        setGalleryPreviews([]);
+      })
+      .catch((err) => {
+        console.error('Failed to load article', err);
+        toast.error(ADMIN_NEWS_TEXTS.TOAST.ERROR_GENERIC);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, [isOpen, articleId, defaultIsYouth, form, loadCategories, resetForm]);
 
   const handleAddTag = () => {
     const trimmed = tagInput.trim().replace(/^#/, '');
-    if (trimmed && !tags.includes(trimmed)) {
-      setTags([...tags, trimmed]);
+    const currentTags = form.getValues('tags') || [];
+    if (trimmed && !currentTags.includes(trimmed)) {
+      form.setValue('tags', [...currentTags, trimmed]);
       setTagInput('');
     }
   };
 
   const handleRemoveTag = (tagToRemove: string) => {
-    setTags(tags.filter((t) => t !== tagToRemove));
+    const currentTags = form.getValues('tags') || [];
+    form.setValue(
+      'tags',
+      currentTags.filter((t) => t !== tagToRemove),
+    );
   };
 
   const handleCropCover = (croppedBlob: Blob) => {
     setCoverFile(croppedBlob);
-    setCoverImage(URL.createObjectURL(croppedBlob));
+    form.setValue('coverImage', URL.createObjectURL(croppedBlob));
   };
 
   const handleRemoveCover = () => {
     setCoverFile(null);
-    setCoverImage(null);
+    form.setValue('coverImage', null);
   };
 
   const handleSelectGalleryFiles = (files: FileList | File[]) => {
@@ -266,13 +267,8 @@ export const useAdminNewsDrawer = (
     setGalleryFiles((prev) => [...prev, ...fileArray]);
     setGalleryPreviews((prev) => [...prev, ...newPreviews]);
 
-    // If 1 photo is selected, open crop modal immediately for precision editing
     if (fileArray.length === 1) {
-      setGalleryCropItem({
-        type: 'new',
-        index: startIndex,
-        src: newPreviews[0],
-      });
+      setGalleryCropItem({ type: 'new', index: startIndex, src: newPreviews[0] });
     }
   };
 
@@ -282,10 +278,8 @@ export const useAdminNewsDrawer = (
 
   const handleCropGallerySave = (croppedBlob: Blob) => {
     if (!galleryCropItem) return;
-
     const newUrl = URL.createObjectURL(croppedBlob);
-    const fileName = `gallery-${Date.now()}.png`;
-    const newFile = new File([croppedBlob], fileName, {
+    const newFile = new File([croppedBlob], `gallery-${Date.now()}.png`, {
       type: croppedBlob.type || 'image/png',
     });
 
@@ -303,9 +297,12 @@ export const useAdminNewsDrawer = (
         return updated;
       });
     } else {
-      // Existing photo: remove from saved URLs and add to new files queue ready to upload
       const idx = galleryCropItem.index;
-      setGallery((prev) => prev.filter((_, i) => i !== idx));
+      const currentGallery = form.getValues('gallery') || [];
+      form.setValue(
+        'gallery',
+        currentGallery.filter((_, i) => i !== idx),
+      );
       setGalleryFiles((prev) => [...prev, newFile]);
       setGalleryPreviews((prev) => [...prev, newUrl]);
     }
@@ -314,12 +311,14 @@ export const useAdminNewsDrawer = (
     toast.success(ADMIN_NEWS_TEXTS.TOAST.SUCCESS_GALLERY_PHOTO_CROPPED);
   };
 
-  const handleCropGalleryCancel = () => {
-    setGalleryCropItem(null);
-  };
+  const handleCropGalleryCancel = () => setGalleryCropItem(null);
 
   const handleRemoveExistingGalleryPhoto = (urlToRemove: string) => {
-    setGallery((prev) => prev.filter((u) => u !== urlToRemove));
+    const current = form.getValues('gallery') || [];
+    form.setValue(
+      'gallery',
+      current.filter((u) => u !== urlToRemove),
+    );
   };
 
   const handleRemoveNewGalleryPhoto = (indexToRemove: number) => {
@@ -333,122 +332,29 @@ export const useAdminNewsDrawer = (
 
   const handleCategoryCreated = (newCat: NewsCategoryData) => {
     setCategories((prev) => [...prev, newCat]);
-    setCategoryId(newCat._id || newCat.slug);
-  };
-
-  const handleSave = async (overrideStatus?: NewsStatusType) => {
-    const chosenStatus = overrideStatus || status;
-
-    if (!title.trim()) {
-      toast.error('Informe o título da matéria.');
-      return;
-    }
-    if (!categoryId) {
-      toast.error('Selecione uma categoria.');
-      return;
-    }
-    if (!content || Object.keys(content).length === 0) {
-      toast.error('O conteúdo da notícia não pode estar vazio.');
-      return;
-    }
-
-    try {
-      setIsSaving(true);
-      const payload: Partial<NewsArticleData> = {
-        title: title.trim(),
-        subtitle: subtitle.trim() || undefined,
-        slug: slug.trim() || undefined,
-        summary: summary.trim() || undefined,
-        category: categoryId,
-        tags,
-        coverImage: coverImage || '',
-        coverCaption: coverCaption.trim() || undefined,
-        gallery,
-        content,
-        youtubeVideoUrl: youtubeVideoUrl.trim() || undefined,
-        isFeatured: featuredSlot !== 'NONE',
-        featuredSlot,
-        isPinned,
-        showOnHomepage,
-        reporterName: reporterName.trim() || undefined,
-        photographerName: photographerName.trim() || undefined,
-        allowReactions,
-        allowComments,
-        status: chosenStatus,
-        publishedAt:
-          chosenStatus === 'SCHEDULED' && publishedAt
-            ? new Date(publishedAt).toISOString()
-            : chosenStatus === 'PUBLISHED'
-            ? new Date().toISOString()
-            : undefined,
-      };
-
-      let savedArticleId = articleId;
-
-      if (articleId) {
-        await adminNewsService.updateNews(articleId, payload);
-        toast.success(ADMIN_NEWS_TEXTS.TOAST.SUCCESS_UPDATE);
-      } else {
-        const created = await adminNewsService.createNews(payload);
-        savedArticleId = created._id || created.id || '';
-        toast.success(ADMIN_NEWS_TEXTS.TOAST.SUCCESS_CREATE);
-      }
-
-      // If user uploaded a new cover image binary, upload it to the dedicated endpoint
-      if (coverFile && savedArticleId) {
-        try {
-          const fileToUpload = new File(
-            [coverFile],
-            `cover-${Date.now()}.png`,
-            { type: coverFile.type || 'image/png' }
-          );
-          await adminNewsService.uploadCover(savedArticleId, fileToUpload);
-        } catch (uploadErr) {
-          console.error('Failed to upload cover file', uploadErr);
-        }
-      }
-
-      // If user uploaded new gallery photos, upload them
-      if (galleryFiles.length > 0 && savedArticleId) {
-        try {
-          await adminNewsService.uploadGallery(savedArticleId, galleryFiles);
-          toast.success(ADMIN_NEWS_TEXTS.TOAST.SUCCESS_GALLERY_UPLOADED);
-        } catch (galleryErr) {
-          console.error('Failed to upload gallery photos', galleryErr);
-        }
-      }
-
-      discardDraft();
-      onSuccess();
-    } catch (err: any) {
-      console.error(err);
-      const msg = err?.response?.data?.message || ADMIN_NEWS_TEXTS.TOAST.ERROR_GENERIC;
-      toast.error(msg);
-    } finally {
-      setIsSaving(false);
-    }
+    form.setValue('categoryId', newCat._id || newCat.slug);
   };
 
   const handleSelectFeaturedSlot = async (slot: 'MAIN' | 'SECONDARY' | 'NONE') => {
-    if (slot === 'MAIN' && featuredSlot !== 'MAIN') {
+    if (slot === 'MAIN') {
       try {
-        const currentMain = await adminNewsService.getCurrentMain();
-        if (currentMain && currentMain._id !== articleId && currentMain.id !== articleId) {
-          setExistingMainTitle(currentMain.title);
+        const existingMain = await adminNewsService.getCurrentMain();
+        if (existingMain && (existingMain._id !== articleId && existingMain.id !== articleId)) {
+          setExistingMainTitle(existingMain.title);
           setReplaceMainModalOpen(true);
           return;
         }
       } catch (err) {
-        console.error('Failed to check current main article', err);
+        console.error('Error verifying existing main featured article', err);
       }
     }
-    setFeaturedSlot(slot);
-    setIsFeatured(slot !== 'NONE');
+    form.setValue('featuredSlot', slot);
+    form.setValue('isFeatured', slot !== 'NONE');
   };
 
   const confirmReplaceMain = () => {
-    setFeaturedSlot('MAIN');
-    setIsFeatured(true);
+    form.setValue('featuredSlot', 'MAIN');
+    form.setValue('isFeatured', true);
     setReplaceMainModalOpen(false);
   };
 
@@ -456,31 +362,150 @@ export const useAdminNewsDrawer = (
     setReplaceMainModalOpen(false);
   };
 
+  const handleSave = async (overrideStatus?: NewsStatusType) => {
+    if (isSaving) return;
+
+    if (overrideStatus) {
+      form.setValue('status', overrideStatus);
+    }
+
+    return form.handleSubmit(async (data: NewsArticleFormData) => {
+      const chosenStatus = overrideStatus || data.status;
+
+      if (!data.content || Object.keys(data.content).length === 0) {
+        toast.error(ADMIN_NEWS_TEXTS.TOAST.ERROR_CONTENT_REQUIRED);
+        return;
+      }
+      if (chosenStatus === 'SCHEDULED' && !data.publishedAt) {
+        toast.error(ADMIN_NEWS_TEXTS.TOAST.ERROR_SCHEDULE_DATE_REQUIRED);
+        return;
+      }
+
+      const folderId =
+        articleId ||
+        (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+          ? crypto.randomUUID()
+          : String(Date.now()));
+
+      await runTransactionalSave({
+        hasPendingMedia: Boolean(coverFile) || galleryFiles.length > 0,
+        uploadMedia: async () => {
+          let finalCoverUrl = stripBlobUrl(data.coverImage, '');
+          if (coverFile) {
+            const fileToUpload =
+              coverFile instanceof File
+                ? coverFile
+                : new File([coverFile], `cover-${Date.now()}.png`, {
+                    type: coverFile.type || 'image/png',
+                  });
+            const uploadRes = await adminNewsService.uploadCoverMedia(fileToUpload, folderId);
+            finalCoverUrl = verifyUploadedUrl(uploadRes?.url, ADMIN_NEWS_TEXTS.TOAST.ERROR_COVER_UPLOAD);
+            form.setValue('coverImage', finalCoverUrl);
+            setCoverFile(null);
+          }
+
+          let finalGalleryUrls = sanitizeMediaUrlList(data.gallery);
+          if (galleryFiles.length > 0) {
+            const galleryRes = await adminNewsService.uploadGalleryMedia(galleryFiles, folderId);
+            const validUploaded = sanitizeMediaUrlList(galleryRes?.urls);
+            if (validUploaded.length !== galleryFiles.length) {
+              throw new Error(ADMIN_NEWS_TEXTS.TOAST.ERROR_GALLERY_UPLOAD);
+            }
+            finalGalleryUrls = [...finalGalleryUrls, ...validUploaded];
+            form.setValue('gallery', finalGalleryUrls);
+            galleryPreviews.forEach((previewUrl) => {
+              if (previewUrl.startsWith('blob:')) URL.revokeObjectURL(previewUrl);
+            });
+            setGalleryFiles([]);
+            setGalleryPreviews([]);
+          }
+
+          return { finalCoverUrl, finalGalleryUrls };
+        },
+        saveToDb: async (uploaded) => {
+          const finalCoverUrl = uploaded ? uploaded.finalCoverUrl : stripBlobUrl(data.coverImage, '');
+          const finalGalleryUrls = uploaded ? uploaded.finalGalleryUrls : sanitizeMediaUrlList(data.gallery);
+
+          const payload: Partial<NewsArticleData> = {
+            title: data.title.trim(),
+            subtitle: data.subtitle?.trim() || undefined,
+            slug: data.slug?.trim() || undefined,
+            summary: data.summary?.trim() || undefined,
+            category: data.categoryId,
+            tags: data.tags || [],
+            coverImage: finalCoverUrl,
+            coverCaption: data.coverCaption?.trim() || undefined,
+            gallery: finalGalleryUrls,
+            content: data.content,
+            youtubeVideoUrl: data.youtubeVideoUrl?.trim() || undefined,
+            isFeatured: data.featuredSlot !== 'NONE',
+            featuredSlot: data.featuredSlot,
+            isPinned: data.isPinned,
+            isYouth: data.isYouth,
+            showOnHomepage: data.isYouth ? data.showOnHomepage : true,
+            reporterName: data.reporterName?.trim() || undefined,
+            photographerName: data.photographerName?.trim() || undefined,
+            allowReactions: data.allowReactions,
+            allowComments: data.allowComments,
+            status: chosenStatus,
+            publishedAt:
+              chosenStatus === 'SCHEDULED' && data.publishedAt
+                ? new Date(data.publishedAt).toISOString()
+                : chosenStatus === 'PUBLISHED'
+                  ? data.publishedAt
+                    ? new Date(data.publishedAt).toISOString()
+                    : new Date().toISOString()
+                  : undefined,
+          };
+
+          const saved = articleId
+            ? await adminNewsService.updateNews(articleId, payload)
+            : await adminNewsService.createNews(payload);
+
+          if (!saved || (!saved._id && !saved.id)) {
+            throw new Error(ADMIN_NEWS_TEXTS.TOAST.ERROR_GENERIC);
+          }
+          return saved;
+        },
+        onConfirmed: () => {
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem(AUTOSAVE_KEY);
+          }
+          const successMsg =
+            chosenStatus === 'PUBLISHED'
+              ? ADMIN_NEWS_TEXTS.TOAST.SUCCESS_PUBLISH
+              : chosenStatus === 'SCHEDULED'
+                ? ADMIN_NEWS_TEXTS.TOAST.SUCCESS_SCHEDULE
+                : articleId
+                  ? ADMIN_NEWS_TEXTS.TOAST.SUCCESS_UPDATE
+                  : ADMIN_NEWS_TEXTS.TOAST.SUCCESS_CREATE;
+
+          toast.success(successMsg);
+          onSuccess();
+        },
+        onError: (err: any) => {
+          console.error('Failed to save article', err);
+          toast.error(err?.response?.data?.message || err?.message || ADMIN_NEWS_TEXTS.TOAST.ERROR_GENERIC);
+        },
+      });
+    })();
+  };
+
   return {
+    form,
     isLoading,
     isSaving,
+    savingStage,
+    savingLabel,
     categories,
-    title,
-    setTitle,
-    subtitle,
-    setSubtitle,
-    slug,
-    setSlug,
-    summary,
-    setSummary,
-    categoryId,
-    setCategoryId,
-    tags,
     tagInput,
     setTagInput,
     handleAddTag,
     handleRemoveTag,
-    coverImage,
-    coverCaption,
-    setCoverCaption,
+    coverFile,
     handleCropCover,
     handleRemoveCover,
-    gallery,
+    galleryFiles,
     galleryPreviews,
     galleryCropItem,
     handleSelectGalleryFiles,
@@ -489,44 +514,17 @@ export const useAdminNewsDrawer = (
     handleCropGalleryCancel,
     handleRemoveExistingGalleryPhoto,
     handleRemoveNewGalleryPhoto,
-    content,
-    setContent,
-    youtubeVideoUrl,
-    setYoutubeVideoUrl,
-    isFeatured,
-    setIsFeatured,
-    featuredSlot,
-    setFeaturedSlot,
     handleSelectFeaturedSlot,
     replaceMainModalOpen,
     existingMainTitle,
     confirmReplaceMain,
     cancelReplaceMain,
-    isPinned,
-    setIsPinned,
-    isYouth,
-    setIsYouth,
-    showOnHomepage,
-    setShowOnHomepage,
-    reporterName,
-    setReporterName,
-    photographerName,
-    setPhotographerName,
-    allowReactions,
-    setAllowReactions,
-    allowComments,
-    setAllowComments,
-    status,
-    setStatus,
-    publishedAt,
-    setPublishedAt,
-    quickCategoryOpen,
-    setQuickCategoryOpen,
-    handleCategoryCreated,
     hasRecoverableDraft,
     recoverDraft,
     discardDraft,
+    quickCategoryOpen,
+    setQuickCategoryOpen,
+    handleCategoryCreated,
     handleSave,
   };
 };
-

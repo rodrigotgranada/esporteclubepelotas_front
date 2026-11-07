@@ -1,182 +1,213 @@
 'use client';
 
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'react-hot-toast';
+import { useTransactionalSave, stripBlobUrl, verifyUploadedUrl } from '@/shared/hooks';
 import { adminFootballService } from '../../services/admin-football.service';
-import { AthleteData, PreferredFoot, AthleteGender, AthleteType } from '@/features/football/services/football.service';
+import {
+  AthleteData,
+  AthleteType,
+} from '@/features/football/services/football.service';
 import { ADMIN_FOOTBALL_CONSTANTS } from '../../constants/admin-football.constants';
+import { athleteSchema, AthleteFormData } from '../../schemas/football/athlete.schema';
 
-export const useAdminAthleteDrawer = (onSuccess: () => void, defaultAthleteType: AthleteType = 'PROFESSIONAL') => {
+export const useAdminAthleteDrawer = (
+  onSuccess: () => void,
+  defaultAthleteType: AthleteType = 'PROFESSIONAL',
+) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [editingAthleteId, setEditingAthleteId] = useState<string | null>(null);
 
-  // Form Fields
-  const [gender, setGender] = useState<AthleteGender>('MALE');
-  const [athleteType, setAthleteType] = useState<AthleteType>(defaultAthleteType);
-  const [youthCategory, setYouthCategory] = useState<string>('');
-  const [entryYear, setEntryYear] = useState<string>('');
-  const [staffRole, setStaffRole] = useState<string>('Treinador');
-  const [name, setName] = useState<string>('');
-  const [nickname, setNickname] = useState<string>('');
-  const [birthDate, setBirthDate] = useState<string>('');
-  const [birthPlace, setBirthPlace] = useState<string>('');
-  const [height, setHeight] = useState<string>('');
-  const [weight, setWeight] = useState<string>('');
-  const [preferredFoot, setPreferredFoot] = useState<PreferredFoot>('RIGHT');
-  const [primaryPosition, setPrimaryPosition] = useState<string>('');
-  const [secondaryPositionsText, setSecondaryPositionsText] = useState<string>('');
-  const [pastClubsText, setPastClubsText] = useState<string>('');
-  const [biography, setBiography] = useState<string>('');
-  const [instagram, setInstagram] = useState<string>('');
-  const [isRetired, setIsRetired] = useState<boolean>(false);
+  const { isSaving, savingStage, savingLabel, runTransactionalSave } = useTransactionalSave({
+    uploadingMedia: ADMIN_FOOTBALL_CONSTANTS.DRAWER_ATHLETE.BTN_UPLOADING_PHOTO,
+    savingDb: ADMIN_FOOTBALL_CONSTANTS.DRAWER_ATHLETE.BTN_SAVING_DB,
+  });
 
-  // Photo
+  const form = useForm<AthleteFormData>({
+    resolver: zodResolver(athleteSchema),
+    defaultValues: {
+      gender: 'MALE',
+      athleteType: defaultAthleteType,
+      youthCategory: defaultAthleteType === 'YOUTH' ? 'SUB_20' : '',
+      entryYear: defaultAthleteType === 'YOUTH' ? String(new Date().getFullYear()) : '',
+      staffRole: 'Treinador',
+      name: '',
+      nickname: '',
+      birthDate: '',
+      birthPlace: '',
+      height: '',
+      weight: '',
+      preferredFoot: 'RIGHT',
+      primaryPosition: '',
+      secondaryPositionsText: '',
+      pastClubsText: '',
+      biography: '',
+      instagram: '',
+      isRetired: false,
+    },
+  });
+
+  // Photo state
   const [photoUrl, setPhotoUrl] = useState<string>('');
   const [pendingPhotoFile, setPendingPhotoFile] = useState<File | null>(null);
 
-  const [isSaving, setIsSaving] = useState<boolean>(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
-
-  const resetForm = () => {
+  const resetForm = (targetType: AthleteType = defaultAthleteType) => {
     setEditingAthleteId(null);
-    setGender('MALE');
-    setAthleteType(defaultAthleteType);
-    setYouthCategory(defaultAthleteType === 'YOUTH' ? 'SUB_20' : '');
-    setEntryYear(defaultAthleteType === 'YOUTH' ? String(new Date().getFullYear()) : '');
-
-
-    setStaffRole('Treinador');
-    setName('');
-    setNickname('');
-    setBirthDate('');
-    setBirthPlace('');
-    setHeight('');
-    setWeight('');
-    setPreferredFoot('RIGHT');
-    setPrimaryPosition('');
-    setSecondaryPositionsText('');
-    setPastClubsText('');
-    setBiography('');
-    setInstagram('');
-    setIsRetired(false);
     setPhotoUrl('');
     setPendingPhotoFile(null);
-    setErrors({});
+    form.reset({
+      gender: 'MALE',
+      athleteType: targetType,
+      youthCategory: targetType === 'YOUTH' ? 'SUB_20' : '',
+      entryYear: targetType === 'YOUTH' ? String(new Date().getFullYear()) : '',
+      staffRole: 'Treinador',
+      name: '',
+      nickname: '',
+      birthDate: '',
+      birthPlace: '',
+      height: '',
+      weight: '',
+      preferredFoot: 'RIGHT',
+      primaryPosition: '',
+      secondaryPositionsText: '',
+      pastClubsText: '',
+      biography: '',
+      instagram: '',
+      isRetired: false,
+    });
   };
 
   const openCreate = () => {
-    resetForm();
+    resetForm(defaultAthleteType);
     setIsOpen(true);
   };
 
   const openEdit = (athlete: AthleteData) => {
-    resetForm();
+    const aType = athlete.athleteType || 'PROFESSIONAL';
     setEditingAthleteId(athlete.id || athlete._id);
-    setGender(athlete.gender || 'MALE');
-    setAthleteType(athlete.athleteType || 'PROFESSIONAL');
-    setYouthCategory(athlete.youthCategory || '');
-    setEntryYear(athlete.entryYear ? String(athlete.entryYear) : '');
-    setStaffRole(athlete.staffRole || athlete.primaryPosition || 'Treinador');
-    setName(athlete.name || '');
-    setNickname(athlete.nickname || '');
-    setBirthDate(athlete.birthDate ? athlete.birthDate.split('T')[0] : '');
-    setBirthPlace(athlete.birthPlace || '');
-    setHeight(athlete.height ? String(athlete.height) : '');
-    setWeight(athlete.weight ? String(athlete.weight) : '');
-    setPreferredFoot(athlete.preferredFoot || 'RIGHT');
-    setPrimaryPosition(athlete.primaryPosition || '');
-    setSecondaryPositionsText((athlete.secondaryPositions || []).join(', '));
-    setPastClubsText((athlete.pastClubs || []).join(', '));
-    setBiography(athlete.biography || '');
-    setInstagram(athlete.instagram || '');
-    setIsRetired(Boolean(athlete.isRetired));
     setPhotoUrl(athlete.photoUrl || '');
+    setPendingPhotoFile(null);
+
+    form.reset({
+      gender: athlete.gender || 'MALE',
+      athleteType: aType,
+      youthCategory: athlete.youthCategory || (aType === 'YOUTH' ? 'SUB_20' : ''),
+      entryYear: athlete.entryYear ? String(athlete.entryYear) : '',
+      staffRole: athlete.staffRole || athlete.primaryPosition || 'Treinador',
+      name: athlete.name || '',
+      nickname: athlete.nickname || '',
+      birthDate: athlete.birthDate ? athlete.birthDate.split('T')[0] : '',
+      birthPlace: athlete.birthPlace || '',
+      height: athlete.height ? String(athlete.height) : '',
+      weight: athlete.weight ? String(athlete.weight) : '',
+      preferredFoot: athlete.preferredFoot || 'RIGHT',
+      primaryPosition: athlete.primaryPosition || '',
+      secondaryPositionsText: (athlete.secondaryPositions || []).join(', '),
+      pastClubsText: (athlete.pastClubs || []).join(', '),
+      biography: athlete.biography || '',
+      instagram: athlete.instagram || '',
+      isRetired: Boolean(athlete.isRetired),
+    });
+
     setIsOpen(true);
   };
 
   const close = () => {
     setIsOpen(false);
-    resetForm();
+    resetForm(defaultAthleteType);
   };
 
-  const validate = (): boolean => {
-    const newErrors: Record<string, string> = {};
-    if (!name.trim()) newErrors.name = 'O nome completo é obrigatório.';
-    if (athleteType === 'STAFF') {
-      if (!staffRole.trim()) newErrors.staffRole = 'O cargo na comissão técnica é obrigatório.';
-    } else {
-      if (!primaryPosition.trim()) newErrors.primaryPosition = 'A posição principal é obrigatória.';
-    }
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+  const save = form.handleSubmit(async (data) => {
+    if (isSaving) return;
 
-  const save = async () => {
-    if (!validate()) return;
+    const folderId =
+      editingAthleteId ||
+      (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+        ? crypto.randomUUID()
+        : String(Date.now()));
 
-    try {
-      setIsSaving(true);
+    await runTransactionalSave({
+      hasPendingMedia: Boolean(pendingPhotoFile),
+      uploadMedia: async () => {
+        if (!pendingPhotoFile) {
+          return stripBlobUrl(photoUrl, '');
+        }
+        const uploadRes = await adminFootballService.uploadAthletePhotoMedia(pendingPhotoFile, folderId);
+        const confirmedUrl = verifyUploadedUrl(
+          uploadRes?.url || uploadRes?.photoUrl,
+          ADMIN_FOOTBALL_CONSTANTS.DRAWER_ATHLETE.ERROR_PHOTO_UPLOAD,
+        );
+        setPhotoUrl(confirmedUrl);
+        setPendingPhotoFile(null);
+        return confirmedUrl;
+      },
+      saveToDb: async (uploadedPhotoUrl) => {
+        const finalPhotoUrl =
+          typeof uploadedPhotoUrl === 'string' ? uploadedPhotoUrl : stripBlobUrl(photoUrl, '');
 
-      const secondaryPositions = secondaryPositionsText
-        .split(',')
-        .map((s) => s.trim())
-        .filter((s) => s.length > 0);
+        const secondaryPositions = (data.secondaryPositionsText || '')
+          .split(',')
+          .map((s: string) => s.trim())
+          .filter((s: string) => s.length > 0);
 
-      const pastClubs = pastClubsText
-        .split(',')
-        .map((s) => s.trim())
-        .filter((s) => s.length > 0);
+        const pastClubs = (data.pastClubsText || '')
+          .split(',')
+          .map((s: string) => s.trim())
+          .filter((s: string) => s.length > 0);
 
-      const isStaff = athleteType === 'STAFF';
+        const isStaff = data.athleteType === 'STAFF';
 
-      const payload: any = {
-        name: name.trim(),
-        nickname: nickname.trim() || undefined,
-        gender,
-        athleteType,
-        youthCategory: athleteType === 'YOUTH' && youthCategory.trim() ? youthCategory.trim() : undefined,
-        entryYear: athleteType === 'YOUTH' && entryYear ? Number(entryYear) : undefined,
-        staffRole: isStaff ? staffRole.trim() : undefined,
-        primaryPosition: isStaff ? staffRole.trim() : primaryPosition.trim(),
-        secondaryPositions: isStaff ? [] : secondaryPositions,
-        pastClubs: athleteType === 'YOUTH' ? [] : pastClubs,
-        preferredFoot: isStaff ? undefined : preferredFoot,
-        birthDate: birthDate ? birthDate : undefined,
-        birthPlace: birthPlace.trim() || undefined,
-        height: isStaff ? undefined : (height ? Number(height) : undefined),
-        weight: isStaff ? undefined : (weight ? Number(weight) : undefined),
-        biography: biography.trim() || undefined,
-        instagram: instagram.trim() ? instagram.replace('@', '').trim() : undefined,
-        isRetired: isStaff ? false : isRetired,
-        photoUrl: photoUrl.trim() || undefined,
-      };
+        const payload: any = {
+          name: data.name.trim(),
+          nickname: data.nickname.trim() || undefined,
+          gender: data.gender,
+          athleteType: data.athleteType,
+          youthCategory: data.athleteType === 'YOUTH' && data.youthCategory.trim() ? data.youthCategory.trim() : undefined,
+          entryYear: data.athleteType === 'YOUTH' && data.entryYear ? Number(data.entryYear) : undefined,
+          staffRole: isStaff ? data.staffRole.trim() : undefined,
+          primaryPosition: isStaff ? data.staffRole.trim() : data.primaryPosition.trim(),
+          secondaryPositions: isStaff ? [] : secondaryPositions,
+          pastClubs: data.athleteType === 'YOUTH' ? [] : pastClubs,
+          preferredFoot: isStaff ? undefined : data.preferredFoot,
+          birthDate: data.birthDate ? data.birthDate : undefined,
+          birthPlace: data.birthPlace.trim() || undefined,
+          height: isStaff ? undefined : data.height ? Number(data.height) : undefined,
+          weight: isStaff ? undefined : data.weight ? Number(data.weight) : undefined,
+          biography: data.biography.trim() || undefined,
+          instagram: data.instagram.trim() ? data.instagram.replace('@', '').trim() : undefined,
+          isRetired: isStaff ? false : data.isRetired,
+          photoUrl: editingAthleteId ? finalPhotoUrl : finalPhotoUrl || undefined,
+        };
 
-      let athleteId = editingAthleteId;
-      if (editingAthleteId) {
-        await adminFootballService.updateAthlete(editingAthleteId, payload);
-        toast.success(ADMIN_FOOTBALL_CONSTANTS.DRAWER_ATHLETE.SUCCESS_UPDATE);
-      } else {
-        const created = await adminFootballService.createAthlete(payload);
-        athleteId = created.id || created._id;
-        toast.success(ADMIN_FOOTBALL_CONSTANTS.DRAWER_ATHLETE.SUCCESS_CREATE);
-      }
+        const saved = editingAthleteId
+          ? await adminFootballService.updateAthlete(editingAthleteId, payload)
+          : await adminFootballService.createAthlete(payload);
 
-      // Se houver arquivo de foto pendente, faz upload
-      if (pendingPhotoFile && athleteId) {
-        await adminFootballService.uploadAthletePhoto(athleteId, pendingPhotoFile);
-      }
-
-      close();
-      onSuccess();
-    } catch (err: any) {
-      console.error('Erro ao salvar profissional:', err);
-      toast.error(err?.response?.data?.message || 'Erro ao salvar profissional.');
-    } finally {
-      setIsSaving(false);
-    }
-  };
+        if (!saved || (!saved.id && !saved._id)) {
+          throw new Error('Falha ao confirmar persistência do profissional no banco de dados.');
+        }
+        return saved;
+      },
+      onConfirmed: () => {
+        toast.success(
+          editingAthleteId
+            ? ADMIN_FOOTBALL_CONSTANTS.DRAWER_ATHLETE.SUCCESS_UPDATE
+            : ADMIN_FOOTBALL_CONSTANTS.DRAWER_ATHLETE.SUCCESS_CREATE,
+        );
+        close();
+        onSuccess();
+      },
+      onError: (err: any) => {
+        console.error('Erro ao salvar profissional:', err);
+        toast.error(err?.response?.data?.message || err?.message || 'Erro ao salvar profissional.');
+      },
+    });
+  });
 
   return {
+    form,
     isOpen,
     isEditing: !!editingAthleteId,
     openCreate,
@@ -184,43 +215,8 @@ export const useAdminAthleteDrawer = (onSuccess: () => void, defaultAthleteType:
     close,
     save,
     isSaving,
-    errors,
-    gender,
-    setGender,
-    athleteType,
-    setAthleteType,
-    youthCategory,
-    setYouthCategory,
-    entryYear,
-    setEntryYear,
-    staffRole,
-    setStaffRole,
-    name,
-    setName,
-    nickname,
-    setNickname,
-    birthDate,
-    setBirthDate,
-    birthPlace,
-    setBirthPlace,
-    height,
-    setHeight,
-    weight,
-    setWeight,
-    preferredFoot,
-    setPreferredFoot,
-    primaryPosition,
-    setPrimaryPosition,
-    secondaryPositionsText,
-    setSecondaryPositionsText,
-    pastClubsText,
-    setPastClubsText,
-    biography,
-    setBiography,
-    instagram,
-    setInstagram,
-    isRetired,
-    setIsRetired,
+    savingStage,
+    savingLabel,
     photoUrl,
     setPhotoUrl,
     pendingPhotoFile,

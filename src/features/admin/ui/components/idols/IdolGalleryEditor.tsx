@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { Image as ImageIcon, Trash2, Upload } from 'lucide-react';
 import {
   LayoutContainer,
@@ -10,12 +10,9 @@ import {
   Button,
   SafeImage,
   DEFAULT_NEWS_COVER,
-  Spinner,
 } from '@/shared/ui/components';
 import { ADMIN_IDOLS_TEXTS } from '../../../constants/admin-idols.constants';
 import { IdolGalleryItem } from '../../../../idols/services/idols.service';
-import { adminIdolsService } from '../../../services/admin-idols.service';
-import toast from 'react-hot-toast';
 
 export interface IdolGalleryEditorProps {
   idolId: string | null;
@@ -26,7 +23,6 @@ export interface IdolGalleryEditorProps {
 }
 
 export const IdolGalleryEditor: React.FC<IdolGalleryEditorProps> = ({
-  idolId,
   items,
   onUpdateCaption,
   onRemoveItem,
@@ -34,45 +30,26 @@ export const IdolGalleryEditor: React.FC<IdolGalleryEditorProps> = ({
 }) => {
   const texts = ADMIN_IDOLS_TEXTS.DRAWER;
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [isUploading, setIsUploading] = useState(false);
 
-  const handleFilesSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
+  const handleFilesSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []).filter((f) => f.type.startsWith('image/'));
     if (files.length === 0) return;
 
-    try {
-      setIsUploading(true);
+    const localItems: IdolGalleryItem[] = files.map((file) => ({
+      url: URL.createObjectURL(file),
+      caption: '',
+    }));
+    onAddItems(localItems, files);
 
-      if (idolId) {
-        // Upload immediately via API for existing idol
-        const res = await adminIdolsService.uploadGallery(idolId, files);
-        const newUploaded = (res.gallery || []).slice(items.length).map((url) => ({
-          url,
-          caption: '',
-        }));
-        onAddItems(newUploaded);
-        toast.success('Fotos adicionadas à galeria com sucesso!');
-      } else {
-        // For new idols not yet created, create preview object URLs and queue files for post-create upload
-        const localItems: IdolGalleryItem[] = files.map((file) => ({
-          url: URL.createObjectURL(file),
-          caption: '',
-        }));
-        onAddItems(localItems, files);
-      }
-    } catch (err) {
-      console.error('Erro no upload de fotos:', err);
-      toast.error('Erro ao fazer upload das fotos da galeria.');
-    } finally {
-      setIsUploading(false);
-      if (fileInputRef.current) fileInputRef.current.value = '';
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
   };
 
   return (
     <LayoutContainer className="flex flex-col gap-4 p-5 rounded-2xl bg-surface border border-border shadow-xs">
       <LayoutContainer className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-        <LayoutContainer className="flex items-center gap-2">
+        <LayoutContainer className="flex flex-col sm:flex-row sm:items-center gap-2">
           <ImageIcon className="w-4 h-4 text-primary" />
           <Title level="h3" className="text-sm font-black text-text-primary uppercase tracking-wider">
             {texts.SECTION_GALLERY}
@@ -80,7 +57,7 @@ export const IdolGalleryEditor: React.FC<IdolGalleryEditorProps> = ({
         </LayoutContainer>
 
         <LayoutContainer className="flex items-center gap-2">
-          <input
+          <Input
             ref={fileInputRef}
             type="file"
             accept="image/*"
@@ -93,11 +70,10 @@ export const IdolGalleryEditor: React.FC<IdolGalleryEditorProps> = ({
             variant="outline"
             size="sm"
             onClick={() => fileInputRef.current?.click()}
-            disabled={isUploading}
-            leftIcon={isUploading ? <Spinner size={14} /> : <Upload className="w-3.5 h-3.5" />}
+            leftIcon={<Upload className="w-3.5 h-3.5" />}
             className="text-xs font-bold"
           >
-            {isUploading ? 'Enviando...' : texts.BTN_UPLOAD_PHOTOS}
+            {texts.BTN_UPLOAD_PHOTOS}
           </Button>
         </LayoutContainer>
       </LayoutContainer>
@@ -110,29 +86,27 @@ export const IdolGalleryEditor: React.FC<IdolGalleryEditorProps> = ({
         <LayoutContainer className="p-6 rounded-xl border border-dashed border-border flex flex-col items-center justify-center text-center gap-2 bg-background/50">
           <ImageIcon className="w-8 h-8 text-text-muted opacity-40" />
           <Text as="span" className="text-xs text-text-muted">
-            Nenhuma foto histórica adicionada à galeria deste ídolo.
+            {texts.GALLERY_EMPTY}
           </Text>
         </LayoutContainer>
       ) : (
         <LayoutContainer className="flex flex-col gap-3">
           {items.map((item, idx) => (
             <LayoutContainer
-              key={idx}
+              key={`${item.url}-${idx}`}
               className="flex items-center gap-3 p-3 rounded-xl bg-background border border-border"
             >
-              {/* Thumbnail */}
               <LayoutContainer className="relative w-16 h-12 rounded-lg overflow-hidden bg-surface border border-border shrink-0">
                 <SafeImage
                   src={item.url}
                   fallbackSrc={DEFAULT_NEWS_COVER}
-                  alt={`Foto ${idx + 1}`}
+                  alt={item.caption || `${texts.LABEL_PHOTO_CAPTION} ${idx + 1}`}
                   fill
                   className="object-cover"
                   sizes="64px"
                 />
               </LayoutContainer>
 
-              {/* Caption Input */}
               <LayoutContainer className="flex-1 min-w-0">
                 <Input
                   value={item.caption || ''}
@@ -142,7 +116,6 @@ export const IdolGalleryEditor: React.FC<IdolGalleryEditorProps> = ({
                 />
               </LayoutContainer>
 
-              {/* Delete Button */}
               <Button
                 type="button"
                 variant="ghost"

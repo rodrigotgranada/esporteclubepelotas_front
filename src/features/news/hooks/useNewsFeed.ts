@@ -7,6 +7,7 @@ import {
   NewsArticleData,
   NewsCategoryData,
 } from '@/features/admin/services/admin-news.service';
+import { useRealtimeEvents } from '@/shared/hooks/useRealtimeEvents';
 
 export const useNewsFeed = () => {
   const searchParams = useSearchParams();
@@ -24,7 +25,6 @@ export const useNewsFeed = () => {
   const [total, setTotal] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  // Sync state if URL search query changes externally
   useEffect(() => {
     const urlTag = searchParams?.get('tag') || '';
     setSelectedTag(urlTag);
@@ -48,27 +48,34 @@ export const useNewsFeed = () => {
     }
   }, []);
 
-  const loadNews = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      const cleanTag = selectedTag.trim().replace(/^#/, '');
-      const res = await newsService.getNews({
-        page,
-        limit: 9,
-        category: selectedCategory || undefined,
-        tag: cleanTag || undefined,
-        search: search.trim() || undefined,
-      });
+  const loadNews = useCallback(
+    async (options?: { silent?: boolean }) => {
+      try {
+        if (!options?.silent) {
+          setIsLoading(true);
+        }
+        const cleanTag = selectedTag.trim().replace(/^#/, '');
+        const res = await newsService.getNews({
+          page,
+          limit: 9,
+          category: selectedCategory || undefined,
+          tag: cleanTag || undefined,
+          search: search.trim() || undefined,
+        });
 
-      setNews(res.data);
-      setTotal(res.total);
-      setTotalPages(res.totalPages || Math.ceil(res.total / 9) || 1);
-    } catch (err) {
-      console.error('Failed to load news feed', err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [page, selectedCategory, selectedTag, search]);
+        setNews(res.data || []);
+        setTotal(res.total || 0);
+        setTotalPages(res.totalPages || Math.ceil((res.total || 0) / 9) || 1);
+      } catch (err) {
+        console.error('Failed to load news feed', err);
+      } finally {
+        if (!options?.silent) {
+          setIsLoading(false);
+        }
+      }
+    },
+    [page, selectedCategory, selectedTag, search],
+  );
 
   useEffect(() => {
     loadCategories();
@@ -78,6 +85,15 @@ export const useNewsFeed = () => {
   useEffect(() => {
     loadNews();
   }, [loadNews]);
+
+  useRealtimeEvents('news', () => {
+    loadNews({ silent: true });
+    loadFeatured();
+  });
+
+  useRealtimeEvents('news-categories', () => {
+    loadCategories();
+  });
 
   const handleCategorySelect = (slug: string) => {
     setSelectedCategory(slug);

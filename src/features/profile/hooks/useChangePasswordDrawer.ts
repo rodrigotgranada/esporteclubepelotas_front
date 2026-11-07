@@ -1,54 +1,55 @@
-import { useState, useEffect } from 'react';
-import { PROFILE_TEXTS } from '@/features/profile/constants';
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import {
+  changePasswordSchema,
+  ChangePasswordFormData,
+} from '../schemas/change-password.schema';
 
 interface UseChangePasswordDrawerProps {
   isOpen: boolean;
-  onSubmit: (current: string, newPass: string) => Promise<void>;
+  onSubmit: (current: string, newPass: string) => Promise<boolean | void>;
+  isLoading?: boolean;
 }
 
-export const useChangePasswordDrawer = ({ isOpen, onSubmit }: UseChangePasswordDrawerProps) => {
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
+export const useChangePasswordDrawer = ({
+  isOpen,
+  onSubmit,
+  isLoading,
+}: UseChangePasswordDrawerProps) => {
+  const form = useForm<ChangePasswordFormData>({
+    resolver: zodResolver(changePasswordSchema),
+    defaultValues: {
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: '',
+    },
+  });
 
   useEffect(() => {
     if (!isOpen) {
-      setCurrentPassword('');
-      setNewPassword('');
-      setConfirmPassword('');
-      setError('');
+      form.reset({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+      });
     }
-  }, [isOpen]);
+  }, [isOpen, form]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-
-    if (newPassword !== confirmPassword) {
-      setError(PROFILE_TEXTS.CHANGE_PASSWORD_ERROR_MISMATCH);
-      return;
+  const handleSubmit = form.handleSubmit(async (data: ChangePasswordFormData) => {
+    if (isLoading) return;
+    const succeeded = await onSubmit(data.currentPassword, data.newPassword);
+    if (succeeded !== false) {
+      form.reset({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+      });
     }
-
-    if (newPassword.length < 6) {
-      setError(PROFILE_TEXTS.CHANGE_PASSWORD_ERROR_MIN_LENGTH);
-      return;
-    }
-
-    await onSubmit(currentPassword, newPassword);
-    setCurrentPassword('');
-    setNewPassword('');
-    setConfirmPassword('');
-  };
+  });
 
   return {
-    currentPassword,
-    setCurrentPassword,
-    newPassword,
-    setNewPassword,
-    confirmPassword,
-    setConfirmPassword,
-    error,
+    form,
     handleSubmit,
   };
 };

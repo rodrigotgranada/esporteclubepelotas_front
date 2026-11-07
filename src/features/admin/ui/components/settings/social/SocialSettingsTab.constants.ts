@@ -8,9 +8,11 @@ export const SOCIAL_SETTINGS_TEXTS = {
   FIELD_PLATFORM: 'Plataforma',
   FIELD_LABEL: 'Nome / Identificação',
   FIELD_LABEL_PLACEHOLDER: 'Ex: @ecpelotas ou Pelotas Oficial',
+  LABEL_PLACEHOLDER: 'Ex: @ecpelotas ou Pelotas Oficial',
   FIELD_URL: 'Link do Perfil',
   FIELD_URL_PLACEHOLDER: 'https://...',
   BTN_REMOVE: 'Remover',
+  REMOVE_TOOLTIP: 'Remover rede social',
   TOAST_SUCCESS: 'Redes sociais atualizadas com sucesso!',
   TOAST_ERROR: 'Erro ao atualizar as redes sociais.',
   VALIDATION_URL: 'Por favor, preencha o link da rede social.',
@@ -25,4 +27,3 @@ export const SOCIAL_SETTINGS_TEXTS = {
     LINKEDIN: 'LinkedIn',
   },
 };
-

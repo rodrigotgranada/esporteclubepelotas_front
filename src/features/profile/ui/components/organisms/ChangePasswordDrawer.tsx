@@ -1,62 +1,109 @@
 import React from 'react';
-import { Drawer, PasswordInput, Button, LayoutContainer, Form, Text, PasswordStrengthMeter } from '@/shared/ui/components';
+import {
+  Drawer,
+  PasswordInput,
+  Button,
+  LayoutContainer,
+  Form,
+  FormField,
+  PasswordStrengthMeter,
+} from '@/shared/ui/components';
 import { PROFILE_TEXTS } from '@/features/profile/constants';
 import { useChangePasswordDrawer } from '@/features/profile/hooks/useChangePasswordDrawer';
 
 interface ChangePasswordDrawerProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (current: string, newPass: string) => Promise<void>;
+  onSubmit: (current: string, newPass: string) => Promise<boolean | void>;
   isLoading: boolean;
 }
 
-export const ChangePasswordDrawer = ({ isOpen, onClose, onSubmit, isLoading }: ChangePasswordDrawerProps) => {
-  const {
-    currentPassword,
-    setCurrentPassword,
-    newPassword,
-    setNewPassword,
-    confirmPassword,
-    setConfirmPassword,
-    error,
-    handleSubmit,
-  } = useChangePasswordDrawer({ isOpen, onSubmit });
+export const ChangePasswordDrawer = ({
+  isOpen,
+  onClose,
+  onSubmit,
+  isLoading,
+}: ChangePasswordDrawerProps) => {
+  const { form, handleSubmit } = useChangePasswordDrawer({
+    isOpen,
+    onSubmit,
+    isLoading,
+  });
+
+  const newPassword = form.watch('newPassword');
 
   return (
-    <Drawer isOpen={isOpen} onClose={onClose} title={PROFILE_TEXTS.CHANGE_PASSWORD_DRAWER_TITLE}>
+    <Drawer
+      isOpen={isOpen}
+      onClose={() => {
+        if (!isLoading) onClose();
+      }}
+      title={PROFILE_TEXTS.CHANGE_PASSWORD_DRAWER_TITLE}
+    >
       <Form onSubmit={handleSubmit} className="flex flex-col flex-1 mt-4">
         <LayoutContainer className="flex-1 space-y-4">
-          <PasswordInput
+          <FormField
+            name="currentPassword"
+            control={form.control}
             label={PROFILE_TEXTS.CHANGE_PASSWORD_LABEL_CURRENT}
-            value={currentPassword}
-            onChange={(e) => setCurrentPassword(e.target.value)}
             required
+            render={({ field }) => (
+              <PasswordInput
+                {...field}
+                required
+              />
+            )}
           />
-          <PasswordInput
+
+          <FormField
+            name="newPassword"
+            control={form.control}
             label={PROFILE_TEXTS.CHANGE_PASSWORD_LABEL_NEW}
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
             required
+            render={({ field }) => (
+              <PasswordInput
+                {...field}
+                required
+              />
+            )}
           />
+
           {newPassword && (
             <PasswordStrengthMeter password={newPassword} />
           )}
-          <PasswordInput
+
+          <FormField
+            name="confirmPassword"
+            control={form.control}
             label={PROFILE_TEXTS.CHANGE_PASSWORD_LABEL_CONFIRM}
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
             required
+            render={({ field }) => (
+              <PasswordInput
+                {...field}
+                required
+              />
+            )}
           />
-          {error && (
-            <Text className="text-error text-sm">{error}</Text>
-          )}
         </LayoutContainer>
 
         <LayoutContainer className="mt-8 pt-6 border-t border-white/10 flex gap-3">
-          <Button type="button" variant="outline" size="md" className="flex-1" onClick={onClose}>
+          <Button
+            type="button"
+            variant="outline"
+            size="md"
+            className="flex-1"
+            onClick={onClose}
+            disabled={isLoading}
+          >
             {PROFILE_TEXTS.ADDRESSES_BUTTON_CANCEL}
           </Button>
-          <Button type="submit" variant="primary" size="md" className="flex-1" isLoading={isLoading}>
+          <Button
+            type="submit"
+            variant="primary"
+            size="md"
+            className="flex-1"
+            isLoading={isLoading}
+          >
             {PROFILE_TEXTS.CHANGE_PASSWORD_BUTTON_SAVE}
           </Button>
         </LayoutContainer>

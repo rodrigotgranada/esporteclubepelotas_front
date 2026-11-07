@@ -1,18 +1,20 @@
 'use client';
 
 import React from 'react';
+import { UseFormReturn, Controller } from 'react-hook-form';
 import {
   Drawer,
   LayoutContainer,
-  Title,
   Text,
   Input,
+  Textarea,
   Select,
   Option,
   Button,
   ImageCropper,
   Switch,
   Badge,
+  FormField,
 } from '@/shared/ui/components';
 import { ADMIN_FOOTBALL_CONSTANTS } from '../../../constants/admin-football.constants';
 import { FOOTBALL_CONSTANTS } from '@/features/football/constants/football.constants';
@@ -21,6 +23,7 @@ import {
   AthleteType,
   PreferredFoot,
 } from '@/features/football/services/football.service';
+import { AthleteFormData } from '../../../schemas/football/athlete.schema';
 
 export interface AthleteEditorDrawerProps {
   isOpen: boolean;
@@ -28,48 +31,11 @@ export interface AthleteEditorDrawerProps {
   onClose: () => void;
   onSave: () => void;
   isSaving: boolean;
-  errors: Record<string, string>;
-
-  // Fields
-  gender: AthleteGender;
-  setGender: (v: AthleteGender) => void;
-  athleteType: AthleteType;
-  setAthleteType: (v: AthleteType) => void;
-  youthCategory: string;
-  setYouthCategory: (v: string) => void;
-  entryYear: string;
-  setEntryYear: (v: string) => void;
-  staffRole: string;
-  setStaffRole: (v: string) => void;
-  name: string;
-  setName: (v: string) => void;
-  nickname: string;
-  setNickname: (v: string) => void;
-  birthDate: string;
-  setBirthDate: (v: string) => void;
-  birthPlace: string;
-  setBirthPlace: (v: string) => void;
-  height: string;
-  setHeight: (v: string) => void;
-  weight: string;
-  setWeight: (v: string) => void;
-  preferredFoot: PreferredFoot;
-  setPreferredFoot: (v: PreferredFoot) => void;
-  primaryPosition: string;
-  setPrimaryPosition: (v: string) => void;
-  secondaryPositionsText: string;
-  setSecondaryPositionsText: (v: string) => void;
-  pastClubsText: string;
-  setPastClubsText: (v: string) => void;
-  biography: string;
-  setBiography: (v: string) => void;
-  instagram: string;
-  setInstagram: (v: string) => void;
-  isRetired: boolean;
-  setIsRetired: (v: boolean) => void;
+  savingLabel?: string;
+  form: UseFormReturn<AthleteFormData, any, any>;
   photoUrl: string;
   setPhotoUrl: (v: string) => void;
-  pendingPhotoFile: File | null;
+  pendingPhotoFile?: File | null;
   setPendingPhotoFile: (f: File | null) => void;
   allowedTypes?: AthleteType[];
 }
@@ -80,54 +46,24 @@ export const AthleteEditorDrawer: React.FC<AthleteEditorDrawerProps> = ({
   onClose,
   onSave,
   isSaving,
-  errors,
-  gender,
-  setGender,
-  athleteType,
-  setAthleteType,
-  youthCategory,
-  setYouthCategory,
-  entryYear,
-  setEntryYear,
-  staffRole,
-  setStaffRole,
-  name,
-  setName,
-  nickname,
-  setNickname,
-  birthDate,
-  setBirthDate,
-  birthPlace,
-  setBirthPlace,
-  height,
-  setHeight,
-  weight,
-  setWeight,
-  preferredFoot,
-  setPreferredFoot,
-  primaryPosition,
-  setPrimaryPosition,
-  secondaryPositionsText,
-  setSecondaryPositionsText,
-  pastClubsText,
-  setPastClubsText,
-  biography,
-  setBiography,
-  instagram,
-  setInstagram,
-  isRetired,
-  setIsRetired,
+  savingLabel,
+  form,
   photoUrl,
   setPhotoUrl,
   setPendingPhotoFile,
   allowedTypes,
 }) => {
   const texts = ADMIN_FOOTBALL_CONSTANTS.DRAWER_ATHLETE;
+  const { register, control, watch, formState: { errors } } = form;
+
+  const athleteType = watch('athleteType');
   const isStaff = athleteType === 'STAFF';
   const isYouth = athleteType === 'YOUTH';
 
   const handleCropComplete = (croppedImageBlob: Blob) => {
-    const file = new File([croppedImageBlob], 'photo.webp', { type: croppedImageBlob.type || 'image/webp' });
+    const file = new File([croppedImageBlob], 'photo.webp', {
+      type: croppedImageBlob.type || 'image/webp',
+    });
     setPendingPhotoFile(file);
     const previewUrl = URL.createObjectURL(croppedImageBlob);
     setPhotoUrl(previewUrl);
@@ -141,7 +77,6 @@ export const AthleteEditorDrawer: React.FC<AthleteEditorDrawerProps> = ({
       size="lg"
     >
       <LayoutContainer className="flex flex-col gap-6 p-6">
-        {/* Foto Oficial Crop 3:4 */}
         <LayoutContainer className="flex flex-col gap-2">
           <Text as="span" className="text-xs font-extrabold uppercase text-text-primary tracking-wider">
             {texts.PHOTO_LABEL}
@@ -159,56 +94,108 @@ export const AthleteEditorDrawer: React.FC<AthleteEditorDrawerProps> = ({
           />
         </LayoutContainer>
 
-        {/* Gênero & Vínculo */}
         <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-2xl bg-surface-secondary border border-border">
-          <LayoutContainer className="flex flex-col gap-1.5">
-            <Text as="span" className="text-xs font-bold text-text-primary">
-              {texts.FIELD_GENDER} *
-            </Text>
-            <Select
-              value={gender}
-              onChange={(e) => setGender(e.target.value as AthleteGender)}
-              className="w-full"
-            >
-              <Option value="MALE">{texts.GENDER_MALE}</Option>
-              <Option value="FEMALE">{texts.GENDER_FEMALE}</Option>
-            </Select>
-          </LayoutContainer>
+          <FormField
+            control={control}
+            name="gender"
+            label={`${texts.FIELD_GENDER} *`}
+            render={({ field }) => (
+              <Select
+                value={field.value}
+                onChange={(e) => field.onChange(e.target.value as AthleteGender)}
+                className="w-full"
+              >
+                <Option value="MALE">{texts.GENDER_MALE}</Option>
+                <Option value="FEMALE">{texts.GENDER_FEMALE}</Option>
+              </Select>
+            )}
+          />
 
-          <LayoutContainer className="flex flex-col gap-1.5">
-            <Text as="span" className="text-xs font-bold text-text-primary">
-              {texts.FIELD_ATHLETE_TYPE} *
-            </Text>
-            <Select
-              value={athleteType}
-              onChange={(e) => {
-                const nextType = e.target.value as AthleteType;
-                setAthleteType(nextType);
-                if (nextType === 'STAFF' && !staffRole) {
-                  setStaffRole('Treinador');
-                }
-              }}
-              className="w-full"
-            >
-              {(!allowedTypes || allowedTypes.includes('PROFESSIONAL') || athleteType === 'PROFESSIONAL') && <Option value="PROFESSIONAL">{texts.TYPE_PROFESSIONAL}</Option>}
-              {(!allowedTypes || allowedTypes.includes('YOUTH') || athleteType === 'YOUTH') && <Option value="YOUTH">{texts.TYPE_YOUTH}</Option>}
-              {(!allowedTypes || allowedTypes.includes('STAFF') || athleteType === 'STAFF') && <Option value="STAFF">{texts.TYPE_STAFF}</Option>}
-
-
-            </Select>
-          </LayoutContainer>
+          <FormField
+            control={control}
+            name="athleteType"
+            label={`${texts.FIELD_ATHLETE_TYPE} *`}
+            render={({ field }) => (
+              <Select
+                value={field.value}
+                onChange={(e) => {
+                  const nextType = e.target.value as AthleteType;
+                  field.onChange(nextType);
+                  if (nextType === 'STAFF') {
+                    form.setValue('staffRole', form.getValues('staffRole') || 'Treinador');
+                  }
+                }}
+                className="w-full"
+              >
+                {(!allowedTypes || allowedTypes.includes('PROFESSIONAL') || athleteType === 'PROFESSIONAL') && (
+                  <Option value="PROFESSIONAL">{texts.TYPE_PROFESSIONAL}</Option>
+                )}
+                {(!allowedTypes || allowedTypes.includes('YOUTH') || athleteType === 'YOUTH') && (
+                  <Option value="YOUTH">{texts.TYPE_YOUTH}</Option>
+                )}
+                {(!allowedTypes || allowedTypes.includes('STAFF') || athleteType === 'STAFF') && (
+                  <Option value="STAFF">{texts.TYPE_STAFF}</Option>
+                )}
+              </Select>
+            )}
+          />
         </LayoutContainer>
 
-        {/* Submenu Condicional da Comissão Técnica */}
-        {isStaff && (
-          <LayoutContainer className="p-4 rounded-2xl bg-surface border border-primary/20 flex flex-col gap-2 shadow-xs">
-            <LayoutContainer className="flex flex-col gap-1.5">
-              <Text as="span" className="text-xs font-bold text-text-primary">
-                {texts.FIELD_STAFF_ROLE} *
-              </Text>
+        {isYouth && (
+          <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-2xl bg-primary/5 border border-primary/20">
+            <FormField
+              control={control}
+              name="youthCategory"
+              label={texts.FIELD_YOUTH_CATEGORY}
+              render={({ field }) => (
+                <Select
+                  value={field.value}
+                  onChange={(e) => field.onChange(e.target.value)}
+                  className="w-full"
+                >
+                  <Option value="SUB_20">{FOOTBALL_CONSTANTS.CATEGORIES.SUB_20_FULL}</Option>
+                  <Option value="SUB_17">{FOOTBALL_CONSTANTS.CATEGORIES.SUB_17_FULL}</Option>
+                  <Option value="SUB_15">{FOOTBALL_CONSTANTS.CATEGORIES.SUB_15_FULL}</Option>
+                </Select>
+              )}
+            />
+
+            <FormField label={texts.FIELD_ENTRY_YEAR} error={errors.entryYear?.message}>
+              <Input
+                type="number"
+                {...register('entryYear')}
+                placeholder={texts.FIELD_ENTRY_YEAR_PLACEHOLDER}
+              />
+            </FormField>
+          </LayoutContainer>
+        )}
+
+        <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <FormField label={`${texts.FIELD_NAME} *`} error={errors.name?.message}>
+            <Input
+              {...register('name')}
+              placeholder={texts.FIELD_NAME_PLACEHOLDER}
+            />
+          </FormField>
+
+          <FormField label={texts.FIELD_NICKNAME} error={errors.nickname?.message}>
+            <Input
+              {...register('nickname')}
+              placeholder={texts.FIELD_NICKNAME_PLACEHOLDER}
+            />
+          </FormField>
+        </LayoutContainer>
+
+        {isStaff ? (
+          <FormField
+            control={control}
+            name="staffRole"
+            label={`${texts.FIELD_STAFF_ROLE} *`}
+            error={errors.staffRole?.message}
+            render={({ field }) => (
               <Select
-                value={staffRole}
-                onChange={(e) => setStaffRole(e.target.value)}
+                value={field.value}
+                onChange={(e) => field.onChange(e.target.value)}
                 className="w-full"
               >
                 {FOOTBALL_CONSTANTS.STAFF_ROLES.map((role) => (
@@ -217,275 +204,146 @@ export const AthleteEditorDrawer: React.FC<AthleteEditorDrawerProps> = ({
                   </Option>
                 ))}
               </Select>
-              {errors.staffRole && (
-                <Text as="span" className="text-[11px] text-[#ea580c] font-medium">
-                  {errors.staffRole}
-                </Text>
-              )}
-            </LayoutContainer>
-            <Text as="p" className="text-xs text-text-muted italic">
-              ℹ️ {texts.STAFF_NOTICE}
-            </Text>
-          </LayoutContainer>
-        )}
-
-        {/* Nome Completo & Apelido */}
-        <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <LayoutContainer className="flex flex-col gap-1.5">
-            <Text as="span" className="text-xs font-bold text-text-primary">
-              {texts.FIELD_NAME} *
-            </Text>
-            <Input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder={texts.FIELD_NAME_PLACEHOLDER}
-              className={errors.name ? 'border-[#ea580c]' : ''}
-            />
-            {errors.name && (
-              <Text as="span" className="text-[11px] text-[#ea580c] font-medium">
-                {errors.name}
-              </Text>
             )}
-          </LayoutContainer>
-
-          <LayoutContainer className="flex flex-col gap-1.5">
-            <Text as="span" className="text-xs font-bold text-text-primary">
-              {texts.FIELD_NICKNAME}
-            </Text>
-            <Input
-              value={nickname}
-              onChange={(e) => setNickname(e.target.value)}
-              placeholder={texts.FIELD_NICKNAME_PLACEHOLDER}
-            />
-          </LayoutContainer>
-        </LayoutContainer>
-
-        {/* Posição Principal & Pé Preferencial (Apenas Atletas) */}
-        {!isStaff && (
+          />
+        ) : (
           <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <LayoutContainer className="flex flex-col gap-1.5">
-              <Text as="span" className="text-xs font-bold text-text-primary">
-                {texts.FIELD_PRIMARY_POSITION} *
-              </Text>
+            <FormField
+              label={`${texts.FIELD_PRIMARY_POSITION} *`}
+              error={errors.primaryPosition?.message}
+            >
               <Input
-                value={primaryPosition}
-                onChange={(e) => setPrimaryPosition(e.target.value)}
+                {...register('primaryPosition')}
                 placeholder={texts.FIELD_PRIMARY_POSITION_PLACEHOLDER}
-                className={errors.primaryPosition ? 'border-[#ea580c]' : ''}
               />
-              {errors.primaryPosition && (
-                <Text as="span" className="text-[11px] text-[#ea580c] font-medium">
-                  {errors.primaryPosition}
-                </Text>
-              )}
-            </LayoutContainer>
+            </FormField>
 
-            <LayoutContainer className="flex flex-col gap-1.5">
-              <Text as="span" className="text-xs font-bold text-text-primary">
-                {texts.FIELD_PREFERRED_FOOT}
-              </Text>
-              <Select
-                value={preferredFoot}
-                onChange={(e) => setPreferredFoot(e.target.value as PreferredFoot)}
-                className="w-full"
-              >
-                <Option value="RIGHT">Destro</Option>
-                <Option value="LEFT">Canhoto</Option>
-                <Option value="BOTH">Ambidestro</Option>
-              </Select>
-            </LayoutContainer>
-          </LayoutContainer>
-        )}
-
-        {/* Data de Nascimento & Naturalidade */}
-        <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <LayoutContainer className="flex flex-col gap-1.5">
-            <Text as="span" className="text-xs font-bold text-text-primary">
-              {texts.FIELD_BIRTH_DATE}
-            </Text>
-            <Input
-              type="date"
-              value={birthDate}
-              onChange={(e) => setBirthDate(e.target.value)}
-            />
-          </LayoutContainer>
-
-          <LayoutContainer className="flex flex-col gap-1.5">
-            <Text as="span" className="text-xs font-bold text-text-primary">
-              {texts.FIELD_BIRTH_PLACE}
-            </Text>
-            <Input
-              value={birthPlace}
-              onChange={(e) => setBirthPlace(e.target.value)}
-              placeholder={texts.FIELD_BIRTH_PLACE_PLACEHOLDER}
-            />
-          </LayoutContainer>
-        </LayoutContainer>
-
-        {/* Altura & Peso (Apenas Atletas) */}
-        {!isStaff && (
-          <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <LayoutContainer className="flex flex-col gap-1.5">
-              <Text as="span" className="text-xs font-bold text-text-primary">
-                {texts.FIELD_HEIGHT}
-              </Text>
-              <Input
-                type="number"
-                value={height}
-                onChange={(e) => setHeight(e.target.value)}
-                placeholder={texts.FIELD_HEIGHT_PLACEHOLDER}
-              />
-            </LayoutContainer>
-
-            <LayoutContainer className="flex flex-col gap-1.5">
-              <Text as="span" className="text-xs font-bold text-text-primary">
-                {texts.FIELD_WEIGHT}
-              </Text>
-              <Input
-                type="number"
-                value={weight}
-                onChange={(e) => setWeight(e.target.value)}
-                placeholder={texts.FIELD_WEIGHT_PLACEHOLDER}
-              />
-            </LayoutContainer>
-          </LayoutContainer>
-        )}
-
-        {/* Posições Secundárias (Apenas Atletas) */}
-        {!isStaff && (
-          <LayoutContainer className="flex flex-col gap-1.5">
-            <Text as="span" className="text-xs font-bold text-text-primary">
-              {texts.FIELD_SECONDARY_POSITIONS}
-            </Text>
-            <Input
-              value={secondaryPositionsText}
-              onChange={(e) => setSecondaryPositionsText(e.target.value)}
-              placeholder={texts.FIELD_SECONDARY_POSITIONS_PLACEHOLDER}
-            />
-          </LayoutContainer>
-        )}
-
-        {/* Base vs Clubes Anteriores (Comissão técnica e Profissionais têm clubes anteriores) */}
-        {isYouth ? (
-          <LayoutContainer className="p-4 rounded-2xl bg-surface border border-primary/20 flex flex-col gap-4">
-            <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <LayoutContainer className="flex flex-col gap-1.5">
-                <Text as="span" className="text-xs font-bold text-text-primary">
-                  {texts.FIELD_YOUTH_CATEGORY}
-                </Text>
+            <FormField
+              control={control}
+              name="preferredFoot"
+              label={texts.FIELD_PREFERRED_FOOT}
+              render={({ field }) => (
                 <Select
-                  value={youthCategory}
-                  onChange={(e) => setYouthCategory(e.target.value)}
+                  value={field.value}
+                  onChange={(e) => field.onChange(e.target.value as PreferredFoot)}
                   className="w-full"
                 >
-                  <Option value="">Selecione a Categoria</Option>
-                  <Option value="SUB_20">Sub-20 (Júnior)</Option>
-                  <Option value="SUB_17">Sub-17 (Juvenil)</Option>
-                  <Option value="SUB_15">Sub-15 (Infantil)</Option>
+                  <Option value="RIGHT">{FOOTBALL_CONSTANTS.FEET.RIGHT}</Option>
+                  <Option value="LEFT">{FOOTBALL_CONSTANTS.FEET.LEFT}</Option>
+                  <Option value="BOTH">{FOOTBALL_CONSTANTS.FEET.BOTH}</Option>
                 </Select>
-              </LayoutContainer>
-
-              <LayoutContainer className="flex flex-col gap-1.5">
-                <Text as="span" className="text-xs font-bold text-text-primary">
-                  {texts.FIELD_ENTRY_YEAR}
-                </Text>
-                <Input
-                  type="number"
-                  value={entryYear}
-                  onChange={(e) => setEntryYear(e.target.value)}
-                  placeholder={texts.FIELD_ENTRY_YEAR_PLACEHOLDER}
-                />
-              </LayoutContainer>
-            </LayoutContainer>
-            <Text as="p" className="text-xs text-text-muted italic">
-              ℹ️ {texts.YOUTH_NOTICE}
-            </Text>
-          </LayoutContainer>
-        ) : (
-          <LayoutContainer className="flex flex-col gap-1.5">
-            <Text as="span" className="text-xs font-bold text-text-primary">
-              {texts.FIELD_PAST_CLUBS}
-            </Text>
-            <Input
-              value={pastClubsText}
-              onChange={(e) => setPastClubsText(e.target.value)}
-              placeholder={texts.FIELD_PAST_CLUBS_PLACEHOLDER}
+              )}
             />
           </LayoutContainer>
         )}
 
-        {/* Instagram */}
-        <LayoutContainer className="flex flex-col gap-1.5">
-          <Text as="span" className="text-xs font-bold text-text-primary">
-            {texts.FIELD_INSTAGRAM}
-          </Text>
-          <Input
-            value={instagram}
-            onChange={(e) => setInstagram(e.target.value)}
-            placeholder={texts.FIELD_INSTAGRAM_PLACEHOLDER}
-          />
+        <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <FormField label={texts.FIELD_BIRTH_DATE} error={errors.birthDate?.message}>
+            <Input type="date" {...register('birthDate')} />
+          </FormField>
+
+          <FormField label={texts.FIELD_BIRTH_PLACE} error={errors.birthPlace?.message}>
+            <Input
+              {...register('birthPlace')}
+              placeholder={texts.FIELD_BIRTH_PLACE_PLACEHOLDER}
+            />
+          </FormField>
         </LayoutContainer>
 
-        {/* Biografia / Resumo da Trajetória */}
-        <LayoutContainer className="flex flex-col gap-1.5">
-          <Text as="span" className="text-xs font-bold text-text-primary">
-            {texts.FIELD_BIOGRAPHY}
-          </Text>
-          <textarea
-            value={biography}
-            onChange={(e) => setBiography(e.target.value)}
-            rows={4}
-            placeholder={texts.FIELD_BIOGRAPHY_PLACEHOLDER}
-            className="w-full p-3 rounded-xl bg-background border border-border text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-primary transition-colors resize-y"
-          />
-        </LayoutContainer>
-
-        {/* Atleta Aposentado / Fora de Atividade (Apenas Atletas) */}
         {!isStaff && (
-          <LayoutContainer className="p-4 rounded-2xl bg-surface border border-border flex flex-col gap-2">
-            <LayoutContainer className="flex items-center justify-between gap-4">
-              <LayoutContainer className="flex items-center gap-2">
-                <Text as="span" className="text-xs font-bold text-text-primary">
-                  {texts.FIELD_IS_RETIRED}
-                </Text>
-                {isRetired && (
-                  <Badge variant="default" size="sm" className="font-extrabold text-[10px] uppercase text-text-muted">
-                    {ADMIN_FOOTBALL_CONSTANTS.ATHLETES_TAB.BADGE_RETIRED}
-                  </Badge>
-                )}
-              </LayoutContainer>
-
-              <Switch
-                checked={isRetired}
-                onChange={setIsRetired}
-                aria-label={texts.FIELD_IS_RETIRED}
+          <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <FormField label={texts.FIELD_HEIGHT} error={errors.height?.message}>
+              <Input
+                type="number"
+                {...register('height')}
+                placeholder={texts.FIELD_HEIGHT_PLACEHOLDER}
               />
-            </LayoutContainer>
+            </FormField>
 
-            <Text as="p" className="text-xs text-text-muted leading-relaxed">
-              {texts.FIELD_IS_RETIRED_DESC}
-            </Text>
+            <FormField label={texts.FIELD_WEIGHT} error={errors.weight?.message}>
+              <Input
+                type="number"
+                {...register('weight')}
+                placeholder={texts.FIELD_WEIGHT_PLACEHOLDER}
+              />
+            </FormField>
           </LayoutContainer>
         )}
 
-        {/* Footer Actions */}
-        <LayoutContainer className="flex items-center justify-end gap-3 pt-4 border-t border-border mt-4">
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={onClose}
-            disabled={isSaving}
+        {!isStaff && (
+          <FormField
+            label={texts.FIELD_SECONDARY_POSITIONS}
+            error={errors.secondaryPositionsText?.message}
           >
-            Cancelar
+            <Input
+              {...register('secondaryPositionsText')}
+              placeholder={texts.FIELD_SECONDARY_POSITIONS_PLACEHOLDER}
+            />
+          </FormField>
+        )}
+
+        {!isYouth && (
+          <FormField
+            label={texts.FIELD_PAST_CLUBS}
+            error={errors.pastClubsText?.message}
+          >
+            <Input
+              {...register('pastClubsText')}
+              placeholder={texts.FIELD_PAST_CLUBS_PLACEHOLDER}
+            />
+          </FormField>
+        )}
+
+        <FormField label={texts.FIELD_INSTAGRAM} error={errors.instagram?.message}>
+          <Input
+            {...register('instagram')}
+            placeholder={texts.FIELD_INSTAGRAM_PLACEHOLDER}
+          />
+        </FormField>
+
+        <FormField label={texts.FIELD_BIOGRAPHY} error={errors.biography?.message}>
+          <Textarea
+            {...register('biography')}
+            rows={4}
+            placeholder={texts.FIELD_BIOGRAPHY_PLACEHOLDER}
+          />
+        </FormField>
+
+        {!isStaff && (
+          <LayoutContainer className="flex items-center justify-between p-4 rounded-2xl bg-surface-secondary border border-border">
+            <LayoutContainer className="flex flex-col gap-0.5">
+              <Text as="span" className="text-sm font-bold text-text-primary">
+                {texts.FIELD_IS_RETIRED}
+              </Text>
+              <Text as="p" className="text-xs text-text-secondary">
+                {texts.FIELD_IS_RETIRED_DESC}
+              </Text>
+            </LayoutContainer>
+            <Controller
+              control={control}
+              name="isRetired"
+              render={({ field }) => (
+                <Switch
+                  checked={field.value}
+                  onChange={field.onChange}
+                  aria-label={texts.FIELD_IS_RETIRED}
+                />
+              )}
+            />
+          </LayoutContainer>
+        )}
+
+        <LayoutContainer className="flex items-center justify-end gap-3 pt-4 border-t border-border">
+          <Button variant="ghost" onClick={onClose} disabled={isSaving}>
+            {texts.BTN_CANCEL}
           </Button>
           <Button
-            type="button"
             variant="primary"
             onClick={onSave}
             isLoading={isSaving}
-            className="font-bold"
+            className="font-bold shadow-md shadow-primary/20"
           >
-            {isSaving ? texts.BTN_SAVING : texts.BTN_SAVE}
+            {isSaving ? savingLabel || texts.BTN_SAVING : texts.BTN_SAVE}
           </Button>
         </LayoutContainer>
       </LayoutContainer>

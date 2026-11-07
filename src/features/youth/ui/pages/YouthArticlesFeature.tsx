@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Newspaper, Calendar, Search, ArrowRight, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Newspaper, Calendar, ArrowRight, AlertCircle } from 'lucide-react';
 import {
   LayoutContainer,
   Title,
@@ -17,6 +17,7 @@ import {
 import { newsService } from '@/features/news/services/news.service';
 import { NewsArticleData } from '@/features/admin/services/admin-news.service';
 import { YOUTH_CONSTANTS } from '../../constants/youth.constants';
+import { useRealtimeEvents } from '@/shared/hooks/useRealtimeEvents';
 
 export const YouthArticlesFeature: React.FC = () => {
   const [articles, setArticles] = useState<NewsArticleData[]>([]);
@@ -25,13 +26,14 @@ export const YouthArticlesFeature: React.FC = () => {
 
   const texts = YOUTH_CONSTANTS.PAGE_NEWS;
 
-  const loadArticles = useCallback(async () => {
+  const loadArticles = useCallback(async (options?: { silent?: boolean }) => {
     try {
-      setIsLoading(true);
+      if (!options?.silent) {
+        setIsLoading(true);
+      }
       const res = await newsService.getNews({ isYouth: true, limit: 30 });
       const rawList = res.data || [];
 
-      // Filtra matérias que pertençam à base ou que contenham a tag de base
       const filtered = rawList.filter((art) => {
         const catName =
           typeof art.category === 'object' && art.category
@@ -45,15 +47,23 @@ export const YouthArticlesFeature: React.FC = () => {
       setArticles(filtered.length > 0 ? filtered : rawList);
     } catch (err) {
       console.warn('Erro ao carregar matérias da base:', err);
-      setArticles([]);
+      if (!options?.silent) {
+        setArticles([]);
+      }
     } finally {
-      setIsLoading(false);
+      if (!options?.silent) {
+        setIsLoading(false);
+      }
     }
   }, []);
 
   useEffect(() => {
     loadArticles();
   }, [loadArticles]);
+
+  useRealtimeEvents('news', () => {
+    loadArticles({ silent: true });
+  });
 
   const displayedArticles = articles.filter((a) => {
     if (!search.trim()) return true;
@@ -205,4 +215,3 @@ export const YouthArticlesFeature: React.FC = () => {
     </LayoutContainer>
   );
 };
-

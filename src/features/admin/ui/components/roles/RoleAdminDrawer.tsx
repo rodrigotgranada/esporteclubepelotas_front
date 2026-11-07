@@ -1,5 +1,14 @@
 import React from 'react';
-import { Drawer, Input, Button, LayoutContainer, Form, Text, Checkbox } from '@/shared/ui/components';
+import {
+  Drawer,
+  Input,
+  Button,
+  LayoutContainer,
+  Form,
+  Text,
+  Checkbox,
+  FormField,
+} from '@/shared/ui/components';
 import { useRoleAdminDrawer } from '../../../hooks/useRoleAdminDrawer';
 import { ROLE_ADMIN_DRAWER_TEXTS } from './RoleAdminDrawer.constants';
 import { useSystemModulesStore } from '@/store/useSystemModulesStore';
@@ -12,9 +21,17 @@ interface RoleAdminDrawerProps {
 }
 
 export const RoleAdminDrawer = ({ isOpen, onClose, role, onSaveSuccess }: RoleAdminDrawerProps) => {
-  const { formData, isLoading, updateField, handleTogglePermission, handleSubmit } = useRoleAdminDrawer(role, onSaveSuccess);
+  const { form, isLoading, handleTogglePermission, handleSubmit } = useRoleAdminDrawer(role, onSaveSuccess);
   const { modules } = useSystemModulesStore();
   const isImmutable = role?.isImmutable;
+
+  const {
+    register,
+    watch,
+    formState: { errors },
+  } = form;
+
+  const permissions = watch('permissions') || [];
 
   return (
     <Drawer
@@ -25,53 +42,71 @@ export const RoleAdminDrawer = ({ isOpen, onClose, role, onSaveSuccess }: RoleAd
     >
       <Form onSubmit={handleSubmit} className="flex flex-col h-full mt-4">
         <LayoutContainer className="flex-1 space-y-6 overflow-y-auto pr-2 custom-scrollbar">
-
           <LayoutContainer className="space-y-4">
-            <Input 
-              label={ROLE_ADMIN_DRAWER_TEXTS.LABEL_NAME} 
-              value={formData.name} 
-              onChange={e => updateField('name', e.target.value.toUpperCase().replace(/\s+/g, '_'))} 
-              required 
-              disabled={isImmutable}
-              placeholder={ROLE_ADMIN_DRAWER_TEXTS.PLACEHOLDER_NAME}
-            />
-            <Input 
-              label={ROLE_ADMIN_DRAWER_TEXTS.LABEL_LABEL} 
-              value={formData.label || ''} 
-              onChange={e => updateField('label', e.target.value)} 
-              required
-              placeholder={ROLE_ADMIN_DRAWER_TEXTS.PLACEHOLDER_LABEL}
-            />
-            <Input 
-              label={ROLE_ADMIN_DRAWER_TEXTS.LABEL_DESCRIPTION} 
-              value={formData.description} 
-              onChange={e => updateField('description', e.target.value)} 
-              placeholder={ROLE_ADMIN_DRAWER_TEXTS.PLACEHOLDER_DESCRIPTION}
-            />
+            <FormField
+              label={ROLE_ADMIN_DRAWER_TEXTS.LABEL_NAME}
+              error={errors.name?.message}
+            >
+              <Input
+                {...register('name', {
+                  onChange: (e) => {
+                    e.target.value = e.target.value.toUpperCase().replace(/\s+/g, '_');
+                  },
+                })}
+                disabled={isImmutable}
+                placeholder={ROLE_ADMIN_DRAWER_TEXTS.PLACEHOLDER_NAME}
+              />
+            </FormField>
+
+            <FormField
+              label={ROLE_ADMIN_DRAWER_TEXTS.LABEL_LABEL}
+              error={errors.label?.message}
+            >
+              <Input
+                {...register('label')}
+                placeholder={ROLE_ADMIN_DRAWER_TEXTS.PLACEHOLDER_LABEL}
+              />
+            </FormField>
+
+            <FormField
+              label={ROLE_ADMIN_DRAWER_TEXTS.LABEL_DESCRIPTION}
+              error={errors.description?.message}
+            >
+              <Input
+                {...register('description')}
+                placeholder={ROLE_ADMIN_DRAWER_TEXTS.PLACEHOLDER_DESCRIPTION}
+              />
+            </FormField>
           </LayoutContainer>
 
           <LayoutContainer className="border-t border-border pt-4">
-            <Text className="text-sm font-bold text-text-primary mb-4">{ROLE_ADMIN_DRAWER_TEXTS.PERMISSIONS_TITLE}</Text>
-            
+            <Text as="p" className="text-sm font-bold text-text-primary mb-4">
+              {ROLE_ADMIN_DRAWER_TEXTS.PERMISSIONS_TITLE}
+            </Text>
+
             {isImmutable && (role?.name || role) === 'OWNER' && (
               <LayoutContainer className="bg-warning/10 border border-warning/30 p-3 rounded-lg mb-4">
-                <Text className="text-xs text-warning">{ROLE_ADMIN_DRAWER_TEXTS.OWNER_WARNING}</Text>
+                <Text as="p" className="text-xs text-warning">
+                  {ROLE_ADMIN_DRAWER_TEXTS.OWNER_WARNING}
+                </Text>
               </LayoutContainer>
             )}
 
             <LayoutContainer className="space-y-4">
-              {[...ROLE_ADMIN_DRAWER_TEXTS.CORE_MODULES, ...modules].map(mod => {
+              {[...ROLE_ADMIN_DRAWER_TEXTS.CORE_MODULES, ...modules].map((mod) => {
                 const moduleName = mod.name;
                 const moduleSlug = mod.slug;
-                
+
                 return (
                   <LayoutContainer key={moduleSlug} className="bg-surface border border-border/50 rounded-xl p-4">
-                    <Text className="text-sm font-bold text-text-primary mb-3">{moduleName}</Text>
-                    <LayoutContainer className="flex flex-wrap gap-4">
-                      {ROLE_ADMIN_DRAWER_TEXTS.CRUD_ACTIONS.map(action => {
+                    <Text as="span" className="text-sm font-bold text-text-primary mb-3">
+                      {moduleName}
+                    </Text>
+                    <LayoutContainer className="flex flex-wrap gap-4 mt-2">
+                      {ROLE_ADMIN_DRAWER_TEXTS.CRUD_ACTIONS.map((action) => {
                         const permKey = `${moduleSlug}.${action.action}`;
-                        const isChecked = formData.permissions.includes(permKey) || ((role?.name || role) === 'OWNER');
-                        
+                        const isChecked = permissions.includes(permKey) || (role?.name || role) === 'OWNER';
+
                         return (
                           <Checkbox
                             key={permKey}
@@ -88,7 +123,6 @@ export const RoleAdminDrawer = ({ isOpen, onClose, role, onSaveSuccess }: RoleAd
               })}
             </LayoutContainer>
           </LayoutContainer>
-
         </LayoutContainer>
 
         <LayoutContainer className="mt-6 pt-6 border-t border-border flex gap-3">

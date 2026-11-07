@@ -1,34 +1,79 @@
 import { useState, useEffect } from 'react';
-import { useSettingsStore } from '@/store/useSettingsStore';
+import { useForm, UseFormReturn } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useSettingsStore, Settings } from '@/store/useSettingsStore';
 import { settingsApi } from '@/shared/api/settings.api';
 import toast from 'react-hot-toast';
 import { GENERAL_SETTINGS_TEXTS } from '../../ui/components/settings/general/GeneralSettingsTab.constants';
+import {
+  isBlobUrl,
+  sanitizeMediaUrlList,
+  stripBlobUrl,
+  useTransactionalSave,
+  verifyUploadedUrl,
+} from '@/shared/hooks/useTransactionalSave';
+import {
+  generalSettingsSchema,
+  GeneralSettingsFormData,
+} from '../../schemas/settings/general-settings.schema';
 
 export const useGeneralSettingsTab = () => {
   const { settings, setSettings } = useSettingsStore();
-  const [isSaving, setIsSaving] = useState(false);
-  const [clubName, setClubName] = useState(settings?.clubName || 'Esporte Clube Pelotas');
-  const [previewLogo, setPreviewLogo] = useState<string | null>(settings?.clubLogoUrl || null);
+  const isFetching = false;
   const [fileToUpload, setFileToUpload] = useState<File | null>(null);
-  const [gallery, setGallery] = useState<string[]>(settings?.clubLogoGallery || []);
 
   const [isCropModalOpen, setIsCropModalOpen] = useState(false);
   const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
   const [originalFile, setOriginalFile] = useState<File | null>(null);
 
+  const { isSaving, savingLabel, runTransactionalSave } = useTransactionalSave({
+    uploadingMedia: GENERAL_SETTINGS_TEXTS.BUTTON_UPLOADING_LOGO,
+    savingDb: GENERAL_SETTINGS_TEXTS.BUTTON_SAVING,
+  });
+
+  const form = useForm<GeneralSettingsFormData>({
+    resolver: zodResolver(generalSettingsSchema),
+    defaultValues: {
+      clubName: 'Esporte Clube Pelotas',
+      clubLogoUrl: null,
+      clubLogoGallery: [],
+    },
+  });
+
+  const previewLogo = form.watch('clubLogoUrl');
+  const gallery = form.watch('clubLogoGallery') || [];
+
   useEffect(() => {
     if (settings) {
-      setClubName(settings.clubName || '');
-      setGallery(settings.clubLogoGallery?.length ? settings.clubLogoGallery : (settings.clubLogoUrl ? [settings.clubLogoUrl] : []));
+      form.setValue('clubName', settings.clubName || '');
+      form.setValue(
+        'clubLogoGallery',
+        settings.clubLogoGallery?.length
+          ? settings.clubLogoGallery
+          : settings.clubLogoUrl
+            ? [settings.clubLogoUrl]
+            : [],
+      );
       if (!fileToUpload) {
-        setPreviewLogo(settings.clubLogoUrl || null);
+        form.setValue('clubLogoUrl', settings.clubLogoUrl || null);
       }
     }
-  }, [settings, fileToUpload]);
+  }, [settings, fileToUpload, form]);
+
+  useEffect(() => {
+    return () => {
+      if (previewLogo && isBlobUrl(previewLogo)) {
+        URL.revokeObjectURL(previewLogo);
+      }
+    };
+  }, [previewLogo]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      if (cropImageSrc && isBlobUrl(cropImageSrc)) {
+        URL.revokeObjectURL(cropImageSrc);
+      }
       const url = URL.createObjectURL(file);
       setOriginalFile(file);
       setCropImageSrc(url);
@@ -37,55 +82,78 @@ export const useGeneralSettingsTab = () => {
   };
 
   const handleCropSave = (croppedBlob: Blob) => {
+    if (previewLogo && isBlobUrl(previewLogo)) {
+      URL.revokeObjectURL(previewLogo);
+    }
     const url = URL.createObjectURL(croppedBlob);
-    setPreviewLogo(url);
+    form.setValue('clubLogoUrl', url);
     setFileToUpload(new File([croppedBlob], 'logo.png', { type: 'image/png' }));
     setIsCropModalOpen(false);
   };
 
   const handleUseOriginal = () => {
     if (cropImageSrc && originalFile) {
-      setPreviewLogo(cropImageSrc);
+      form.setValue('clubLogoUrl', cropImageSrc);
       setFileToUpload(originalFile);
       setIsCropModalOpen(false);
     }
   };
 
   const handleSelectFromGallery = (url: string) => {
-    setPreviewLogo(url);
+    form.setValue('clubLogoUrl', url);
     setFileToUpload(null);
   };
 
   const handleRemoveFromGallery = (url: string) => {
-    const newGallery = gallery.filter(item => item !== url);
-    setGallery(newGallery);
+    const newGallery = gallery.filter((item) => item !== url);
+    form.setValue('clubLogoGallery', newGallery);
   };
 
-  const handleSave = async () => {
-    setIsSaving(true);
-    try {
-      const data: any = { clubName, clubLogoGallery: gallery };
+  const handleSave = form.handleSubmit(async (data: GeneralSettingsFormData) => {
+    await runTransactionalSave<string | undefined, Settings>({
+      hasPendingMedia: Boolean(fileToUpload),
+      uploadMedia: async () => {
+        const uploadedUrl = await settingsApi.uploadLogoMedia(fileToUpload!);
+        return verifyUploadedUrl(uploadedUrl);
+      },
+      saveToDb: async (uploadedUrl) => {
+        const finalUrl = uploadedUrl
+          ? uploadedUrl
+          : stripBlobUrl(data.clubLogoUrl, settings?.clubLogoUrl || '');
 
-      if (previewLogo && !previewLogo.startsWith('blob:') && !fileToUpload) {
-        data.clubLogoUrl = previewLogo;
-      }
+        let finalGallery = sanitizeMediaUrlList(data.clubLogoGallery);
+        if (finalUrl && !finalGallery.includes(finalUrl)) {
+          finalGallery = [finalUrl, ...finalGallery];
+        }
 
-      const newSettings = await settingsApi.updateSettings(data, fileToUpload || undefined);
-      setSettings(newSettings);
-      setFileToUpload(null);
-      toast.success(GENERAL_SETTINGS_TEXTS.TOAST_SUCCESS);
-    } catch (err) {
-      toast.error(GENERAL_SETTINGS_TEXTS.TOAST_ERROR);
-    } finally {
-      setIsSaving(false);
-    }
-  };
+        const payload = {
+          clubName: data.clubName.trim(),
+          clubLogoUrl: finalUrl,
+          clubLogoGallery: finalGallery,
+        };
+
+        const res = await settingsApi.updateSettings(payload);
+        return res;
+      },
+      onConfirmed: (savedSettings) => {
+        toast.success(GENERAL_SETTINGS_TEXTS.TOAST_SUCCESS);
+        setSettings(savedSettings);
+        form.setValue('clubLogoUrl', savedSettings.clubLogoUrl || null);
+        form.setValue('clubLogoGallery', savedSettings.clubLogoGallery || []);
+        setFileToUpload(null);
+      },
+      onError: (err: any) => {
+        console.error('Failed to update general settings:', err);
+        toast.error(err?.response?.data?.message || err?.message || GENERAL_SETTINGS_TEXTS.TOAST_ERROR);
+      },
+    });
+  });
 
   return {
+    form,
     isSaving,
-    isFetching: !settings,
-    clubName,
-    setClubName,
+    savingLabel,
+    isFetching,
     previewLogo,
     gallery,
     isCropModalOpen,

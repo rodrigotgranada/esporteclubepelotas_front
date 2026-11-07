@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -8,7 +8,8 @@ import {
   Title,
   Text,
   Button,
-  ShieldPlaceholder, isUnoptimizedImageUrl,
+  ShieldPlaceholder,
+  isUnoptimizedImageUrl,
 } from '@/shared/ui/components';
 import { HOME_FEATURE_TEXTS } from './HomeFeature.constants';
 import { useSettingsStore } from '@/store/useSettingsStore';
@@ -16,66 +17,61 @@ import { newsService } from '@/features/news/services/news.service';
 import { NewsArticleData } from '@/features/admin/services/admin-news.service';
 import { NewsBentoHero } from '@/features/news/ui/components/NewsBentoHero';
 import { NewsCard } from '@/features/news/ui/components/NewsCard';
+import { useRealtimeEvents } from '@/shared/hooks/useRealtimeEvents';
 
 export const HomeFeature = () => {
   const { settings } = useSettingsStore();
   const [featuredNews, setFeaturedNews] = useState<NewsArticleData[]>([]);
   const [latestNews, setLatestNews] = useState<NewsArticleData[]>([]);
 
-  useEffect(() => {
-    let isMounted = true;
+  const loadHomeData = useCallback(async () => {
+    try {
+      const [featuredResult, feedResult] = await Promise.allSettled([
+        newsService.getFeaturedNews(3),
+        newsService.getNews({ limit: 6 }),
+      ]);
 
-    async function loadHomeData() {
-      try {
-        const [featuredResult, feedResult] = await Promise.allSettled([
-          newsService.getFeaturedNews(3),
-          newsService.getNews({ limit: 6 }),
-        ]);
+      const featuredArticles =
+        featuredResult.status === 'fulfilled' && Array.isArray(featuredResult.value)
+          ? featuredResult.value
+          : [];
 
-        if (!isMounted) return;
+      const feedArticles =
+        feedResult.status === 'fulfilled' && Array.isArray(feedResult.value?.data)
+          ? feedResult.value.data
+          : [];
 
-        const featuredArticles =
-          featuredResult.status === 'fulfilled' && Array.isArray(featuredResult.value)
-            ? featuredResult.value
-            : [];
+      setFeaturedNews(featuredArticles);
 
-        const feedArticles =
-          feedResult.status === 'fulfilled' && Array.isArray(feedResult.value?.data)
-            ? feedResult.value.data
-            : [];
+      const featuredSlugs = new Set(
+        featuredArticles.map((f) => f.slug).filter(Boolean),
+      );
 
-        setFeaturedNews(featuredArticles);
+      const filteredLatest = feedArticles
+        .filter((a) => a?.slug && !featuredSlugs.has(a.slug))
+        .slice(0, 3);
 
-        const featuredSlugs = new Set(
-          featuredArticles.map((f) => f.slug).filter(Boolean),
-        );
-
-        const filteredLatest = feedArticles
-          .filter((a) => a?.slug && !featuredSlugs.has(a.slug))
-          .slice(0, 3);
-
-        setLatestNews(filteredLatest);
-      } catch (err) {
-        console.warn('Nenhuma notícia carregada para a Home:', err);
-      }
+      setLatestNews(filteredLatest);
+    } catch (err) {
+      console.warn('Nenhuma notícia carregada para a Home:', err);
     }
-
-    loadHomeData();
-
-    return () => {
-      isMounted = false;
-    };
   }, []);
+
+  useEffect(() => {
+    loadHomeData();
+  }, [loadHomeData]);
+
+  useRealtimeEvents('news', () => {
+    loadHomeData();
+  });
 
   return (
     <LayoutContainer className="flex flex-col bg-transparent">
       {/* 1. Primeira Seção: Vitrine Editorial de Notícias (Destaques & Bento Grid) */}
       {(featuredNews.length > 0 || latestNews.length > 0) && (
         <LayoutContainer className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-10 pb-8 sm:pb-12 w-full flex flex-col gap-8 sm:gap-10 bg-transparent">
-          {/* Mosaico Bento Hero Grid (Destaques da Capa - Cards Diretos e Elegantes) */}
           {featuredNews.length > 0 && <NewsBentoHero articles={featuredNews} />}
 
-          {/* Grid de Notícias Mais Recentes ("Notícias do Lobo") */}
           {latestNews.length > 0 && (
             <LayoutContainer
               className={`flex flex-col gap-6 ${
@@ -112,7 +108,6 @@ export const HomeFeature = () => {
 
       {/* 2. Segunda Seção: Hero Institucional do Clube (Sócio Áureo-Cerúleo & Alcatéia) */}
       <LayoutContainer className="relative py-12 sm:py-20 px-4 flex items-center justify-center overflow-hidden border-t border-border/40 bg-transparent">
-        {/* Glow sutil e transparente para destacar a marca d'água */}
         <LayoutContainer className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/[0.02] to-transparent pointer-events-none z-0" />
 
         <LayoutContainer className="relative z-10 max-w-4xl mx-auto px-4 text-center animate-in fade-in slide-in-from-bottom-6 duration-700 flex flex-col items-center">
@@ -120,10 +115,11 @@ export const HomeFeature = () => {
             {settings?.clubLogoUrl ? (
               <Image
                 src={settings.clubLogoUrl}
-                alt="Logo"
+                alt={settings.clubName || 'Esporte Clube Pelotas'}
                 width={110}
                 height={110}
-                className="object-contain drop-shadow-2xl w-24 h-24 sm:w-28 sm:h-28" unoptimized={isUnoptimizedImageUrl(settings.clubLogoUrl)}
+                className="object-contain drop-shadow-2xl w-24 h-24 sm:w-28 sm:h-28"
+                unoptimized={isUnoptimizedImageUrl(settings.clubLogoUrl)}
               />
             ) : (
               <ShieldPlaceholder size={100} className="drop-shadow-2xl opacity-80" />
@@ -139,7 +135,7 @@ export const HomeFeature = () => {
             className="text-3xl sm:text-5xl md:text-6xl font-black text-text-primary tracking-tighter mb-3 sm:mb-4 leading-tight"
           >
             {HOME_FEATURE_TEXTS.TITLE_PREFIX}{' '}
-            <span className="text-primary">{HOME_FEATURE_TEXTS.TITLE_HIGHLIGHT}</span>
+            <Text as="span" className="text-primary">{HOME_FEATURE_TEXTS.TITLE_HIGHLIGHT}</Text>
           </Title>
 
           <Text className="text-sm sm:text-base md:text-lg text-text-secondary max-w-xl mx-auto mb-6 sm:mb-8 px-2">

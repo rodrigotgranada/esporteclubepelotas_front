@@ -1,14 +1,25 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import { useForm, UseFormReturn } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'react-hot-toast';
 import { adminTimelineService } from '../../services/admin-timeline.service';
 import { TimelineEventData } from '@/features/timeline/services/timeline.service';
 import { ADMIN_TIMELINE_CONSTANTS } from '../../constants/admin-timeline.constants';
+import {
+  stripBlobUrl,
+  useTransactionalSave,
+  verifyUploadedUrl,
+} from '@/shared/hooks/useTransactionalSave';
+import {
+  timelineEventSchema,
+  TimelineEventFormData,
+} from '../../schemas/timeline/timeline.schema';
 
 const MONTH_NAMES = [
   'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-  'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+  'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro',
 ];
 
 export const formatPtBrDate = (dateIsoString: string): string => {
@@ -25,50 +36,59 @@ export const formatPtBrDate = (dateIsoString: string): string => {
   return dateIsoString;
 };
 
+const generateDraftFolderId = (): string => {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  return `timeline-${Date.now()}`;
+};
+
+const defaultEventValues: TimelineEventFormData = {
+  year: new Date().getFullYear(),
+  title: '',
+  description: '',
+  categoryId: '',
+  category: 'fundacao',
+  eventDate: '',
+  dateFormatted: '',
+  displayOrder: 0,
+  isHighlighted: false,
+  isActive: true,
+  imageUrl: null,
+};
+
 export const useAdminTimelineDrawer = (onSuccess: () => void) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-
-  // Form Fields
-  const [year, setYear] = useState<number>(1908);
-  const [title, setTitle] = useState<string>('');
-  const [description, setDescription] = useState<string>('');
-  const [categoryId, setCategoryId] = useState<string>('');
-  const [category, setCategory] = useState<string>('fundacao');
-  const [eventDate, setEventDate] = useState<string>('');
-  const [dateFormatted, setDateFormatted] = useState<string>('');
-  const [displayOrder, setDisplayOrder] = useState<number>(0);
-  const [isHighlighted, setIsHighlighted] = useState<boolean>(false);
-  const [isActive, setIsActive] = useState<boolean>(true);
-  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+  const draftFolderIdRef = useRef<string>(generateDraftFolderId());
   const [pendingPhotoFile, setPendingPhotoFile] = useState<File | null>(null);
+
+  const { isSaving, savingLabel, runTransactionalSave } = useTransactionalSave({
+    uploadingMedia: ADMIN_TIMELINE_CONSTANTS.DRAWER.BTN_UPLOADING_PHOTO,
+    savingDb: ADMIN_TIMELINE_CONSTANTS.DRAWER.BTN_SAVING,
+  });
+
+  const form = useForm<TimelineEventFormData>({
+    resolver: zodResolver(timelineEventSchema),
+    defaultValues: defaultEventValues,
+  });
 
   const resetForm = () => {
     setEditingId(null);
-    setYear(new Date().getFullYear());
-    setTitle('');
-    setDescription('');
-    setCategoryId('');
-    setCategory('fundacao');
-    setEventDate('');
-    setDateFormatted('');
-    setDisplayOrder(0);
-    setIsHighlighted(false);
-    setIsActive(true);
-    setPhotoUrl(null);
+    draftFolderIdRef.current = generateDraftFolderId();
+    form.reset(defaultEventValues);
     setPendingPhotoFile(null);
   };
 
   const handleEventDateChange = (val: string) => {
-    setEventDate(val);
+    form.setValue('eventDate', val);
     if (val && val.includes('-')) {
       const parts = val.split('-');
       const y = parseInt(parts[0], 10);
       if (!isNaN(y)) {
-        setYear(y);
+        form.setValue('year', y);
       }
-      setDateFormatted(formatPtBrDate(val));
+      form.setValue('dateFormatted', formatPtBrDate(val));
     }
   };
 
@@ -78,18 +98,22 @@ export const useAdminTimelineDrawer = (onSuccess: () => void) => {
   };
 
   const openEdit = (event: TimelineEventData) => {
-    setEditingId(event.id || event._id || null);
-    setYear(event.year);
-    setTitle(event.title);
-    setDescription(event.description);
-    setCategoryId(event.categoryId || '');
-    setCategory(event.category || 'fundacao');
-    setEventDate(event.eventDate || '');
-    setDateFormatted(event.dateFormatted || (event.eventDate ? formatPtBrDate(event.eventDate) : ''));
-    setDisplayOrder(event.displayOrder || 0);
-    setIsHighlighted(Boolean(event.isHighlighted));
-    setIsActive(event.isActive !== false);
-    setPhotoUrl(event.imageUrl || null);
+    const id = event.id || event._id || null;
+    setEditingId(id);
+    draftFolderIdRef.current = id || generateDraftFolderId();
+    form.reset({
+      year: event.year,
+      title: event.title,
+      description: event.description,
+      categoryId: event.categoryId || '',
+      category: event.category || 'fundacao',
+      eventDate: event.eventDate || '',
+      dateFormatted: event.dateFormatted || (event.eventDate ? formatPtBrDate(event.eventDate) : ''),
+      displayOrder: event.displayOrder || 0,
+      isHighlighted: Boolean(event.isHighlighted),
+      isActive: event.isActive !== false,
+      imageUrl: event.imageUrl || null,
+    });
     setPendingPhotoFile(null);
     setIsOpen(true);
   };
@@ -100,86 +124,66 @@ export const useAdminTimelineDrawer = (onSuccess: () => void) => {
     resetForm();
   };
 
-  const save = async () => {
-    if (!year || isNaN(year)) {
-      toast.error('Informe um ano válido para o marco histórico.');
-      return;
-    }
-    if (!title.trim()) {
-      toast.error('Informe o título do marco histórico.');
-      return;
-    }
-    if (!description.trim()) {
-      toast.error('Informe a descrição do marco histórico.');
-      return;
-    }
+  const save = form.handleSubmit(async (data: TimelineEventFormData) => {
+    await runTransactionalSave<string | undefined, TimelineEventData>({
+      hasPendingMedia: Boolean(pendingPhotoFile),
+      uploadMedia: async () => {
+        const uploadedUrl = await adminTimelineService.uploadPhotoMedia(
+          pendingPhotoFile!,
+          editingId || draftFolderIdRef.current,
+        );
+        return verifyUploadedUrl(uploadedUrl);
+      },
+      saveToDb: async (uploadedPhotoUrl) => {
+        const resolvedPhotoUrl = uploadedPhotoUrl
+          ? uploadedPhotoUrl
+          : stripBlobUrl(data.imageUrl, '');
 
-    try {
-      setIsSaving(true);
-      const payload: any = {
-        year: Number(year),
-        title: title.trim(),
-        description: description.trim(),
-        category,
-        categoryId: categoryId || undefined,
-        eventDate: eventDate || undefined,
-        dateFormatted: dateFormatted.trim() || undefined,
-        displayOrder: Number(displayOrder) || 0,
-        isHighlighted,
-        isActive,
-      };
+        const payload: any = {
+          year: Number(data.year),
+          title: data.title.trim(),
+          description: data.description.trim(),
+          category: data.category,
+          categoryId: data.categoryId?.trim() || undefined,
+          eventDate: data.eventDate?.trim() || undefined,
+          dateFormatted: data.dateFormatted?.trim() || undefined,
+          displayOrder: Number(data.displayOrder) || 0,
+          isHighlighted: Boolean(data.isHighlighted),
+          isActive: Boolean(data.isActive),
+          imageUrl: resolvedPhotoUrl || undefined,
+        };
 
-      if (editingId) {
-        if (!pendingPhotoFile && photoUrl) {
-          payload.imageUrl = photoUrl;
+        if (editingId) {
+          return adminTimelineService.updateEvent(editingId, payload);
         }
-        await adminTimelineService.updateEvent(editingId, payload, pendingPhotoFile || undefined);
-        toast.success(ADMIN_TIMELINE_CONSTANTS.DRAWER.TOAST_UPDATE_SUCCESS);
-      } else {
-        await adminTimelineService.createEvent(payload, pendingPhotoFile || undefined);
-        toast.success(ADMIN_TIMELINE_CONSTANTS.DRAWER.TOAST_CREATE_SUCCESS);
-      }
-
-      setIsOpen(false);
-      resetForm();
-      onSuccess();
-    } catch (err: any) {
-      console.error('Erro ao salvar marco histórico:', err);
-      toast.error(err.response?.data?.message || ADMIN_TIMELINE_CONSTANTS.DRAWER.TOAST_ERROR_GENERIC);
-    } finally {
-      setIsSaving(false);
-    }
-  };
+        return adminTimelineService.createEvent(payload);
+      },
+      onConfirmed: () => {
+        toast.success(
+          editingId
+            ? ADMIN_TIMELINE_CONSTANTS.TOAST.SUCCESS_UPDATE
+            : ADMIN_TIMELINE_CONSTANTS.TOAST.SUCCESS_CREATE,
+        );
+        close();
+        onSuccess();
+      },
+      onError: (err: any) => {
+        console.error('Erro ao salvar marco histórico da timeline:', err);
+        toast.error(err?.response?.data?.message || err?.message || ADMIN_TIMELINE_CONSTANTS.TOAST.ERROR_SAVE);
+      },
+    });
+  });
 
   return {
+    form,
     isOpen,
-    isSaving,
+    editingId,
     isEditing: Boolean(editingId),
-    year,
-    setYear,
-    title,
-    setTitle,
-    description,
-    setDescription,
-    categoryId,
-    setCategoryId,
-    category,
-    setCategory,
-    eventDate,
-    setEventDate,
-    handleEventDateChange,
-    dateFormatted,
-    setDateFormatted,
-    displayOrder,
-    setDisplayOrder,
-    isHighlighted,
-    setIsHighlighted,
-    isActive,
-    setIsActive,
-    photoUrl,
-    setPhotoUrl,
+    isSaving,
+    savingLabel,
     pendingPhotoFile,
     setPendingPhotoFile,
+    handleEventDateChange,
     openCreate,
     openEdit,
     close,

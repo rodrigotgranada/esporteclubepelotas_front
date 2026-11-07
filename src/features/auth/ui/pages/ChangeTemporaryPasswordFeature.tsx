@@ -1,73 +1,29 @@
 'use client';
 
-import React, { useState } from 'react';
-import { LayoutContainer, Title, Text, Button, PasswordInput, Form, PasswordStrengthMeter } from '@/shared/ui/components';
+import React from 'react';
+import {
+  LayoutContainer,
+  Title,
+  Text,
+  Button,
+  PasswordInput,
+  Form,
+  FormField,
+  PasswordStrengthMeter,
+} from '@/shared/ui/components';
 import { KeyRound, ShieldAlert, Check } from 'lucide-react';
-import { useAuthStore } from '@/store/useAuthStore';
-import { updatePassword } from '@/services/profile.service';
-import { useRouter } from 'next/navigation';
-import { toast } from 'react-hot-toast';
 import { CHANGE_TEMPORARY_PASSWORD_TEXTS } from '../../constants/change-temporary-password.constants';
+import { useChangeTemporaryPassword } from '../../hooks/useChangeTemporaryPassword';
 
 export const ChangeTemporaryPasswordFeature = () => {
-  const router = useRouter();
-  const { user, updateUser, logout } = useAuthStore();
+  const { form, isLoading, handleSubmit, logout, router } =
+    useChangeTemporaryPassword();
 
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-
-    if (!currentPassword || !newPassword || !confirmPassword) {
-      setError(CHANGE_TEMPORARY_PASSWORD_TEXTS.ERROR_REQUIRED_FIELDS);
-      return;
-    }
-
-    if (newPassword.length < 6) {
-      setError(CHANGE_TEMPORARY_PASSWORD_TEXTS.ERROR_MIN_LENGTH);
-      return;
-    }
-
-    if (newPassword !== confirmPassword) {
-      setError(CHANGE_TEMPORARY_PASSWORD_TEXTS.ERROR_PASSWORD_MISMATCH);
-      return;
-    }
-
-    if (newPassword === currentPassword) {
-      setError(CHANGE_TEMPORARY_PASSWORD_TEXTS.ERROR_SAME_AS_CURRENT);
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-      await updatePassword(currentPassword, newPassword);
-      updateUser({ mustChangePassword: false });
-      toast.success(CHANGE_TEMPORARY_PASSWORD_TEXTS.TOAST_SUCCESS);
-      
-      const roleName = typeof user?.role === 'object' ? user?.role?.name : user?.role;
-      if (roleName === 'ADMIN' || roleName === 'OWNER') {
-        router.push('/gestao');
-      } else {
-        router.push('/profile');
-      }
-    } catch (err: any) {
-      const message = err.response?.data?.message || CHANGE_TEMPORARY_PASSWORD_TEXTS.TOAST_ERROR_GENERIC;
-      setError(message);
-      toast.error(message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const newPassword = form.watch('newPassword');
 
   return (
     <LayoutContainer className="min-h-screen bg-background flex flex-col justify-center items-center p-4">
       <LayoutContainer className="w-full max-w-md bg-surface border border-border rounded-2xl p-6 sm:p-8 shadow-xl animate-in fade-in zoom-in-95 duration-300">
-        
         {/* Header */}
         <LayoutContainer className="flex flex-col items-center text-center mb-6">
           <LayoutContainer className="w-14 h-14 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center text-primary mb-3">
@@ -96,39 +52,49 @@ export const ChangeTemporaryPasswordFeature = () => {
 
         {/* Form */}
         <Form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <PasswordInput
+          <FormField
+            name="currentPassword"
+            control={form.control}
             label={CHANGE_TEMPORARY_PASSWORD_TEXTS.LABEL_CURRENT_PASSWORD}
-            placeholder={CHANGE_TEMPORARY_PASSWORD_TEXTS.PLACEHOLDER_CURRENT_PASSWORD}
-            value={currentPassword}
-            onChange={(e) => setCurrentPassword(e.target.value)}
             required
+            render={({ field }) => (
+              <PasswordInput
+                {...field}
+                placeholder={CHANGE_TEMPORARY_PASSWORD_TEXTS.PLACEHOLDER_CURRENT_PASSWORD}
+                required
+              />
+            )}
           />
 
-          <PasswordInput
+          <FormField
+            name="newPassword"
+            control={form.control}
             label={CHANGE_TEMPORARY_PASSWORD_TEXTS.LABEL_NEW_PASSWORD}
-            placeholder={CHANGE_TEMPORARY_PASSWORD_TEXTS.PLACEHOLDER_NEW_PASSWORD}
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
             required
+            render={({ field }) => (
+              <PasswordInput
+                {...field}
+                placeholder={CHANGE_TEMPORARY_PASSWORD_TEXTS.PLACEHOLDER_NEW_PASSWORD}
+                required
+              />
+            )}
           />
 
-          {newPassword && (
-            <PasswordStrengthMeter password={newPassword} />
-          )}
+          {newPassword && <PasswordStrengthMeter password={newPassword} />}
 
-          <PasswordInput
+          <FormField
+            name="confirmPassword"
+            control={form.control}
             label={CHANGE_TEMPORARY_PASSWORD_TEXTS.LABEL_CONFIRM_PASSWORD}
-            placeholder={CHANGE_TEMPORARY_PASSWORD_TEXTS.PLACEHOLDER_CONFIRM_PASSWORD}
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
             required
+            render={({ field }) => (
+              <PasswordInput
+                {...field}
+                placeholder={CHANGE_TEMPORARY_PASSWORD_TEXTS.PLACEHOLDER_CONFIRM_PASSWORD}
+                required
+              />
+            )}
           />
-
-          {error && (
-            <LayoutContainer className="bg-error/10 border border-error/30 rounded-lg p-2.5">
-              <Text className="text-xs font-medium text-error">{error}</Text>
-            </LayoutContainer>
-          )}
 
           <Button
             type="submit"
@@ -154,7 +120,6 @@ export const ChangeTemporaryPasswordFeature = () => {
             {CHANGE_TEMPORARY_PASSWORD_TEXTS.BUTTON_LOGOUT}
           </Button>
         </Form>
-
       </LayoutContainer>
     </LayoutContainer>
   );

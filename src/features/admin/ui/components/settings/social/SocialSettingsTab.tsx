@@ -1,18 +1,19 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { Controller } from 'react-hook-form';
 import {
   LayoutContainer,
   Text,
   Title,
   Button,
+  IconButton,
   Input,
   Select,
   Option,
+  FormField,
 } from '@/shared/ui/components';
-import { useSettingsStore, SocialPlatform, SocialLinkItem } from '@/store/useSettingsStore';
-import { settingsApi } from '@/shared/api/settings.api';
-import { toast } from 'react-hot-toast';
+import { SocialPlatform } from '@/store/useSettingsStore';
 import {
   FaInstagram,
   FaFacebookF,
@@ -24,6 +25,7 @@ import {
 } from 'react-icons/fa6';
 import { Plus, Trash2, ExternalLink } from 'lucide-react';
 import { SOCIAL_SETTINGS_TEXTS } from './SocialSettingsTab.constants';
+import { useSocialSettingsTab } from '@/features/admin/hooks/settings/useSocialSettingsTab';
 
 const PLATFORM_CONFIG: Record<
   SocialPlatform,
@@ -74,101 +76,24 @@ const PLATFORM_CONFIG: Record<
 };
 
 export const SocialSettingsTab = () => {
-  const { settings, updateSettings } = useSettingsStore();
-  const [isLoading, setIsLoading] = useState(false);
-  const [links, setLinks] = useState<SocialLinkItem[]>([]);
+  const {
+    control,
+    register,
+    errors,
+    fields,
+    remove,
+    watch,
+    isLoading,
+    onSave,
+    handleAdd,
+  } = useSocialSettingsTab();
 
-  useEffect(() => {
-    if (settings?.socialLinks && settings.socialLinks.length > 0) {
-      setLinks(settings.socialLinks);
-    } else if (settings?.socialMedia) {
-      // Migrate from old structure if present
-      const migrated: SocialLinkItem[] = [];
-      const sm = settings.socialMedia;
-      if (Array.isArray(sm.instagram)) {
-        sm.instagram.forEach((url, i) =>
-          url && migrated.push({ platform: 'instagram', label: i === 0 ? '@ecpelotas (Oficial)' : `@ecpelotas ${i + 1}`, url })
-        );
-      }
-      if (Array.isArray(sm.facebook)) {
-        sm.facebook.forEach((url, i) =>
-          url && migrated.push({ platform: 'facebook', label: i === 0 ? 'Pelotas Oficial' : `Pelotas ${i + 1}`, url })
-        );
-      }
-      if (Array.isArray(sm.x)) {
-        sm.x.forEach((url, i) =>
-          url && migrated.push({ platform: 'x', label: i === 0 ? '@ecpelotas' : `@ecpelotas ${i + 1}`, url })
-        );
-      }
-      if (Array.isArray(sm.youtube)) {
-        sm.youtube.forEach((url, i) =>
-          url && migrated.push({ platform: 'youtube', label: i === 0 ? 'TV Lobo Oficial' : `Pelotas Vídeos ${i + 1}`, url })
-        );
-      }
-      setLinks(migrated.length > 0 ? migrated : [{ platform: 'instagram', label: '@ecpelotas', url: 'https://instagram.com/ecpelotas' }]);
-    } else {
-      setLinks([
-        { platform: 'instagram', label: '@ecpelotas (Oficial)', url: 'https://instagram.com/ecpelotas' },
-        { platform: 'facebook', label: 'Esporte Clube Pelotas', url: 'https://facebook.com/ecpelotas' },
-        { platform: 'x', label: '@ecpelotas', url: 'https://x.com/ecpelotas' },
-        { platform: 'youtube', label: 'TV Lobo Oficial', url: 'https://youtube.com/@ecpelotasoficial' },
-      ]);
-    }
-  }, [settings]);
-
-  const handleFieldChange = (index: number, field: keyof SocialLinkItem, value: string) => {
-    setLinks((prev) => {
-      const next = [...prev];
-      next[index] = { ...next[index], [field]: value };
-      return next;
-    });
-  };
-
-  const handleAddLink = () => {
-    setLinks((prev) => [
-      ...prev,
-      {
-        platform: 'instagram',
-        label: '',
-        url: '',
-      },
-    ]);
-  };
-
-  const handleRemoveLink = (index: number) => {
-    setLinks((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const handleSave = async () => {
-    try {
-      setIsLoading(true);
-      const cleanedLinks = links
-        .map((item) => ({
-          platform: item.platform,
-          label: item.label.trim(),
-          url: item.url.trim(),
-        }))
-        .filter((item) => item.url !== '');
-
-      const payload = {
-        socialLinks: cleanedLinks,
-      };
-
-      const updated = await settingsApi.updateSettings(payload);
-      updateSettings({ socialLinks: updated.socialLinks });
-      setLinks(updated.socialLinks || []);
-      toast.success(SOCIAL_SETTINGS_TEXTS.TOAST_SUCCESS);
-    } catch (error) {
-      console.error('Error updating social settings:', error);
-      toast.error(SOCIAL_SETTINGS_TEXTS.TOAST_ERROR);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const watchedLinks = watch('socialLinks') || [];
 
   return (
-    <LayoutContainer className="max-w-4xl bg-surface border border-border rounded-2xl p-6 sm:p-8 flex flex-col gap-6">
-      <LayoutContainer className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-border">
+    <LayoutContainer className="space-y-6 max-w-4xl animate-in fade-in duration-300">
+      {/* Header */}
+      <LayoutContainer className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-5">
         <LayoutContainer>
           <Title level="h2" className="text-xl font-bold text-text-primary">
             {SOCIAL_SETTINGS_TEXTS.TITLE}
@@ -179,102 +104,117 @@ export const SocialSettingsTab = () => {
         </LayoutContainer>
 
         <Button
-          variant="outline"
+          type="button"
+          variant="secondary"
           size="sm"
-          onClick={handleAddLink}
-          leftIcon={<Plus className="w-4 h-4" />}
-          className="shrink-0"
+          onClick={handleAdd}
+          className="shrink-0 flex items-center gap-2"
         >
+          <Plus className="w-4 h-4" />
           {SOCIAL_SETTINGS_TEXTS.ADD_BUTTON}
         </Button>
       </LayoutContainer>
 
-      {links.length === 0 ? (
-        <LayoutContainer className="p-8 text-center border-2 border-dashed border-border rounded-xl">
+      {/* List of Social Links */}
+      {fields.length === 0 ? (
+        <LayoutContainer className="text-center py-12 border-2 border-dashed border-border rounded-xl bg-surface/30">
           <Text className="text-text-secondary text-sm">
             {SOCIAL_SETTINGS_TEXTS.EMPTY_STATE}
           </Text>
+          <Button
+            type="button"
+            variant="primary"
+            size="sm"
+            onClick={handleAdd}
+            className="mt-4"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            {SOCIAL_SETTINGS_TEXTS.ADD_BUTTON}
+          </Button>
         </LayoutContainer>
       ) : (
-        <LayoutContainer className="flex flex-col gap-4">
-          {links.map((link, index) => {
-            const platformConfig = PLATFORM_CONFIG[link.platform] || PLATFORM_CONFIG.instagram;
-            const IconComponent = platformConfig.icon;
+        <LayoutContainer className="space-y-3">
+          {fields.map((fieldItem, index) => {
+            const currentPlatform = (watchedLinks[index]?.platform ||
+              'instagram') as SocialPlatform;
+            const platformConfig =
+              PLATFORM_CONFIG[currentPlatform] || PLATFORM_CONFIG.instagram;
+            const Icon = platformConfig.icon;
+            const linkError = errors.socialLinks?.[index];
 
             return (
               <LayoutContainer
-                key={index}
-                className="bg-background border border-border rounded-xl p-4 sm:p-5 flex flex-col md:flex-row md:items-center gap-4 transition-all hover:border-primary/40"
+                key={fieldItem.id}
+                className="flex flex-col md:flex-row items-stretch md:items-center gap-3 p-3.5 bg-surface rounded-xl border border-border shadow-xs hover:border-primary/40 transition-colors"
               >
-                {/* Platform Badge with Icon */}
-                <LayoutContainer className="flex items-center gap-3 md:w-56 shrink-0">
-                  <LayoutContainer
-                    className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-xs"
-                    style={{ backgroundColor: `${platformConfig.color}18`, color: platformConfig.color }}
-                  >
-                    <IconComponent className="w-5 h-5" />
-                  </LayoutContainer>
-
-                  <LayoutContainer className="flex-1">
-                    <Select
-                      value={link.platform}
-                      onChange={(e) =>
-                        handleFieldChange(index, 'platform', e.target.value as SocialPlatform)
-                      }
-                      className="w-full text-xs font-semibold"
-                    >
-                      {Object.keys(PLATFORM_CONFIG).map((platKey) => (
-                        <Option key={platKey} value={platKey}>
-                          {PLATFORM_CONFIG[platKey as SocialPlatform].name}
-                        </Option>
-                      ))}
-                    </Select>
-                  </LayoutContainer>
-                </LayoutContainer>
-
-                {/* Label input */}
-                <LayoutContainer className="flex-1 md:w-1/3">
-                  <Input
-                    placeholder={SOCIAL_SETTINGS_TEXTS.FIELD_LABEL_PLACEHOLDER}
-                    value={link.label}
-                    onChange={(e) => handleFieldChange(index, 'label', e.target.value)}
-                    className="text-sm"
+                {/* Platform Selector with Icon */}
+                <LayoutContainer className="w-full md:w-56 shrink-0">
+                  <Controller
+                    control={control}
+                    name={`socialLinks.${index}.platform` as const}
+                    render={({ field }) => (
+                      <LayoutContainer className="relative flex items-center">
+                        <LayoutContainer
+                          className="absolute left-3 z-10 w-6 h-6 rounded-md flex items-center justify-center text-white text-xs shadow-xs pointer-events-none"
+                          style={{ backgroundColor: platformConfig.color }}
+                        >
+                          <Icon />
+                        </LayoutContainer>
+                        <Select
+                          value={field.value}
+                          onChange={(val) => field.onChange(val as SocialPlatform)}
+                          className="pl-11"
+                        >
+                          {Object.entries(PLATFORM_CONFIG).map(([key, cfg]) => (
+                            <Option key={key} value={key}>
+                              {cfg.name}
+                            </Option>
+                          ))}
+                        </Select>
+                      </LayoutContainer>
+                    )}
                   />
                 </LayoutContainer>
 
-                {/* URL input */}
-                <LayoutContainer className="flex-1 md:w-1/2">
-                  <Input
-                    placeholder={platformConfig.defaultUrlPrefix || SOCIAL_SETTINGS_TEXTS.FIELD_URL_PLACEHOLDER}
-                    value={link.url}
-                    onChange={(e) => handleFieldChange(index, 'url', e.target.value)}
-                    className="text-sm"
-                  />
+                {/* Profile Label */}
+                <LayoutContainer className="flex-1">
+                  <FormField error={linkError?.label?.message}>
+                    <Input
+                      {...register(`socialLinks.${index}.label` as const)}
+                      placeholder={SOCIAL_SETTINGS_TEXTS.LABEL_PLACEHOLDER}
+                    />
+                  </FormField>
+                </LayoutContainer>
+
+                {/* URL */}
+                <LayoutContainer className="flex-1 md:flex-[1.5]">
+                  <FormField error={linkError?.url?.message}>
+                    <Input
+                      {...register(`socialLinks.${index}.url` as const)}
+                      placeholder={platformConfig.defaultUrlPrefix}
+                    />
+                  </FormField>
                 </LayoutContainer>
 
                 {/* Actions */}
-                <LayoutContainer className="flex items-center gap-2 justify-end shrink-0">
-                  {link.url && (
-                    <a
-                      href={link.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-2 text-text-secondary hover:text-primary transition-colors"
-                      title={link.url}
-                    >
-                      <ExternalLink className="w-4 h-4" />
-                    </a>
+                <LayoutContainer className="flex items-center gap-1 shrink-0 self-end md:self-center">
+                  {watchedLinks[index]?.url && (
+                    <IconButton
+                      icon={<ExternalLink className="w-4 h-4" />}
+                      variant="ghost"
+                      onClick={() => window.open(watchedLinks[index].url, '_blank')}
+                      title="Abrir link"
+                      className="text-text-secondary hover:text-primary"
+                    />
                   )}
 
-                  <Button
+                  <IconButton
+                    icon={<Trash2 className="w-4 h-4" />}
                     variant="ghost"
-                    size="sm"
-                    className="text-error hover:bg-error/10 p-2 h-auto"
-                    onClick={() => handleRemoveLink(index)}
-                    title={SOCIAL_SETTINGS_TEXTS.BTN_REMOVE}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
+                    onClick={() => remove(index)}
+                    title={SOCIAL_SETTINGS_TEXTS.REMOVE_TOOLTIP}
+                    className="text-text-secondary hover:text-[#ea580c]"
+                  />
                 </LayoutContainer>
               </LayoutContainer>
             );
@@ -282,17 +222,23 @@ export const SocialSettingsTab = () => {
         </LayoutContainer>
       )}
 
-      {/* Footer Actions */}
-      <LayoutContainer className="pt-4 border-t border-border flex justify-end gap-3">
-        <Button
-          variant="primary"
-          onClick={handleSave}
-          isLoading={isLoading}
-          className="min-w-[180px]"
-        >
-          {isLoading ? SOCIAL_SETTINGS_TEXTS.SAVING_BUTTON : SOCIAL_SETTINGS_TEXTS.SAVE_BUTTON}
-        </Button>
-      </LayoutContainer>
+      {/* Footer Save Button */}
+      {fields.length > 0 && (
+        <LayoutContainer className="flex justify-end pt-4 border-t border-border">
+          <Button
+            type="button"
+            variant="primary"
+            size="md"
+            onClick={onSave}
+            isLoading={isLoading}
+            className="w-full sm:w-auto font-semibold px-8"
+          >
+            {isLoading
+              ? SOCIAL_SETTINGS_TEXTS.SAVING_BUTTON
+              : SOCIAL_SETTINGS_TEXTS.SAVE_BUTTON}
+          </Button>
+        </LayoutContainer>
+      )}
     </LayoutContainer>
   );
 };

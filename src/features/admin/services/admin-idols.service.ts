@@ -58,6 +58,32 @@ export const adminIdolsService = {
     return response.data;
   },
 
+  uploadPhotoMedia: async (
+    file: File,
+    folderId?: string,
+  ): Promise<{ url: string; photoUrl: string }> => {
+    const formData = new FormData();
+    formData.append('photo', file);
+    if (folderId) formData.append('folderId', folderId);
+    const response = await api.post('/idols/admin/upload-photo', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data;
+  },
+
+  uploadGalleryMedia: async (
+    files: File[],
+    folderId?: string,
+  ): Promise<{ urls: string[]; gallery: string[] }> => {
+    const formData = new FormData();
+    files.forEach((file) => formData.append('gallery', file));
+    if (folderId) formData.append('folderId', folderId);
+    const response = await api.post('/idols/admin/upload-gallery', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data;
+  },
+
   createIdol: async (dto: CreateAdminIdolDto): Promise<IdolData> => {
     const response = await api.post('/idols/admin', dto);
     return response.data;

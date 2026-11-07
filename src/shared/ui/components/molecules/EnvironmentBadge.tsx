@@ -1,72 +1,24 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
-import { api } from '@/services/api';
+import React from 'react';
 import { LayoutContainer } from '../atoms/LayoutContainer';
 import { Text } from '../atoms/Text';
+import { Button } from '../atoms/Button';
 import { ENVIRONMENT_BADGE_TEXTS } from './EnvironmentBadge.constants';
-
-interface EnvTestResponse {
-  stage?: 'PROD' | 'DEV';
-  environment?: string;
-  databaseSuffix?: string;
-  mongoConnected?: boolean;
-  storageProvider?: string;
-  storageProject?: string;
-  storageConfigured?: boolean;
-}
+import { useEnvironmentBadge } from '@/shared/hooks/useEnvironmentBadge';
 
 export const EnvironmentBadge = () => {
-  const [status, setStatus] = useState<'loading' | 'ok' | 'error'>('loading');
-  const [envData, setEnvData] = useState<EnvTestResponse | null>(null);
-  const [isOpen, setIsOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    const checkConnection = async () => {
-      try {
-        const res = await api.get<EnvTestResponse>('/auth/env-test');
-        if (!isMounted) return;
-        const data = res.data;
-        const resolvedStage: 'PROD' | 'DEV' =
-          data.stage ||
-          (data.databaseSuffix === 'ecp_prod' ? 'PROD' : 'DEV');
-
-        setEnvData({ ...data, stage: resolvedStage });
-        setStatus(data.mongoConnected === false ? 'error' : 'ok');
-      } catch {
-        if (!isMounted) return;
-        setStatus('error');
-      }
-    };
-
-    checkConnection();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  const { status, envData, isOpen, setIsOpen, containerRef } =
+    useEnvironmentBadge();
 
   const isProd = status === 'ok' && envData?.stage === 'PROD';
-  const isDev = status === 'ok' && envData?.stage !== 'PROD';
 
   const getCircleStyles = () => {
     if (status === 'loading') {
       return 'bg-neutral-500/30 border-neutral-400/60 text-white animate-pulse';
     }
     if (status === 'error') {
-      return 'bg-orange-600/35 border-orange-500/80 text-white hover:bg-orange-600/50';
+      return 'bg-[#ea580c]/35 border-[#ea580c]/80 text-white hover:bg-[#ea580c]/50';
     }
     if (isProd) {
       return 'bg-emerald-500/35 border-emerald-400/80 text-white hover:bg-emerald-500/50';
@@ -102,19 +54,36 @@ export const EnvironmentBadge = () => {
           {status === 'ok' && envData ? (
             <LayoutContainer className="space-y-1.5 pt-1">
               <LayoutContainer className="flex justify-between gap-2">
-                <Text as="span" className="text-text-secondary">{ENVIRONMENT_BADGE_TEXTS.API_LABEL}</Text>
-                <Text as="span" className="font-semibold text-success">{ENVIRONMENT_BADGE_TEXTS.STATUS_OK}</Text>
-              </LayoutContainer>
-              <LayoutContainer className="flex justify-between gap-2">
-                <Text as="span" className="text-text-secondary">{ENVIRONMENT_BADGE_TEXTS.DB_LABEL}</Text>
-                <Text as="span" className="font-mono font-semibold text-text-primary">
-                  {envData.databaseSuffix} ({envData.mongoConnected !== false ? ENVIRONMENT_BADGE_TEXTS.STATUS_OK : ENVIRONMENT_BADGE_TEXTS.STATUS_DISCONNECTED})
+                <Text as="span" className="text-text-secondary">
+                  {ENVIRONMENT_BADGE_TEXTS.API_LABEL}
+                </Text>
+                <Text as="span" className="font-semibold text-success">
+                  {ENVIRONMENT_BADGE_TEXTS.STATUS_OK}
                 </Text>
               </LayoutContainer>
               <LayoutContainer className="flex justify-between gap-2">
-                <Text as="span" className="text-text-secondary">{ENVIRONMENT_BADGE_TEXTS.STORAGE_LABEL}</Text>
-                <Text as="span" className="font-mono font-semibold text-text-primary truncate max-w-[165px]">
-                  {envData.storageProject || envData.storageProvider || ENVIRONMENT_BADGE_TEXTS.STATUS_OK}
+                <Text as="span" className="text-text-secondary">
+                  {ENVIRONMENT_BADGE_TEXTS.DB_LABEL}
+                </Text>
+                <Text as="span" className="font-mono font-semibold text-text-primary">
+                  {envData.databaseSuffix} (
+                  {envData.mongoConnected !== false
+                    ? ENVIRONMENT_BADGE_TEXTS.STATUS_OK
+                    : ENVIRONMENT_BADGE_TEXTS.STATUS_DISCONNECTED}
+                  )
+                </Text>
+              </LayoutContainer>
+              <LayoutContainer className="flex justify-between gap-2">
+                <Text as="span" className="text-text-secondary">
+                  {ENVIRONMENT_BADGE_TEXTS.STORAGE_LABEL}
+                </Text>
+                <Text
+                  as="span"
+                  className="font-mono font-semibold text-text-primary truncate max-w-[165px]"
+                >
+                  {envData.storageProject ||
+                    envData.storageProvider ||
+                    ENVIRONMENT_BADGE_TEXTS.STATUS_OK}
                 </Text>
               </LayoutContainer>
             </LayoutContainer>
@@ -126,8 +95,10 @@ export const EnvironmentBadge = () => {
         </LayoutContainer>
       )}
 
-      <button
+      <Button
         type="button"
+        variant="custom"
+        size="none"
         data-testid="environment-badge"
         aria-label={ENVIRONMENT_BADGE_TEXTS.ARIA_LABEL}
         title={getPanelTitle()}
@@ -140,8 +111,7 @@ export const EnvironmentBadge = () => {
         >
           {getLabel()}
         </Text>
-      </button>
+      </Button>
     </LayoutContainer>
   );
 };
-

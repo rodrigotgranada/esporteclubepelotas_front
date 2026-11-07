@@ -1,43 +1,46 @@
 'use client';
 
 import { useState } from 'react';
+import { useForm, UseFormReturn } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import toast from 'react-hot-toast';
 import { adminNewsService, NewsCategoryData } from '../../services/admin-news.service';
 import { ADMIN_NEWS_TEXTS } from '../../constants/admin-news.constants';
+import {
+  quickCategorySchema,
+  QuickCategoryFormData,
+} from '../../schemas/news/quick-category.schema';
+
+const defaultQuickCategoryValues: QuickCategoryFormData = {
+  name: '',
+  description: '',
+};
 
 export const useQuickCategoryModal = (onCategoryCreated?: (category: NewsCategoryData) => void) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+  const form = useForm<QuickCategoryFormData>({
+    resolver: zodResolver(quickCategorySchema),
+    defaultValues: defaultQuickCategoryValues,
+  });
+
   const open = () => {
-    setName('');
-    setDescription('');
+    form.reset(defaultQuickCategoryValues);
     setIsOpen(true);
   };
 
   const close = () => {
-    setName('');
-    setDescription('');
+    form.reset(defaultQuickCategoryValues);
     setIsOpen(false);
   };
 
-  const handleSubmit = async (e?: React.FormEvent) => {
-    if (e) {
-      e.preventDefault();
-    }
-
-    if (!name.trim()) {
-      toast.error('Informe o nome da categoria.');
-      return;
-    }
-
+  const handleSubmit = form.handleSubmit(async (data: QuickCategoryFormData) => {
     try {
       setIsLoading(true);
       const created = await adminNewsService.createCategory({
-        name: name.trim(),
-        description: description.trim() || undefined,
+        name: data.name.trim(),
+        description: data.description?.trim() || undefined,
       });
 
       toast.success(ADMIN_NEWS_TEXTS.TOAST.SUCCESS_CATEGORY_CREATED);
@@ -51,18 +54,14 @@ export const useQuickCategoryModal = (onCategoryCreated?: (category: NewsCategor
     } finally {
       setIsLoading(false);
     }
-  };
+  });
 
   return {
+    form,
     isOpen,
-    name,
-    setName,
-    description,
-    setDescription,
     isLoading,
     open,
     close,
     handleSubmit,
   };
 };
-

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import toast from 'react-hot-toast';
+import { useRealtimeEvents } from '@/shared/hooks';
 import {
   adminNewsService,
   NewsArticleData,
@@ -43,32 +44,41 @@ export const useAdminNewsList = (options?: { fixedIsYouth?: boolean }) => {
     }
   }, []);
 
-  const loadNews = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      const params: any = {
-        page,
-        limit,
-      };
+  const loadNews = useCallback(
+    async (opts?: { silent?: boolean }) => {
+      try {
+        if (!opts?.silent) {
+          setIsLoading(true);
+        }
+        const params: any = {
+          page,
+          limit,
+        };
 
-      if (search.trim()) params.search = search.trim();
-      if (categoryFilter) params.category = categoryFilter;
-      if (statusFilter) params.status = statusFilter;
-      if (featuredFilter === 'YES') params.isFeatured = true;
-      if (featuredFilter === 'NO') params.isFeatured = false;
-      if (typeof fixedIsYouth === 'boolean') params.isYouth = fixedIsYouth;
+        if (search.trim()) params.search = search.trim();
+        if (categoryFilter) params.category = categoryFilter;
+        if (statusFilter) params.status = statusFilter;
+        if (featuredFilter === 'YES') params.isFeatured = true;
+        if (featuredFilter === 'NO') params.isFeatured = false;
+        if (typeof fixedIsYouth === 'boolean') params.isYouth = fixedIsYouth;
 
-      const res = await adminNewsService.getNews(params);
-      setNews(res.data);
-      setTotal(res.total);
-      setTotalPages(res.totalPages || Math.ceil(res.total / limit) || 1);
-    } catch (err) {
-      console.error(err);
-      toast.error(ADMIN_NEWS_TEXTS.TOAST.ERROR_GENERIC);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [page, limit, search, categoryFilter, statusFilter, featuredFilter, fixedIsYouth]);
+        const res = await adminNewsService.getNews(params);
+        setNews(res.data);
+        setTotal(res.total);
+        setTotalPages(res.totalPages || Math.ceil(res.total / limit) || 1);
+      } catch (err) {
+        console.error(err);
+        if (!opts?.silent) {
+          toast.error(ADMIN_NEWS_TEXTS.TOAST.ERROR_GENERIC);
+        }
+      } finally {
+        if (!opts?.silent) {
+          setIsLoading(false);
+        }
+      }
+    },
+    [page, limit, search, categoryFilter, statusFilter, featuredFilter, fixedIsYouth],
+  );
 
   useEffect(() => {
     loadCategories();
@@ -77,6 +87,11 @@ export const useAdminNewsList = (options?: { fixedIsYouth?: boolean }) => {
   useEffect(() => {
     loadNews();
   }, [loadNews]);
+
+  // Sincronização em tempo real via WebSocket quando matérias forem criadas, editadas, publicadas ou removidas
+  useRealtimeEvents('news', () => {
+    loadNews({ silent: true });
+  });
 
   // Drawer controls
   const openCreateDrawer = () => {
@@ -96,7 +111,7 @@ export const useAdminNewsList = (options?: { fixedIsYouth?: boolean }) => {
 
   const handleDrawerSuccess = () => {
     closeDrawer();
-    loadNews();
+    loadNews({ silent: true });
     loadCategories();
   };
 
@@ -118,7 +133,7 @@ export const useAdminNewsList = (options?: { fixedIsYouth?: boolean }) => {
       await adminNewsService.deleteNews(articleToDelete._id || articleToDelete.id || '');
       toast.success(ADMIN_NEWS_TEXTS.TOAST.SUCCESS_DELETE);
       closeDeleteModal();
-      loadNews();
+      await loadNews({ silent: true });
     } catch (err: any) {
       const msg = err?.response?.data?.message || ADMIN_NEWS_TEXTS.TOAST.ERROR_GENERIC;
       toast.error(msg);
@@ -149,9 +164,9 @@ export const useAdminNewsList = (options?: { fixedIsYouth?: boolean }) => {
       await adminNewsService.duplicateNews(articleToDuplicate._id || articleToDuplicate.id || '');
       toast.success(ADMIN_NEWS_TEXTS.DRAWER.SUCCESS_DUPLICATE);
       closeDuplicateModal();
-      loadNews();
+      await loadNews({ silent: true });
     } catch {
-      toast.error('Erro ao duplicar matéria.');
+      toast.error(ADMIN_NEWS_TEXTS.TOAST.ERROR_GENERIC);
     } finally {
       setIsDuplicating(false);
     }
@@ -198,4 +213,3 @@ export const useAdminNewsList = (options?: { fixedIsYouth?: boolean }) => {
     confirmDuplicate,
   };
 };
-

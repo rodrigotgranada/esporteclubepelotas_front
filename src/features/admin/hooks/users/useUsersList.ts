@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { adminService, UserAdminData } from '@/features/admin/services/admin.service';
 import { ADMIN_TEXTS } from '../../constants/admin.constants';
 import { toast } from 'react-hot-toast';
+import { useRealtimeEvents } from '@/shared/hooks/useRealtimeEvents';
 
 export const useUsersList = () => {
   const [users, setUsers] = useState<UserAdminData[]>([]);
@@ -9,86 +10,108 @@ export const useUsersList = () => {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
-  const [statusFilter, setStatusFilter] = useState('ACTIVE'); // default to ACTIVE as requested
-  const [isLoading, setIsLoading] = useState(false);
+  const [statusFilter, setStatusFilter] = useState('ACTIVE');
+  const [isLoading, setIsLoading] = useState(true);
   const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
-  
+  const mutatingRef = useRef(false);
+
   const limit = 10;
   const totalPages = Math.ceil(total / limit) || 1;
 
-  const loadUsers = async () => {
+  const loadUsers = useCallback(async (options?: { silent?: boolean }) => {
     try {
-      setIsLoading(true);
+      if (!options?.silent) {
+        setIsLoading(true);
+      }
       const params: any = { page, limit, search };
       if (roleFilter) params.role = roleFilter;
       if (statusFilter && statusFilter !== 'ALL') params.status = statusFilter;
-      if (statusFilter === 'ALL') params.status = 'ALL'; // Wait, let's just send 'ALL' as string if we change backend to accept string
-
+      if (statusFilter === 'ALL') params.status = 'ALL';
 
       const res = await adminService.getUsers(params);
-      setUsers(res.data);
-      setTotal(res.total);
+      setUsers(res.data || []);
+      setTotal(res.total || 0);
     } catch (error) {
       console.error(error);
-      toast.error(ADMIN_TEXTS.TOAST_ERROR_GENERIC);
+      if (!options?.silent) {
+        toast.error(ADMIN_TEXTS.TOAST_ERROR_GENERIC);
+      }
     } finally {
-      setIsLoading(false);
+      if (!options?.silent) {
+        setIsLoading(false);
+      }
     }
-  };
+  }, [page, limit, search, roleFilter, statusFilter]);
 
   useEffect(() => {
     loadUsers();
-  }, [page, search, roleFilter, statusFilter]);
+  }, [loadUsers]);
+
+  useRealtimeEvents('users', () => {
+    loadUsers({ silent: true });
+  });
 
   const handleToggleStatus = async (user: UserAdminData) => {
+    if (mutatingRef.current) return;
+    mutatingRef.current = true;
     const newStatus = user.status === 'BLOCKED' ? 'ACTIVE' : 'BLOCKED';
     try {
       await adminService.updateUserStatus(user.id, newStatus);
       toast.success(ADMIN_TEXTS.TOAST_USER_STATUS_UPDATED);
-      loadUsers();
+      await loadUsers({ silent: true });
     } catch (error: any) {
       toast.error(error.response?.data?.message || ADMIN_TEXTS.TOAST_ERROR_GENERIC);
+    } finally {
+      mutatingRef.current = false;
     }
   };
 
   const toggleUserSelection = (userId: string) => {
-    setSelectedUserIds(prev => 
-      prev.includes(userId) ? prev.filter(id => id !== userId) : [...prev, userId]
+    setSelectedUserIds((prev) =>
+      prev.includes(userId) ? prev.filter((id) => id !== userId) : [...prev, userId]
     );
   };
 
   const selectAllUsers = (selectAll: boolean) => {
     if (selectAll) {
-      setSelectedUserIds(users.map(u => u.id));
+      setSelectedUserIds(users.map((u) => u.id));
     } else {
       setSelectedUserIds([]);
     }
   };
 
   const handleBulkUpdateStatus = async (status: string) => {
+    if (mutatingRef.current || selectedUserIds.length === 0) return;
+    mutatingRef.current = true;
     try {
       setIsLoading(true);
-      await Promise.all(selectedUserIds.map(id => adminService.updateUserStatus(id, status)));
-      toast.success(`Status atualizado para ${selectedUserIds.length} usuários.`);
+      const count = selectedUserIds.length;
+      await Promise.all(selectedUserIds.map((id) => adminService.updateUserStatus(id, status)));
+      toast.success(`Status atualizado para ${count} usuários.`);
       setSelectedUserIds([]);
-      loadUsers();
-    } catch (error) {
+      await loadUsers({ silent: true });
+    } catch {
       toast.error('Erro ao atualizar status em massa.');
     } finally {
+      mutatingRef.current = false;
       setIsLoading(false);
     }
   };
 
   const handleBulkUpdateRole = async (roleId: string) => {
+    if (mutatingRef.current || selectedUserIds.length === 0) return;
+    mutatingRef.current = true;
     try {
       setIsLoading(true);
-      await Promise.all(selectedUserIds.map(id => adminService.updateUserRole(id, roleId)));
-      toast.success(`Cargo atualizado para ${selectedUserIds.length} usuários.`);
+      const count = selectedUserIds.length;
+      await Promise.all(selectedUserIds.map((id) => adminService.updateUserRole(id, roleId)));
+      toast.success(`Cargo atualizado para ${count} usuários.`);
       setSelectedUserIds([]);
-      loadUsers();
-    } catch (error) {
+      await loadUsers({ silent: true });
+    } catch {
       toast.error('Erro ao atualizar cargo em massa.');
     } finally {
+      mutatingRef.current = false;
       setIsLoading(false);
     }
   };
@@ -100,15 +123,15 @@ export const useUsersList = () => {
       if (roleFilter) params.role = roleFilter;
       if (statusFilter && statusFilter !== 'ALL') params.status = statusFilter;
       if (statusFilter === 'ALL') params.status = 'ALL';
-      
+
       const res = await adminService.getUsers(params);
       const csvRows = [];
       const headers = ['ID', 'Nome', 'Sobrenome', 'Email', 'CPF', 'Nascimento', 'Status', 'Cargo'];
       csvRows.push(headers.join(','));
 
-      res.data.forEach(u => {
-        const roleName = typeof u.role === 'string' ? u.role : (u.role?.name || '');
-        const birthDate = u.birthDate ? new Date(u.birthDate).toLocaleDateString() : '';
+      res.data.forEach((u) => {
+        const roleName = typeof u.role === 'string' ? u.role : u.role?.name || '';
+        const birthDate = u.birthDate ? new Date(u.birthDate).toLocaleDateString('pt-BR') : '';
         const values = [
           u.id,
           `"${u.firstName}"`,
@@ -117,7 +140,7 @@ export const useUsersList = () => {
           `"${u.cpf}"`,
           `"${birthDate}"`,
           `"${u.status}"`,
-          `"${roleName}"`
+          `"${roleName}"`,
         ];
         csvRows.push(values.join(','));
       });
@@ -131,6 +154,7 @@ export const useUsersList = () => {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      URL.revokeObjectURL(url);
       toast.success('Download iniciado!', { id: 'export-csv' });
     } catch (error) {
       console.error(error);
@@ -159,6 +183,6 @@ export const useUsersList = () => {
     handleBulkUpdateRole,
     handleToggleStatus,
     loadUsers,
-    handleExportCsv
+    handleExportCsv,
   };
 };

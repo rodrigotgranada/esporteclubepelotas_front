@@ -172,33 +172,14 @@ export const AdminTimelineFeature: React.FC = () => {
       <TimelineDrawer
         isOpen={timelineDrawer.isOpen}
         isSaving={timelineDrawer.isSaving}
+        savingLabel={timelineDrawer.savingLabel}
         isEditing={timelineDrawer.isEditing}
+        form={timelineDrawer.form}
         categories={timelineCategories.categories}
         onOpenNewCategory={timelineCategories.openCreateModal}
-        year={timelineDrawer.year}
-        setYear={timelineDrawer.setYear}
-        title={timelineDrawer.title}
-        setTitle={timelineDrawer.setTitle}
-        description={timelineDrawer.description}
-        setDescription={timelineDrawer.setDescription}
-        category={timelineDrawer.category}
-        setCategory={timelineDrawer.setCategory}
-        categoryId={timelineDrawer.categoryId}
-        setCategoryId={timelineDrawer.setCategoryId}
-        eventDate={timelineDrawer.eventDate}
-        handleEventDateChange={timelineDrawer.handleEventDateChange}
-        dateFormatted={timelineDrawer.dateFormatted}
-        setDateFormatted={timelineDrawer.setDateFormatted}
-        displayOrder={timelineDrawer.displayOrder}
-        setDisplayOrder={timelineDrawer.setDisplayOrder}
-        isHighlighted={timelineDrawer.isHighlighted}
-        setIsHighlighted={timelineDrawer.setIsHighlighted}
-        isActive={timelineDrawer.isActive}
-        setIsActive={timelineDrawer.setIsActive}
-        photoUrl={timelineDrawer.photoUrl}
-        setPhotoUrl={timelineDrawer.setPhotoUrl}
         pendingPhotoFile={timelineDrawer.pendingPhotoFile}
         setPendingPhotoFile={timelineDrawer.setPendingPhotoFile}
+        handleEventDateChange={timelineDrawer.handleEventDateChange}
         onClose={timelineDrawer.close}
         onSave={timelineDrawer.save}
       />
@@ -210,18 +191,7 @@ export const AdminTimelineFeature: React.FC = () => {
         onSave={timelineCategories.saveCategory}
         isSaving={timelineCategories.isSaving}
         isEditing={Boolean(timelineCategories.editingCategory)}
-        name={timelineCategories.name}
-        setName={timelineCategories.setName}
-        slug={timelineCategories.slug}
-        setSlug={timelineCategories.setSlug}
-        icon={timelineCategories.icon}
-        setIcon={timelineCategories.setIcon}
-        description={timelineCategories.description}
-        setDescription={timelineCategories.setDescription}
-        displayOrder={timelineCategories.displayOrder}
-        setDisplayOrder={timelineCategories.setDisplayOrder}
-        isActive={timelineCategories.isActive}
-        setIsActive={timelineCategories.setIsActive}
+        form={timelineCategories.form}
       />
 
       {/* Confirm Delete Event Modal */}

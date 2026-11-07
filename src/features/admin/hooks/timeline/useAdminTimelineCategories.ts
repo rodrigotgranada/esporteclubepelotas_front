@@ -1,40 +1,62 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
+import { useForm, UseFormReturn } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { toast } from 'react-hot-toast';
 import { adminTimelineService } from '../../services/admin-timeline.service';
 import { TimelineCategoryData } from '@/features/timeline/services/timeline.service';
 import { ADMIN_TIMELINE_CONSTANTS } from '../../constants/admin-timeline.constants';
+import { useTransactionalSave } from '@/shared/hooks/useTransactionalSave';
+import { useRealtimeEvents } from '@/shared/hooks/useRealtimeEvents';
+import {
+  timelineCategorySchema,
+  TimelineCategoryFormData,
+} from '../../schemas/timeline/timeline-category.schema';
+
+const defaultCategoryValues: TimelineCategoryFormData = {
+  name: '',
+  slug: '',
+  icon: 'Flag',
+  description: '',
+  displayOrder: 0,
+  isActive: true,
+};
 
 export const useAdminTimelineCategories = () => {
   const [categories, setCategories] = useState<TimelineCategoryData[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [isSaving, setIsSaving] = useState<boolean>(false);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
+
+  const { isSaving, runTransactionalSave } = useTransactionalSave({
+    savingDb: ADMIN_TIMELINE_CONSTANTS.MODAL_CATEGORY.BTN_SAVING,
+  });
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [editingCategory, setEditingCategory] = useState<TimelineCategoryData | null>(null);
 
-  // Form Fields
-  const [name, setName] = useState<string>('');
-  const [slug, setSlug] = useState<string>('');
-  const [icon, setIcon] = useState<string>('Flag');
-  const [description, setDescription] = useState<string>('');
-  const [displayOrder, setDisplayOrder] = useState<number>(0);
-  const [isActive, setIsActive] = useState<boolean>(true);
-
   // Delete State
   const [categoryToDelete, setCategoryToDelete] = useState<TimelineCategoryData | null>(null);
 
-  const loadCategories = useCallback(async () => {
-    setIsLoading(true);
+  const form = useForm<TimelineCategoryFormData>({
+    resolver: zodResolver(timelineCategorySchema),
+    defaultValues: defaultCategoryValues,
+  });
+
+  const loadCategories = useCallback(async (options?: { silent?: boolean }) => {
+    if (!options?.silent) {
+      setIsLoading(true);
+    }
     try {
       const data = await adminTimelineService.getCategories();
       setCategories(data);
     } catch (err) {
       console.error('Erro ao carregar categorias da timeline:', err);
     } finally {
-      setIsLoading(false);
+      if (!options?.silent) {
+        setIsLoading(false);
+      }
     }
   }, []);
 
@@ -42,110 +64,116 @@ export const useAdminTimelineCategories = () => {
     loadCategories();
   }, [loadCategories]);
 
+  useRealtimeEvents('timeline', () => {
+    loadCategories({ silent: true });
+  });
+
   const openCreateModal = () => {
     setEditingCategory(null);
-    setName('');
-    setSlug('');
-    setIcon('Flag');
-    setDescription('');
-    setDisplayOrder(categories.length + 1);
-    setIsActive(true);
+    form.reset({
+      ...defaultCategoryValues,
+      displayOrder: categories.length + 1,
+    });
     setIsModalOpen(true);
   };
 
   const openEditModal = (category: TimelineCategoryData) => {
     setEditingCategory(category);
-    setName(category.name);
-    setSlug(category.slug);
-    setIcon(category.icon || 'Flag');
-    setDescription(category.description || '');
-    setDisplayOrder(category.displayOrder || 0);
-    setIsActive(category.isActive ?? true);
+    form.reset({
+      name: category.name,
+      slug: category.slug,
+      icon: category.icon || 'Flag',
+      description: category.description || '',
+      displayOrder: category.displayOrder || 0,
+      isActive: category.isActive ?? true,
+    });
     setIsModalOpen(true);
   };
 
   const closeModal = () => {
+    if (isSaving) return;
     setIsModalOpen(false);
     setEditingCategory(null);
+    form.reset(defaultCategoryValues);
   };
 
-  const saveCategory = async (): Promise<TimelineCategoryData | null> => {
-    if (!name.trim()) return null;
-    setIsSaving(true);
-    try {
-      let saved: TimelineCategoryData;
-      if (editingCategory) {
-        saved = await adminTimelineService.updateCategory(editingCategory.id || editingCategory._id!, {
-          name: name.trim(),
-          slug: slug.trim() || undefined,
-          icon: icon.trim(),
-          description: description.trim() || undefined,
-          displayOrder,
-          isActive,
+  const saveCategory = form.handleSubmit(async (data: TimelineCategoryFormData) => {
+    const result = await runTransactionalSave<void, TimelineCategoryData>({
+      hasPendingMedia: false,
+      saveToDb: async () => {
+        if (editingCategory) {
+          return adminTimelineService.updateCategory(editingCategory.id || editingCategory._id!, {
+            name: data.name.trim(),
+            slug: data.slug?.trim() || undefined,
+            icon: data.icon.trim(),
+            description: data.description?.trim() || undefined,
+            displayOrder: Number(data.displayOrder) || 0,
+            isActive: Boolean(data.isActive),
+          });
+        }
+        return adminTimelineService.createCategory({
+          name: data.name.trim(),
+          slug: data.slug?.trim() || undefined,
+          icon: data.icon.trim(),
+          description: data.description?.trim() || undefined,
+          displayOrder: Number(data.displayOrder) || 0,
+          isActive: Boolean(data.isActive),
         });
-      } else {
-        saved = await adminTimelineService.createCategory({
-          name: name.trim(),
-          slug: slug.trim() || undefined,
-          icon: icon.trim(),
-          description: description.trim() || undefined,
-          displayOrder,
-          isActive,
-        });
-      }
+      },
+      onConfirmed: () => {
+        toast.success(
+          editingCategory
+            ? ADMIN_TIMELINE_CONSTANTS.TOAST.SUCCESS_CATEGORY_UPDATE
+            : ADMIN_TIMELINE_CONSTANTS.TOAST.SUCCESS_CATEGORY_CREATE,
+        );
+        closeModal();
+        loadCategories({ silent: true });
+      },
+      onError: (err: any) => {
+        console.error('Erro ao salvar categoria da timeline:', err);
+        toast.error(err?.response?.data?.message || err?.message || ADMIN_TIMELINE_CONSTANTS.TOAST.ERROR_CATEGORY_SAVE);
+      },
+    });
 
-      await loadCategories();
-      closeModal();
-      return saved;
-    } catch (err) {
-      console.error('Erro ao salvar categoria da timeline:', err);
-      return null;
-    } finally {
-      setIsSaving(false);
-    }
+    return result || null;
+  });
+
+  const promptDeleteCategory = (category: TimelineCategoryData) => {
+    setCategoryToDelete(category);
   };
 
   const handleDeleteCategory = async () => {
     if (!categoryToDelete) return;
-    setIsDeleting(true);
     try {
+      setIsDeleting(true);
       await adminTimelineService.deleteCategory(categoryToDelete.id || categoryToDelete._id!);
-      await loadCategories();
+      toast.success(ADMIN_TIMELINE_CONSTANTS.TOAST.SUCCESS_CATEGORY_DELETE);
       setCategoryToDelete(null);
-    } catch (err) {
-      console.error('Erro ao excluir categoria da timeline:', err);
+      loadCategories({ silent: true });
+    } catch (err: any) {
+      console.error('Erro ao deletar categoria da timeline:', err);
+      toast.error(err?.response?.data?.message || err?.message || ADMIN_TIMELINE_CONSTANTS.TOAST.ERROR_CATEGORY_DELETE);
     } finally {
       setIsDeleting(false);
     }
   };
 
   return {
+    form,
     categories,
     isLoading,
     isSaving,
     isDeleting,
     isModalOpen,
     editingCategory,
-    name,
-    setName,
-    slug,
-    setSlug,
-    icon,
-    setIcon,
-    description,
-    setDescription,
-    displayOrder,
-    setDisplayOrder,
-    isActive,
-    setIsActive,
     categoryToDelete,
-    setCategoryToDelete,
+    loadCategories,
     openCreateModal,
     openEditModal,
     closeModal,
     saveCategory,
+    promptDeleteCategory,
     handleDeleteCategory,
-    loadCategories,
+    setCategoryToDelete,
   };
 };
-

@@ -334,14 +334,18 @@ export const PublicNavigationDrawer: React.FC<PublicNavigationDrawerProps> = ({
 
               <LayoutContainer className="flex flex-col gap-2">
                 {/* Boca do Lobo Patrimônio */}
-                <LayoutContainer className="flex items-center justify-between p-3.5 rounded-xl bg-surface/70 border border-border/70">
+                <Link
+                  href="/estadio"
+                  onClick={onClose}
+                  className="flex items-center justify-between p-3.5 rounded-xl bg-surface/70 hover:bg-surface border border-border/70 hover:border-primary/50 transition-all group"
+                >
                   <LayoutContainer className="flex items-center gap-3">
-                    <LayoutContainer className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                    <LayoutContainer className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:bg-primary group-hover:text-black transition-all">
                       <Shield className="w-5 h-5" />
                     </LayoutContainer>
                     <LayoutContainer className="flex flex-col">
                       <LayoutContainer className="flex items-center gap-2">
-                        <span className="text-sm font-bold text-text-primary">
+                        <span className="text-sm font-bold text-text-primary group-hover:text-primary transition-colors">
                           {PUBLIC_DRAWER_TEXTS.LINK_STADIUM}
                         </span>
                         <Badge variant="default" size="sm" className="text-[9px] py-0 px-1.5 font-semibold">
@@ -353,7 +357,8 @@ export const PublicNavigationDrawer: React.FC<PublicNavigationDrawerProps> = ({
                       </span>
                     </LayoutContainer>
                   </LayoutContainer>
-                </LayoutContainer>
+                  <ChevronRight className="w-4 h-4 text-text-secondary/60 group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                </Link>
 
                 {/* Ídolos e Linha do Tempo Grid */}
                 <LayoutContainer className="grid grid-cols-2 gap-2">

@@ -10,6 +10,9 @@ import {
   Button,
   SafeImage,
   Spinner,
+  Form,
+  FormField,
+  Textarea,
 } from '@/shared/ui/components';
 import { PUBLIC_NEWS_TEXTS } from '../../constants/news.constants';
 import { useNewsComments } from '../../hooks/useNewsComments';
@@ -20,6 +23,7 @@ export interface NewsCommentsSectionProps {
 
 export const NewsCommentsSection: React.FC<NewsCommentsSectionProps> = ({ slug }) => {
   const {
+    form,
     user,
     isUserActive,
     comments,
@@ -27,14 +31,14 @@ export const NewsCommentsSection: React.FC<NewsCommentsSectionProps> = ({ slug }
     hasMore,
     isLoading,
     isLoadingMore,
-    newComment,
-    setNewComment,
     isSubmitting,
     deletingId,
     handleSubmit,
     handleDelete,
     handleLoadMore,
   } = useNewsComments(slug);
+
+  const content = form.watch('content') || '';
 
   const formatDate = (dateStr?: string) => {
     if (!dateStr) return '';
@@ -69,7 +73,7 @@ export const NewsCommentsSection: React.FC<NewsCommentsSectionProps> = ({ slug }
 
       {/* Cenário 1: Usuário Autenticado e com Conta Ativa */}
       {user && isUserActive ? (
-        <form onSubmit={handleSubmit} className="flex flex-col gap-3 p-4 sm:p-5 rounded-2xl bg-surface border border-border shadow-xs">
+        <Form onSubmit={handleSubmit} className="flex flex-col gap-3 p-4 sm:p-5 rounded-2xl bg-surface border border-border shadow-xs">
           <LayoutContainer className="flex items-center gap-2.5">
             {user.avatarUrl ? (
               <LayoutContainer className="relative w-8 h-8 rounded-full overflow-hidden border border-border shrink-0">
@@ -86,34 +90,39 @@ export const NewsCommentsSection: React.FC<NewsCommentsSectionProps> = ({ slug }
           </LayoutContainer>
 
           <LayoutContainer className="relative">
-            <textarea
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              placeholder={PUBLIC_NEWS_TEXTS.COMMENTS_INPUT_PLACEHOLDER}
-              maxLength={1000}
-              rows={3}
-              disabled={isSubmitting}
-              className="w-full p-3 text-sm bg-drawer text-text-primary rounded-xl border border-border focus:border-primary focus:outline-hidden transition-all resize-none"
+            <FormField
+              name="content"
+              control={form.control}
+              render={({ field }) => (
+                <Textarea
+                  {...field}
+                  placeholder={PUBLIC_NEWS_TEXTS.COMMENTS_INPUT_PLACEHOLDER}
+                  maxLength={1000}
+                  rows={3}
+                  disabled={isSubmitting}
+                  className="w-full p-3 text-sm bg-drawer text-text-primary rounded-xl border border-border focus:border-primary focus:outline-hidden transition-all resize-none"
+                />
+              )}
             />
           </LayoutContainer>
 
           <LayoutContainer className="flex items-center justify-between">
             <Text className="text-[11px] text-text-secondary">
-              {newComment.length} / 1000
+              {content.length} / 1000
             </Text>
             <Button
               type="submit"
               variant="primary"
               size="sm"
               isLoading={isSubmitting}
-              disabled={!newComment.trim() || isSubmitting}
+              disabled={!content.trim() || isSubmitting}
               rightIcon={<Send className="w-3.5 h-3.5" />}
               className="text-xs font-bold"
             >
               {isSubmitting ? PUBLIC_NEWS_TEXTS.COMMENTS_SUBMITTING : PUBLIC_NEWS_TEXTS.COMMENTS_SUBMIT_BTN}
             </Button>
           </LayoutContainer>
-        </form>
+        </Form>
       ) : user && !isUserActive ? (
         /* Cenário 2: Usuário Autenticado mas com Conta Inativa ou Pendente */
         <LayoutContainer className="p-6 rounded-2xl bg-surface border border-warning/30 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
@@ -264,10 +273,10 @@ export const NewsCommentsSection: React.FC<NewsCommentsSectionProps> = ({ slug }
                   PUBLIC_NEWS_TEXTS.COMMENTS_LOADING_MORE
                 ) : (
                   <LayoutContainer className="flex items-center gap-1.5">
-                    <span>{PUBLIC_NEWS_TEXTS.COMMENTS_LOAD_MORE}</span>
-                    <span className="text-text-secondary text-[11px] font-mono">
+                    <Text as="span">{PUBLIC_NEWS_TEXTS.COMMENTS_LOAD_MORE}</Text>
+                    <Text as="span" className="text-text-secondary text-[11px] font-mono">
                       {PUBLIC_NEWS_TEXTS.COMMENTS_REMAINING(Math.max(0, total - comments.length))}
-                    </span>
+                    </Text>
                   </LayoutContainer>
                 )}
               </Button>

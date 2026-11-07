@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { UseFormReturn, Controller } from 'react-hook-form';
 import {
   Modal,
   LayoutContainer,
@@ -12,9 +13,11 @@ import {
   Option,
   Switch,
   Button,
+  FormField,
 } from '@/shared/ui/components';
 import { ADMIN_TIMELINE_CONSTANTS } from '@/features/admin/constants/admin-timeline.constants';
 import { Flag, Trophy, Landmark, Star, Sparkles, Medal, Shield, Heart } from 'lucide-react';
+import { TimelineCategoryFormData } from '@/features/admin/schemas/timeline/timeline-category.schema';
 
 export interface TimelineCategoryModalProps {
   isOpen: boolean;
@@ -22,18 +25,7 @@ export interface TimelineCategoryModalProps {
   onSave: () => void;
   isSaving: boolean;
   isEditing: boolean;
-  name: string;
-  setName: (val: string) => void;
-  slug: string;
-  setSlug: (val: string) => void;
-  icon: string;
-  setIcon: (val: string) => void;
-  description: string;
-  setDescription: (val: string) => void;
-  displayOrder: number;
-  setDisplayOrder: (val: number) => void;
-  isActive: boolean;
-  setIsActive: (val: boolean) => void;
+  form: UseFormReturn<TimelineCategoryFormData, any, any>;
 }
 
 export const renderCategoryIconComponent = (iconName: string, className = 'w-4 h-4 text-primary') => {
@@ -64,20 +56,18 @@ export const TimelineCategoryModal: React.FC<TimelineCategoryModalProps> = ({
   onSave,
   isSaving,
   isEditing,
-  name,
-  setName,
-  slug,
-  setSlug,
-  icon,
-  setIcon,
-  description,
-  setDescription,
-  displayOrder,
-  setDisplayOrder,
-  isActive,
-  setIsActive,
+  form,
 }) => {
   const texts = ADMIN_TIMELINE_CONSTANTS.MODAL_CATEGORY;
+
+  const {
+    register,
+    control,
+    watch,
+    formState: { errors },
+  } = form;
+
+  const icon = watch('icon');
 
   if (!isOpen) return null;
 
@@ -90,66 +80,94 @@ export const TimelineCategoryModal: React.FC<TimelineCategoryModalProps> = ({
         </Title>
       </LayoutContainer>
 
-      <Text className="text-xs text-text-secondary mb-4 leading-relaxed">
+      <Text as="p" className="text-xs text-text-secondary mb-4 leading-relaxed">
         {texts.DESC}
       </Text>
 
       <LayoutContainer className="flex flex-col gap-4">
-        {/* Name and Slug */}
-        <Input
-          label={texts.FIELD_NAME}
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder={texts.FIELD_NAME_PLACEHOLDER}
-          required
-        />
-
-        <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {/* Name */}
+        <FormField
+          label={`${texts.FIELD_NAME} *`}
+          error={errors.name?.message}
+        >
           <Input
-            label={texts.FIELD_SLUG}
-            value={slug}
-            onChange={(e) => setSlug(e.target.value)}
-            placeholder={texts.FIELD_SLUG_PLACEHOLDER}
+            {...register('name')}
+            placeholder={texts.FIELD_NAME_PLACEHOLDER}
           />
+        </FormField>
 
-          <LayoutContainer className="flex flex-col">
-            <Select
-              label={texts.FIELD_ICON}
-              value={icon}
-              onChange={(e) => setIcon(e.target.value)}
-            >
-              {ADMIN_TIMELINE_CONSTANTS.CATEGORY_ICONS.map((ic) => (
-                <Option key={ic.value} value={ic.value}>
-                  {ic.label}
-                </Option>
-              ))}
-            </Select>
-          </LayoutContainer>
+        {/* Slug and Icon */}
+        <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <FormField
+            label={texts.FIELD_SLUG}
+            error={errors.slug?.message}
+          >
+            <Input
+              {...register('slug')}
+              placeholder={texts.FIELD_SLUG_PLACEHOLDER}
+            />
+          </FormField>
+
+          <FormField
+            label={texts.FIELD_ICON}
+            name="icon"
+            control={control}
+            error={errors.icon?.message}
+            render={({ field }) => (
+              <Select
+                value={field.value}
+                onChange={(e) => field.onChange(e.target.value)}
+                className="w-full"
+              >
+                {ADMIN_TIMELINE_CONSTANTS.CATEGORY_ICONS.map((ic) => (
+                  <Option key={ic.value} value={ic.value}>
+                    {ic.label}
+                  </Option>
+                ))}
+              </Select>
+            )}
+          />
         </LayoutContainer>
 
+        {/* Order and Active */}
         <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
-          <Input
+          <FormField
             label={texts.FIELD_ORDER}
-            type="number"
-            value={displayOrder}
-            onChange={(e) => setDisplayOrder(Number(e.target.value))}
-          />
+            error={errors.displayOrder?.message}
+          >
+            <Input
+              type="number"
+              {...register('displayOrder')}
+            />
+          </FormField>
 
           <LayoutContainer className="flex items-center justify-between p-3 rounded-xl bg-surface border border-border">
-            <Text className="text-xs font-bold text-text-primary">
+            <Text as="span" className="text-xs font-bold text-text-primary">
               {texts.FIELD_ACTIVE}
             </Text>
-            <Switch checked={isActive} onChange={setIsActive} />
+            <Controller
+              control={control}
+              name="isActive"
+              render={({ field }) => (
+                <Switch
+                  checked={field.value}
+                  onChange={field.onChange}
+                />
+              )}
+            />
           </LayoutContainer>
         </LayoutContainer>
 
-        <Textarea
+        <FormField
           label={texts.FIELD_DESC}
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          placeholder={texts.FIELD_DESC_PLACEHOLDER}
-          rows={3}
-        />
+          error={errors.description?.message}
+        >
+          <Textarea
+            {...register('description')}
+            placeholder={texts.FIELD_DESC_PLACEHOLDER}
+            rows={3}
+          />
+        </FormField>
 
         {/* Modal Actions */}
         <LayoutContainer className="flex items-center justify-end gap-3 pt-3 border-t border-border mt-2">
@@ -164,4 +182,3 @@ export const TimelineCategoryModal: React.FC<TimelineCategoryModalProps> = ({
     </Modal>
   );
 };
-

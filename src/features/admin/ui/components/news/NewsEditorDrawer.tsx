@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
+import { Controller } from 'react-hook-form';
 import {
-  X,
   Sparkles,
   Calendar,
   Video,
@@ -11,7 +11,6 @@ import {
   Eye,
   Lock,
   Unlock,
-  MessageSquare,
   Globe,
 } from 'lucide-react';
 import {
@@ -27,6 +26,7 @@ import {
   Spinner,
   ConfirmModal,
   Switch,
+  FormField,
 } from '@/shared/ui/components';
 import { ADMIN_NEWS_TEXTS } from '../../../constants/admin-news.constants';
 import { useAdminNewsDrawer } from '../../../hooks/news/useAdminNewsDrawer';
@@ -45,42 +45,32 @@ export interface NewsEditorDrawerProps {
   isOpen: boolean;
   onClose: () => void;
   articleId: string | null;
-  onSaveSuccess: () => void; defaultIsYouth?: boolean;
+  onSaveSuccess: () => void;
+  defaultIsYouth?: boolean;
 }
 
 export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
   isOpen,
   onClose,
   articleId,
-  onSaveSuccess, defaultIsYouth = false,
+  onSaveSuccess,
+  defaultIsYouth = false,
 }) => {
   const { DRAWER: texts, STATUS_MAP, MODAL_REPLACE_MAIN: replaceMainTexts } = ADMIN_NEWS_TEXTS;
 
   const {
+    form,
     isLoading,
     isSaving,
+    savingLabel,
     categories,
-    title,
-    setTitle,
-    subtitle,
-    setSubtitle,
-    slug,
-    setSlug,
-    summary,
-    setSummary,
-    categoryId,
-    setCategoryId,
-    tags,
     tagInput,
     setTagInput,
     handleAddTag,
     handleRemoveTag,
-    coverImage,
-    coverCaption,
-    setCoverCaption,
     handleCropCover,
     handleRemoveCover,
-    gallery,
+    galleryFiles,
     galleryPreviews,
     galleryCropItem,
     handleSelectGalleryFiles,
@@ -89,41 +79,25 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
     handleCropGalleryCancel,
     handleRemoveExistingGalleryPhoto,
     handleRemoveNewGalleryPhoto,
-    content,
-    setContent,
-    youtubeVideoUrl,
-    setYoutubeVideoUrl,
-    featuredSlot,
-    setFeaturedSlot,
     handleSelectFeaturedSlot,
     replaceMainModalOpen,
     existingMainTitle,
     confirmReplaceMain,
     cancelReplaceMain,
-    isPinned,
-    setIsPinned,
-    isYouth,
-    setIsYouth,
-    showOnHomepage,
-    setShowOnHomepage,
-    reporterName,
-    setReporterName,
-    photographerName,
-    setPhotographerName,
-    allowReactions,
-    setAllowReactions,
-    allowComments,
-    setAllowComments,
-    status,
-    setStatus,
-    publishedAt,
-    setPublishedAt,
-    handleCategoryCreated,
     hasRecoverableDraft,
     recoverDraft,
     discardDraft,
+    handleCategoryCreated,
     handleSave,
   } = useAdminNewsDrawer(articleId, isOpen, onSaveSuccess, defaultIsYouth);
+
+  const {
+    register,
+    control,
+    watch,
+    setValue,
+    formState: { errors },
+  } = form;
 
   const quickCat = useQuickCategoryModal(handleCategoryCreated);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
@@ -133,9 +107,30 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
     setIsSlugUnlocked(false);
   }, [isOpen, articleId]);
 
+  const title = watch('title');
+  const subtitle = watch('subtitle');
+  const slug = watch('slug');
+  const summary = watch('summary');
+  const categoryId = watch('categoryId');
+  const tags = watch('tags') || [];
+  const coverImage = watch('coverImage');
+  const coverCaption = watch('coverCaption') || '';
+  const gallery = watch('gallery') || [];
+  const content = watch('content') || {};
+  const youtubeVideoUrl = watch('youtubeVideoUrl') || '';
+  const featuredSlot = watch('featuredSlot');
+  const isPinned = watch('isPinned');
+  const isYouth = watch('isYouth');
+  const showOnHomepage = watch('showOnHomepage');
+  const reporterName = watch('reporterName') || '';
+  const photographerName = watch('photographerName') || '';
+  const allowReactions = watch('allowReactions');
+  const allowComments = watch('allowComments');
+  const status = watch('status');
+  const publishedAt = watch('publishedAt') || '';
+
   const isPublishedArticle = Boolean(articleId && status === 'PUBLISHED');
   const isSlugLocked = isPublishedArticle && !isSlugUnlocked;
-
   const selectedCategory = categories.find((c) => c._id === categoryId || c.slug === categoryId);
 
   return (
@@ -150,12 +145,11 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
           <LayoutContainer className="flex flex-col items-center justify-center p-16">
             <Spinner className="w-8 h-8 text-primary mb-3" />
             <Text as="p" className="text-text-secondary font-medium">
-              Carregando dados da matéria...
+              {texts.LOADING_ARTICLE}
             </Text>
           </LayoutContainer>
         ) : (
           <LayoutContainer className="flex flex-col gap-6 pb-8">
-            {/* Aviso de Rascunho Recuperado do LocalStorage */}
             {hasRecoverableDraft && !articleId && (
               <LayoutContainer className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl border border-primary/40 bg-primary/10 shadow-sm animate-in fade-in duration-300">
                 <LayoutContainer className="flex items-center gap-2.5">
@@ -165,22 +159,10 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
                   </Text>
                 </LayoutContainer>
                 <LayoutContainer className="flex items-center gap-2 shrink-0">
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="primary"
-                    onClick={recoverDraft}
-                    className="text-xs font-bold h-7 px-3"
-                  >
+                  <Button type="button" size="sm" variant="primary" onClick={recoverDraft} className="text-xs font-bold h-7 px-3">
                     {texts.AUTOSAVE_RECOVER_BTN}
                   </Button>
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="ghost"
-                    onClick={discardDraft}
-                    className="text-xs h-7 px-2 text-text-secondary hover:text-text-primary"
-                  >
+                  <Button type="button" size="sm" variant="ghost" onClick={discardDraft} className="text-xs h-7 px-2 text-text-secondary hover:text-text-primary">
                     {texts.AUTOSAVE_DISCARD_BTN}
                   </Button>
                 </LayoutContainer>
@@ -189,36 +171,33 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
 
             {/* 1. Titulo & Subtitulo */}
             <LayoutContainer className="flex flex-col gap-4">
-              <LayoutContainer className="flex flex-col gap-1.5">
-                <Text as="span" className="text-xs font-semibold text-text-primary uppercase tracking-wider">
-                  {texts.LABEL_TITLE} *
-                </Text>
+              <FormField
+                label={`${texts.LABEL_TITLE} *`}
+                error={errors.title?.message}
+              >
                 <Input
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
+                  {...register('title')}
                   placeholder={texts.PLACEHOLDER_TITLE}
-                  required
                 />
-              </LayoutContainer>
+              </FormField>
 
-              <LayoutContainer className="flex flex-col gap-1.5">
-                <Text as="span" className="text-xs font-semibold text-text-primary uppercase tracking-wider">
-                  {texts.LABEL_SUBTITLE}
-                </Text>
+              <FormField
+                label={texts.LABEL_SUBTITLE}
+                error={errors.subtitle?.message}
+              >
                 <Input
-                  value={subtitle}
-                  onChange={(e) => setSubtitle(e.target.value)}
+                  {...register('subtitle')}
                   placeholder={texts.PLACEHOLDER_SUBTITLE}
                 />
-              </LayoutContainer>
+              </FormField>
             </LayoutContainer>
 
-                        {/* Classificação: Matéria da Categoria de Base */}
-            <LayoutContainer className={`p-4 rounded-2xl border transition-all duration-300 flex flex-col gap-2 ${
-              isYouth 
-                ? 'bg-primary/10 border-primary/40 shadow-xs' 
-                : 'bg-surface border-border'
-            }`}>
+            {/* Classificação: Matéria da Categoria de Base */}
+            <LayoutContainer
+              className={`p-4 rounded-2xl border transition-all duration-300 flex flex-col gap-2 ${
+                isYouth ? 'bg-primary/10 border-primary/40 shadow-xs' : 'bg-surface border-border'
+              }`}
+            >
               <LayoutContainer className="flex items-center justify-between">
                 <LayoutContainer className="flex items-center gap-2">
                   <Text as="span" className="text-sm font-bold text-text-primary">
@@ -229,10 +208,16 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
                   </Badge>
                 </LayoutContainer>
 
-                <Switch
-                  checked={isYouth}
-                  onChange={setIsYouth}
-                  aria-label={texts.SWITCH_IS_YOUTH_LABEL}
+                <Controller
+                  control={control}
+                  name="isYouth"
+                  render={({ field }) => (
+                    <Switch
+                      checked={field.value}
+                      onChange={field.onChange}
+                      aria-label={texts.SWITCH_IS_YOUTH_LABEL}
+                    />
+                  )}
                 />
               </LayoutContainer>
 
@@ -241,11 +226,10 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
               </Text>
             </LayoutContainer>
 
-            {/* 2. Categoria & Nova Categoria & Slug */}
+            {/* 2. Categoria & Slug */}
             <LayoutContainer className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Categoria */}
-              <LayoutContainer className="flex flex-col gap-1.5">
-                <LayoutContainer className="flex items-center justify-between">
+              <LayoutContainer className="flex flex-col">
+                <LayoutContainer className="flex items-center justify-between mb-1">
                   <Text as="span" className="text-xs font-semibold text-text-primary uppercase tracking-wider">
                     {texts.LABEL_CATEGORY} *
                   </Text>
@@ -259,22 +243,28 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
                     {texts.BUTTON_QUICK_CATEGORY}
                   </Button>
                 </LayoutContainer>
-                <Select
-                  value={categoryId}
-                  onChange={(e) => setCategoryId(e.target.value)}
-                  required
-                >
-                  {categories.map((c) => (
-                    <Option key={c._id || c.slug} value={c._id || c.slug}>
-                      {c.name}
-                    </Option>
-                  ))}
-                </Select>
+                <FormField
+                  name="categoryId"
+                  control={control}
+                  error={errors.categoryId?.message}
+                  render={({ field }) => (
+                    <Select
+                      value={field.value}
+                      onChange={(e) => field.onChange(e.target.value)}
+                      className="w-full"
+                    >
+                      {categories.map((c) => (
+                        <Option key={c._id || c.slug} value={c._id || c.slug}>
+                          {c.name}
+                        </Option>
+                      ))}
+                    </Select>
+                  )}
+                />
               </LayoutContainer>
 
-              {/* Slug Customizado (Opcional) */}
-              <LayoutContainer className="flex flex-col gap-1.5">
-                <LayoutContainer className="flex items-center justify-between">
+              <LayoutContainer className="flex flex-col">
+                <LayoutContainer className="flex items-center justify-between mb-1">
                   <LayoutContainer className="flex items-center gap-1.5">
                     <Text as="span" className="text-xs font-semibold text-text-primary uppercase tracking-wider">
                       {texts.LABEL_SLUG}
@@ -282,15 +272,15 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
                     {isPublishedArticle && (
                       <Badge variant={isSlugLocked ? 'default' : 'warning'} size="sm">
                         {isSlugLocked ? (
-                          <span className="flex items-center gap-1">
+                          <Text as="span" className="flex items-center gap-1">
                             <Lock className="w-3 h-3" />
                             {texts.SLUG_LOCKED_BADGE}
-                          </span>
+                          </Text>
                         ) : (
-                          <span className="flex items-center gap-1">
+                          <Text as="span" className="flex items-center gap-1">
                             <Unlock className="w-3 h-3" />
                             {texts.SLUG_UNLOCKED_BADGE}
-                          </span>
+                          </Text>
                         )}
                       </Badge>
                     )}
@@ -306,45 +296,42 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
                       {isSlugLocked ? (
                         <>
                           <Unlock className="w-3.5 h-3.5 mr-1 text-primary" />
-                          <span className="text-primary">{texts.SLUG_UNLOCK_BTN}</span>
+                          <Text as="span" className="text-primary">{texts.SLUG_UNLOCK_BTN}</Text>
                         </>
                       ) : (
                         <>
                           <Lock className="w-3.5 h-3.5 mr-1 text-text-secondary" />
-                          <span>{texts.SLUG_LOCK_BTN}</span>
+                          <Text as="span">{texts.SLUG_LOCK_BTN}</Text>
                         </>
                       )}
                     </Button>
                   )}
                 </LayoutContainer>
-                <Input
-                  value={slug}
-                  onChange={(e) => setSlug(e.target.value)}
-                  placeholder={texts.PLACEHOLDER_SLUG}
-                  disabled={isSlugLocked}
-                  className={isSlugLocked ? 'opacity-70 bg-surface-hover cursor-not-allowed' : ''}
-                />
-                {isSlugLocked ? (
-                  <Text as="span" className="text-[11px] text-text-secondary">
-                    {texts.SLUG_LOCKED_HINT}
-                  </Text>
-                ) : isPublishedArticle ? (
-                  <Text as="span" className="text-[11px] text-amber-500 font-medium">
-                    {texts.SLUG_UNLOCKED_WARNING}
-                  </Text>
-                ) : (
-                  <Text as="span" className="text-[11px] text-text-secondary">
-                    {texts.SLUG_HINT}
-                  </Text>
-                )}
+                <FormField
+                  error={errors.slug?.message}
+                  description={
+                    isSlugLocked
+                      ? texts.SLUG_LOCKED_HINT
+                      : isPublishedArticle
+                        ? texts.SLUG_UNLOCKED_WARNING
+                        : texts.SLUG_HINT
+                  }
+                >
+                  <Input
+                    {...register('slug')}
+                    placeholder={texts.PLACEHOLDER_SLUG}
+                    disabled={isSlugLocked}
+                    className={isSlugLocked ? 'opacity-70 bg-surface-hover cursor-not-allowed' : ''}
+                  />
+                </FormField>
               </LayoutContainer>
             </LayoutContainer>
 
             {/* 3. Imagem de Capa 16:9 com Crop & Legenda */}
             <NewsEditorCoverSection
-              coverImage={coverImage}
+              coverImage={coverImage || null}
               coverCaption={coverCaption}
-              setCoverCaption={setCoverCaption}
+              setCoverCaption={(val) => setValue('coverCaption', val)}
               onCropSave={handleCropCover}
               onImageRemove={handleRemoveCover}
             />
@@ -363,29 +350,28 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
             />
 
             {/* 5. Resumo / SEO Preview */}
-            <LayoutContainer className="flex flex-col gap-1.5">
-              <Text as="span" className="text-xs font-semibold text-text-primary uppercase tracking-wider">
-                {texts.LABEL_SUMMARY}
-              </Text>
+            <FormField
+              label={texts.LABEL_SUMMARY}
+              error={errors.summary?.message}
+            >
               <Input
-                value={summary}
-                onChange={(e) => setSummary(e.target.value)}
+                {...register('summary')}
                 placeholder={texts.PLACEHOLDER_SUMMARY}
               />
-            </LayoutContainer>
+            </FormField>
 
-            {/* 5. Tiptap Block Editor (Conteúdo) */}
+            {/* 6. Tiptap Block Editor (Conteúdo) */}
             <LayoutContainer className="flex flex-col gap-1.5">
               <Text as="span" className="text-xs font-semibold text-text-primary uppercase tracking-wider">
                 {texts.LABEL_CONTENT} *
               </Text>
               <NewsBlockEditor
                 content={content}
-                onChange={(json) => setContent(json)}
+                onChange={(json) => setValue('content', json)}
               />
             </LayoutContainer>
 
-            {/* 6. Tags com Enter e chips */}
+            {/* 7. Tags */}
             <NewsEditorTagsSection
               tags={tags}
               tagInput={tagInput}
@@ -394,36 +380,39 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
               onRemoveTag={handleRemoveTag}
             />
 
-            {/* 7. Créditos Editoriais Livres (Repórter / Fotógrafo) */}
+            {/* 8. Créditos Editoriais */}
             <NewsEditorCreditsSection
               reporterName={reporterName}
-              setReporterName={setReporterName}
+              setReporterName={(val) => setValue('reporterName', val)}
               photographerName={photographerName}
-              setPhotographerName={setPhotographerName}
+              setPhotographerName={(val) => setValue('photographerName', val)}
             />
 
-            {/* 8. Video do YouTube */}
-            <LayoutContainer className="flex flex-col gap-1.5">
-              <Text as="span" className="text-xs font-semibold text-text-primary uppercase tracking-wider flex items-center gap-1.5">
-                <Video className="w-4 h-4 text-primary" />
-                {texts.LABEL_YOUTUBE}
-              </Text>
+            {/* 9. Video do YouTube */}
+            <FormField
+              label={
+                <Text as="span" className="flex items-center gap-1.5">
+                  <Video className="w-4 h-4 text-primary" />
+                  {texts.LABEL_YOUTUBE}
+                </Text>
+              }
+              error={errors.youtubeVideoUrl?.message}
+            >
               <Input
-                value={youtubeVideoUrl}
-                onChange={(e) => setYoutubeVideoUrl(e.target.value)}
+                {...register('youtubeVideoUrl')}
                 placeholder={texts.PLACEHOLDER_YOUTUBE}
               />
-            </LayoutContainer>
+            </FormField>
 
-            {/* 9. Vitrine Editorial & Destaques da Capa */}
+            {/* 10. Vitrine Editorial & Destaques da Capa */}
             <NewsEditorFeaturedSection
               featuredSlot={featuredSlot}
               setFeaturedSlot={handleSelectFeaturedSlot}
               isPinned={isPinned}
-              setIsPinned={setIsPinned}
+              setIsPinned={(val) => setValue('isPinned', val)}
             />
 
-            {/* Distribuição & Exibição da Matéria (Aparece apenas quando marcado como Categoria de Base) */}
+            {/* Distribuição & Exibição da Matéria (Categoria de Base) */}
             {isYouth && (
               <LayoutContainer className="p-4 rounded-2xl bg-surface border border-border flex flex-col gap-3 animate-in fade-in duration-200">
                 <Text as="span" className="text-xs font-semibold text-text-primary uppercase tracking-wider flex items-center gap-1.5">
@@ -431,11 +420,17 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
                   {texts.LABEL_DISTRIBUTION_SECTION}
                 </Text>
 
-                <Checkbox
-                  label={texts.LABEL_SHOW_ON_HOMEPAGE}
-                  description={texts.SHOW_ON_HOMEPAGE_HINT}
-                  checked={showOnHomepage}
-                  onChange={(e) => setShowOnHomepage(e.target.checked)}
+                <Controller
+                  control={control}
+                  name="showOnHomepage"
+                  render={({ field }) => (
+                    <Checkbox
+                      label={texts.LABEL_SHOW_ON_HOMEPAGE}
+                      description={texts.SHOW_ON_HOMEPAGE_HINT}
+                      checked={field.value}
+                      onChange={(e) => field.onChange(e.target.checked)}
+                    />
+                  )}
                 />
 
                 <LayoutContainer className="p-2.5 rounded-xl bg-primary/10 border border-primary/20 text-xs text-text-secondary mt-1">
@@ -444,55 +439,56 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
               </LayoutContainer>
             )}
 
-            {/* 10. Interatividade com a Torcida (Reações e Comentários) */}
+            {/* 11. Interatividade com a Torcida */}
             <NewsEditorInteractivitySection
               allowReactions={allowReactions}
-              setAllowReactions={setAllowReactions}
+              setAllowReactions={(val) => setValue('allowReactions', val)}
               allowComments={allowComments}
-              setAllowComments={setAllowComments}
+              setAllowComments={(val) => setValue('allowComments', val)}
             />
 
-            {/* 11. Status & Agendamento */}
+            {/* 12. Status & Agendamento */}
             <LayoutContainer className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-xl border border-border bg-surface">
-              <LayoutContainer className="flex flex-col gap-1.5">
-                <Text as="span" className="text-xs font-semibold text-text-primary uppercase tracking-wider">
-                  {texts.LABEL_STATUS}
-                </Text>
-                <Select
-                  value={status}
-                  onChange={(e) => setStatus(e.target.value as any)}
-                >
-                  <Option value="DRAFT">{STATUS_MAP.DRAFT}</Option>
-                  <Option value="PUBLISHED">{STATUS_MAP.PUBLISHED}</Option>
-                  <Option value="SCHEDULED">{STATUS_MAP.SCHEDULED}</Option>
-                  <Option value="ARCHIVED">{STATUS_MAP.ARCHIVED}</Option>
-                </Select>
-              </LayoutContainer>
+              <FormField
+                label={texts.LABEL_STATUS}
+                name="status"
+                control={control}
+                error={errors.status?.message}
+                render={({ field }) => (
+                  <Select
+                    value={field.value}
+                    onChange={(e) => field.onChange(e.target.value as any)}
+                    className="w-full"
+                  >
+                    <Option value="DRAFT">{STATUS_MAP.DRAFT}</Option>
+                    <Option value="PUBLISHED">{STATUS_MAP.PUBLISHED}</Option>
+                    <Option value="SCHEDULED">{STATUS_MAP.SCHEDULED}</Option>
+                    <Option value="ARCHIVED">{STATUS_MAP.ARCHIVED}</Option>
+                  </Select>
+                )}
+              />
 
               {status === 'SCHEDULED' && (
-                <LayoutContainer className="flex flex-col gap-1.5">
-                  <Text as="span" className="text-xs font-semibold text-text-primary uppercase tracking-wider flex items-center gap-1">
-                    <Calendar className="w-3.5 h-3.5" />
-                    {texts.LABEL_PUBLISHED_AT}
-                  </Text>
+                <FormField
+                  label={
+                    <Text as="span" className="flex items-center gap-1">
+                      <Calendar className="w-3.5 h-3.5" />
+                      {texts.LABEL_PUBLISHED_AT}
+                    </Text>
+                  }
+                  error={errors.publishedAt?.message}
+                >
                   <Input
                     type="datetime-local"
-                    value={publishedAt}
-                    onChange={(e) => setPublishedAt(e.target.value)}
-                    required
+                    {...register('publishedAt')}
                   />
-                </LayoutContainer>
+                </FormField>
               )}
             </LayoutContainer>
 
-            {/* 10. Botoes de Acao do Footer */}
+            {/* 13. Botoes de Acao do Footer */}
             <LayoutContainer className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-border mt-4">
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={onClose}
-                disabled={isSaving}
-              >
+              <Button type="button" variant="ghost" onClick={onClose} disabled={isSaving}>
                 {texts.BUTTON_CANCEL}
               </Button>
 
@@ -529,7 +525,7 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
                     leftIcon={<Send className="w-4 h-4" />}
                     className="font-bold"
                   >
-                    {texts.BUTTON_PUBLISH}
+                    {isSaving && savingLabel ? savingLabel : texts.BUTTON_PUBLISH}
                   </Button>
                 ) : (
                   <Button
@@ -540,7 +536,7 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
                     leftIcon={<Save className="w-4 h-4" />}
                     className="font-bold"
                   >
-                    {texts.BUTTON_SAVE_CHANGES}
+                    {isSaving && savingLabel ? savingLabel : texts.BUTTON_SAVE_CHANGES}
                   </Button>
                 )}
               </LayoutContainer>
@@ -549,19 +545,14 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
         )}
       </Drawer>
 
-      {/* Modal Quick Category */}
       <QuickCategoryModal
         isOpen={quickCat.isOpen}
         onClose={quickCat.close}
-        name={quickCat.name}
-        setName={quickCat.setName}
-        description={quickCat.description}
-        setDescription={quickCat.setDescription}
+        form={quickCat.form}
         isLoading={quickCat.isLoading}
         onSubmit={quickCat.handleSubmit}
       />
 
-      {/* Modal Preview da Matéria (Desktop & Mobile) */}
       <NewsArticlePreviewModal
         isOpen={isPreviewOpen}
         onClose={() => setIsPreviewOpen(false)}
@@ -582,7 +573,6 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
         tags={tags}
       />
 
-      {/* Modal de Confirmação para Substituir Manchetão */}
       <ConfirmModal
         isOpen={replaceMainModalOpen}
         onClose={cancelReplaceMain}

@@ -10,6 +10,7 @@ export const SIDEBAR_TEXTS = {
     YOUTH: 'Categorias de Base',
     IDOLS: 'Ídolos & Memorial',
     TIMELINE: 'História & Linha do Tempo',
+    STADIUM: 'Estádio Boca do Lobo',
     MODULES: 'Módulos do Sistema',
     ROLES: 'Cargos e Permissões',
     SETTINGS: 'Configurações',

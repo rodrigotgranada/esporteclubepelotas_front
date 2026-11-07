@@ -36,6 +36,19 @@ export const adminFootballService = {
     return response.data;
   },
 
+  uploadAthletePhotoMedia: async (
+    file: File,
+    folderId?: string,
+  ): Promise<{ url: string; photoUrl: string }> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    if (folderId) formData.append('folderId', folderId);
+    const response = await api.post('/athletes/admin/upload-photo', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data;
+  },
+
   createAthlete: async (data: Partial<AthleteData>): Promise<AthleteData> => {
     const response = await api.post('/athletes/admin', data);
     return response.data;
@@ -82,6 +95,19 @@ export const adminFootballService = {
 
   getSquadById: async (id: string): Promise<SquadData> => {
     const response = await api.get(`/squads/admin/${id}`);
+    return response.data;
+  },
+
+  uploadSquadCoverMedia: async (
+    file: File,
+    folderId?: string,
+  ): Promise<{ url: string; coverUrl: string }> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    if (folderId) formData.append('folderId', folderId);
+    const response = await api.post('/squads/admin/upload-cover', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
     return response.data;
   },
 

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import Link from 'next/link';
@@ -320,9 +320,14 @@ export const PublicFooter = () => {
 
           {/* Column 4: Stadium Location & Clickable Google Map (lg:col-span-3) */}
           <LayoutContainer className="lg:col-span-3 flex flex-col gap-3">
-            <Title level="h4" className="text-sm font-bold text-text-primary uppercase tracking-wider">
-              {stadiumName}
-            </Title>
+            <LayoutContainer className="flex items-center justify-between">
+              <Title level="h4" className="text-sm font-bold text-text-primary uppercase tracking-wider">
+                {stadiumName}
+              </Title>
+              <Link href="/estadio" className="text-[11px] font-bold text-primary hover:underline">
+                História →
+              </Link>
+            </LayoutContainer>
 
             <LayoutContainer className="flex items-start gap-2 text-xs text-text-secondary leading-snug">
               <MapPin className="w-4 h-4 text-primary shrink-0 mt-0.5" />

@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
-import { useAuthStore } from '@/store/useAuthStore';
+import { useAuthStore, User } from '@/store/useAuthStore';
 import { updateProfile } from '@/services/profile.service';
 import { toast } from 'react-hot-toast';
 import { PROFILE_TEXTS } from '../constants';
+import { useTransactionalSave } from '@/shared/hooks/useTransactionalSave';
 
 export const usePreferencesData = () => {
   const { user, updateUser } = useAuthStore();
   const [receiveNewsletter, setReceiveNewsletter] = useState<boolean>(true);
   const [receiveSms, setReceiveSms] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(false);
+  const { isSaving: loading, runTransactionalSave } = useTransactionalSave();
 
   useEffect(() => {
     if (user?.preferences) {
@@ -18,22 +19,24 @@ export const usePreferencesData = () => {
   }, [user]);
 
   const handleSavePreferences = async () => {
-    try {
-      setLoading(true);
-      const updatedUser = await updateProfile({
-        preferences: {
-          receiveNewsletter,
-          receiveSms,
-        },
-      });
-      updateUser(updatedUser);
-      toast.success(PROFILE_TEXTS.TOAST_PREFERENCES_SUCCESS);
-    } catch (error: any) {
-      console.error('Failed to update preferences:', error);
-      toast.error(error.response?.data?.message || PROFILE_TEXTS.TOAST_PREFERENCES_ERROR);
-    } finally {
-      setLoading(false);
-    }
+    await runTransactionalSave<void, User>({
+      hasPendingMedia: false,
+      saveToDb: async () =>
+        updateProfile({
+          preferences: {
+            receiveNewsletter,
+            receiveSms,
+          },
+        }),
+      onConfirmed: (updatedUser) => {
+        updateUser(updatedUser);
+        toast.success(PROFILE_TEXTS.TOAST_PREFERENCES_SUCCESS);
+      },
+      onError: (error: any) => {
+        console.error('Failed to update preferences:', error);
+        toast.error(error?.response?.data?.message || PROFILE_TEXTS.TOAST_PREFERENCES_ERROR);
+      },
+    });
   };
 
   const handleExportData = () => {
@@ -89,4 +92,3 @@ export const usePreferencesData = () => {
     handleExportData,
   };
 };
-

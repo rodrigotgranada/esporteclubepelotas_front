@@ -1,23 +1,41 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { registerSchema, RegisterForm } from '../schemas';
 import { authRepository } from '../repositories';
-import { Toast  } from '@/shared/ui/components';
+import { Toast } from '@/shared/ui/components';
 
 export const useRegister = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [success, setSuccess] = useState(false);
   const [avatarBlob, setAvatarBlob] = useState<Blob | null>(null);
   const [isMounted, setIsMounted] = useState(false);
+  const submittingRef = useRef(false);
 
   const form = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      firstName: '', lastName: '', cpf: '', birthDate: '', email: '', password: '', confirmPassword: '',
+      firstName: '',
+      lastName: '',
+      cpf: '',
+      birthDate: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
       phones: [{ number: '', isWhatsapp: false, isPrimary: true }],
-      addresses: [{ zipCode: '', street: '', number: '', complement: '', neighborhood: '', city: '', state: '', isPrimary: true }],
-    }
+      addresses: [
+        {
+          zipCode: '',
+          street: '',
+          number: '',
+          complement: '',
+          neighborhood: '',
+          city: '',
+          state: '',
+          isPrimary: true,
+        },
+      ],
+    },
   });
 
   useEffect(() => {
@@ -36,12 +54,10 @@ export const useRegister = () => {
     }
   }, [form]);
 
-  // Watch step changes
   useEffect(() => {
     sessionStorage.setItem('register-form-step', currentStep.toString());
   }, [currentStep]);
 
-  // Watch form changes
   useEffect(() => {
     const subscription = form.watch((value) => {
       const dataToSave = { ...value };
@@ -72,7 +88,7 @@ export const useRegister = () => {
   const removePhone = (index: number) => {
     const isRemovingPrimary = form.getValues(`phones.${index}.isPrimary`);
     phonesArray.remove(index);
-    
+
     setTimeout(() => {
       const currentPhones = form.getValues('phones');
       if (currentPhones.length === 1 || isRemovingPrimary) {
@@ -86,7 +102,7 @@ export const useRegister = () => {
   const removeAddress = (index: number) => {
     const isRemovingPrimary = form.getValues(`addresses.${index}.isPrimary`);
     addressesArray.remove(index);
-    
+
     setTimeout(() => {
       const currentAddresses = form.getValues('addresses');
       if (currentAddresses.length === 1 || isRemovingPrimary) {
@@ -110,7 +126,7 @@ export const useRegister = () => {
       try {
         const cleanCpf = form.getValues('cpf').replace(/\D/g, '');
         await authRepository.checkAvailability('cpf', cleanCpf);
-      } catch (err) {
+      } catch {
         form.setError('cpf', { type: 'manual', message: 'CPF já está em uso' });
         return;
       }
@@ -119,7 +135,7 @@ export const useRegister = () => {
     if (currentStep === 2) {
       try {
         await authRepository.checkAvailability('email', form.getValues('email'));
-      } catch (err) {
+      } catch {
         form.setError('email', { type: 'manual', message: 'E-mail já está em uso' });
         return;
       }
@@ -131,17 +147,23 @@ export const useRegister = () => {
   const prevStep = () => setCurrentStep((prev) => prev - 1);
 
   const onSubmit = async (data: RegisterForm) => {
+    if (submittingRef.current) return;
+    submittingRef.current = true;
     try {
-      // Remove confirmPassword from payload and convert Date
       const { confirmPassword, ...restData } = data;
-      
+
       const payload = {
         ...restData,
         cpf: restData.cpf.replace(/\D/g, ''),
         birthDate: new Date(data.birthDate).toISOString(),
-        // Garante que se houver 1 telefone/endereço, ele é principal
-        phones: data.phones.map((p) => ({ ...p, isPrimary: data.phones.length === 1 ? true : p.isPrimary })),
-        addresses: data.addresses.map((a) => ({ ...a, isPrimary: data.addresses.length === 1 ? true : a.isPrimary })),
+        phones: data.phones.map((p) => ({
+          ...p,
+          isPrimary: data.phones.length === 1 ? true : p.isPrimary,
+        })),
+        addresses: data.addresses.map((a) => ({
+          ...a,
+          isPrimary: data.addresses.length === 1 ? true : a.isPrimary,
+        })),
       };
 
       const formData = new FormData();
@@ -151,21 +173,20 @@ export const useRegister = () => {
         formData.append('avatar', avatarBlob, 'avatar.jpg');
       }
 
-      // Envia os dados e a foto juntos
       await authRepository.register(formData);
 
-      // Limpa storage após sucesso
       if (typeof window !== 'undefined') {
         sessionStorage.removeItem('register-form-data');
         sessionStorage.removeItem('register-form-step');
       }
 
-      // Redirecionamento ficará por conta do componente que consome o success/email
       Toast.success('Conta criada com sucesso!');
       setSuccess(true);
     } catch (error: unknown) {
       const err = error as { response?: { data?: { message?: string } } };
       Toast.error(err.response?.data?.message || 'Ocorreu um erro ao realizar o cadastro.');
+    } finally {
+      submittingRef.current = false;
     }
   };
 

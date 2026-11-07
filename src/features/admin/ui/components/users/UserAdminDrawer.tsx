@@ -1,5 +1,24 @@
 import React from 'react';
-import { Drawer, Input, PasswordInput, Button, LayoutContainer, Form, Text, Accordion, PhoneInput, CpfInput, Select, Option, Checkbox, IconButton, ImageCropper, PasswordStrengthMeter } from '@/shared/ui/components';
+import { Controller } from 'react-hook-form';
+import {
+  Drawer,
+  Input,
+  PasswordInput,
+  Button,
+  LayoutContainer,
+  Form,
+  Text,
+  Accordion,
+  PhoneInput,
+  CpfInput,
+  Select,
+  Option,
+  Checkbox,
+  IconButton,
+  ImageCropper,
+  PasswordStrengthMeter,
+  FormField,
+} from '@/shared/ui/components';
 import { ConfirmModal } from '@/shared/ui/components/molecules/ConfirmModal';
 import { UserAdminData } from '@/features/admin/services/admin.service';
 import { useUserAdminDrawer } from '../../../hooks/users/useUserAdminDrawer';
@@ -21,15 +40,39 @@ export const UserAdminDrawer = ({ isOpen, onClose, user, onSaveSuccess }: UserAd
   const isSelf = !!(user && currentUser && (user.id === currentUser._id || user.id === (currentUser as any).id || (user as any)._id === currentUser._id));
 
   const {
-    formData, updateField,
-    addPhone, updatePhone, removePhone,
-    addAddress, updateAddress, removeAddress,
-    avatarFile, setAvatarFile,
-    isLoading, handleSubmit,
-    handleGenerateTemporaryPassword, handleCopyPassword,
-    confirmModal, setConfirmModal, executeConfirmedAction, getModalConfig,
-    availableRoles
+    form,
+    addPhone,
+    updatePhone,
+    removePhone,
+    addAddress,
+    updateAddress,
+    removeAddress,
+    avatarFile,
+    setAvatarFile,
+    isLoading,
+    handleSubmit,
+    handleGenerateTemporaryPassword,
+    handleCopyPassword,
+    confirmModal,
+    setConfirmModal,
+    executeConfirmedAction,
+    getModalConfig,
+    availableRoles,
   } = useUserAdminDrawer(user, onClose, onSaveSuccess);
+
+  const {
+    register,
+    control,
+    watch,
+    setValue,
+    formState: { errors },
+  } = form;
+
+  const currentRole = watch('role');
+  const currentStatus = watch('status');
+  const currentPassword = watch('password');
+  const phones = watch('phones') || [];
+  const addresses = watch('addresses') || [];
 
   const handleFormSubmitClick = (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,63 +102,182 @@ export const UserAdminDrawer = ({ isOpen, onClose, user, onSaveSuccess }: UserAd
                   }}
                   onImageRemove={() => {
                     setAvatarFile(null);
-                    updateField('avatarUrl', '');
+                    setValue('avatarUrl', '');
                   }}
                 />
-                <Text className="text-xs text-text-secondary mt-2">
+                <Text as="p" className="text-xs text-text-secondary mt-2">
                   {user ? USER_ADMIN_DRAWER_TEXTS.LABELS.CLICK_TO_CHANGE_PHOTO : USER_ADMIN_DRAWER_TEXTS.LABELS.UPLOAD_PHOTO_HINT}
                 </Text>
               </LayoutContainer>
 
               <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                <Input label={USER_ADMIN_DRAWER_TEXTS.LABELS.FIRST_NAME} value={formData.firstName || ''} onChange={e => updateField('firstName', e.target.value)} required />
-                <Input label={USER_ADMIN_DRAWER_TEXTS.LABELS.LAST_NAME} value={formData.lastName || ''} onChange={e => updateField('lastName', e.target.value)} required />
+                <FormField
+                  label={USER_ADMIN_DRAWER_TEXTS.LABELS.FIRST_NAME}
+                  error={errors.firstName?.message}
+                >
+                  <Input
+                    {...register('firstName')}
+                  />
+                </FormField>
+
+                <FormField
+                  label={USER_ADMIN_DRAWER_TEXTS.LABELS.LAST_NAME}
+                  error={errors.lastName?.message}
+                >
+                  <Input
+                    {...register('lastName')}
+                  />
+                </FormField>
               </LayoutContainer>
+
               <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                <CpfInput label={USER_ADMIN_DRAWER_TEXTS.LABELS.CPF} value={formData.cpf || ''} onChange={e => updateField('cpf', e.target.value)} required disabled={!!user} />
-                <Input type="date" label={USER_ADMIN_DRAWER_TEXTS.LABELS.BIRTH_DATE} value={formData.birthDate || ''} onChange={e => updateField('birthDate', e.target.value)} required />
+                <FormField
+                  label={USER_ADMIN_DRAWER_TEXTS.LABELS.CPF}
+                  error={errors.cpf?.message}
+                >
+                  <CpfInput
+                    {...register('cpf')}
+                    disabled={!!user}
+                  />
+                </FormField>
+
+                <FormField
+                  label={USER_ADMIN_DRAWER_TEXTS.LABELS.BIRTH_DATE}
+                  error={errors.birthDate?.message}
+                >
+                  <Input
+                    type="date"
+                    {...register('birthDate')}
+                  />
+                </FormField>
               </LayoutContainer>
-              <Input type="email" label={USER_ADMIN_DRAWER_TEXTS.LABELS.EMAIL} value={formData.email || ''} onChange={e => updateField('email', e.target.value)} required disabled={!!user && currentUserRole !== 'OWNER'} />
+
+              <FormField
+                label={USER_ADMIN_DRAWER_TEXTS.LABELS.EMAIL}
+                error={errors.email?.message}
+              >
+                <Input
+                  type="email"
+                  {...register('email')}
+                  disabled={!!user && currentUserRole !== 'OWNER'}
+                />
+              </FormField>
             </Accordion>
 
             <Accordion title={USER_ADMIN_DRAWER_TEXTS.SECTIONS.PHONES}>
-              {formData.phones?.map((phone, idx) => (
+              {phones.map((phone, idx) => (
                 <LayoutContainer key={idx} className="bg-surface p-4 rounded-xl mb-4 relative border border-border">
-                  <IconButton icon={<Trash2 size={18} />} variant="ghost" onClick={() => removePhone(idx)} className="absolute top-2 right-2 text-text-secondary hover:text-error" />
-                  <PhoneInput label={USER_ADMIN_DRAWER_TEXTS.LABELS.PHONE(idx)} value={phone.number} onChange={e => updatePhone(idx, 'number', e.target.value)} required />
+                  <IconButton
+                    icon={<Trash2 size={18} />}
+                    variant="ghost"
+                    onClick={() => removePhone(idx)}
+                    className="absolute top-2 right-2 text-text-secondary hover:text-[#ea580c]"
+                    aria-label="Remover telefone"
+                  />
+                  <FormField label={USER_ADMIN_DRAWER_TEXTS.LABELS.PHONE(idx)}>
+                    <PhoneInput
+                      value={phone.number}
+                      onChange={(e) => updatePhone(idx, 'number', e.target.value)}
+                    />
+                  </FormField>
                   <LayoutContainer className="flex items-center gap-6 mt-3">
-                    <Checkbox label={USER_ADMIN_DRAWER_TEXTS.LABELS.IS_WHATSAPP} checked={phone.isWhatsapp || false} onChange={e => updatePhone(idx, 'isWhatsapp', e.target.checked)} />
-                    <Checkbox label={USER_ADMIN_DRAWER_TEXTS.LABELS.IS_PRIMARY_PHONE} checked={phone.isPrimary || false} onChange={e => updatePhone(idx, 'isPrimary', e.target.checked)} />
+                    <Checkbox
+                      label={USER_ADMIN_DRAWER_TEXTS.LABELS.IS_WHATSAPP}
+                      checked={phone.isWhatsapp || false}
+                      onChange={(e) => updatePhone(idx, 'isWhatsapp', e.target.checked)}
+                    />
+                    <Checkbox
+                      label={USER_ADMIN_DRAWER_TEXTS.LABELS.IS_PRIMARY_PHONE}
+                      checked={phone.isPrimary || false}
+                      onChange={(e) => updatePhone(idx, 'isPrimary', e.target.checked)}
+                    />
                   </LayoutContainer>
                 </LayoutContainer>
               ))}
-              <Button type="button" variant="outline" size="sm" onClick={addPhone} className="w-full flex items-center justify-center gap-2 border-secondary/30 text-secondary hover:bg-secondary/10">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={addPhone}
+                className="w-full flex items-center justify-center gap-2 border-secondary/30 text-secondary hover:bg-secondary/10"
+              >
                 <Plus size={16} />
                 {USER_ADMIN_DRAWER_TEXTS.BUTTONS.ADD_PHONE}
               </Button>
             </Accordion>
 
             <Accordion title={USER_ADMIN_DRAWER_TEXTS.SECTIONS.ADDRESSES}>
-              {formData.addresses?.map((address, idx) => (
+              {addresses.map((address, idx) => (
                 <LayoutContainer key={idx} className="bg-surface p-4 rounded-xl mb-4 relative border border-border space-y-3">
-                  <IconButton icon={<Trash2 size={18} />} variant="ghost" onClick={() => removeAddress(idx)} className="absolute top-2 right-2 text-text-secondary hover:text-error" />
+                  <IconButton
+                    icon={<Trash2 size={18} />}
+                    variant="ghost"
+                    onClick={() => removeAddress(idx)}
+                    className="absolute top-2 right-2 text-text-secondary hover:text-[#ea580c]"
+                    aria-label="Remover endereço"
+                  />
                   <LayoutContainer className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <Input label={USER_ADMIN_DRAWER_TEXTS.LABELS.ZIP_CODE} value={address.zipCode} onChange={e => updateAddress(idx, 'zipCode', e.target.value)} required />
-                    <Input label={USER_ADMIN_DRAWER_TEXTS.LABELS.CITY} value={address.city} onChange={e => updateAddress(idx, 'city', e.target.value)} required />
-                    <Input label={USER_ADMIN_DRAWER_TEXTS.LABELS.STATE} value={address.state} onChange={e => updateAddress(idx, 'state', e.target.value)} required />
+                    <FormField label={USER_ADMIN_DRAWER_TEXTS.LABELS.ZIP_CODE}>
+                      <Input
+                        value={address.zipCode}
+                        onChange={(e) => updateAddress(idx, 'zipCode', e.target.value)}
+                      />
+                    </FormField>
+                    <FormField label={USER_ADMIN_DRAWER_TEXTS.LABELS.CITY}>
+                      <Input
+                        value={address.city}
+                        onChange={(e) => updateAddress(idx, 'city', e.target.value)}
+                      />
+                    </FormField>
+                    <FormField label={USER_ADMIN_DRAWER_TEXTS.LABELS.STATE}>
+                      <Input
+                        value={address.state}
+                        onChange={(e) => updateAddress(idx, 'state', e.target.value)}
+                      />
+                    </FormField>
                   </LayoutContainer>
                   <LayoutContainer className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <Input label={USER_ADMIN_DRAWER_TEXTS.LABELS.STREET} value={address.street} onChange={e => updateAddress(idx, 'street', e.target.value)} required className="sm:col-span-2" />
-                    <Input label={USER_ADMIN_DRAWER_TEXTS.LABELS.NUMBER} value={address.number} onChange={e => updateAddress(idx, 'number', e.target.value)} required />
+                    <FormField label={USER_ADMIN_DRAWER_TEXTS.LABELS.STREET} className="sm:col-span-2">
+                      <Input
+                        value={address.street}
+                        onChange={(e) => updateAddress(idx, 'street', e.target.value)}
+                      />
+                    </FormField>
+                    <FormField label={USER_ADMIN_DRAWER_TEXTS.LABELS.NUMBER}>
+                      <Input
+                        value={address.number}
+                        onChange={(e) => updateAddress(idx, 'number', e.target.value)}
+                      />
+                    </FormField>
                   </LayoutContainer>
                   <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <Input label={USER_ADMIN_DRAWER_TEXTS.LABELS.NEIGHBORHOOD} value={address.neighborhood} onChange={e => updateAddress(idx, 'neighborhood', e.target.value)} required />
-                    <Input label={USER_ADMIN_DRAWER_TEXTS.LABELS.COMPLEMENT} value={address.complement || ''} onChange={e => updateAddress(idx, 'complement', e.target.value)} />
+                    <FormField label={USER_ADMIN_DRAWER_TEXTS.LABELS.NEIGHBORHOOD}>
+                      <Input
+                        value={address.neighborhood}
+                        onChange={(e) => updateAddress(idx, 'neighborhood', e.target.value)}
+                      />
+                    </FormField>
+                    <FormField label={USER_ADMIN_DRAWER_TEXTS.LABELS.COMPLEMENT}>
+                      <Input
+                        value={address.complement || ''}
+                        onChange={(e) => updateAddress(idx, 'complement', e.target.value)}
+                      />
+                    </FormField>
                   </LayoutContainer>
-                  <Checkbox label={USER_ADMIN_DRAWER_TEXTS.LABELS.IS_PRIMARY_ADDRESS} checked={address.isPrimary || false} onChange={e => updateAddress(idx, 'isPrimary', e.target.checked)} />
+                  <Checkbox
+                    label={USER_ADMIN_DRAWER_TEXTS.LABELS.IS_PRIMARY_ADDRESS}
+                    checked={address.isPrimary || false}
+                    onChange={(e) => updateAddress(idx, 'isPrimary', e.target.checked)}
+                  />
                 </LayoutContainer>
               ))}
-              <Button type="button" variant="outline" size="sm" onClick={addAddress} className="w-full flex items-center justify-center gap-2 border-secondary/30 text-secondary hover:bg-secondary/10">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={addAddress}
+                className="w-full flex items-center justify-center gap-2 border-secondary/30 text-secondary hover:bg-secondary/10"
+              >
                 <Plus size={16} />
                 {USER_ADMIN_DRAWER_TEXTS.BUTTONS.ADD_ADDRESS}
               </Button>
@@ -126,65 +288,74 @@ export const UserAdminDrawer = ({ isOpen, onClose, user, onSaveSuccess }: UserAd
                 <LayoutContainer>
                   {(() => {
                     const actorLevel = ROLE_HIERARCHY[currentUserRole?.toUpperCase()] || 0;
-                    const targetRoleName = availableRoles.find(r => r._id === formData.role || r.name === formData.role)?.name || formData.role;
+                    const targetRoleName = availableRoles.find((r) => r._id === currentRole || r.name === currentRole)?.name || currentRole;
                     const targetRoleLevel = ROLE_HIERARCHY[targetRoleName?.toUpperCase()] || 0;
                     const canChangeRole = currentUserRole === 'OWNER' || (!user ? true : targetRoleLevel < actorLevel);
 
                     return (
-                      <>
-                        <Select
-                          label={USER_ADMIN_DRAWER_TEXTS.LABELS.ROLE}
-                          value={formData.role || ''}
-                          onChange={e => updateField('role', e.target.value)}
-                          disabled={isSelf || !canChangeRole}
-                        >
-                          {availableRoles.map((r: any) => {
-                            const roleLevel = ROLE_HIERARCHY[r.name?.toUpperCase()] || 0;
-                            const canAssign = currentUserRole === 'OWNER' || roleLevel < actorLevel;
-                            if (!canAssign) return null;
-                            return (
-                              <Option key={r._id || r.name} value={r._id || r.name}>
-                                {r.label || r.name}
-                              </Option>
-                            );
-                          })}
-                        </Select>
-                        {isSelf && (
-                          <Text className="text-xs text-text-secondary mt-1">
-                            {USER_ADMIN_DRAWER_TEXTS.LABELS.ROLE_SELF_DISABLED_HINT}
-                          </Text>
+                      <FormField
+                        label={USER_ADMIN_DRAWER_TEXTS.LABELS.ROLE}
+                        name="role"
+                        control={control}
+                        error={errors.role?.message}
+                        description={
+                          isSelf
+                            ? USER_ADMIN_DRAWER_TEXTS.LABELS.ROLE_SELF_DISABLED_HINT
+                            : !canChangeRole
+                              ? 'Você não tem permissão para alterar o cargo deste usuário.'
+                              : undefined
+                        }
+                        render={({ field }) => (
+                          <Select
+                            value={field.value || ''}
+                            onChange={(e) => field.onChange(e.target.value)}
+                            disabled={isSelf || !canChangeRole}
+                            className="w-full"
+                          >
+                            {availableRoles.map((r: any) => {
+                              const roleLevel = ROLE_HIERARCHY[r.name?.toUpperCase()] || 0;
+                              const canAssign = currentUserRole === 'OWNER' || roleLevel < actorLevel;
+                              if (!canAssign) return null;
+                              return (
+                                <Option key={r._id || r.name} value={r._id || r.name}>
+                                  {r.label || r.name}
+                                </Option>
+                              );
+                            })}
+                          </Select>
                         )}
-                        {!isSelf && !canChangeRole && (
-                          <Text className="text-xs text-text-secondary mt-1">
-                            Você não tem permissão para alterar o cargo deste usuário.
-                          </Text>
-                        )}
-                      </>
+                      />
                     );
                   })()}
                 </LayoutContainer>
 
-                <LayoutContainer>
-                  <Select
-                    label={USER_ADMIN_DRAWER_TEXTS.LABELS.STATUS}
-                    value={formData.status || 'ACTIVE'}
-                    onChange={e => updateField('status', e.target.value)}
-                    disabled={isSelf}
-                  >
-                    <Option value="ACTIVE">{USER_STATUS_MAP.ACTIVE}</Option>
-                    <Option value="PENDING">{USER_STATUS_MAP.PENDING}</Option>
-                    <Option value="BLOCKED">{USER_STATUS_MAP.BLOCKED}</Option>
-                    <Option value="INACTIVE">{USER_STATUS_MAP.INACTIVE}</Option>
-                  </Select>
-                </LayoutContainer>
+                <FormField
+                  label={USER_ADMIN_DRAWER_TEXTS.LABELS.STATUS}
+                  name="status"
+                  control={control}
+                  error={errors.status?.message}
+                  render={({ field }) => (
+                    <Select
+                      value={field.value || 'ACTIVE'}
+                      onChange={(e) => field.onChange(e.target.value as any)}
+                      disabled={isSelf}
+                      className="w-full"
+                    >
+                      <Option value="ACTIVE">{USER_STATUS_MAP.ACTIVE}</Option>
+                      <Option value="PENDING">{USER_STATUS_MAP.PENDING}</Option>
+                      <Option value="BLOCKED">{USER_STATUS_MAP.BLOCKED}</Option>
+                      <Option value="INACTIVE">{USER_STATUS_MAP.INACTIVE}</Option>
+                    </Select>
+                  )}
+                />
               </LayoutContainer>
 
               <LayoutContainer className="flex items-center justify-between pt-3 pb-1 border-t border-border/40">
-                <Text className="text-xs font-bold text-text-secondary uppercase tracking-wider">
+                <Text as="span" className="text-xs font-bold text-text-secondary uppercase tracking-wider">
                   {USER_ADMIN_DRAWER_TEXTS.LABELS.PASSWORD}
                 </Text>
                 <LayoutContainer className="flex items-center gap-2">
-                  {formData.password && (
+                  {currentPassword && (
                     <Button
                       type="button"
                       variant="ghost"
@@ -210,32 +381,45 @@ export const UserAdminDrawer = ({ isOpen, onClose, user, onSaveSuccess }: UserAd
               </LayoutContainer>
 
               <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                <PasswordInput
+                <FormField
                   label={USER_ADMIN_DRAWER_TEXTS.LABELS.PASSWORD}
-                  placeholder={user ? USER_ADMIN_DRAWER_TEXTS.LABELS.PASSWORD_PLACEHOLDER_EDIT : USER_ADMIN_DRAWER_TEXTS.LABELS.PASSWORD_PLACEHOLDER_CREATE}
-                  value={formData.password || ''}
-                  onChange={e => updateField('password', e.target.value)}
-                  required={!user}
-                />
-                <PasswordInput
+                  error={errors.password?.message}
+                >
+                  <PasswordInput
+                    placeholder={user ? USER_ADMIN_DRAWER_TEXTS.LABELS.PASSWORD_PLACEHOLDER_EDIT : USER_ADMIN_DRAWER_TEXTS.LABELS.PASSWORD_PLACEHOLDER_CREATE}
+                    {...register('password')}
+                  />
+                </FormField>
+
+                <FormField
                   label={USER_ADMIN_DRAWER_TEXTS.LABELS.CONFIRM_PASSWORD}
-                  placeholder={USER_ADMIN_DRAWER_TEXTS.LABELS.CONFIRM_PASSWORD_PLACEHOLDER}
-                  value={formData.confirmPassword || ''}
-                  onChange={e => updateField('confirmPassword', e.target.value)}
-                  required={!!formData.password}
-                />
-                {formData.password && (
+                  error={errors.confirmPassword?.message}
+                >
+                  <PasswordInput
+                    placeholder={USER_ADMIN_DRAWER_TEXTS.LABELS.CONFIRM_PASSWORD_PLACEHOLDER}
+                    {...register('confirmPassword')}
+                  />
+                </FormField>
+
+                {currentPassword && (
                   <LayoutContainer className="sm:col-span-2">
-                    <PasswordStrengthMeter password={formData.password} />
+                    <PasswordStrengthMeter password={currentPassword} />
                   </LayoutContainer>
                 )}
+
                 <LayoutContainer className="sm:col-span-2 pt-1">
-                  <Checkbox
-                    label={USER_ADMIN_DRAWER_TEXTS.LABELS.MUST_CHANGE_PASSWORD}
-                    checked={formData.mustChangePassword || false}
-                    onChange={e => updateField('mustChangePassword', e.target.checked)}
+                  <Controller
+                    control={control}
+                    name="mustChangePassword"
+                    render={({ field }) => (
+                      <Checkbox
+                        label={USER_ADMIN_DRAWER_TEXTS.LABELS.MUST_CHANGE_PASSWORD}
+                        checked={field.value || false}
+                        onChange={(e) => field.onChange(e.target.checked)}
+                      />
+                    )}
                   />
-                  <Text className="text-xs text-text-secondary mt-1 pl-6">
+                  <Text as="p" className="text-xs text-text-secondary mt-1 pl-6">
                     {USER_ADMIN_DRAWER_TEXTS.LABELS.MUST_CHANGE_PASSWORD_HINT}
                   </Text>
                 </LayoutContainer>
@@ -264,14 +448,14 @@ export const UserAdminDrawer = ({ isOpen, onClose, user, onSaveSuccess }: UserAd
                   <Button
                     type="button"
                     variant="outline"
-                    className={`w-full ${isSelf ? 'opacity-50 cursor-not-allowed' : 'border-error/50 text-error hover:bg-error/10'}`}
+                    className={`w-full ${isSelf ? 'opacity-50 cursor-not-allowed' : 'border-[#ea580c]/50 text-[#ea580c] hover:bg-[#ea580c]/10'}`}
                     disabled={isSelf}
                     onClick={() => !isSelf && setConfirmModal({ isOpen: true, type: 'delete' })}
                   >
                     {USER_ADMIN_DRAWER_TEXTS.BUTTONS.DELETE_USER}
                   </Button>
                   {isSelf && (
-                    <Text className="text-xs text-text-secondary text-center">
+                    <Text as="p" className="text-xs text-text-secondary text-center">
                       {USER_ADMIN_DRAWER_TEXTS.LABELS.DELETE_USER_SELF_DISABLED_HINT}
                     </Text>
                   )}
@@ -298,7 +482,6 @@ export const UserAdminDrawer = ({ isOpen, onClose, user, onSaveSuccess }: UserAd
         onConfirm={executeConfirmedAction}
         title={modalConfig.title}
         description={modalConfig.description}
-        variant={modalConfig.variant}
         isLoading={isLoading}
       />
     </>

@@ -1,27 +1,27 @@
 'use client';
 
 import React from 'react';
-import { LayoutContainer, Text, Title, Input, Textarea } from '@/shared/ui/components';
+import { UseFormReturn } from 'react-hook-form';
+import {
+  LayoutContainer,
+  Title,
+  Input,
+  Textarea,
+  FormField,
+} from '@/shared/ui/components';
 import { ADMIN_IDOLS_TEXTS } from '../../../constants/admin-idols.constants';
+import { IdolFormData } from '@/features/admin/schemas';
 
 export interface IdolStaffFieldsProps {
-  roleName: string;
-  setRoleName: (val: string) => void;
-  yearsOfDedication: string;
-  setYearsOfDedication: (val: string) => void;
-  backstageStory: string;
-  setBackstageStory: (val: string) => void;
+  form: UseFormReturn<IdolFormData, any, any>;
 }
 
-export const IdolStaffFields: React.FC<IdolStaffFieldsProps> = ({
-  roleName,
-  setRoleName,
-  yearsOfDedication,
-  setYearsOfDedication,
-  backstageStory,
-  setBackstageStory,
-}) => {
+export const IdolStaffFields: React.FC<IdolStaffFieldsProps> = ({ form }) => {
   const texts = ADMIN_IDOLS_TEXTS.DRAWER;
+  const {
+    register,
+    formState: { errors },
+  } = form;
 
   return (
     <LayoutContainer className="flex flex-col gap-4 p-5 rounded-2xl bg-surface/50 border border-border shadow-xs animate-in fade-in duration-200">
@@ -30,40 +30,37 @@ export const IdolStaffFields: React.FC<IdolStaffFieldsProps> = ({
       </Title>
 
       <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <LayoutContainer className="flex flex-col gap-1.5">
-          <Text as="span" className="text-xs font-semibold text-text-secondary">
-            {texts.LABEL_ROLE_NAME}
-          </Text>
+        <FormField
+          label={texts.LABEL_ROLE_NAME}
+          error={errors.roleName?.message}
+        >
           <Input
-            value={roleName}
-            onChange={(e) => setRoleName(e.target.value)}
+            {...register('roleName')}
             placeholder={texts.PLACEHOLDER_ROLE_NAME}
           />
-        </LayoutContainer>
+        </FormField>
 
-        <LayoutContainer className="flex flex-col gap-1.5">
-          <Text as="span" className="text-xs font-semibold text-text-secondary">
-            {texts.LABEL_YEARS_DEDICATION}
-          </Text>
+        <FormField
+          label={texts.LABEL_YEARS_DEDICATION}
+          error={errors.yearsOfDedication?.message}
+        >
           <Input
-            value={yearsOfDedication}
-            onChange={(e) => setYearsOfDedication(e.target.value)}
+            {...register('yearsOfDedication')}
             placeholder={texts.PLACEHOLDER_YEARS_DEDICATION}
           />
-        </LayoutContainer>
+        </FormField>
       </LayoutContainer>
 
-      <LayoutContainer className="flex flex-col gap-1.5">
-        <Text as="span" className="text-xs font-semibold text-text-secondary">
-          {texts.LABEL_BACKSTAGE_STORY}
-        </Text>
+      <FormField
+        label={texts.LABEL_BACKSTAGE_STORY}
+        error={errors.backstageStory?.message}
+      >
         <Textarea
-          value={backstageStory}
-          onChange={(e) => setBackstageStory(e.target.value)}
+          {...register('backstageStory')}
           placeholder={texts.PLACEHOLDER_BACKSTAGE_STORY}
           rows={3}
         />
-      </LayoutContainer>
+      </FormField>
     </LayoutContainer>
   );
 };
