@@ -38,8 +38,6 @@ export interface SponsorsTableProps {
   onPageChange: (newPage: number) => void;
   onEdit: (sponsor: Sponsor) => void;
   onDelete: (sponsor: Sponsor) => void;
-  onToggleFeatured: (sponsor: Sponsor) => void;
-  onToggleActive: (sponsor: Sponsor) => void;
 }
 
 export const SponsorsTable: React.FC<SponsorsTableProps> = ({
@@ -50,8 +48,6 @@ export const SponsorsTable: React.FC<SponsorsTableProps> = ({
   onPageChange,
   onEdit,
   onDelete,
-  onToggleFeatured,
-  onToggleActive,
 }) => {
   const texts = ADMIN_SPONSORS_TEXTS.TABLE;
 
@@ -229,41 +225,25 @@ export const SponsorsTable: React.FC<SponsorsTableProps> = ({
                   </Text>
                 </TableCell>
 
-                {/* Destaque Ticker (Clicável) */}
+                {/* Destaque Ticker (Somente Leitura / Consulta) */}
                 <TableCell className="py-3 px-4 text-center">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onToggleFeatured(sponsor)}
-                    className="p-1 h-auto hover:bg-primary/10 rounded-lg"
-                    title={sponsor.isFeatured ? 'Remover destaque' : 'Marcar como destaque'}
-                  >
-                    {sponsor.isFeatured ? (
-                      <Badge variant="primary" size="sm" className="font-bold flex items-center gap-1 cursor-pointer">
-                        <Sparkles size={11} />
-                        {texts.FEATURED_LABEL}
-                      </Badge>
-                    ) : (
-                      <Badge variant="default" size="sm" className="text-text-secondary cursor-pointer hover:border-primary">
-                        Comum
-                      </Badge>
-                    )}
-                  </Button>
+                  {(sponsor.isFeatured ?? (sponsor as any).featured) ? (
+                    <Badge variant="primary" size="sm" className="font-bold inline-flex items-center gap-1">
+                      <Sparkles size={11} />
+                      {texts.FEATURED_LABEL}
+                    </Badge>
+                  ) : (
+                    <Badge variant="default" size="sm" className="text-text-secondary font-medium">
+                      Comum
+                    </Badge>
+                  )}
                 </TableCell>
 
-                {/* Status Contratual */}
+                {/* Status Contratual (Somente Leitura / Consulta) */}
                 <TableCell className="py-3 px-4 text-center">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onToggleActive(sponsor)}
-                    className="p-0 h-auto hover:opacity-80"
-                    title={sponsor.isActive ? 'Clique para desativar' : 'Clique para ativar'}
-                  >
+                  <LayoutContainer className="inline-flex justify-center">
                     {getStatusBadge(sponsor.status)}
-                  </Button>
+                  </LayoutContainer>
                 </TableCell>
 
                 {/* Ações */}

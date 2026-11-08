@@ -82,12 +82,17 @@ export const useSponsorAdminDrawer = ({
       adminSponsorsService
         .getSponsorById(sponsorId)
         .then((sponsor) => {
+          const isFeatured = Boolean(sponsor.isFeatured ?? (sponsor as any).featured ?? false);
+          const isActive = sponsor.isActive !== undefined
+            ? Boolean(sponsor.isActive)
+            : ((sponsor as any).active !== undefined ? Boolean((sponsor as any).active) : true);
+
           form.reset({
             name: sponsor.name || '',
             logoUrl: sponsor.logoUrl || '',
             websiteUrl: sponsor.websiteUrl || '',
-            isFeatured: Boolean(sponsor.isFeatured),
-            isActive: Boolean(sponsor.isActive),
+            isFeatured,
+            isActive,
             displayOrder: sponsor.displayOrder ?? 0,
             contractStartDate: sponsor.contractStartDate ? sponsor.contractStartDate.slice(0, 10) : '',
             contractEndDate: sponsor.contractEndDate ? sponsor.contractEndDate.slice(0, 10) : '',
@@ -170,7 +175,9 @@ export const useSponsorAdminDrawer = ({
           logoUrl: finalLogoUrl,
           websiteUrl: data.websiteUrl ? data.websiteUrl.trim() : null,
           isFeatured: Boolean(data.isFeatured),
+          featured: Boolean(data.isFeatured),
           isActive: Boolean(data.isActive),
+          active: Boolean(data.isActive),
           displayOrder: Number(data.displayOrder || 0),
           contractStartDate: data.contractStartDate ? data.contractStartDate : null,
           contractEndDate: data.contractEndDate ? data.contractEndDate : null,

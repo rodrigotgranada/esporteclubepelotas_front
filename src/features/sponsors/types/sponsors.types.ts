@@ -6,7 +6,9 @@ export interface Sponsor {
   logoUrl: string;
   websiteUrl?: string | null;
   isFeatured: boolean;
+  featured?: boolean;
   isActive: boolean;
+  active?: boolean;
   displayOrder: number;
   contractStartDate?: string | null;
   contractEndDate?: string | null;
@@ -21,7 +23,9 @@ export interface CreateSponsorPayload {
   logoUrl: string;
   websiteUrl?: string | null;
   isFeatured?: boolean;
+  featured?: boolean;
   isActive?: boolean;
+  active?: boolean;
   displayOrder?: number;
   contractStartDate?: string | null;
   contractEndDate?: string | null;
@@ -32,7 +36,9 @@ export interface UpdateSponsorPayload {
   logoUrl?: string;
   websiteUrl?: string | null;
   isFeatured?: boolean;
+  featured?: boolean;
   isActive?: boolean;
+  active?: boolean;
   displayOrder?: number;
   contractStartDate?: string | null;
   contractEndDate?: string | null;

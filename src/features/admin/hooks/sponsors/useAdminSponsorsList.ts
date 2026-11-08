@@ -109,32 +109,6 @@ export const useAdminSponsorsList = () => {
     }
   };
 
-  // Toggle rápido de Destaque
-  const handleToggleFeatured = async (sponsor: Sponsor) => {
-    try {
-      const nextFeatured = !sponsor.isFeatured;
-      await adminSponsorsService.updateSponsor(sponsor.id, { isFeatured: nextFeatured });
-      toast.success(ADMIN_SPONSORS_TEXTS.TOAST.TOGGLE_SUCCESS);
-      loadSponsors();
-    } catch (err) {
-      console.error('Erro ao alternar destaque do patrocinador:', err);
-      toast.error(ADMIN_SPONSORS_TEXTS.TOAST.ERROR_SAVE);
-    }
-  };
-
-  // Toggle rápido de Ativo
-  const handleToggleActive = async (sponsor: Sponsor) => {
-    try {
-      const nextActive = !sponsor.isActive;
-      await adminSponsorsService.updateSponsor(sponsor.id, { isActive: nextActive });
-      toast.success(ADMIN_SPONSORS_TEXTS.TOAST.TOGGLE_SUCCESS);
-      loadSponsors();
-    } catch (err) {
-      console.error('Erro ao alternar status ativo do patrocinador:', err);
-      toast.error(ADMIN_SPONSORS_TEXTS.TOAST.ERROR_SAVE);
-    }
-  };
-
   return {
     sponsors,
     total,
@@ -160,8 +134,6 @@ export const useAdminSponsorsList = () => {
     openDeleteModal,
     closeDeleteModal,
     confirmDelete,
-    handleToggleFeatured,
-    handleToggleActive,
   };
 };
 

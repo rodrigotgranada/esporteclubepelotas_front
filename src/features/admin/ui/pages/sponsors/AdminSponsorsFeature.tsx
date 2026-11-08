@@ -35,8 +35,6 @@ export const AdminSponsorsFeature = () => {
     openDeleteModal,
     closeDeleteModal,
     confirmDelete,
-    handleToggleFeatured,
-    handleToggleActive,
   } = useAdminSponsorsList();
 
   return (
@@ -62,7 +60,7 @@ export const AdminSponsorsFeature = () => {
         onNewSponsor={openCreateDrawer}
       />
 
-      {/* Tabela de Patrocinadores */}
+      {/* Tabela de Patrocinadores (Somente Consulta + Ações Editar/Excluir) */}
       <SponsorsTable
         sponsors={sponsors}
         isLoading={isLoading}
@@ -71,8 +69,6 @@ export const AdminSponsorsFeature = () => {
         onPageChange={setPage}
         onEdit={openEditDrawer}
         onDelete={openDeleteModal}
-        onToggleFeatured={handleToggleFeatured}
-        onToggleActive={handleToggleActive}
       />
 
       {/* Drawer de Cadastro e Edição de Patrocinador */}

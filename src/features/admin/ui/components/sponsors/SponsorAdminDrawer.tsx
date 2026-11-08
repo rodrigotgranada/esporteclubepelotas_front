@@ -10,13 +10,14 @@ import {
   Form,
   Input,
   Button,
-  Checkbox,
+  Switch,
+  Badge,
   Spinner,
   FormField,
   SafeImage,
   CropModal,
 } from '@/shared/ui/components';
-import { Save, Upload, Building2, Globe, Calendar, Hash } from 'lucide-react';
+import { Save, Upload, Building2, Globe, Calendar, Hash, Sparkles, Eye } from 'lucide-react';
 import { ADMIN_SPONSORS_TEXTS } from '../../../constants/admin-sponsors.constants';
 import { useSponsorAdminDrawer } from '../../../hooks/sponsors/useSponsorAdminDrawer';
 
@@ -200,7 +201,7 @@ export const SponsorAdminDrawer: React.FC<SponsorAdminDrawerProps> = ({
               </LayoutContainer>
             </LayoutContainer>
 
-            {/* Seção 3: Vigência Contratual e Flags */}
+            {/* Seção 3: Vigência Contratual */}
             <LayoutContainer className="flex flex-col gap-4">
               <LayoutContainer className="flex items-center gap-2 border-b border-border pb-2">
                 <Calendar size={18} className="text-primary" />
@@ -236,41 +237,81 @@ export const SponsorAdminDrawer: React.FC<SponsorAdminDrawerProps> = ({
                   />
                 </FormField>
               </LayoutContainer>
+            </LayoutContainer>
 
-              {/* Flags de Configuração */}
-              <LayoutContainer className="flex flex-col gap-3 pt-2">
-                {/* Destaque no Ticker */}
-                <Controller
-                  name="isFeatured"
-                  control={control}
-                  render={({ field }) => (
-                    <LayoutContainer className="p-3.5 rounded-xl bg-surface/50 border border-border hover:border-primary/30 transition-colors">
-                      <Checkbox
-                        id="isFeatured-checkbox"
-                        checked={Boolean(field.value)}
-                        onChange={(e) => field.onChange(e.target.checked)}
-                        label={texts.LABEL_IS_FEATURED}
-                        description={texts.DESC_IS_FEATURED}
-                      />
-                    </LayoutContainer>
-                  )}
-                />
+            {/* Seção 4: Visibilidade e Destaques (Status & Ticker) */}
+            <LayoutContainer className="flex flex-col gap-4">
+              <LayoutContainer className="flex items-center gap-2 border-b border-border pb-2">
+                <Eye size={18} className="text-primary" />
+                <Title level="h3" className="text-base font-bold text-text-primary">
+                  {texts.SECTION_VISIBILITY}
+                </Title>
+              </LayoutContainer>
 
-                {/* Ativo */}
+              <LayoutContainer className="flex flex-col gap-3">
+                {/* Switch 1: Status Ativo / Inativo */}
                 <Controller
                   name="isActive"
                   control={control}
-                  render={({ field }) => (
-                    <LayoutContainer className="p-3.5 rounded-xl bg-surface/50 border border-border hover:border-primary/30 transition-colors">
-                      <Checkbox
-                        id="isActive-checkbox"
-                        checked={Boolean(field.value)}
-                        onChange={(e) => field.onChange(e.target.checked)}
-                        label={texts.LABEL_IS_ACTIVE}
-                        description={texts.DESC_IS_ACTIVE}
-                      />
-                    </LayoutContainer>
-                  )}
+                  render={({ field }) => {
+                    const isActive = Boolean(field.value);
+                    return (
+                      <LayoutContainer className="flex items-center justify-between p-4 rounded-xl bg-surface/60 border border-border hover:border-primary/40 transition-all shadow-xs">
+                        <LayoutContainer className="flex flex-col gap-1 pr-4">
+                          <LayoutContainer className="flex items-center gap-2">
+                            <Text as="span" className="font-bold text-sm text-text-primary">
+                              {isActive ? texts.LABEL_IS_ACTIVE : texts.LABEL_IS_INACTIVE}
+                            </Text>
+                            <Badge variant={isActive ? 'success' : 'default'} size="sm" className="font-bold">
+                              {isActive ? texts.BADGE_ACTIVE : texts.BADGE_INACTIVE}
+                            </Badge>
+                          </LayoutContainer>
+                          <Text as="p" className="text-xs text-text-secondary leading-relaxed">
+                            {isActive ? texts.DESC_IS_ACTIVE : texts.DESC_IS_INACTIVE}
+                          </Text>
+                        </LayoutContainer>
+                        <Switch
+                          checked={isActive}
+                          onChange={(checked) => field.onChange(checked)}
+                          id="sponsor-is-active-switch"
+                          label=""
+                        />
+                      </LayoutContainer>
+                    );
+                  }}
+                />
+
+                {/* Switch 2: Destaque no Ticker Superior */}
+                <Controller
+                  name="isFeatured"
+                  control={control}
+                  render={({ field }) => {
+                    const isFeatured = Boolean(field.value);
+                    return (
+                      <LayoutContainer className="flex items-center justify-between p-4 rounded-xl bg-surface/60 border border-border hover:border-primary/40 transition-all shadow-xs">
+                        <LayoutContainer className="flex flex-col gap-1 pr-4">
+                          <LayoutContainer className="flex items-center gap-2">
+                            <Sparkles className={`w-4 h-4 shrink-0 ${isFeatured ? 'text-primary' : 'text-text-secondary'}`} />
+                            <Text as="span" className="font-bold text-sm text-text-primary">
+                              {isFeatured ? texts.LABEL_IS_FEATURED : texts.LABEL_IS_STANDARD}
+                            </Text>
+                            <Badge variant={isFeatured ? 'primary' : 'default'} size="sm" className="font-bold">
+                              {isFeatured ? texts.BADGE_FEATURED : texts.BADGE_STANDARD}
+                            </Badge>
+                          </LayoutContainer>
+                          <Text as="p" className="text-xs text-text-secondary leading-relaxed">
+                            {isFeatured ? texts.DESC_IS_FEATURED : texts.DESC_IS_STANDARD}
+                          </Text>
+                        </LayoutContainer>
+                        <Switch
+                          checked={isFeatured}
+                          onChange={(checked) => field.onChange(checked)}
+                          id="sponsor-is-featured-switch"
+                          label=""
+                        />
+                      </LayoutContainer>
+                    );
+                  }}
                 />
               </LayoutContainer>
             </LayoutContainer>
