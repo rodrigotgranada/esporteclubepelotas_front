@@ -261,42 +261,45 @@ export const StadiumGalleryManager: React.FC<StadiumGalleryManagerProps> = ({
 
               <LayoutContainer className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
 
-              {/* Botões de Ação Flutuantes */}
+              {/* Botões de Ação Flutuantes com Alto Contraste */}
               <LayoutContainer className="absolute top-2.5 right-2.5 flex items-center gap-1.5 z-20">
                 {/* Botão de Recortar / Cortar Imagem */}
                 <Button
                   type="button"
-                  variant="ghost"
-                  size="sm"
+                  size="none"
+                  variant="custom"
                   onClick={() => handleOpenRecrop(index)}
-                  className="w-7 h-7 p-0 rounded-full bg-black/75 hover:bg-primary text-white hover:text-black flex items-center justify-center transition-colors cursor-pointer shadow-md"
-                  title="Recortar / Ajustar imagem"
+                  className="w-8 h-8 rounded-full bg-slate-950/85 hover:bg-primary text-white hover:text-black border border-white/20 shadow-md flex items-center justify-center transition-all cursor-pointer hover:scale-110"
+                  title="Recortar foto"
+                  aria-label="Recortar foto"
                 >
-                  <CropIcon className="w-3.5 h-3.5" />
+                  <CropIcon className="w-4 h-4 text-current" />
                 </Button>
 
                 {/* Botão de Editar Legenda & Imagem */}
                 <Button
                   type="button"
-                  variant="ghost"
-                  size="sm"
+                  size="none"
+                  variant="custom"
                   onClick={() => handleOpenEdit(index)}
-                  className="w-7 h-7 p-0 rounded-full bg-black/75 hover:bg-primary text-white hover:text-black flex items-center justify-center transition-colors cursor-pointer shadow-md"
+                  className="w-8 h-8 rounded-full bg-slate-950/85 hover:bg-primary text-white hover:text-black border border-white/20 shadow-md flex items-center justify-center transition-all cursor-pointer hover:scale-110"
                   title={ADMIN_STADIUM_TEXTS.GALLERY.EDIT_PHOTO_TOOLTIP}
+                  aria-label={ADMIN_STADIUM_TEXTS.GALLERY.EDIT_PHOTO_TOOLTIP}
                 >
-                  <Edit3 className="w-3.5 h-3.5" />
+                  <Edit3 className="w-4 h-4 text-current" />
                 </Button>
 
                 {/* Botão de Excluir Foto */}
                 <Button
                   type="button"
-                  variant="ghost"
-                  size="sm"
+                  size="none"
+                  variant="custom"
                   onClick={() => setDeletingIndex(index)}
-                  className="w-7 h-7 p-0 rounded-full bg-black/75 hover:bg-[#ea580c] text-white flex items-center justify-center transition-colors cursor-pointer shadow-md"
+                  className="w-8 h-8 rounded-full bg-slate-950/85 hover:bg-[#ea580c] text-white border border-white/20 shadow-md flex items-center justify-center transition-all cursor-pointer hover:scale-110"
                   title={ADMIN_STADIUM_TEXTS.GALLERY.DELETE_PHOTO_TOOLTIP}
+                  aria-label={ADMIN_STADIUM_TEXTS.GALLERY.DELETE_PHOTO_TOOLTIP}
                 >
-                  <Trash2 className="w-3.5 h-3.5" />
+                  <Trash2 className="w-4 h-4 text-current" />
                 </Button>
               </LayoutContainer>
 
@@ -322,33 +325,71 @@ export const StadiumGalleryManager: React.FC<StadiumGalleryManagerProps> = ({
             {ADMIN_STADIUM_TEXTS.GALLERY.EDIT_MODAL_TITLE}
           </Title>
           {photoBeingEdited && (
-            <LayoutContainer className="relative w-full h-48 rounded-xl overflow-hidden bg-background border border-border">
+            <LayoutContainer className="group relative w-full h-56 rounded-2xl overflow-hidden bg-background border border-border shadow-inner">
               <SafeImage
                 src={photoBeingEdited.url}
                 alt="Foto em edição"
                 fill
-                sizes="500px"
-                className="object-cover"
+                sizes="600px"
+                className="object-cover transition-transform duration-300 group-hover:scale-105"
               />
-              <LayoutContainer className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                <Button
-                  type="button"
-                  variant="primary"
-                  size="sm"
-                  onClick={() => replaceFileInputRef.current?.click()}
-                  className="flex items-center gap-2 cursor-pointer font-bold shadow-lg"
-                >
-                  <Camera className="w-4 h-4" />
-                  <Text as="span">{ADMIN_STADIUM_TEXTS.GALLERY.REPLACE_IMAGE_BUTTON}</Text>
-                </Button>
-                <Input
-                  ref={replaceFileInputRef}
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleSelectReplaceFile}
-                />
+
+              {/* Overlay que surge ao passar o mouse com as 2 opções solicitadas */}
+              <LayoutContainer className="absolute inset-0 bg-black/65 opacity-0 group-hover:opacity-100 transition-all duration-200 flex flex-col items-center justify-center gap-3 backdrop-blur-xs z-10">
+                <LayoutContainer className="flex items-center gap-4">
+                  {/* Opção 1: Ícone de recortar para recortar */}
+                  <Button
+                    type="button"
+                    size="none"
+                    variant="custom"
+                    onClick={() => {
+                      if (editingIndex !== null) {
+                        handleOpenRecrop(editingIndex);
+                      }
+                    }}
+                    className="w-12 h-12 rounded-full bg-surface/95 text-text-primary hover:bg-primary hover:text-black border border-border shadow-2xl flex items-center justify-center cursor-pointer transition-transform hover:scale-110"
+                    title={ADMIN_STADIUM_TEXTS.GALLERY.CROP_PHOTO_TOOLTIP}
+                    aria-label={ADMIN_STADIUM_TEXTS.GALLERY.CROP_PHOTO_TOOLTIP}
+                  >
+                    <CropIcon className="w-5 h-5 text-current" />
+                  </Button>
+
+                  {/* Opção 2: Caneta para alterar / substituir a foto se quiser */}
+                  <Button
+                    type="button"
+                    size="none"
+                    variant="custom"
+                    onClick={() => replaceFileInputRef.current?.click()}
+                    className="w-12 h-12 rounded-full bg-surface/95 text-text-primary hover:bg-primary hover:text-black border border-border shadow-2xl flex items-center justify-center cursor-pointer transition-transform hover:scale-110"
+                    title={ADMIN_STADIUM_TEXTS.GALLERY.REPLACE_PHOTO_TOOLTIP}
+                    aria-label={ADMIN_STADIUM_TEXTS.GALLERY.REPLACE_PHOTO_TOOLTIP}
+                  >
+                    <Edit3 className="w-5 h-5 text-current" />
+                  </Button>
+                </LayoutContainer>
+
+                <Text className="text-xs text-white/90 font-medium tracking-wide">
+                  {ADMIN_STADIUM_TEXTS.GALLERY.CLICK_HINT}
+                </Text>
               </LayoutContainer>
+
+              {/* Indicador discreto no rodapé quando sem mouse hover */}
+              <LayoutContainer className="absolute bottom-2.5 left-2.5 pointer-events-none group-hover:opacity-0 transition-opacity z-10">
+                <LayoutContainer className="bg-black/75 backdrop-blur-md px-3 py-1 rounded-lg border border-white/15 flex items-center gap-1.5 shadow-md">
+                  <CropIcon className="w-3.5 h-3.5 text-primary" />
+                  <Text className="text-[11px] text-white font-medium">
+                    {ADMIN_STADIUM_TEXTS.GALLERY.HOVER_HINT}
+                  </Text>
+                </LayoutContainer>
+              </LayoutContainer>
+
+              <Input
+                ref={replaceFileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleSelectReplaceFile}
+              />
             </LayoutContainer>
           )}
 

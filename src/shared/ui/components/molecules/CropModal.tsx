@@ -90,11 +90,13 @@ export const CropModal: React.FC<CropModalProps> = ({
   const [currentImageSrc, setCurrentImageSrc] = useState(imageSrc);
   const [isRemovingBg, setIsRemovingBg] = useState(false);
   const [zoom, setZoom] = useState(1);
+  const [corsFailed, setCorsFailed] = useState(false);
 
   useEffect(() => {
     setCurrentImageSrc(imageSrc);
     setCurrentAspect(aspect);
     setZoom(1);
+    setCorsFailed(false);
     if (fixedShape) {
       setCropMode(fixedShape);
     }
@@ -241,11 +243,16 @@ export const CropModal: React.FC<CropModalProps> = ({
       }, 'image/png');
     } catch (e) {
       console.error('Failed to crop canvas', e);
-      toast.error('Erro ao recortar a imagem.');
+      handleUseOriginal();
     }
   };
 
   if (!isOpen) return null;
+
+  const isExternalHttp =
+    typeof currentImageSrc === 'string' &&
+    (currentImageSrc.startsWith('http://') || currentImageSrc.startsWith('https://'));
+  const crossOriginProp = isExternalHttp && !corsFailed ? 'anonymous' : undefined;
 
   return (
     <Modal 
@@ -336,7 +343,12 @@ export const CropModal: React.FC<CropModalProps> = ({
             ref={imgRef}
             src={currentImageSrc}
             alt="Recorte"
-            crossOrigin="anonymous"
+            crossOrigin={crossOriginProp}
+            onError={() => {
+              if (isExternalHttp && !corsFailed) {
+                setCorsFailed(true);
+              }
+            }}
             onLoad={onImageLoad}
             style={{
               maxHeight: '400px',

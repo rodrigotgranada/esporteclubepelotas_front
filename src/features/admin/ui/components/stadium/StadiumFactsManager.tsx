@@ -260,26 +260,27 @@ export const StadiumFactsManager: React.FC<StadiumFactsManagerProps> = ({
                   </LayoutContainer>
                 </LayoutContainer>
 
-                <LayoutContainer className="flex items-center gap-1.5 shrink-0">
+                <LayoutContainer className="flex items-center gap-2 shrink-0">
                   {/* Botão de Editar */}
                   <Button
                     type="button"
-                    variant="ghost"
-                    size="sm"
+                    size="none"
+                    variant="custom"
                     onClick={() => handleStartEdit(index)}
-                    className="w-8 h-8 p-0 rounded-lg hover:bg-surface text-text-secondary hover:text-primary flex items-center justify-center transition-colors cursor-pointer"
+                    className="h-9 px-3 rounded-xl bg-surface hover:bg-primary text-text-primary hover:text-black border border-border/80 shadow-xs flex items-center gap-1.5 transition-all cursor-pointer font-bold text-xs"
                     title={ADMIN_STADIUM_TEXTS.FACTS.EDIT_FACT_TOOLTIP}
                   >
-                    <Edit3 className="w-4 h-4" />
+                    <Edit3 className="w-3.5 h-3.5" />
+                    <Text as="span">{ADMIN_STADIUM_TEXTS.FACTS.EDIT_BUTTON_LABEL}</Text>
                   </Button>
 
                   {/* Botão de Excluir */}
                   <Button
                     type="button"
-                    variant="ghost"
-                    size="sm"
+                    size="none"
+                    variant="custom"
                     onClick={() => setDeletingIndex(index)}
-                    className="w-8 h-8 p-0 rounded-lg hover:bg-[#ea580c] hover:text-white text-text-secondary flex items-center justify-center transition-colors cursor-pointer"
+                    className="h-9 w-9 rounded-xl bg-surface hover:bg-[#ea580c] text-text-secondary hover:text-white border border-border/80 shadow-xs flex items-center justify-center transition-all cursor-pointer"
                     title={ADMIN_STADIUM_TEXTS.FACTS.DELETE_FACT_TOOLTIP}
                   >
                     <Trash2 className="w-4 h-4" />
