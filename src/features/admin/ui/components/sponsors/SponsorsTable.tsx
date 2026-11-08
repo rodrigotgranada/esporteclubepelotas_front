@@ -9,6 +9,8 @@ import {
   ExternalLink,
   ChevronLeft,
   ChevronRight,
+  ChevronUp,
+  ChevronDown,
   MousePointerClick,
   Calendar,
 } from 'lucide-react';
@@ -38,6 +40,9 @@ export interface SponsorsTableProps {
   onPageChange: (newPage: number) => void;
   onEdit: (sponsor: Sponsor) => void;
   onDelete: (sponsor: Sponsor) => void;
+  onMoveUp?: (sponsor: Sponsor) => void;
+  onMoveDown?: (sponsor: Sponsor) => void;
+  isReordering?: boolean;
 }
 
 export const SponsorsTable: React.FC<SponsorsTableProps> = ({
@@ -48,6 +53,9 @@ export const SponsorsTable: React.FC<SponsorsTableProps> = ({
   onPageChange,
   onEdit,
   onDelete,
+  onMoveUp,
+  onMoveDown,
+  isReordering = false,
 }) => {
   const texts = ADMIN_SPONSORS_TEXTS.TABLE;
 
@@ -101,27 +109,24 @@ export const SponsorsTable: React.FC<SponsorsTableProps> = ({
     }
   };
 
-  if (isLoading) {
+  if (isLoading && sponsors.length === 0) {
     return (
       <LayoutContainer className="flex flex-col items-center justify-center p-16 rounded-2xl bg-surface border border-border">
         <Spinner size={36} />
-        <Text as="p" className="text-text-secondary font-medium mt-4">
-          Carregando patrocinadores...
+        <Text as="p" className="text-text-secondary mt-3 text-sm">
+          Carregando patrocinadores oficiais...
         </Text>
       </LayoutContainer>
     );
   }
 
-  if (sponsors.length === 0) {
+  if (!isLoading && sponsors.length === 0) {
     return (
-      <LayoutContainer className="flex flex-col items-center justify-center p-12 text-center rounded-2xl bg-surface border border-border">
-        <LayoutContainer className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-          <Sparkles className="w-8 h-8 text-primary" />
-        </LayoutContainer>
-        <Title level="h3" className="text-lg font-bold text-text-primary">
+      <LayoutContainer className="flex flex-col items-center justify-center p-12 sm:p-16 rounded-2xl bg-surface border border-border text-center">
+        <Title level="h3" className="text-base sm:text-lg font-bold text-text-primary">
           {texts.EMPTY_TITLE}
         </Title>
-        <Text as="p" className="text-sm text-text-secondary max-w-sm mt-1">
+        <Text as="p" className="text-text-secondary text-sm max-w-md mt-1">
           {texts.EMPTY_DESC}
         </Text>
       </LayoutContainer>
@@ -130,12 +135,12 @@ export const SponsorsTable: React.FC<SponsorsTableProps> = ({
 
   return (
     <LayoutContainer className="flex flex-col gap-4">
-      {/* Tabela Desktop & Tablet */}
-      <LayoutContainer className="overflow-x-auto rounded-2xl bg-surface border border-border shadow-xs">
-        <Table className="w-full">
-          <TableHeader>
-            <TableRow className="border-b border-border bg-surface/50">
-              <TableHead className="py-3 px-4 font-bold text-xs uppercase text-text-secondary">
+      {/* Container de Tabela com Scroll Horizontal Suave */}
+      <LayoutContainer className="overflow-x-auto rounded-2xl border border-border bg-surface shadow-xs">
+        <Table className="w-full text-left border-collapse">
+          <TableHeader className="border-b border-border bg-surface/50">
+            <TableRow>
+              <TableHead className="py-3 px-4 font-bold text-xs uppercase text-text-secondary w-20">
                 {texts.COL_LOGO}
               </TableHead>
               <TableHead className="py-3 px-4 font-bold text-xs uppercase text-text-secondary">
@@ -162,7 +167,7 @@ export const SponsorsTable: React.FC<SponsorsTableProps> = ({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {sponsors.map((sponsor) => (
+            {sponsors.map((sponsor, index) => (
               <TableRow
                 key={sponsor.id}
                 className="border-b border-border/50 hover:bg-background/50 transition-colors"
@@ -218,11 +223,37 @@ export const SponsorsTable: React.FC<SponsorsTableProps> = ({
                   </LayoutContainer>
                 </TableCell>
 
-                {/* Ordem Manual */}
+                {/* Ordem Manual com Botões Rápidos de Subir / Descer */}
                 <TableCell className="py-3 px-4 text-center">
-                  <Text as="span" className="text-xs font-mono font-bold text-text-secondary">
-                    #{sponsor.displayOrder ?? 0}
-                  </Text>
+                  <LayoutContainer className="inline-flex items-center gap-1.5 justify-center">
+                    <Text as="span" className="text-xs font-mono font-bold text-text-secondary min-w-[20px]">
+                      #{sponsor.displayOrder ?? 0}
+                    </Text>
+                    {onMoveUp && onMoveDown && (
+                      <LayoutContainer className="flex flex-col gap-0.5">
+                        <button
+                          type="button"
+                          onClick={() => onMoveUp(sponsor)}
+                          disabled={index === 0 || isReordering}
+                          className="p-0.5 rounded hover:bg-primary/20 text-text-secondary hover:text-primary disabled:opacity-20 disabled:pointer-events-none cursor-pointer transition-colors"
+                          title={texts.TOOLTIP_MOVE_UP}
+                          aria-label={texts.TOOLTIP_MOVE_UP}
+                        >
+                          <ChevronUp size={13} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => onMoveDown(sponsor)}
+                          disabled={index === sponsors.length - 1 || isReordering}
+                          className="p-0.5 rounded hover:bg-primary/20 text-text-secondary hover:text-primary disabled:opacity-20 disabled:pointer-events-none cursor-pointer transition-colors"
+                          title={texts.TOOLTIP_MOVE_DOWN}
+                          aria-label={texts.TOOLTIP_MOVE_DOWN}
+                        >
+                          <ChevronDown size={13} />
+                        </button>
+                      </LayoutContainer>
+                    )}
+                  </LayoutContainer>
                 </TableCell>
 
                 {/* Destaque Ticker (Somente Leitura / Consulta) */}

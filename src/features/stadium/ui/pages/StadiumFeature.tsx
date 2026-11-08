@@ -9,6 +9,7 @@ import { StadiumQuickFacts } from '../components/StadiumQuickFacts';
 import { StadiumStorySection } from '../components/StadiumStorySection';
 import { StadiumGallery } from '../components/StadiumGallery';
 import { StadiumLocation } from '../components/StadiumLocation';
+import { PublicSponsorsStrip } from '@/features/sponsors';
 import { Loader2, RefreshCw } from 'lucide-react';
 
 export const StadiumFeature: React.FC = () => {
@@ -82,6 +83,11 @@ export const StadiumFeature: React.FC = () => {
         mapsDirectUrl={stadium?.mapsDirectUrl}
         mapsEmbedUrl={stadium?.mapsEmbedUrl}
       />
+
+      {/* 6. Marcas que apoiam o Esporte Clube Pelotas e o Estádio Boca do Lobo */}
+      <LayoutContainer className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+        <PublicSponsorsStrip title="Parceiros Oficiais do Lobo & Estádio Boca do Lobo" />
+      </LayoutContainer>
     </LayoutContainer>
   );
 };

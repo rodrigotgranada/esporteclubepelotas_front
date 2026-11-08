@@ -2,6 +2,7 @@ export const ADMIN_SPONSORS_TEXTS = {
   PAGE_TITLE: 'Patrocinadores & Parceiros',
   PAGE_SUBTITLE: 'Gerencie marcas parceiras, vigências contratuais, destaques no ticker e métricas de engajamento.',
   BUTTON_NEW_SPONSOR: 'Novo Patrocinador',
+  BUTTON_EXPORT_REPORT: 'Exportar Relatório CSV',
 
   FILTERS: {
     SEARCH_PLACEHOLDER: 'Buscar por nome do parceiro...',
@@ -29,6 +30,8 @@ export const ADMIN_SPONSORS_TEXTS = {
     TOOLTIP_VISIT: 'Abrir link oficial',
     TOOLTIP_EDIT: 'Editar patrocinador',
     TOOLTIP_DELETE: 'Excluir patrocinador',
+    TOOLTIP_MOVE_UP: 'Subir ordem de exibição',
+    TOOLTIP_MOVE_DOWN: 'Descer ordem de exibição',
     STATUS_LABELS: {
       ACTIVE: 'Ativo',
       SCHEDULED: 'Agendado',
@@ -110,9 +113,12 @@ export const ADMIN_SPONSORS_TEXTS = {
     UPDATE_SUCCESS: 'Dados do patrocinador atualizados com sucesso!',
     DELETE_SUCCESS: 'Patrocinador excluído com sucesso!',
     TOGGLE_SUCCESS: 'Visibilidade atualizada com sucesso!',
+    REORDER_SUCCESS: 'Ordem dos patrocinadores atualizada com sucesso!',
+    EXPORT_SUCCESS: 'Relatório de desempenho exportado com sucesso!',
     ERROR_LOAD: 'Erro ao carregar lista de patrocinadores.',
     ERROR_SAVE: 'Erro ao salvar informações do patrocinador.',
     ERROR_DELETE: 'Erro ao remover patrocinador.',
+    ERROR_REORDER: 'Erro ao atualizar ordem dos patrocinadores.',
     ERROR_LOGO_REQUIRED: 'Cadastre ao menos um logotipo da marca (tema claro ou escuro).',
   },
 };

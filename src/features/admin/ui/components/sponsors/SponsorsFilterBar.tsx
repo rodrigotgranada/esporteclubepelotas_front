@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Search, Plus, Sparkles, Filter } from 'lucide-react';
+import { Search, Plus, Download } from 'lucide-react';
 import { LayoutContainer, Input, Select, Option, Button } from '@/shared/ui/components';
 import { ADMIN_SPONSORS_TEXTS } from '../../../constants/admin-sponsors.constants';
 
@@ -13,6 +13,8 @@ export interface SponsorsFilterBarProps {
   featuredFilter: string;
   onFeaturedFilterChange: (value: string) => void;
   onNewSponsor: () => void;
+  onExportReport?: () => void;
+  isExporting?: boolean;
 }
 
 export const SponsorsFilterBar: React.FC<SponsorsFilterBarProps> = ({
@@ -23,6 +25,8 @@ export const SponsorsFilterBar: React.FC<SponsorsFilterBarProps> = ({
   featuredFilter,
   onFeaturedFilterChange,
   onNewSponsor,
+  onExportReport,
+  isExporting = false,
 }) => {
   return (
     <LayoutContainer className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 p-4 rounded-2xl bg-surface border border-border shadow-xs">
@@ -65,17 +69,33 @@ export const SponsorsFilterBar: React.FC<SponsorsFilterBarProps> = ({
         </LayoutContainer>
       </LayoutContainer>
 
-      {/* Botão Novo Patrocinador */}
-      <Button
-        type="button"
-        variant="primary"
-        onClick={onNewSponsor}
-        leftIcon={<Plus className="w-4 h-4" />}
-        className="font-bold rounded-xl shrink-0"
-      >
-        {ADMIN_SPONSORS_TEXTS.BUTTON_NEW_SPONSOR}
-      </Button>
+      {/* Ações: Exportar Relatório e Novo Patrocinador */}
+      <LayoutContainer className="flex items-center gap-2 shrink-0">
+        {onExportReport && (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onExportReport}
+            isLoading={isExporting}
+            disabled={isExporting}
+            leftIcon={!isExporting ? <Download className="w-4 h-4" /> : undefined}
+            className="font-bold rounded-xl"
+            title="Exportar métricas de desempenho em CSV para prestação de contas"
+          >
+            {ADMIN_SPONSORS_TEXTS.BUTTON_EXPORT_REPORT}
+          </Button>
+        )}
+
+        <Button
+          type="button"
+          variant="primary"
+          onClick={onNewSponsor}
+          leftIcon={<Plus className="w-4 h-4" />}
+          className="font-bold rounded-xl"
+        >
+          {ADMIN_SPONSORS_TEXTS.BUTTON_NEW_SPONSOR}
+        </Button>
+      </LayoutContainer>
     </LayoutContainer>
   );
 };
-

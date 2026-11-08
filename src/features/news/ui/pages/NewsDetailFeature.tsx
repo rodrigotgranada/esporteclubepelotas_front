@@ -36,6 +36,7 @@ import { NewsReactions } from '../components/NewsReactions';
 import { NewsSocioBanner } from '../components/NewsSocioBanner';
 import { NewsCommentsSection } from '../components/NewsCommentsSection';
 import { NewsPrevNextNav } from '../components/NewsPrevNextNav';
+import { PublicSponsorsStrip } from '@/features/sponsors';
 import { calculateReadingTime, getYoutubeEmbedUrl, getYoutubeWatchUrl } from '../../utils/news.utils';
 
 export interface NewsDetailFeatureProps {
@@ -361,6 +362,9 @@ export const NewsDetailFeature: React.FC<NewsDetailFeatureProps> = ({ slug }) =>
           </LayoutContainer>
         </LayoutContainer>
       )}
+
+      {/* Régua Institucional de Patrocinadores Oficiais */}
+      <PublicSponsorsStrip title="Parceiros Oficiais do Lobo" />
     </LayoutContainer>
     </>
   );

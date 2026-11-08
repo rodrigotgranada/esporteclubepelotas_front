@@ -16,6 +16,8 @@ export const AdminSponsorsFeature = () => {
     page,
     totalPages,
     isLoading,
+    isReordering,
+    isExporting,
     setPage,
     search,
     setSearch,
@@ -35,6 +37,9 @@ export const AdminSponsorsFeature = () => {
     openDeleteModal,
     closeDeleteModal,
     confirmDelete,
+    handleMoveUp,
+    handleMoveDown,
+    handleExportReport,
   } = useAdminSponsorsList();
 
   return (
@@ -49,7 +54,7 @@ export const AdminSponsorsFeature = () => {
         </Text>
       </LayoutContainer>
 
-      {/* Barra de Filtros e Novo Cadastro */}
+      {/* Barra de Filtros, Exportação CSV e Novo Cadastro */}
       <SponsorsFilterBar
         search={search}
         onSearchChange={setSearch}
@@ -58,9 +63,11 @@ export const AdminSponsorsFeature = () => {
         featuredFilter={featuredFilter}
         onFeaturedFilterChange={setFeaturedFilter}
         onNewSponsor={openCreateDrawer}
+        onExportReport={handleExportReport}
+        isExporting={isExporting}
       />
 
-      {/* Tabela de Patrocinadores (Somente Consulta + Ações Editar/Excluir) */}
+      {/* Tabela de Patrocinadores com Reordenação Rápida */}
       <SponsorsTable
         sponsors={sponsors}
         isLoading={isLoading}
@@ -69,6 +76,9 @@ export const AdminSponsorsFeature = () => {
         onPageChange={setPage}
         onEdit={openEditDrawer}
         onDelete={openDeleteModal}
+        onMoveUp={handleMoveUp}
+        onMoveDown={handleMoveDown}
+        isReordering={isReordering}
       />
 
       {/* Drawer de Cadastro e Edição de Patrocinador */}
@@ -79,7 +89,7 @@ export const AdminSponsorsFeature = () => {
         onSaveSuccess={handleDrawerSuccess}
       />
 
-      {/* Modal de Confirmação de Exclusão */}
+      {/* Modal de Confirmação de Exclusão (Soft Delete) */}
       <ConfirmModal
         isOpen={deleteModalOpen}
         onClose={closeDeleteModal}
@@ -94,4 +104,3 @@ export const AdminSponsorsFeature = () => {
     </LayoutContainer>
   );
 };
-
