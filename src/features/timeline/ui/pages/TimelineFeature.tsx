@@ -8,6 +8,7 @@ import {
   Spinner,
   Button,
   MembershipCtaCard,
+  ScrollReadingProgressBar,
 } from '@/shared/ui/components';
 import { useTimeline } from '../../hooks/useTimeline';
 import { TimelineHero } from '../components/TimelineHero';
@@ -102,6 +103,9 @@ export const TimelineFeature: React.FC = () => {
 
   return (
     <LayoutContainer className="min-h-screen pb-24">
+      {/* Barra de Progresso de Leitura Fixa no Topo */}
+      <ScrollReadingProgressBar />
+
       {/* Hero Header */}
       <TimelineHero
         totalMilestones={events.length}
