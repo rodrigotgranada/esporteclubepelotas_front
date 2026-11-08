@@ -14,14 +14,44 @@ export const DEFAULT_IDOL_COVER = '/images/default-idol-cover.svg';
 const SYNTHETIC_UNSPLASH_REGEX = /^https?:\/\/images\.unsplash\.com\/photo-\d+(\?|$)/i;
 const KNOWN_DEAD_IMAGE_TOKENS = ['photo-1508098682722', 'photo-1517649763962'];
 
+const OPTIMIZED_HOSTNAMES = new Set([
+  'storage.googleapis.com',
+  'firebasestorage.googleapis.com',
+  's3.amazonaws.com',
+  'images.unsplash.com',
+  'upload.wikimedia.org',
+]);
+
 export function isUnoptimizedImageUrl(url?: string | null): boolean {
   if (!url || typeof url !== 'string') return false;
   const trimmed = url.trim();
-  return (
+  if (
     trimmed.startsWith('data:') ||
     trimmed.startsWith('blob:') ||
     /\.svg(\?|$)/i.test(trimmed)
-  );
+  ) {
+    return true;
+  }
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+    try {
+      const { hostname } = new URL(trimmed);
+      const lowerHost = hostname.toLowerCase();
+      if (OPTIMIZED_HOSTNAMES.has(lowerHost)) return false;
+      if (
+        lowerHost.endsWith('.firebasestorage.app') ||
+        lowerHost.endsWith('.googleusercontent.com') ||
+        lowerHost.endsWith('.amazonaws.com')
+      ) {
+        return false;
+      }
+      // Qualquer domínio externo desconhecido usa renderização direta unoptimized
+      // para nunca quebrar a interface com erro de host unconfigured no Next.js
+      return true;
+    } catch {
+      return true;
+    }
+  }
+  return false;
 }
 
 function isUsableImageSrc(url?: string | null): url is string {
@@ -39,7 +69,7 @@ export const SafeImage: React.FC<SafeImageProps> = ({
   alt = '',
   className = '',
   unoptimized,
-  loading = "eager",
+  loading = 'eager',
   ...props
 }) => {
   const usable = isUsableImageSrc(src);
