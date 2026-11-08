@@ -47,63 +47,42 @@ export const PublicHeader = () => {
         className="sticky top-0 z-40 w-full bg-header/95 backdrop-blur-md border-b border-header-border transition-colors duration-200"
       >
         <LayoutContainer className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 relative flex items-center justify-between">
-          {/* LADO ESQUERDO: */}
-          {/* No Mobile: Distintivo do clube na esquerda */}
-          {/* No Desktop: Botão de Menu Hamburguer (sem bordas e sem texto) */}
-          <LayoutContainer className="flex items-center gap-2">
-            {/* Botão de Hambúrguer Desktop (apenas ícone, sem bordas, sem texto) */}
+          {/* LADO ESQUERDO: Botão de Menu Hamburguer (Mobile, Tablet e Desktop) */}
+          <LayoutContainer className="flex items-center gap-2 shrink-0">
             <button
               onClick={() => setIsDrawerOpen(true)}
-              className="hidden md:flex items-center justify-center p-2 rounded-xl text-header-text hover:bg-header-text/10 transition-colors cursor-pointer focus:outline-none"
+              className="flex items-center justify-center p-2 rounded-xl text-header-text hover:bg-header-text/10 transition-colors cursor-pointer focus:outline-none"
               aria-label={PUBLIC_HEADER_TEXTS.ARIA_OPEN_MENU}
               title={PUBLIC_HEADER_TEXTS.NAV_EXPLORE}
             >
               <Menu className="w-6 h-6" />
             </button>
+          </LayoutContainer>
 
-            {/* Distintivo Mobile (apenas o escudo, alinhado à esquerda) */}
+          {/* CENTRO: Distintivo do Clube Centralizado com Limites Rígidos de Dimensão */}
+          <LayoutContainer className="absolute left-1/2 -translate-x-1/2 flex items-center justify-center pointer-events-auto">
             <Link
               href="/"
-              className="md:hidden flex items-center group focus:outline-none shrink-0"
+              className="relative w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 max-w-[40px] sm:max-w-[44px] md:max-w-[48px] max-h-[40px] sm:max-h-[44px] md:max-h-[48px] flex items-center justify-center shrink-0 group focus:outline-none overflow-hidden"
               aria-label={settings?.clubName || PUBLIC_HEADER_TEXTS.LOGO_FULL}
             >
               {settings?.clubLogoUrl ? (
                 <Image
                   src={settings.clubLogoUrl}
                   alt={settings?.clubName || PUBLIC_HEADER_TEXTS.LOGO_FULL}
-                  width={38}
-                  height={38}
-                  priority style={{ width: 'auto', height: 'auto' }} className="object-contain drop-shadow-sm group-hover:scale-105 transition-transform" unoptimized={isUnoptimizedImageUrl(settings.clubLogoUrl)}
+                  fill
+                  sizes="(max-width: 640px) 40px, 48px"
+                  priority
+                  className="object-contain drop-shadow-sm group-hover:scale-105 transition-transform"
+                  unoptimized={isUnoptimizedImageUrl(settings.clubLogoUrl)}
                 />
               ) : (
-                <ShieldPlaceholder size={38} />
+                <ShieldPlaceholder size={40} />
               )}
             </Link>
           </LayoutContainer>
 
-          {/* CENTRO: Distintivo Centralizado no Desktop (apenas o escudo, sem texto) */}
-          <LayoutContainer className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center justify-center">
-            <Link
-              href="/"
-              className="flex items-center group focus:outline-none shrink-0"
-              aria-label={settings?.clubName || PUBLIC_HEADER_TEXTS.LOGO_FULL}
-            >
-              {settings?.clubLogoUrl ? (
-                <Image
-                  src={settings.clubLogoUrl}
-                  alt={settings?.clubName || PUBLIC_HEADER_TEXTS.LOGO_FULL}
-                  width={46}
-                  height={46}
-                  priority style={{ width: 'auto', height: 'auto' }} className="object-contain drop-shadow-sm group-hover:scale-105 transition-transform" unoptimized={isUnoptimizedImageUrl(settings.clubLogoUrl)}
-                />
-              ) : (
-                <ShieldPlaceholder size={46} />
-              )}
-            </Link>
-          </LayoutContainer>
-
-          {/* LADO DIREITO: */}
-          {/* ThemeToggle (apenas Desktop) + Sessão do Usuário / Botão Entrar + Menu Hamburguer no Mobile */}
+          {/* LADO DIREITO: ThemeToggle (apenas Desktop) + Sessão do Usuário / Botão Entrar */}
           <LayoutContainer className="flex items-center gap-2 sm:gap-3 shrink-0">
             {/* Theme Toggle (visível apenas no Desktop; no mobile fica dentro do menu) */}
             <LayoutContainer className="hidden md:flex shrink-0">
@@ -124,7 +103,8 @@ export const PublicHeader = () => {
                         src={user.avatarUrl}
                         alt="Avatar"
                         fill
-                        sizes="36px" unoptimized={isUnoptimizedImageUrl(user.avatarUrl)}
+                        sizes="36px"
+                        unoptimized={isUnoptimizedImageUrl(user.avatarUrl)}
                         className="object-cover"
                       />
                     ) : (
@@ -171,16 +151,6 @@ export const PublicHeader = () => {
                 </Button>
               </Link>
             )}
-
-            {/* Botão de Hambúrguer Mobile (apenas o ícone, sem bordas e sem texto) */}
-            <button
-              onClick={() => setIsDrawerOpen(true)}
-              className="md:hidden flex items-center justify-center p-1.5 rounded-xl text-header-text hover:bg-header-text/10 transition-colors cursor-pointer focus:outline-none shrink-0"
-              aria-label={PUBLIC_HEADER_TEXTS.ARIA_OPEN_MENU}
-              title={PUBLIC_HEADER_TEXTS.NAV_EXPLORE}
-            >
-              <Menu className="w-6 h-6" />
-            </button>
           </LayoutContainer>
         </LayoutContainer>
       </LayoutContainer>

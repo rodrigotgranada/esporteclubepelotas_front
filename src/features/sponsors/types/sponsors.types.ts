@@ -4,6 +4,7 @@ export interface Sponsor {
   id: string;
   name: string;
   logoUrl: string;
+  logoDarkUrl?: string | null;
   websiteUrl?: string | null;
   isFeatured: boolean;
   featured?: boolean;
@@ -21,6 +22,7 @@ export interface Sponsor {
 export interface CreateSponsorPayload {
   name: string;
   logoUrl: string;
+  logoDarkUrl?: string | null;
   websiteUrl?: string | null;
   isFeatured?: boolean;
   featured?: boolean;
@@ -34,6 +36,7 @@ export interface CreateSponsorPayload {
 export interface UpdateSponsorPayload {
   name?: string;
   logoUrl?: string;
+  logoDarkUrl?: string | null;
   websiteUrl?: string | null;
   isFeatured?: boolean;
   featured?: boolean;

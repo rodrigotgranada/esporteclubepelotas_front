@@ -1,8 +1,8 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { Sponsor } from '../../../types/sponsors.types';
-import { sponsorsService } from '../../../services/sponsors.service';
+import { Sponsor } from '../types/sponsors.types';
+import { sponsorsService } from '../services/sponsors.service';
 import { useRealtimeEvents } from '@/shared/hooks/useRealtimeEvents';
 
 export const useHomeSponsorsTicker = () => {

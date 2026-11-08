@@ -171,7 +171,7 @@ export const SponsorsTable: React.FC<SponsorsTableProps> = ({
                 <TableCell className="py-3 px-4">
                   <LayoutContainer className="relative w-12 h-10 rounded-lg bg-surface/80 border border-border/60 p-1 flex items-center justify-center overflow-hidden">
                     <SafeImage
-                      src={sponsor.logoUrl}
+                      src={sponsor.logoUrl || sponsor.logoDarkUrl || '/images/pelotas-logo.png'}
                       alt={sponsor.name}
                       fill
                       className="object-contain"

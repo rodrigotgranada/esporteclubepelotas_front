@@ -52,10 +52,29 @@ export const ADMIN_SPONSORS_TEXTS = {
     PLACEHOLDER_WEBSITE: 'https://www.empresa.com.br',
     LABEL_DISPLAY_ORDER: 'Ordem de Exibição (Prioridade)',
     HELP_DISPLAY_ORDER: 'Menores números aparecem primeiro no grid público (ex: 1, 2, 3...).',
-    SECTION_LOGO: 'Logotipo da Marca *',
-    LOGO_HELP: 'Recomendado formato PNG transparente ou SVG. Resolução sugerida: 400x200px.',
-    BUTTON_SELECT_LOGO: 'Selecionar Imagem do Logo',
-    BUTTON_CHANGE_LOGO: 'Trocar Logotipo',
+
+    SECTION_LOGOS: 'Identidade Visual & Logotipos',
+    LOGOS_HELP:
+      'Cadastre as artes da marca. Você pode enviar uma arte para o tema claro e outra para o escuro. Se enviar apenas uma, ela será exibida em ambos os temas.',
+
+    SECTION_LOGO_LIGHT: 'Logotipo Tema Claro (Padrão)',
+    DESC_LOGO_LIGHT: 'Recomendado arte com cores oficiais ou escuras com boa legibilidade sobre fundo claro.',
+    BUTTON_SELECT_LIGHT: 'Selecionar Logo Claro',
+    BUTTON_CHANGE_LIGHT: 'Trocar Logo Claro',
+
+    SECTION_LOGO_DARK: 'Logotipo Tema Escuro (Opcional)',
+    DESC_LOGO_DARK: 'Recomendado arte branca ou clara com boa legibilidade sobre fundo escuro/azul marinho.',
+    BUTTON_SELECT_DARK: 'Selecionar Logo Escuro',
+    BUTTON_CHANGE_DARK: 'Trocar Logo Escuro',
+
+    SECTION_PREVIEWS: 'Pré-visualização em Tempo Real',
+    DESC_PREVIEWS: 'Acompanhe como a marca será visualizada no tema claro e escuro antes de salvar.',
+    PREVIEW_TICKER_TITLE: 'Carrossel Superior (Ticker)',
+    PREVIEW_CARD_TITLE: 'Card de Patrocinador na Home',
+    PREVIEW_LIGHT_LABEL: 'Modo Claro',
+    PREVIEW_DARK_LABEL: 'Modo Escuro',
+    PREVIEW_EMPTY: 'Selecione ao menos um logotipo para pré-visualizar a marca.',
+
     SECTION_CONTRACT: 'Vigência Contratual',
     LABEL_START_DATE: 'Início do Contrato (Opcional)',
     LABEL_END_DATE: 'Término do Contrato (Opcional)',
@@ -75,7 +94,7 @@ export const ADMIN_SPONSORS_TEXTS = {
     BADGE_STANDARD: 'Padrão',
     BUTTON_SAVE: 'Salvar Patrocinador',
     BUTTON_SAVING: 'Gravando alterações...',
-    BUTTON_UPLOADING: 'Enviando logotipo...',
+    BUTTON_UPLOADING: 'Enviando logotipos...',
     BUTTON_CANCEL: 'Cancelar',
   },
 
@@ -94,7 +113,6 @@ export const ADMIN_SPONSORS_TEXTS = {
     ERROR_LOAD: 'Erro ao carregar lista de patrocinadores.',
     ERROR_SAVE: 'Erro ao salvar informações do patrocinador.',
     ERROR_DELETE: 'Erro ao remover patrocinador.',
-    ERROR_LOGO_REQUIRED: 'O upload do logotipo do patrocinador é obrigatório.',
+    ERROR_LOGO_REQUIRED: 'Cadastre ao menos um logotipo da marca (tema claro ou escuro).',
   },
 };
-

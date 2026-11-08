@@ -6,9 +6,8 @@ export const sponsorSchema = z
       .string()
       .min(2, 'O nome deve ter no mínimo 2 caracteres')
       .max(120, 'O nome deve ter no máximo 120 caracteres'),
-    logoUrl: z
-      .string()
-      .min(1, 'O logotipo da marca é obrigatório'),
+    logoUrl: z.string().optional().nullable(),
+    logoDarkUrl: z.string().optional().nullable(),
     websiteUrl: z
       .string()
       .trim()
@@ -24,6 +23,17 @@ export const sponsorSchema = z
     contractStartDate: z.string().optional().nullable(),
     contractEndDate: z.string().optional().nullable(),
   })
+  .refine(
+    (data) =>
+      Boolean(
+        (data.logoUrl && data.logoUrl.trim().length > 0) ||
+          (data.logoDarkUrl && data.logoDarkUrl.trim().length > 0),
+      ),
+    {
+      message: 'Cadastre ao menos um logotipo da marca (tema claro ou tema escuro)',
+      path: ['logoUrl'],
+    },
+  )
   .refine(
     (data) => {
       if (data.contractStartDate && data.contractEndDate) {

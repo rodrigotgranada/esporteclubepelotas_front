@@ -2,10 +2,10 @@
 
 import React from 'react';
 import { LayoutContainer, Title, Text } from '@/shared/ui/components';
-import { useHomeSponsorsSection } from './useHomeSponsorsSection';
-import { HOME_SPONSORS_SECTION_TEXTS } from './HomeSponsorsSection.constants';
-import { HomeSponsorCard } from './HomeSponsorCard';
 import { Sparkles } from 'lucide-react';
+import { useHomeSponsorsSection } from '../../hooks';
+import { HOME_SPONSORS_SECTION_TEXTS } from '../../constants';
+import { HomeSponsorCard } from './HomeSponsorCard';
 
 export const HomeSponsorsSection = () => {
   const { sponsors, isLoading, handleSponsorClick } = useHomeSponsorsSection();
