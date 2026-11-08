@@ -19,3 +19,4 @@ export const resolveSponsorLogo = (
   }
   return light || dark || '/images/pelotas-logo.png';
 };
+

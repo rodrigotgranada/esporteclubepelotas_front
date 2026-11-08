@@ -26,13 +26,11 @@ export const HomeSponsorTickerItem: React.FC<HomeSponsorTickerItemProps> = ({
       role={isClickable ? 'button' : undefined}
       tabIndex={isClickable ? 0 : undefined}
       title={sponsor.name}
-      className={`flex items-center gap-2 group shrink-0 transition-all duration-200 px-3 py-1 rounded-lg ${
-        isClickable
-          ? 'cursor-pointer hover:bg-surface hover:shadow-xs hover:border hover:border-border'
-          : 'cursor-default opacity-85'
+      className={`group flex items-center justify-center shrink-0 px-2 sm:px-3 py-1 transition-all duration-300 select-none ${
+        isClickable ? 'cursor-pointer' : 'cursor-default'
       }`}
     >
-      <LayoutContainer className="relative h-6 sm:h-7 w-20 sm:w-28 flex items-center justify-center transition-transform duration-300 group-hover:scale-105">
+      <LayoutContainer className="relative h-6 sm:h-7 w-20 sm:w-28 flex items-center justify-center transition-all duration-300 opacity-80 group-hover:opacity-100 group-hover:scale-105">
         <SafeImage
           src={logoSrc}
           alt={HOME_SPONSORS_TICKER_TEXTS.LOGO_ALT(sponsor.name)}
