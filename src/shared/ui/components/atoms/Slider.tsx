@@ -1,8 +1,6 @@
 import React, { forwardRef } from 'react';
 
-export interface SliderProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'> {
-  // Can add custom slider props here if needed
-}
+export type SliderProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'>;
 
 export const Slider = forwardRef<HTMLInputElement, SliderProps>(
   ({ className = '', disabled, ...props }, ref) => {

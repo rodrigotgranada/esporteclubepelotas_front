@@ -1,13 +1,14 @@
 'use client';
 
-import { useRef, useState } from 'react';
-import { useForm, UseFormReturn } from 'react-hook-form';
+import { useRef, useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'react-hot-toast';
 import { adminTimelineService } from '../../services/admin-timeline.service';
-import { TimelineEventData } from '@/features/timeline/services/timeline.service';
+import { TimelineEventData, TimelineCategoryData } from '@/features/timeline/services/timeline.service';
 import { ADMIN_TIMELINE_CONSTANTS } from '../../constants/admin-timeline.constants';
 import {
+  isBlobUrl,
   stripBlobUrl,
   useTransactionalSave,
   verifyUploadedUrl,
@@ -40,7 +41,7 @@ const generateDraftFolderId = (): string => {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
     return crypto.randomUUID();
   }
-  return `timeline-${Date.now()}`;
+  return `timeline-draft-${Math.random().toString(36).substring(2, 9)}`;
 };
 
 const defaultEventValues: TimelineEventFormData = {
@@ -62,7 +63,17 @@ export const useAdminTimelineDrawer = (onSuccess: () => void) => {
   const [isOpen, setIsOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const draftFolderIdRef = useRef<string>(generateDraftFolderId());
+
+  // Foto Principal
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [pendingPhotoFile, setPendingPhotoFile] = useState<File | null>(null);
+
+  // Mini-Galeria de Fotos Complementares
+  const galleryInputRef = useRef<HTMLInputElement>(null);
+  const [selectedGalleryFile, setSelectedGalleryFile] = useState<File | null>(null);
+  const [isCropModalOpen, setIsCropModalOpen] = useState(false);
+  const [cropSourceImage, setCropSourceImage] = useState<string>('');
+  const [isUploadingGallery, setIsUploadingGallery] = useState(false);
 
   const { isSaving, savingLabel, runTransactionalSave } = useTransactionalSave({
     uploadingMedia: ADMIN_TIMELINE_CONSTANTS.DRAWER.BTN_UPLOADING_PHOTO,
@@ -74,11 +85,26 @@ export const useAdminTimelineDrawer = (onSuccess: () => void) => {
     defaultValues: defaultEventValues,
   });
 
+  const photoUrl = form.watch('imageUrl');
+  const galleryUrls = form.watch('galleryUrls') || [];
+
+  // Revoga URL temporária em desmontagem
+  useEffect(() => {
+    return () => {
+      if (photoUrl && isBlobUrl(photoUrl)) {
+        URL.revokeObjectURL(photoUrl);
+      }
+    };
+  }, [photoUrl]);
+
   const resetForm = () => {
     setEditingId(null);
     draftFolderIdRef.current = generateDraftFolderId();
     form.reset(defaultEventValues);
     setPendingPhotoFile(null);
+    setSelectedGalleryFile(null);
+    setCropSourceImage('');
+    setIsCropModalOpen(false);
   };
 
   const handleEventDateChange = (val: string) => {
@@ -91,6 +117,89 @@ export const useAdminTimelineDrawer = (onSuccess: () => void) => {
       }
       form.setValue('dateFormatted', formatPtBrDate(val));
     }
+  };
+
+  const handleCategorySelect = (selectedSlugOrId: string, categories: TimelineCategoryData[]) => {
+    form.setValue('category', selectedSlugOrId);
+    const found = categories.find(
+      (c) => c.slug === selectedSlugOrId || c.id === selectedSlugOrId || c._id === selectedSlugOrId,
+    );
+    if (found) {
+      form.setValue('categoryId', found.id || found._id || '');
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (photoUrl && isBlobUrl(photoUrl)) {
+        URL.revokeObjectURL(photoUrl);
+      }
+      setPendingPhotoFile(file);
+      form.setValue('imageUrl', URL.createObjectURL(file));
+    }
+  };
+
+  const handleRemovePhoto = () => {
+    if (photoUrl && isBlobUrl(photoUrl)) {
+      URL.revokeObjectURL(photoUrl);
+    }
+    setPendingPhotoFile(null);
+    form.setValue('imageUrl', null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const handleSelectGalleryFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setSelectedGalleryFile(file);
+      setCropSourceImage(URL.createObjectURL(file));
+      setIsCropModalOpen(true);
+      e.target.value = '';
+    }
+  };
+
+  const handleGalleryCropSave = async (blob: Blob) => {
+    try {
+      setIsUploadingGallery(true);
+      const fileToUpload = new File([blob], `timeline-gallery-${Math.random().toString(36).substring(2, 9)}.png`, { type: 'image/png' });
+      const uploadedUrl = await adminTimelineService.uploadPhotoMedia(fileToUpload);
+      form.setValue('galleryUrls', [...galleryUrls, uploadedUrl]);
+      setIsCropModalOpen(false);
+      setCropSourceImage('');
+      setSelectedGalleryFile(null);
+      toast.success('Foto complementar adicionada!');
+    } catch (err: unknown) {
+      console.error('Erro ao enviar foto complementar:', err);
+      toast.error('Erro ao enviar foto para galeria.');
+    } finally {
+      setIsUploadingGallery(false);
+    }
+  };
+
+  const handleGalleryUseOriginal = async () => {
+    if (!selectedGalleryFile) return;
+    try {
+      setIsUploadingGallery(true);
+      const uploadedUrl = await adminTimelineService.uploadPhotoMedia(selectedGalleryFile);
+      form.setValue('galleryUrls', [...galleryUrls, uploadedUrl]);
+      setIsCropModalOpen(false);
+      setCropSourceImage('');
+      setSelectedGalleryFile(null);
+      toast.success('Foto complementar adicionada!');
+    } catch (err: unknown) {
+      console.error('Erro ao enviar foto original:', err);
+      toast.error('Erro ao enviar foto para galeria.');
+    } finally {
+      setIsUploadingGallery(false);
+    }
+  };
+
+  const handleRemoveGalleryPhoto = (index: number) => {
+    form.setValue(
+      'galleryUrls',
+      galleryUrls.filter((_, idx) => idx !== index)
+    );
   };
 
   const openCreate = () => {
@@ -141,7 +250,7 @@ export const useAdminTimelineDrawer = (onSuccess: () => void) => {
           ? uploadedPhotoUrl
           : stripBlobUrl(data.imageUrl, '');
 
-        const payload: any = {
+        const payload = {
           year: Number(data.year),
           title: data.title.trim(),
           description: data.description.trim(),
@@ -170,9 +279,13 @@ export const useAdminTimelineDrawer = (onSuccess: () => void) => {
         close();
         onSuccess();
       },
-      onError: (err: any) => {
+      onError: (err: unknown) => {
         console.error('Erro ao salvar marco histórico da timeline:', err);
-        toast.error(err?.response?.data?.message || err?.message || ADMIN_TIMELINE_CONSTANTS.TOAST.ERROR_SAVE);
+        const errMsg =
+          err && typeof err === 'object' && 'message' in err && typeof (err as { message: unknown }).message === 'string'
+            ? (err as { message: string }).message
+            : ADMIN_TIMELINE_CONSTANTS.TOAST.ERROR_SAVE;
+        toast.error(errMsg);
       },
     });
   });
@@ -184,8 +297,23 @@ export const useAdminTimelineDrawer = (onSuccess: () => void) => {
     isEditing: Boolean(editingId),
     isSaving,
     savingLabel,
+    fileInputRef,
+    galleryInputRef,
     pendingPhotoFile,
-    setPendingPhotoFile,
+    selectedGalleryFile,
+    setSelectedGalleryFile,
+    isCropModalOpen,
+    setIsCropModalOpen,
+    cropSourceImage,
+    setCropSourceImage,
+    isUploadingGallery,
+    handleFileChange,
+    handleRemovePhoto,
+    handleCategorySelect,
+    handleSelectGalleryFile,
+    handleGalleryCropSave,
+    handleGalleryUseOriginal,
+    handleRemoveGalleryPhoto,
     handleEventDateChange,
     openCreate,
     openEdit,

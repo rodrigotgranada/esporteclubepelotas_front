@@ -1,6 +1,6 @@
 import React, { OptionHTMLAttributes } from 'react';
 
-export interface OptionProps extends OptionHTMLAttributes<HTMLOptionElement> {}
+export type OptionProps = OptionHTMLAttributes<HTMLOptionElement>;
 
 export const Option = React.forwardRef<HTMLOptionElement, OptionProps>(
   ({ className = '', children, ...props }, ref) => {

@@ -170,18 +170,9 @@ export const AdminTimelineFeature: React.FC = () => {
 
       {/* Drawer for Events */}
       <TimelineDrawer
-        isOpen={timelineDrawer.isOpen}
-        isSaving={timelineDrawer.isSaving}
-        savingLabel={timelineDrawer.savingLabel}
-        isEditing={timelineDrawer.isEditing}
-        form={timelineDrawer.form}
+        drawer={timelineDrawer}
         categories={timelineCategories.categories}
         onOpenNewCategory={timelineCategories.openCreateModal}
-        pendingPhotoFile={timelineDrawer.pendingPhotoFile}
-        setPendingPhotoFile={timelineDrawer.setPendingPhotoFile}
-        handleEventDateChange={timelineDrawer.handleEventDateChange}
-        onClose={timelineDrawer.close}
-        onSave={timelineDrawer.save}
       />
 
       {/* Category Modal */}

@@ -9,6 +9,7 @@ export const settingsApi = {
 
   uploadLogoMedia: async (file: File): Promise<string> => {
     const formData = new FormData();
+    formData.append('file', file);
     formData.append('logo', file);
     const response = await api.post('/settings/upload-logo', formData, {
       headers: {

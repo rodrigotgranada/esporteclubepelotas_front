@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import {
   LayoutContainer,
   Title,
@@ -14,6 +14,7 @@ import {
 import { StadiumFact } from '@/features/stadium/types/stadium.types';
 import { ADMIN_STADIUM_TEXTS } from '../../../constants/admin-stadium.constants';
 import { History, Plus, Trash2, Edit3, Check, X, AlertTriangle, Loader2 } from 'lucide-react';
+import { useStadiumFactsManager } from '../../../hooks/stadium/useStadiumFactsManager';
 
 interface StadiumFactsManagerProps {
   facts: StadiumFact[];
@@ -22,90 +23,34 @@ interface StadiumFactsManagerProps {
   onRemoveFact: (index: number) => Promise<void> | void;
 }
 
-export const StadiumFactsManager: React.FC<StadiumFactsManagerProps> = ({
-  facts,
-  onAddFact,
-  onUpdateFact,
-  onRemoveFact,
-}) => {
-  // Estado para criação de novo marco
-  const [year, setYear] = useState('');
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [isAdding, setIsAdding] = useState(false);
-
-  // Estado para edição in-place de marco existente
-  const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  const [editYear, setEditYear] = useState('');
-  const [editTitle, setEditTitle] = useState('');
-  const [editDescription, setEditDescription] = useState('');
-  const [isSavingEdit, setIsSavingEdit] = useState(false);
-
-  // Estado para exclusão com confirmação
-  const [deletingIndex, setDeletingIndex] = useState<number | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
-
-  const handleAdd = async () => {
-    if (!year.trim() || !title.trim() || !description.trim()) return;
-    try {
-      setIsAdding(true);
-      await onAddFact({
-        year: year.trim(),
-        title: title.trim(),
-        description: description.trim(),
-      });
-      setYear('');
-      setTitle('');
-      setDescription('');
-    } finally {
-      setIsAdding(false);
-    }
-  };
-
-  const handleStartEdit = (index: number) => {
-    const fact = facts[index];
-    if (!fact) return;
-    setEditingIndex(index);
-    setEditYear(fact.year);
-    setEditTitle(fact.title);
-    setEditDescription(fact.description);
-  };
-
-  const handleCancelEdit = () => {
-    setEditingIndex(null);
-    setEditYear('');
-    setEditTitle('');
-    setEditDescription('');
-  };
-
-  const handleSaveEdit = async () => {
-    if (editingIndex === null) return;
-    if (!editYear.trim() || !editTitle.trim() || !editDescription.trim()) return;
-    try {
-      setIsSavingEdit(true);
-      await onUpdateFact(editingIndex, {
-        year: editYear.trim(),
-        title: editTitle.trim(),
-        description: editDescription.trim(),
-      });
-      handleCancelEdit();
-    } finally {
-      setIsSavingEdit(false);
-    }
-  };
-
-  const handleConfirmDelete = async () => {
-    if (deletingIndex === null) return;
-    try {
-      setIsDeleting(true);
-      await onRemoveFact(deletingIndex);
-      setDeletingIndex(null);
-    } finally {
-      setIsDeleting(false);
-    }
-  };
-
-  const factToDelete = deletingIndex !== null ? facts[deletingIndex] : null;
+export const StadiumFactsManager: React.FC<StadiumFactsManagerProps> = (props) => {
+  const { facts } = props;
+  const {
+    year,
+    setYear,
+    title,
+    setTitle,
+    description,
+    setDescription,
+    isAdding,
+    editingIndex,
+    editYear,
+    setEditYear,
+    editTitle,
+    setEditTitle,
+    editDescription,
+    setEditDescription,
+    isSavingEdit,
+    deletingIndex,
+    setDeletingIndex,
+    isDeleting,
+    factToDelete,
+    handleAdd,
+    handleStartEdit,
+    handleCancelEdit,
+    handleSaveEdit,
+    handleConfirmDelete,
+  } = useStadiumFactsManager(props);
 
   return (
     <LayoutContainer className="p-6 rounded-2xl bg-surface border border-border shadow-sm flex flex-col gap-6">

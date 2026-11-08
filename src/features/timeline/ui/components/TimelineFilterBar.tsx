@@ -203,3 +203,4 @@ export const TimelineFilterBar: React.FC<TimelineFilterBarProps> = ({
     </LayoutContainer>
   );
 };
+
