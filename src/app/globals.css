@@ -232,3 +232,23 @@ input[type="range"] {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Marquee contínuo para patrocinadores e banners */
+@keyframes marquee-scroll {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll 28s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}

@@ -74,7 +74,7 @@ const getCategoryLabel = (event: TimelineEventData) => {
   const slugKey = (event.category || '').toUpperCase();
   return (
     TIMELINE_CONSTANTS.CATEGORIES[
-      slugKey as keyof typeof TIMELINE_CONSTANTS.CATEGORIES
+    slugKey as keyof typeof TIMELINE_CONSTANTS.CATEGORIES
     ] || event.category || 'Marco Histórico'
   );
 };
@@ -102,11 +102,10 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({ event, isEven }) => 
 
   return (
     <LayoutContainer
-      className={`relative rounded-2xl bg-surface/90 border backdrop-blur-md p-5 sm:p-6 transition-all duration-300 hover:shadow-xl ${
-        event.isHighlighted
+      className={`relative rounded-2xl bg-surface/90 border backdrop-blur-md p-5 sm:p-6 transition-all duration-300 hover:shadow-xl ${event.isHighlighted
           ? 'border-primary/60 shadow-md shadow-primary/10'
           : 'border-border/80 hover:border-primary/40'
-      }`}
+        }`}
     >
       {/* Highlight Ribbon */}
       {event.isHighlighted && (
@@ -153,6 +152,7 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({ event, isEven }) => 
             sizes="(max-width: 768px) 100vw, 500px"
             className="object-cover transition-transform duration-500 group-hover/img:scale-105"
             fallbackSrc={DEFAULT_NEWS_COVER}
+            loading="eager"
             unoptimized={Boolean(event.imageUrl && event.imageUrl.startsWith('http'))}
           />
           <LayoutContainer className="absolute inset-0 bg-black/0 group-hover/img:bg-black/30 transition-colors flex items-center justify-center">
@@ -178,11 +178,10 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({ event, isEven }) => 
               <LayoutContainer
                 key={imgIdx}
                 onClick={() => setLightboxIndex(imgIdx)}
-                className={`relative h-14 sm:h-16 rounded-lg overflow-hidden border bg-background cursor-pointer group/thumb transition-all ${
-                  imgIdx === 0
+                className={`relative h-14 sm:h-16 rounded-lg overflow-hidden border bg-background cursor-pointer group/thumb transition-all ${imgIdx === 0
                     ? 'border-primary/60 ring-1 ring-primary/40'
                     : 'border-border/80 hover:border-primary'
-                }`}
+                  }`}
                 title={`${TIMELINE_CONSTANTS.VIEW_FULL_PHOTO} (${imgIdx + 1}/${allImages.length})`}
               >
                 <SafeImage

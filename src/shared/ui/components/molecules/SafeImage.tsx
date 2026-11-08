@@ -39,6 +39,7 @@ export const SafeImage: React.FC<SafeImageProps> = ({
   alt = '',
   className = '',
   unoptimized,
+  loading = "eager",
   ...props
 }) => {
   const usable = isUsableImageSrc(src);
@@ -62,6 +63,7 @@ export const SafeImage: React.FC<SafeImageProps> = ({
       key={currentSrc}
       src={currentSrc}
       alt={alt}
+      loading={loading}
       className={className}
       unoptimized={unoptimized ?? (isUnoptimizedImageUrl(currentSrc) || hasFailed)}
       onError={() => {

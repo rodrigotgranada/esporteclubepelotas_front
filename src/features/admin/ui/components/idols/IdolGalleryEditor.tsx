@@ -100,6 +100,7 @@ export const IdolGalleryEditor: React.FC<IdolGalleryEditorProps> = ({
                 <SafeImage
                   src={item.url}
                   fallbackSrc={DEFAULT_NEWS_COVER}
+                  loading="eager"
                   alt={item.caption || `${texts.LABEL_PHOTO_CAPTION} ${idx + 1}`}
                   fill
                   className="object-cover"

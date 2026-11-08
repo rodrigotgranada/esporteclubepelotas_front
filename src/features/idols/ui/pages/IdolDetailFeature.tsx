@@ -333,29 +333,29 @@ export const IdolDetailFeature: React.FC<IdolDetailFeatureProps> = ({ slug }) =>
       {/* Titles Block */}
       {((idol.playerStats?.titles && idol.playerStats.titles.length > 0) ||
         (idol.coachStats?.titles && idol.coachStats.titles.length > 0)) && (
-        <LayoutContainer className="flex flex-col gap-4 p-6 sm:p-8 rounded-3xl bg-surface border border-border shadow-xs">
-          <LayoutContainer className="flex items-center gap-2">
-            <Trophy className="w-5 h-5 text-primary" />
-            <Title level="h2" className="text-xl font-black text-text-primary tracking-tight">
-              {texts.TITLES_TITLE}
-            </Title>
-          </LayoutContainer>
+          <LayoutContainer className="flex flex-col gap-4 p-6 sm:p-8 rounded-3xl bg-surface border border-border shadow-xs">
+            <LayoutContainer className="flex items-center gap-2">
+              <Trophy className="w-5 h-5 text-primary" />
+              <Title level="h2" className="text-xl font-black text-text-primary tracking-tight">
+                {texts.TITLES_TITLE}
+              </Title>
+            </LayoutContainer>
 
-          <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {(idol.playerStats?.titles || idol.coachStats?.titles || []).map((title, idx) => (
-              <LayoutContainer
-                key={idx}
-                className="flex items-center gap-3 p-3.5 rounded-2xl bg-background border border-primary/20 shadow-xs"
-              >
-                <Award className="w-5 h-5 text-primary shrink-0" />
-                <Text as="span" className="font-extrabold text-sm text-text-primary">
-                  {title}
-                </Text>
-              </LayoutContainer>
-            ))}
+            <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {(idol.playerStats?.titles || idol.coachStats?.titles || []).map((title, idx) => (
+                <LayoutContainer
+                  key={idx}
+                  className="flex items-center gap-3 p-3.5 rounded-2xl bg-background border border-primary/20 shadow-xs"
+                >
+                  <Award className="w-5 h-5 text-primary shrink-0" />
+                  <Text as="span" className="font-extrabold text-sm text-text-primary">
+                    {title}
+                  </Text>
+                </LayoutContainer>
+              ))}
+            </LayoutContainer>
           </LayoutContainer>
-        </LayoutContainer>
-      )}
+        )}
 
       {/* Memorable Match or Special Story */}
       {idol.playerStats?.memorableMatch && (
@@ -433,6 +433,7 @@ export const IdolDetailFeature: React.FC<IdolDetailFeatureProps> = ({ slug }) =>
                   <SafeImage
                     src={item.url}
                     fallbackSrc={DEFAULT_NEWS_COVER}
+                    loading="eager"
                     alt={item.caption || `${idol.name} foto histórica ${idx + 1}`}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-300"

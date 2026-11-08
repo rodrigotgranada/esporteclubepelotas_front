@@ -1,0 +1,40 @@
+import { z } from 'zod';
+
+export const sponsorSchema = z
+  .object({
+    name: z
+      .string()
+      .min(2, 'O nome deve ter no mínimo 2 caracteres')
+      .max(120, 'O nome deve ter no máximo 120 caracteres'),
+    logoUrl: z
+      .string()
+      .min(1, 'O logotipo da marca é obrigatório'),
+    websiteUrl: z
+      .string()
+      .trim()
+      .optional()
+      .nullable()
+      .refine(
+        (val) => !val || val === '' || /^https?:\/\/.+/.test(val),
+        'A URL deve começar com http:// ou https://',
+      ),
+    isFeatured: z.boolean(),
+    isActive: z.boolean(),
+    displayOrder: z.coerce.number().int().min(0, 'A ordem não pode ser negativa'),
+    contractStartDate: z.string().optional().nullable(),
+    contractEndDate: z.string().optional().nullable(),
+  })
+  .refine(
+    (data) => {
+      if (data.contractStartDate && data.contractEndDate) {
+        return new Date(data.contractEndDate) >= new Date(data.contractStartDate);
+      }
+      return true;
+    },
+    {
+      message: 'A data final do contrato deve ser posterior à data de início',
+      path: ['contractEndDate'],
+    },
+  );
+
+export type SponsorFormData = z.infer<typeof sponsorSchema>;

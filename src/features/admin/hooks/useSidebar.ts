@@ -4,7 +4,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useSystemModulesStore } from '@/store/useSystemModulesStore';
 import { startTransition, useEffect } from 'react';
-import { Home, Users, Settings, Layers, Shield, Newspaper, Trophy, Shirt, Sprout, History, Landmark } from 'lucide-react';
+import { Home, Users, Settings, Layers, Shield, Newspaper, Trophy, Shirt, Sprout, History, Landmark, Handshake } from 'lucide-react';
 import { SIDEBAR_TEXTS } from '../ui/components/Sidebar.constants';
 
 export const useSidebar = () => {
@@ -39,6 +39,7 @@ export const useSidebar = () => {
     { label: SIDEBAR_TEXTS.NAV.IDOLS, href: '/gestao/idols', icon: Trophy, show: true },
     { label: SIDEBAR_TEXTS.NAV.TIMELINE, href: '/gestao/timeline', icon: History, show: true },
     { label: SIDEBAR_TEXTS.NAV.STADIUM, href: '/gestao/stadium', icon: Landmark, show: true },
+    { label: SIDEBAR_TEXTS.NAV.SPONSORS, href: '/gestao/sponsors', icon: Handshake, show: true },
     { label: SIDEBAR_TEXTS.NAV.USERS, href: '/gestao/users', icon: Users, show: isAdmin },
     { label: SIDEBAR_TEXTS.NAV.MODULES, href: '/gestao/modules', icon: Layers, show: isOwner },
     { label: SIDEBAR_TEXTS.NAV.ROLES, href: '/gestao/roles', icon: Shield, show: isOwner },

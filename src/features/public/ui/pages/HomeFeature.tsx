@@ -17,6 +17,7 @@ import { newsService } from '@/features/news/services/news.service';
 import { NewsArticleData } from '@/features/admin/services/admin-news.service';
 import { NewsBentoHero } from '@/features/news/ui/components/NewsBentoHero';
 import { NewsCard } from '@/features/news/ui/components/NewsCard';
+import { HomeSponsorsTicker, HomeSponsorsSection } from '@/features/sponsors';
 import { useRealtimeEvents } from '@/shared/hooks/useRealtimeEvents';
 
 export const HomeFeature = () => {
@@ -67,6 +68,9 @@ export const HomeFeature = () => {
 
   return (
     <LayoutContainer className="flex flex-col bg-transparent">
+      {/* Ticker / Marquee Contínuo de Patrocinadores em Destaque logo abaixo do Header */}
+      <HomeSponsorsTicker />
+
       {/* 1. Primeira Seção: Vitrine Editorial de Notícias (Destaques & Bento Grid) */}
       {(featuredNews.length > 0 || latestNews.length > 0) && (
         <LayoutContainer className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-10 pb-8 sm:pb-12 w-full flex flex-col gap-8 sm:gap-10 bg-transparent">
@@ -174,6 +178,9 @@ export const HomeFeature = () => {
           </LayoutContainer>
         </LayoutContainer>
       </LayoutContainer>
+
+      {/* 4. Quarta Seção: Patrocinadores e Parceiros Oficiais (Pré-Rodapé em 5 colunas) */}
+      <HomeSponsorsSection />
     </LayoutContainer>
   );
 };

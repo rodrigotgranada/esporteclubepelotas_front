@@ -216,6 +216,7 @@ export const TimelineDrawer: React.FC<TimelineDrawerProps> = ({
                 sizes="(max-width: 600px) 100vw, 400px"
                 className="object-cover"
                 fallbackSrc={DEFAULT_NEWS_COVER}
+                loading="eager"
                 unoptimized={Boolean(photoUrl && (photoUrl.startsWith('http') || photoUrl.startsWith('blob:')))}
               />
               <LayoutContainer className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">

@@ -96,6 +96,7 @@ export const TimelineTable: React.FC<TimelineTableProps> = ({
                       sizes="56px"
                       className="object-cover"
                       fallbackSrc={DEFAULT_NEWS_COVER}
+                      loading="eager"
                       unoptimized={Boolean(event.imageUrl && event.imageUrl.startsWith('http'))}
                     />
                   </LayoutContainer>
