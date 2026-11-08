@@ -1,15 +1,11 @@
 'use client';
 
 import React from 'react';
-import {
-  LayoutContainer,
-  Title,
-  Text,
-  SafeImage,
-} from '@/shared/ui/components';
+import { LayoutContainer, Title, Text } from '@/shared/ui/components';
 import { useHomeSponsorsSection } from './useHomeSponsorsSection';
 import { HOME_SPONSORS_SECTION_TEXTS } from './HomeSponsorsSection.constants';
-import { ExternalLink, Sparkles } from 'lucide-react';
+import { HomeSponsorCard } from './HomeSponsorCard';
+import { Sparkles } from 'lucide-react';
 
 export const HomeSponsorsSection = () => {
   const { sponsors, isLoading, handleSponsorClick } = useHomeSponsorsSection();
@@ -51,51 +47,13 @@ export const HomeSponsorsSection = () => {
 
       {/* Grid de 5 colunas com os parceiros */}
       <LayoutContainer className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-5">
-        {sponsors.map((sponsor) => {
-          const isClickable = Boolean(sponsor.websiteUrl);
-
-          return (
-            <LayoutContainer
-              key={sponsor.id}
-              onClick={() => handleSponsorClick(sponsor)}
-              role={isClickable ? 'button' : undefined}
-              tabIndex={isClickable ? 0 : undefined}
-              title={sponsor.name}
-              className={`group relative flex flex-col items-center justify-center p-4 sm:p-6 rounded-2xl border transition-all duration-300 ${
-                sponsor.isFeatured
-                  ? 'border-primary/40 bg-surface/80 shadow-xs hover:border-primary hover:shadow-md'
-                  : 'border-border/60 bg-surface/50 hover:border-primary/40 hover:bg-surface/80'
-              } ${isClickable ? 'cursor-pointer' : 'cursor-default'}`}
-            >
-              {/* Logo do Patrocinador */}
-              <LayoutContainer className="relative h-14 sm:h-16 w-full max-w-[140px] flex items-center justify-center my-2">
-                <SafeImage
-                  src={sponsor.logoUrl}
-                  alt={HOME_SPONSORS_SECTION_TEXTS.LOGO_ALT(sponsor.name)}
-                  fill
-                  className="object-contain filter grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-300"
-                  fallbackSrc="/images/pelotas-logo.png"
-                />
-              </LayoutContainer>
-
-              {/* Nome e Indicador de Link */}
-              <LayoutContainer className="flex items-center gap-1.5 mt-2 text-center">
-                <Text
-                  as="span"
-                  className="text-xs sm:text-sm font-bold text-text-secondary group-hover:text-text-primary transition-colors line-clamp-1"
-                >
-                  {sponsor.name}
-                </Text>
-                {isClickable && (
-                  <ExternalLink
-                    size={12}
-                    className="text-text-secondary/60 group-hover:text-primary transition-colors shrink-0"
-                  />
-                )}
-              </LayoutContainer>
-            </LayoutContainer>
-          );
-        })}
+        {sponsors.map((sponsor) => (
+          <HomeSponsorCard
+            key={sponsor.id}
+            sponsor={sponsor}
+            onClick={handleSponsorClick}
+          />
+        ))}
       </LayoutContainer>
     </LayoutContainer>
   );

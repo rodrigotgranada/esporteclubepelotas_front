@@ -1,9 +1,10 @@
 'use client';
 
 import React from 'react';
-import { LayoutContainer, Text, SafeImage } from '@/shared/ui/components';
+import { LayoutContainer, Text } from '@/shared/ui/components';
 import { useHomeSponsorsTicker } from './useHomeSponsorsTicker';
 import { HOME_SPONSORS_TICKER_TEXTS } from './HomeSponsorsTicker.constants';
+import { HomeSponsorTickerItem } from './HomeSponsorTickerItem';
 
 export const HomeSponsorsTicker = () => {
   const { sponsors, isLoading, handleSponsorClick } = useHomeSponsorsTicker();
@@ -36,33 +37,13 @@ export const HomeSponsorsTicker = () => {
         {/* Trilho de rolagem contínua do marquee com pausa no hover */}
         <LayoutContainer className="flex-1 overflow-hidden relative mask-radial">
           <LayoutContainer className="animate-marquee items-center gap-8 sm:gap-12 cursor-pointer">
-            {marqueeItems.map((sponsor, index) => {
-              const uniqueKey = `${sponsor.id}-${index}`;
-              const isClickable = Boolean(sponsor.websiteUrl);
-
-              return (
-                <LayoutContainer
-                  key={uniqueKey}
-                  onClick={() => handleSponsorClick(sponsor)}
-                  role={isClickable ? 'button' : undefined}
-                  tabIndex={isClickable ? 0 : undefined}
-                  title={sponsor.name}
-                  className={`flex items-center gap-2 group shrink-0 transition-opacity duration-200 ${
-                    isClickable ? 'cursor-pointer hover:opacity-100' : 'cursor-default opacity-80'
-                  }`}
-                >
-                  <LayoutContainer className="relative h-6 sm:h-7 w-20 sm:w-28 flex items-center justify-center grayscale group-hover:grayscale-0 transition-all duration-300">
-                    <SafeImage
-                      src={sponsor.logoUrl}
-                      alt={HOME_SPONSORS_TICKER_TEXTS.LOGO_ALT(sponsor.name)}
-                      fill
-                      className="object-contain"
-                      fallbackSrc="/images/pelotas-logo.png"
-                    />
-                  </LayoutContainer>
-                </LayoutContainer>
-              );
-            })}
+            {marqueeItems.map((sponsor, index) => (
+              <HomeSponsorTickerItem
+                key={`${sponsor.id}-${index}`}
+                sponsor={sponsor}
+                onClick={handleSponsorClick}
+              />
+            ))}
           </LayoutContainer>
         </LayoutContainer>
       </LayoutContainer>
