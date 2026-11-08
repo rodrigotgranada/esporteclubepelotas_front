@@ -26,6 +26,7 @@ export interface CreateTimelineEventInput {
   categoryId?: string | null;
   category?: string;
   imageUrl?: string;
+  galleryUrls?: string[];
   eventDate?: string | null;
   dateFormatted?: string | null;
   displayOrder?: number;
@@ -40,6 +41,7 @@ export interface UpdateTimelineEventInput {
   categoryId?: string | null;
   category?: string;
   imageUrl?: string;
+  galleryUrls?: string[];
   eventDate?: string | null;
   dateFormatted?: string | null;
   displayOrder?: number;

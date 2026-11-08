@@ -25,6 +25,7 @@ interface StadiumGeneralFormProps {
   onAddQuickFact: (card: Omit<StadiumQuickFact, 'id'>) => Promise<void> | void;
   onUpdateQuickFact: (index: number, updatedCard: StadiumQuickFact) => Promise<void> | void;
   onRemoveQuickFact: (index: number) => Promise<void> | void;
+  onReorderQuickFacts: (newQuickFacts: StadiumQuickFact[]) => Promise<void> | void;
 }
 
 export const StadiumGeneralForm: React.FC<StadiumGeneralFormProps> = ({
@@ -34,6 +35,7 @@ export const StadiumGeneralForm: React.FC<StadiumGeneralFormProps> = ({
   onAddQuickFact,
   onUpdateQuickFact,
   onRemoveQuickFact,
+  onReorderQuickFacts,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isCropModalOpen, setIsCropModalOpen] = useState(false);
@@ -159,6 +161,7 @@ export const StadiumGeneralForm: React.FC<StadiumGeneralFormProps> = ({
         onAddCard={onAddQuickFact}
         onUpdateCard={onUpdateQuickFact}
         onRemoveCard={onRemoveQuickFact}
+        onReorderCards={onReorderQuickFacts}
       />
 
       {/* 3. Localização & Configurações de Exibição */}

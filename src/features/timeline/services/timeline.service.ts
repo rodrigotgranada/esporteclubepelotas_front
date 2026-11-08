@@ -25,6 +25,7 @@ export interface TimelineEventData {
   categoryName?: string;
   categoryIcon?: string;
   imageUrl?: string | null;
+  galleryUrls?: string[];
   eventDate?: string | null;
   dateFormatted?: string | null;
   displayOrder: number;

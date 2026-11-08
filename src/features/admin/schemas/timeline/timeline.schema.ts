@@ -23,6 +23,7 @@ export const timelineEventSchema = z.object({
   isHighlighted: z.boolean(),
   isActive: z.boolean(),
   imageUrl: z.string().nullable().optional(),
+  galleryUrls: z.array(z.string()).optional(),
 });
 
 export type TimelineEventFormData = z.infer<typeof timelineEventSchema>;

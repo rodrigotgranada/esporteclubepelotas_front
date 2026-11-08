@@ -273,6 +273,14 @@ export const useAdminStadium = () => {
     await persistStadiumMutation({ quickFacts: updated }, ADMIN_STADIUM_TEXTS.QUICK_FACTS.SUCCESS_DELETE);
   };
 
+  const handleReorderQuickFacts = async (newQuickFacts: StadiumQuickFact[]) => {
+    await persistStadiumMutation({ quickFacts: newQuickFacts }, ADMIN_STADIUM_TEXTS.QUICK_FACTS.SUCCESS_REORDER);
+  };
+
+  const handleReorderGallery = async (newGallery: StadiumGalleryImage[]) => {
+    await persistStadiumMutation({ gallery: newGallery }, ADMIN_STADIUM_TEXTS.GALLERY.SUCCESS_REORDER);
+  };
+
   const onSubmit = form.handleSubmit(async (data: UpdateStadiumFormData) => {
     await runTransactionalSave({
       hasPendingMedia: Boolean(pendingCoverFileRef.current),
@@ -331,12 +339,14 @@ export const useAdminStadium = () => {
     handleAddGalleryImage,
     handleUpdateGalleryImage,
     handleRemoveGalleryImage,
+    handleReorderGallery,
     handleAddFact,
     handleUpdateFact,
     handleRemoveFact,
     handleAddQuickFact,
     handleUpdateQuickFact,
     handleRemoveQuickFact,
+    handleReorderQuickFacts,
     onSubmit,
   };
 };

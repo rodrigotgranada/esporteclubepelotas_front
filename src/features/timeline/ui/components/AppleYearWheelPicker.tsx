@@ -125,6 +125,39 @@ export const AppleYearWheelPicker: React.FC<AppleYearWheelPickerProps> = ({
     [currentIndex, handleItemClick, years]
   );
 
+  // Intercepta o evento de scroll do mouse (wheel) no tambor de forma não passiva
+  // Isso impede que a rodinha do mouse no Windows salte 100-120px (que causava o salto indesejado de 2 em 2 anos)
+  // garantindo avanço/recuo de exatamente 1 ano por clique da rodinha do mouse.
+  useEffect(() => {
+    const el = wheelRef.current;
+    if (!el) return;
+
+    let lastWheelTime = 0;
+    const onNativeWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      markUserInteracting();
+
+      const now = Date.now();
+      // Throttle de 180ms para ignorar micro-inércias e manter passo unitário (1 em 1 ano)
+      if (now - lastWheelTime < 180) {
+        return;
+      }
+      lastWheelTime = now;
+
+      if (e.deltaY > 0) {
+        stepYear('next');
+      } else if (e.deltaY < 0) {
+        stepYear('prev');
+      }
+    };
+
+    el.addEventListener('wheel', onNativeWheel, { passive: false });
+    return () => {
+      el.removeEventListener('wheel', onNativeWheel);
+    };
+  }, [markUserInteracting, stepYear]);
+
   if (!years || years.length === 0) return null;
 
   return (
@@ -177,7 +210,6 @@ export const AppleYearWheelPicker: React.FC<AppleYearWheelPickerProps> = ({
             onScroll={handleWheelScroll}
             onPointerDown={markUserInteracting}
             onTouchStart={markUserInteracting}
-            onWheel={markUserInteracting}
             className="w-full h-full overflow-y-auto no-scrollbar snap-y snap-mandatory py-1 z-1"
             style={{
               scrollSnapType: 'y mandatory',

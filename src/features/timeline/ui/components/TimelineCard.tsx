@@ -1,10 +1,30 @@
 'use client';
 
-import React from 'react';
-import { LayoutContainer, Title, Text, Badge, SafeImage, DEFAULT_NEWS_COVER } from '@/shared/ui/components';
+import React, { useState } from 'react';
+import {
+  LayoutContainer,
+  Title,
+  Text,
+  Badge,
+  SafeImage,
+  ImageLightboxModal,
+  DEFAULT_NEWS_COVER,
+} from '@/shared/ui/components';
 import { TimelineEventData } from '../../services/timeline.service';
 import { TIMELINE_CONSTANTS } from '../../constants/timeline.constants';
-import { Calendar, Trophy, Landmark, Flag, Star, Sparkles, Medal, Shield, Heart } from 'lucide-react';
+import {
+  Calendar,
+  Trophy,
+  Landmark,
+  Flag,
+  Star,
+  Sparkles,
+  Medal,
+  Shield,
+  Heart,
+  Camera,
+  Maximize2,
+} from 'lucide-react';
 
 interface TimelineCardProps {
   event: TimelineEventData;
@@ -60,6 +80,26 @@ const getCategoryLabel = (event: TimelineEventData) => {
 };
 
 export const TimelineCard: React.FC<TimelineCardProps> = ({ event, isEven }) => {
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+
+  // Coleta todas as imagens do marco (capa principal + mini-galeria de fotos históricas)
+  const allImages = React.useMemo(() => {
+    const list: string[] = [];
+    if (event.imageUrl && event.imageUrl.trim()) {
+      list.push(event.imageUrl.trim());
+    }
+    if (Array.isArray(event.galleryUrls)) {
+      event.galleryUrls.forEach((url) => {
+        if (url && url.trim() && !list.includes(url.trim())) {
+          list.push(url.trim());
+        }
+      });
+    }
+    return list;
+  }, [event.imageUrl, event.galleryUrls]);
+
+  const hasAdditionalPhotos = allImages.length > 1;
+
   return (
     <LayoutContainer
       className={`relative rounded-2xl bg-surface/90 border backdrop-blur-md p-5 sm:p-6 transition-all duration-300 hover:shadow-xl ${
@@ -99,18 +139,62 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({ event, isEven }) => 
         {event.title}
       </Title>
 
-      {/* Image if available */}
+      {/* Imagem Principal do Marco */}
       {event.imageUrl && (
-        <LayoutContainer className="relative w-full h-48 sm:h-56 rounded-xl overflow-hidden mb-4 bg-background border border-border/60">
+        <LayoutContainer
+          onClick={() => setLightboxIndex(0)}
+          className="group/img relative w-full h-48 sm:h-56 rounded-xl overflow-hidden mb-3 bg-background border border-border/60 cursor-pointer"
+          title={TIMELINE_CONSTANTS.VIEW_FULL_PHOTO}
+        >
           <SafeImage
             src={event.imageUrl}
             alt={event.title}
             fill
             sizes="(max-width: 768px) 100vw, 500px"
-            className="object-cover transition-transform duration-500 hover:scale-105"
+            className="object-cover transition-transform duration-500 group-hover/img:scale-105"
             fallbackSrc={DEFAULT_NEWS_COVER}
             unoptimized={Boolean(event.imageUrl && event.imageUrl.startsWith('http'))}
           />
+          <LayoutContainer className="absolute inset-0 bg-black/0 group-hover/img:bg-black/30 transition-colors flex items-center justify-center">
+            <LayoutContainer className="w-9 h-9 rounded-full bg-surface/90 text-text-primary border border-border flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity shadow-lg">
+              <Maximize2 className="w-4 h-4 text-primary" />
+            </LayoutContainer>
+          </LayoutContainer>
+        </LayoutContainer>
+      )}
+
+      {/* Mini-Galeria de Imagens Adicionais do Marco */}
+      {hasAdditionalPhotos && (
+        <LayoutContainer className="flex flex-col gap-2 mb-4">
+          <LayoutContainer className="flex items-center justify-between">
+            <Text className="text-xs font-bold text-text-secondary flex items-center gap-1.5 uppercase tracking-wider">
+              <Camera className="w-3.5 h-3.5 text-primary" />
+              {TIMELINE_CONSTANTS.GALLERY_BADGE} ({allImages.length})
+            </Text>
+          </LayoutContainer>
+
+          <LayoutContainer className="grid grid-cols-4 sm:grid-cols-5 gap-2">
+            {allImages.map((imgUrl, imgIdx) => (
+              <LayoutContainer
+                key={imgIdx}
+                onClick={() => setLightboxIndex(imgIdx)}
+                className={`relative h-14 sm:h-16 rounded-lg overflow-hidden border bg-background cursor-pointer group/thumb transition-all ${
+                  imgIdx === 0
+                    ? 'border-primary/60 ring-1 ring-primary/40'
+                    : 'border-border/80 hover:border-primary'
+                }`}
+                title={`${TIMELINE_CONSTANTS.VIEW_FULL_PHOTO} (${imgIdx + 1}/${allImages.length})`}
+              >
+                <SafeImage
+                  src={imgUrl}
+                  alt={`${event.title} - Foto ${imgIdx + 1}`}
+                  fill
+                  sizes="100px"
+                  className="object-cover group-hover/thumb:scale-110 transition-transform duration-300"
+                />
+              </LayoutContainer>
+            ))}
+          </LayoutContainer>
         </LayoutContainer>
       )}
 
@@ -121,6 +205,17 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({ event, isEven }) => 
       >
         {event.description}
       </Text>
+
+      {/* Modal de Lightbox para exibição ampliada das fotos do marco */}
+      {lightboxIndex !== null && allImages.length > 0 && (
+        <ImageLightboxModal
+          isOpen={lightboxIndex !== null}
+          images={allImages}
+          initialIndex={lightboxIndex}
+          title={`${event.year} — ${event.title}`}
+          onClose={() => setLightboxIndex(null)}
+        />
+      )}
     </LayoutContainer>
   );
 };

@@ -39,14 +39,16 @@ export const TimelineHero: React.FC<TimelineHeroProps> = ({
         {/* Scroll Call to Action */}
         {totalMilestones > 0 && (
           <LayoutContainer className="mt-8 flex flex-col items-center gap-2">
-            <button
+            <Button
               type="button"
+              size="none"
+              variant="custom"
               onClick={onScrollToTimeline}
               className="group inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-surface border border-border/80 hover:border-primary/50 text-xs sm:text-sm font-bold text-text-secondary hover:text-text-primary shadow-xs transition-all cursor-pointer"
             >
-              <span>Explorar {totalMilestones} marcos históricos</span>
+              <Text as="span">Explorar {totalMilestones} marcos históricos</Text>
               <ArrowDown className="w-4 h-4 text-primary group-hover:translate-y-0.5 transition-transform" />
-            </button>
+            </Button>
           </LayoutContainer>
         )}
       </LayoutContainer>

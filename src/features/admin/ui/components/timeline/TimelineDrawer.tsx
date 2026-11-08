@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { UseFormReturn, Controller } from 'react-hook-form';
 import {
   Drawer,
@@ -15,12 +15,15 @@ import {
   SafeImage,
   DEFAULT_NEWS_COVER,
   FormField,
+  CropModal,
 } from '@/shared/ui/components';
-import { Upload, X, Plus } from 'lucide-react';
+import { Upload, X, Plus, Camera, Loader2, Trash2 } from 'lucide-react';
 import { TimelineCategoryData } from '@/features/timeline/services/timeline.service';
 import { ADMIN_TIMELINE_CONSTANTS } from '@/features/admin/constants/admin-timeline.constants';
+import { adminTimelineService } from '../../../services/admin-timeline.service';
 import { isBlobUrl } from '@/shared/hooks/useTransactionalSave';
 import { TimelineEventFormData } from '@/features/admin/schemas/timeline/timeline.schema';
+import { toast } from 'react-hot-toast';
 
 export interface TimelineDrawerProps {
   isOpen: boolean;
@@ -90,6 +93,68 @@ export const TimelineDrawer: React.FC<TimelineDrawerProps> = ({
     setPendingPhotoFile(null);
     setValue('imageUrl', null);
     if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  // Mini-Galeria: estados e manipuladores
+  const galleryInputRef = useRef<HTMLInputElement>(null);
+  const [selectedGalleryFile, setSelectedGalleryFile] = useState<File | null>(null);
+  const [isCropModalOpen, setIsCropModalOpen] = useState(false);
+  const [cropSourceImage, setCropSourceImage] = useState<string>('');
+  const [isUploadingGallery, setIsUploadingGallery] = useState(false);
+
+  const galleryUrls = watch('galleryUrls') || [];
+
+  const handleSelectGalleryFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setSelectedGalleryFile(file);
+      setCropSourceImage(URL.createObjectURL(file));
+      setIsCropModalOpen(true);
+      e.target.value = '';
+    }
+  };
+
+  const handleGalleryCropSave = async (blob: Blob) => {
+    try {
+      setIsUploadingGallery(true);
+      const fileToUpload = new File([blob], `timeline-gallery-${Date.now()}.png`, { type: 'image/png' });
+      const uploadedUrl = await adminTimelineService.uploadPhotoMedia(fileToUpload);
+      setValue('galleryUrls', [...galleryUrls, uploadedUrl]);
+      setIsCropModalOpen(false);
+      setCropSourceImage('');
+      setSelectedGalleryFile(null);
+      toast.success('Foto complementar adicionada!');
+    } catch (err) {
+      console.error('Erro ao enviar foto complementar:', err);
+      toast.error('Erro ao enviar foto para galeria.');
+    } finally {
+      setIsUploadingGallery(false);
+    }
+  };
+
+  const handleGalleryUseOriginal = async () => {
+    if (!selectedGalleryFile) return;
+    try {
+      setIsUploadingGallery(true);
+      const uploadedUrl = await adminTimelineService.uploadPhotoMedia(selectedGalleryFile);
+      setValue('galleryUrls', [...galleryUrls, uploadedUrl]);
+      setIsCropModalOpen(false);
+      setCropSourceImage('');
+      setSelectedGalleryFile(null);
+      toast.success('Foto complementar adicionada!');
+    } catch (err) {
+      console.error('Erro ao enviar foto original:', err);
+      toast.error('Erro ao enviar foto para galeria.');
+    } finally {
+      setIsUploadingGallery(false);
+    }
+  };
+
+  const handleRemoveGalleryPhoto = (index: number) => {
+    setValue(
+      'galleryUrls',
+      galleryUrls.filter((_, idx) => idx !== index)
+    );
   };
 
   const handleCategorySelect = (selectedSlugOrId: string) => {
@@ -287,6 +352,76 @@ export const TimelineDrawer: React.FC<TimelineDrawerProps> = ({
           )}
         </LayoutContainer>
 
+        {/* Row 5.1: Mini-Galeria de Fotos Complementares de Arquivo */}
+        <LayoutContainer className="flex flex-col gap-3 p-4 rounded-xl bg-surface border border-border">
+          <LayoutContainer className="flex items-center justify-between">
+            <LayoutContainer className="flex flex-col">
+              <Text as="span" className="text-xs font-semibold text-text-secondary uppercase tracking-wide flex items-center gap-1.5">
+                <Camera className="w-4 h-4 text-primary" />
+                {texts.GALLERY_LABEL}
+              </Text>
+              <Text as="p" className="text-[11px] text-text-secondary">
+                {texts.GALLERY_HELP}
+              </Text>
+            </LayoutContainer>
+
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={isSaving || isUploadingGallery}
+              onClick={() => galleryInputRef.current?.click()}
+              className="text-xs font-bold border-primary/50 text-primary hover:bg-primary hover:text-black flex items-center gap-1.5 cursor-pointer"
+            >
+              {isUploadingGallery ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <Plus className="w-3.5 h-3.5" />
+              )}
+              <Text as="span">{texts.BTN_ADD_GALLERY_PHOTO}</Text>
+            </Button>
+            <Input
+              ref={galleryInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleSelectGalleryFile}
+            />
+          </LayoutContainer>
+
+          {/* Grid de Miniaturas da Galeria */}
+          {galleryUrls.length > 0 && (
+            <LayoutContainer className="grid grid-cols-3 sm:grid-cols-4 gap-2.5 pt-2">
+              {galleryUrls.map((url, idx) => (
+                <LayoutContainer
+                  key={idx}
+                  className="group relative h-20 rounded-xl overflow-hidden border border-border bg-background shadow-xs"
+                >
+                  <SafeImage
+                    src={url}
+                    alt={`Foto complementar ${idx + 1}`}
+                    fill
+                    sizes="120px"
+                    className="object-cover"
+                  />
+                  <LayoutContainer className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <Button
+                      type="button"
+                      size="none"
+                      variant="custom"
+                      onClick={() => handleRemoveGalleryPhoto(idx)}
+                      className="w-7 h-7 rounded-full bg-[#ea580c] text-white flex items-center justify-center hover:scale-110 transition-transform cursor-pointer shadow-md"
+                      title={texts.TOOLTIP_REMOVE_GALLERY_PHOTO}
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
+                  </LayoutContainer>
+                </LayoutContainer>
+              ))}
+            </LayoutContainer>
+          )}
+        </LayoutContainer>
+
         {/* Row 6: Toggles */}
         <LayoutContainer className="flex flex-col gap-4 p-4 rounded-xl bg-surface border border-border">
           <LayoutContainer className="flex items-center justify-between">
@@ -338,6 +473,31 @@ export const TimelineDrawer: React.FC<TimelineDrawerProps> = ({
             {isSaving ? (savingLabel || texts.BTN_SAVING) : texts.BTN_SAVE}
           </Button>
         </LayoutContainer>
+
+        {/* Modal de Recorte / Ajuste de Imagem Complementar */}
+        {isCropModalOpen && cropSourceImage && (
+          <CropModal
+            isOpen={isCropModalOpen}
+            imageSrc={cropSourceImage}
+            onClose={() => {
+              setIsCropModalOpen(false);
+              setCropSourceImage('');
+              setSelectedGalleryFile(null);
+            }}
+            onCropSave={handleGalleryCropSave}
+            onUseOriginal={handleGalleryUseOriginal}
+            isLoading={isUploadingGallery}
+            aspectOptions={[
+              { label: 'Livre', value: undefined },
+              { label: '16:9 Panorâmico', value: 16 / 9 },
+              { label: '4:3 Clássico', value: 4 / 3 },
+              { label: '1:1 Quadrado', value: 1 },
+            ]}
+            texts={{
+              title: 'Ajustar Foto do Acervo Histórico',
+            }}
+          />
+        )}
       </LayoutContainer>
     </Drawer>
   );

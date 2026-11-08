@@ -80,6 +80,10 @@ export const ADMIN_STADIUM_TEXTS = {
     SUCCESS_UPLOAD: 'Foto adicionada ao acervo histórico com sucesso!',
     SUCCESS_UPDATE: 'Foto do acervo atualizada com sucesso!',
     SUCCESS_DELETE: 'Foto removida do acervo histórico.',
+    MOVE_LEFT_TOOLTIP: 'Mover foto para esquerda',
+    MOVE_RIGHT_TOOLTIP: 'Mover foto para direita',
+    DRAG_HINT: 'Arraste para reorganizar a ordem das fotos',
+    SUCCESS_REORDER: 'Ordem das fotos do acervo atualizada com sucesso!',
   },
 
   FACTS: {
@@ -128,6 +132,10 @@ export const ADMIN_STADIUM_TEXTS = {
     SUCCESS_ADD: 'Item da ficha técnica adicionado com sucesso!',
     SUCCESS_UPDATE: 'Item da ficha técnica atualizado com sucesso!',
     SUCCESS_DELETE: 'Item removido da ficha técnica.',
+    MOVE_LEFT_TOOLTIP: 'Mover card para esquerda',
+    MOVE_RIGHT_TOOLTIP: 'Mover card para direita',
+    DRAG_HINT: 'Arraste para reorganizar a ordem dos cards',
+    SUCCESS_REORDER: 'Ordem dos cards da ficha técnica atualizada com sucesso!',
   },
 
   FEEDBACK: {

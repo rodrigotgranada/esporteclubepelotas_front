@@ -29,12 +29,14 @@ export const AdminStadiumFeature: React.FC = () => {
     handleAddGalleryImage,
     handleUpdateGalleryImage,
     handleRemoveGalleryImage,
+    handleReorderGallery,
     handleAddFact,
     handleUpdateFact,
     handleRemoveFact,
     handleAddQuickFact,
     handleUpdateQuickFact,
     handleRemoveQuickFact,
+    handleReorderQuickFacts,
     onSubmit,
   } = useAdminStadium();
 
@@ -135,6 +137,7 @@ export const AdminStadiumFeature: React.FC = () => {
             onAddQuickFact={handleAddQuickFact}
             onUpdateQuickFact={handleUpdateQuickFact}
             onRemoveQuickFact={handleRemoveQuickFact}
+            onReorderQuickFacts={handleReorderQuickFacts}
           />
         )}
 
@@ -144,6 +147,7 @@ export const AdminStadiumFeature: React.FC = () => {
             onAddImage={handleAddGalleryImage}
             onUpdateImage={handleUpdateGalleryImage}
             onRemoveImage={handleRemoveGalleryImage}
+            onReorderImages={handleReorderGallery}
           />
         )}
 

@@ -13,6 +13,8 @@ import {
   CropModal,
 } from '@/shared/ui/components';
 import { StadiumGalleryImage } from '@/features/stadium/types/stadium.types';
+import { StadiumGalleryEditModal } from './StadiumGalleryEditModal';
+import { StadiumGalleryDeleteModal } from './StadiumGalleryDeleteModal';
 import { ADMIN_STADIUM_TEXTS } from '../../../constants/admin-stadium.constants';
 import { stadiumService } from '@/features/stadium/services/stadium.service';
 import {
@@ -27,6 +29,9 @@ import {
   Check,
   X,
   Sparkles,
+  ChevronLeft,
+  ChevronRight,
+  GripVertical,
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
@@ -35,6 +40,7 @@ interface StadiumGalleryManagerProps {
   onAddImage: (file: File | Blob, caption: string) => Promise<void>;
   onUpdateImage: (index: number, updated: Partial<StadiumGalleryImage>) => Promise<void> | void;
   onRemoveImage: (index: number) => Promise<void> | void;
+  onReorderImages?: (newGallery: StadiumGalleryImage[]) => Promise<void> | void;
 }
 
 type CropTarget =
@@ -46,11 +52,74 @@ export const StadiumGalleryManager: React.FC<StadiumGalleryManagerProps> = ({
   onAddImage,
   onUpdateImage,
   onRemoveImage,
+  onReorderImages,
 }) => {
   const [caption, setCaption] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const replaceFileInputRef = useRef<HTMLInputElement>(null);
+
+  // Estados de Reordenação e Drag-and-Drop
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+  const [isReordering, setIsReordering] = useState(false);
+
+  const handleMovePhoto = async (currentIndex: number, direction: 'left' | 'right') => {
+    if (!onReorderImages) return;
+    const targetIndex = direction === 'left' ? currentIndex - 1 : currentIndex + 1;
+    if (targetIndex < 0 || targetIndex >= gallery.length) return;
+
+    const reordered = [...gallery];
+    const [moved] = reordered.splice(currentIndex, 1);
+    reordered.splice(targetIndex, 0, moved);
+
+    const updated = reordered.map((item, idx) => ({ ...item, order: idx + 1 }));
+    try {
+      setIsReordering(true);
+      await onReorderImages(updated);
+    } finally {
+      setIsReordering(false);
+    }
+  };
+
+  const handleDragStart = (index: number) => {
+    setDraggedIndex(index);
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === index) return;
+    setDragOverIndex(index);
+  };
+
+  const handleDrop = async (e: React.DragEvent, dropIndex: number) => {
+    e.preventDefault();
+    if (!onReorderImages || draggedIndex === null || draggedIndex === dropIndex) {
+      setDraggedIndex(null);
+      setDragOverIndex(null);
+      return;
+    }
+
+    const reordered = [...gallery];
+    const [moved] = reordered.splice(draggedIndex, 1);
+    reordered.splice(dropIndex, 0, moved);
+
+    const updated = reordered.map((item, idx) => ({ ...item, order: idx + 1 }));
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+
+    try {
+      setIsReordering(true);
+      await onReorderImages(updated);
+    } finally {
+      setIsReordering(false);
+    }
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+  };
 
   // Estados do CropModal oficial
   const [isCropModalOpen, setIsCropModalOpen] = useState(false);
@@ -268,245 +337,163 @@ export const StadiumGalleryManager: React.FC<StadiumGalleryManagerProps> = ({
         </LayoutContainer>
       ) : (
         <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {gallery.map((photo, index) => (
-            <LayoutContainer
-              key={index}
-              className="group relative h-56 rounded-2xl overflow-hidden border border-border bg-background flex flex-col justify-end p-3 shadow-xs hover:border-primary/50 transition-all"
-            >
-              <SafeImage
-                src={photo.url}
-                alt={photo.caption || 'Foto do Acervo Histórico'}
-                fill
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                className="object-cover group-hover:scale-105 transition-transform duration-300"
-              />
+          {gallery.map((photo, index) => {
+            const isDragging = draggedIndex === index;
+            const isDragTarget = dragOverIndex === index;
+            const canMoveLeft = index > 0;
+            const canMoveRight = index < gallery.length - 1;
 
-              <LayoutContainer className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+            return (
+              <LayoutContainer
+                key={photo.url || index}
+                draggable={!isReordering && Boolean(onReorderImages)}
+                onDragStart={() => handleDragStart(index)}
+                onDragOver={(e) => handleDragOver(e, index)}
+                onDrop={(e) => handleDrop(e, index)}
+                onDragEnd={handleDragEnd}
+                className={`group relative h-56 rounded-2xl overflow-hidden border bg-background flex flex-col justify-end p-3 shadow-xs transition-all select-none ${
+                  isDragging
+                    ? 'opacity-40 border-dashed border-primary ring-2 ring-primary'
+                    : isDragTarget
+                    ? 'border-primary ring-2 ring-primary/40 scale-[1.02]'
+                    : 'border-border hover:border-primary/50'
+                }`}
+              >
+                <SafeImage
+                  src={photo.url}
+                  alt={photo.caption || 'Foto do Acervo Histórico'}
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                  className="object-cover group-hover:scale-105 transition-transform duration-300 pointer-events-none"
+                />
 
-              {/* Botões de Ação Flutuantes com Alto Contraste */}
-              <LayoutContainer className="absolute top-2.5 right-2.5 flex items-center gap-1.5 z-20">
-                {/* Botão de Recortar / Cortar Imagem */}
-                <Button
-                  type="button"
-                  size="none"
-                  variant="custom"
-                  onClick={() => handleOpenRecrop(index)}
-                  className="w-8 h-8 rounded-full bg-slate-950/85 hover:bg-primary text-white hover:text-black border border-white/20 shadow-md flex items-center justify-center transition-all cursor-pointer hover:scale-110"
-                  title="Recortar foto"
-                  aria-label="Recortar foto"
-                >
-                  <CropIcon className="w-4 h-4 text-current" />
-                </Button>
+                <LayoutContainer className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent pointer-events-none" />
 
-                {/* Botão de Editar Legenda & Imagem */}
-                <Button
-                  type="button"
-                  size="none"
-                  variant="custom"
-                  onClick={() => handleOpenEdit(index)}
-                  className="w-8 h-8 rounded-full bg-slate-950/85 hover:bg-primary text-white hover:text-black border border-white/20 shadow-md flex items-center justify-center transition-all cursor-pointer hover:scale-110"
-                  title={ADMIN_STADIUM_TEXTS.GALLERY.EDIT_PHOTO_TOOLTIP}
-                  aria-label={ADMIN_STADIUM_TEXTS.GALLERY.EDIT_PHOTO_TOOLTIP}
-                >
-                  <Edit3 className="w-4 h-4 text-current" />
-                </Button>
+                {/* Controles de Reordenação no Canto Superior Esquerdo */}
+                {onReorderImages && (
+                  <LayoutContainer className="absolute top-2.5 left-2.5 flex items-center gap-1 z-20">
+                    <LayoutContainer
+                      className="w-7 h-7 rounded-full bg-slate-950/85 text-white/80 hover:text-primary flex items-center justify-center border border-white/20 shadow-md cursor-grab active:cursor-grabbing"
+                      title={ADMIN_STADIUM_TEXTS.GALLERY.DRAG_HINT}
+                    >
+                      <GripVertical className="w-3.5 h-3.5" />
+                    </LayoutContainer>
 
-                {/* Botão de Excluir Foto */}
-                <Button
-                  type="button"
-                  size="none"
-                  variant="custom"
-                  onClick={() => setDeletingIndex(index)}
-                  className="w-8 h-8 rounded-full bg-slate-950/85 hover:bg-[#ea580c] text-white border border-white/20 shadow-md flex items-center justify-center transition-all cursor-pointer hover:scale-110"
-                  title={ADMIN_STADIUM_TEXTS.GALLERY.DELETE_PHOTO_TOOLTIP}
-                  aria-label={ADMIN_STADIUM_TEXTS.GALLERY.DELETE_PHOTO_TOOLTIP}
-                >
-                  <Trash2 className="w-4 h-4 text-current" />
-                </Button>
+                    {/* Mover para Esquerda */}
+                    <Button
+                      type="button"
+                      size="none"
+                      variant="custom"
+                      disabled={!canMoveLeft || isReordering}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleMovePhoto(index, 'left');
+                      }}
+                      className="w-7 h-7 rounded-full bg-slate-950/85 hover:bg-primary text-white hover:text-black disabled:opacity-30 disabled:hover:bg-slate-950/85 disabled:hover:text-white border border-white/20 shadow-md flex items-center justify-center transition-all cursor-pointer"
+                      title={ADMIN_STADIUM_TEXTS.GALLERY.MOVE_LEFT_TOOLTIP}
+                      aria-label={ADMIN_STADIUM_TEXTS.GALLERY.MOVE_LEFT_TOOLTIP}
+                    >
+                      <ChevronLeft className="w-3.5 h-3.5 text-current" />
+                    </Button>
+
+                    {/* Mover para Direita */}
+                    <Button
+                      type="button"
+                      size="none"
+                      variant="custom"
+                      disabled={!canMoveRight || isReordering}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleMovePhoto(index, 'right');
+                      }}
+                      className="w-7 h-7 rounded-full bg-slate-950/85 hover:bg-primary text-white hover:text-black disabled:opacity-30 disabled:hover:bg-slate-950/85 disabled:hover:text-white border border-white/20 shadow-md flex items-center justify-center transition-all cursor-pointer"
+                      title={ADMIN_STADIUM_TEXTS.GALLERY.MOVE_RIGHT_TOOLTIP}
+                      aria-label={ADMIN_STADIUM_TEXTS.GALLERY.MOVE_RIGHT_TOOLTIP}
+                    >
+                      <ChevronRight className="w-3.5 h-3.5 text-current" />
+                    </Button>
+                  </LayoutContainer>
+                )}
+
+                {/* Botões de Ação Flutuantes com Alto Contraste no Canto Superior Direito */}
+                <LayoutContainer className="absolute top-2.5 right-2.5 flex items-center gap-1.5 z-20">
+                  {/* Botão de Recortar / Cortar Imagem */}
+                  <Button
+                    type="button"
+                    size="none"
+                    variant="custom"
+                    onClick={() => handleOpenRecrop(index)}
+                    className="w-8 h-8 rounded-full bg-slate-950/85 hover:bg-primary text-white hover:text-black border border-white/20 shadow-md flex items-center justify-center transition-all cursor-pointer hover:scale-110"
+                    title="Recortar foto"
+                    aria-label="Recortar foto"
+                  >
+                    <CropIcon className="w-4 h-4 text-current" />
+                  </Button>
+
+                  {/* Botão de Editar Legenda & Imagem */}
+                  <Button
+                    type="button"
+                    size="none"
+                    variant="custom"
+                    onClick={() => handleOpenEdit(index)}
+                    className="w-8 h-8 rounded-full bg-slate-950/85 hover:bg-primary text-white hover:text-black border border-white/20 shadow-md flex items-center justify-center transition-all cursor-pointer hover:scale-110"
+                    title={ADMIN_STADIUM_TEXTS.GALLERY.EDIT_PHOTO_TOOLTIP}
+                    aria-label={ADMIN_STADIUM_TEXTS.GALLERY.EDIT_PHOTO_TOOLTIP}
+                  >
+                    <Edit3 className="w-4 h-4 text-current" />
+                  </Button>
+
+                  {/* Botão de Excluir Foto */}
+                  <Button
+                    type="button"
+                    size="none"
+                    variant="custom"
+                    onClick={() => setDeletingIndex(index)}
+                    className="w-8 h-8 rounded-full bg-slate-950/85 hover:bg-[#ea580c] text-white border border-white/20 shadow-md flex items-center justify-center transition-all cursor-pointer hover:scale-110"
+                    title={ADMIN_STADIUM_TEXTS.GALLERY.DELETE_PHOTO_TOOLTIP}
+                    aria-label={ADMIN_STADIUM_TEXTS.GALLERY.DELETE_PHOTO_TOOLTIP}
+                  >
+                    <Trash2 className="w-4 h-4 text-current" />
+                  </Button>
+                </LayoutContainer>
+
+                {/* Legenda na base do card */}
+                <LayoutContainer className="relative z-10 flex flex-col gap-0.5 pointer-events-none">
+                  <Text as="p" className="text-xs text-white font-medium line-clamp-2 leading-snug">
+                    {photo.caption || 'Sem legenda'}
+                  </Text>
+                </LayoutContainer>
               </LayoutContainer>
-
-              {/* Legenda na base do card */}
-              <LayoutContainer className="relative z-10 flex flex-col gap-0.5">
-                <Text as="p" className="text-xs text-white font-medium line-clamp-2 leading-snug">
-                  {photo.caption || 'Sem legenda'}
-                </Text>
-              </LayoutContainer>
-            </LayoutContainer>
-          ))}
+            );
+          })}
         </LayoutContainer>
       )}
 
       {/* Modal de Edição de Foto e Legenda */}
-      <Modal
+      <StadiumGalleryEditModal
         isOpen={editingIndex !== null}
+        photo={photoBeingEdited}
+        caption={editCaption}
+        isSaving={isSavingCaption}
         onClose={() => setEditingIndex(null)}
-        size="md"
-      >
-        <LayoutContainer className="flex flex-col gap-5 p-2">
-          <Title level="h3" className="text-lg font-bold text-text-primary">
-            {ADMIN_STADIUM_TEXTS.GALLERY.EDIT_MODAL_TITLE}
-          </Title>
-          {photoBeingEdited && (
-            <LayoutContainer className="group relative w-full h-56 rounded-2xl overflow-hidden bg-background border border-border shadow-inner">
-              <SafeImage
-                src={photoBeingEdited.url}
-                alt="Foto em edição"
-                fill
-                sizes="600px"
-                className="object-cover transition-transform duration-300 group-hover:scale-105"
-              />
-
-              {/* Overlay que surge ao passar o mouse com as 2 opções solicitadas */}
-              <LayoutContainer className="absolute inset-0 bg-black/65 opacity-0 group-hover:opacity-100 transition-all duration-200 flex flex-col items-center justify-center gap-3 backdrop-blur-xs z-10">
-                <LayoutContainer className="flex items-center gap-4">
-                  {/* Opção 1: Ícone de recortar para recortar */}
-                  <Button
-                    type="button"
-                    size="none"
-                    variant="custom"
-                    onClick={() => {
-                      if (editingIndex !== null) {
-                        handleOpenRecrop(editingIndex);
-                      }
-                    }}
-                    className="w-12 h-12 rounded-full bg-surface/95 text-text-primary hover:bg-primary hover:text-black border border-border shadow-2xl flex items-center justify-center cursor-pointer transition-transform hover:scale-110"
-                    title={ADMIN_STADIUM_TEXTS.GALLERY.CROP_PHOTO_TOOLTIP}
-                    aria-label={ADMIN_STADIUM_TEXTS.GALLERY.CROP_PHOTO_TOOLTIP}
-                  >
-                    <CropIcon className="w-5 h-5 text-current" />
-                  </Button>
-
-                  {/* Opção 2: Caneta para alterar / substituir a foto se quiser */}
-                  <Button
-                    type="button"
-                    size="none"
-                    variant="custom"
-                    onClick={() => replaceFileInputRef.current?.click()}
-                    className="w-12 h-12 rounded-full bg-surface/95 text-text-primary hover:bg-primary hover:text-black border border-border shadow-2xl flex items-center justify-center cursor-pointer transition-transform hover:scale-110"
-                    title={ADMIN_STADIUM_TEXTS.GALLERY.REPLACE_PHOTO_TOOLTIP}
-                    aria-label={ADMIN_STADIUM_TEXTS.GALLERY.REPLACE_PHOTO_TOOLTIP}
-                  >
-                    <Edit3 className="w-5 h-5 text-current" />
-                  </Button>
-                </LayoutContainer>
-
-                <Text className="text-xs text-white/90 font-medium tracking-wide">
-                  {ADMIN_STADIUM_TEXTS.GALLERY.CLICK_HINT}
-                </Text>
-              </LayoutContainer>
-
-              {/* Indicador discreto no rodapé quando sem mouse hover */}
-              <LayoutContainer className="absolute bottom-2.5 left-2.5 pointer-events-none group-hover:opacity-0 transition-opacity z-10">
-                <LayoutContainer className="bg-black/75 backdrop-blur-md px-3 py-1 rounded-lg border border-white/15 flex items-center gap-1.5 shadow-md">
-                  <CropIcon className="w-3.5 h-3.5 text-primary" />
-                  <Text className="text-[11px] text-white font-medium">
-                    {ADMIN_STADIUM_TEXTS.GALLERY.HOVER_HINT}
-                  </Text>
-                </LayoutContainer>
-              </LayoutContainer>
-
-              <Input
-                ref={replaceFileInputRef}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handleSelectReplaceFile}
-              />
-            </LayoutContainer>
-          )}
-
-          <FormField label={ADMIN_STADIUM_TEXTS.GALLERY.CAPTION_LABEL}>
-            <Input
-              value={editCaption}
-              placeholder={ADMIN_STADIUM_TEXTS.GALLERY.CAPTION_PLACEHOLDER}
-              onChange={(e) => setEditCaption(e.target.value)}
-            />
-          </FormField>
-
-          <LayoutContainer className="flex items-center justify-end gap-3 pt-3 border-t border-border">
-            <Button
-              type="button"
-              variant="ghost"
-              disabled={isSavingCaption}
-              onClick={() => setEditingIndex(null)}
-              className="cursor-pointer"
-            >
-              <Text as="span">{ADMIN_STADIUM_TEXTS.GALLERY.CANCEL_BUTTON}</Text>
-            </Button>
-            <Button
-              type="button"
-              variant="primary"
-              disabled={isSavingCaption}
-              onClick={handleSaveEditCaption}
-              className="cursor-pointer font-bold shadow-sm"
-            >
-              {isSavingCaption ? (
-                <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />
-              ) : (
-                <Check className="w-4 h-4 mr-1.5" />
-              )}
-              <Text as="span">
-                {isSavingCaption ? 'Salvando...' : ADMIN_STADIUM_TEXTS.GALLERY.UPDATE_CAPTION_BUTTON}
-              </Text>
-            </Button>
-          </LayoutContainer>
-        </LayoutContainer>
-      </Modal>
+        onCaptionChange={setEditCaption}
+        onSave={handleSaveEditCaption}
+        onOpenRecrop={() => {
+          if (editingIndex !== null) {
+            handleOpenRecrop(editingIndex);
+          }
+        }}
+        onSelectReplaceFile={handleSelectReplaceFile}
+      />
 
       {/* Modal de Confirmação de Exclusão de Foto */}
-      <Modal
+      <StadiumGalleryDeleteModal
         isOpen={deletingIndex !== null}
-        onClose={() => !isDeleting && setDeletingIndex(null)}
-        size="md"
-      >
-        <LayoutContainer className="flex flex-col gap-5 p-2">
-          <Title level="h3" className="text-lg font-bold text-text-primary">
-            {ADMIN_STADIUM_TEXTS.GALLERY.DELETE_CONFIRM_TITLE}
-          </Title>
-          <LayoutContainer className="flex items-start gap-3">
-            <LayoutContainer className="w-10 h-10 rounded-full bg-[#ea580c]/10 text-[#ea580c] flex items-center justify-center shrink-0">
-              <AlertTriangle className="w-5 h-5" />
-            </LayoutContainer>
-            <LayoutContainer className="flex flex-col gap-1">
-              <Text className="text-sm text-text-primary font-medium">
-                {ADMIN_STADIUM_TEXTS.GALLERY.DELETE_CONFIRM_DESC}
-              </Text>
-              {photoBeingDeleted && photoBeingDeleted.caption && (
-                <Text className="text-xs text-text-secondary italic mt-1">
-                  &quot;{photoBeingDeleted.caption}&quot;
-                </Text>
-              )}
-            </LayoutContainer>
-          </LayoutContainer>
-
-          <LayoutContainer className="flex items-center justify-end gap-3 pt-3 border-t border-border">
-            <Button
-              type="button"
-              variant="ghost"
-              disabled={isDeleting}
-              onClick={() => setDeletingIndex(null)}
-              className="cursor-pointer"
-            >
-              <Text as="span">{ADMIN_STADIUM_TEXTS.GALLERY.CANCEL_BUTTON}</Text>
-            </Button>
-            <Button
-              type="button"
-              disabled={isDeleting}
-              onClick={handleConfirmDelete}
-              className="bg-[#ea580c] hover:bg-[#c2410c] text-white font-bold cursor-pointer transition-colors shadow-sm disabled:opacity-50"
-            >
-              {isDeleting ? (
-                <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />
-              ) : (
-                <Trash2 className="w-4 h-4 mr-1.5" />
-              )}
-              <Text as="span">
-                {isDeleting ? 'Excluindo...' : ADMIN_STADIUM_TEXTS.GALLERY.CONFIRM_DELETE_BUTTON}
-              </Text>
-            </Button>
-          </LayoutContainer>
-        </LayoutContainer>
-      </Modal>
+        photo={photoBeingDeleted}
+        isDeleting={isDeleting}
+        onClose={() => setDeletingIndex(null)}
+        onConfirm={handleConfirmDelete}
+      />
 
       {/* CropModal Padrão do Sistema (Proporções, Zoom, Corte e Remoção de Fundo por IA) */}
       {isCropModalOpen && cropSourceImage && (

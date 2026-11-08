@@ -25,4 +25,15 @@ export const TIMELINE_CONSTANTS = {
   BTN_BACK_HOME: 'Voltar ao Início',
   CTA_TITLE: 'O Esporte Clube Pelotas é Tradição Centenária',
   CTA_DESC: 'Seja sócio do Lobo e ajude a escrever as próximas páginas douradas da nossa história na Boca do Lobo.',
+
+  SEARCH_PLACEHOLDER: 'Buscar por título, resumo ou ano histórico...',
+  CLEAR_SEARCH_TOOLTIP: 'Limpar busca',
+  ALL_CATEGORIES_LABEL: 'Todos',
+  FILTER_RESULTS_COUNT: 'marco(s) encontrado(s)',
+  FILTER_EMPTY_TITLE: 'Nenhum marco encontrado',
+  FILTER_EMPTY_DESC: 'Não encontramos nenhum marco histórico correspondente à sua busca ou filtro. Tente buscar por outro termo ou ano.',
+  BTN_CLEAR_FILTERS: 'Limpar Filtros',
+  GALLERY_MODAL_TITLE: 'Acervo Fotográfico do Marco Histórico',
+  GALLERY_BADGE: 'Fotos Históricas',
+  VIEW_FULL_PHOTO: 'Ver foto ampliada',
 };

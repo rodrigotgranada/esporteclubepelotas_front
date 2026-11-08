@@ -1,20 +1,36 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
-import { LayoutContainer, Title, Text, Spinner, Button, MembershipCtaCard } from '@/shared/ui/components';
+import {
+  LayoutContainer,
+  Title,
+  Text,
+  Spinner,
+  Button,
+  MembershipCtaCard,
+} from '@/shared/ui/components';
 import { useTimeline } from '../../hooks/useTimeline';
 import { TimelineHero } from '../components/TimelineHero';
 import { TimelineCard } from '../components/TimelineCard';
+import { TimelineFilterBar } from '../components/TimelineFilterBar';
 import { AppleYearWheelPicker } from '../components/AppleYearWheelPicker';
 import { TIMELINE_CONSTANTS } from '../../constants/timeline.constants';
-import { Shield, RotateCcw } from 'lucide-react';
+import { Shield, RotateCcw, SearchX } from 'lucide-react';
 
 export const TimelineFeature: React.FC = () => {
   const {
     events,
+    filteredEvents,
+    categories,
+    categoryCounts,
     availableYears,
     activeYear,
     setActiveYear,
+    searchQuery,
+    setSearchQuery,
+    selectedCategory,
+    setSelectedCategory,
+    clearFilters,
     scrollToYear,
     scrollToTop,
     isNavigatingRef,
@@ -30,7 +46,6 @@ export const TimelineFeature: React.FC = () => {
     if (availableYears.length === 0) return;
 
     const observerCallback: IntersectionObserverCallback = (entries) => {
-      // Se estiver ocorrendo um salto acionado pelo usuário (botão ou roleta), ignora marcos intermediários
       if (isNavigatingRef.current) return;
 
       let bestEntry: IntersectionObserverEntry | null = null;
@@ -63,7 +78,7 @@ export const TimelineFeature: React.FC = () => {
     milestoneEls.forEach((el) => observer.observe(el));
 
     return () => observer.disconnect();
-  }, [availableYears, events, setActiveYear, isNavigatingRef]);
+  }, [availableYears, filteredEvents, setActiveYear, isNavigatingRef]);
 
   const handleScrollToTimeline = () => {
     if (availableYears.length > 0) {
@@ -83,6 +98,7 @@ export const TimelineFeature: React.FC = () => {
 
   // Set para rastrear o primeiro evento de cada ano e atribuir âncora de salto única
   const seenYears = new Set<number>();
+  const isFiltering = Boolean(searchQuery.trim() || selectedCategory);
 
   return (
     <LayoutContainer className="min-h-screen pb-24">
@@ -107,6 +123,20 @@ export const TimelineFeature: React.FC = () => {
         ref={timelineContainerRef}
         className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 sm:mt-12 relative"
       >
+        {/* Barra de Busca e Filtro de Categorias */}
+        {events.length > 0 && (
+          <TimelineFilterBar
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            categories={categories}
+            categoryCounts={categoryCounts}
+            selectedCategory={selectedCategory}
+            onSelectCategory={setSelectedCategory}
+            totalEventsCount={events.length}
+            filteredEventsCount={filteredEvents.length}
+          />
+        )}
+
         {events.length === 0 ? (
           <LayoutContainer className="text-center py-16 sm:py-20 p-8 rounded-3xl bg-surface/90 border border-border shadow-xs max-w-xl mx-auto flex flex-col items-center">
             <LayoutContainer className="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-4 text-primary">
@@ -130,11 +160,30 @@ export const TimelineFeature: React.FC = () => {
               </Button>
             )}
           </LayoutContainer>
+        ) : filteredEvents.length === 0 ? (
+          /* Estado Vazio Quando Busca ou Filtro Não Encontra Resultados */
+          <LayoutContainer className="text-center py-14 sm:py-16 p-8 rounded-3xl bg-surface/90 border border-border shadow-xs max-w-xl mx-auto flex flex-col items-center">
+            <LayoutContainer className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-4 text-primary">
+              <SearchX className="w-7 h-7" />
+            </LayoutContainer>
+            <Title level="h3" className="text-lg sm:text-xl font-bold text-text-primary mb-2">
+              {TIMELINE_CONSTANTS.FILTER_EMPTY_TITLE}
+            </Title>
+            <Text className="text-text-secondary max-w-md mx-auto text-sm leading-relaxed mb-6">
+              {TIMELINE_CONSTANTS.FILTER_EMPTY_DESC}
+            </Text>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={clearFilters}
+              className="font-bold text-blue-950 px-5 py-2.5 shadow-sm hover:scale-105 transition-all cursor-pointer"
+            >
+              {TIMELINE_CONSTANTS.BTN_CLEAR_FILTERS}
+            </Button>
+          </LayoutContainer>
         ) : (
           <LayoutContainer className="relative">
             {/* The Vertical Spine Line */}
-            {/* Mobile: linha fixada à esquerda em left-6 (24px) */}
-            {/* Desktop (lg): linha centralizada exatamente no meio em left-1/2 */}
             <LayoutContainer
               aria-hidden="true"
               className="absolute top-0 bottom-0 w-1 bg-gradient-to-b from-primary via-primary/50 to-primary/10 rounded-full left-6 lg:left-1/2 -translate-x-1/2 pointer-events-none"
@@ -142,7 +191,7 @@ export const TimelineFeature: React.FC = () => {
 
             {/* Lista Contínua de Marcos Históricos */}
             <LayoutContainer className="flex flex-col gap-10 sm:gap-14">
-              {events.map((event, index) => {
+              {filteredEvents.map((event, index) => {
                 const isEven = index % 2 === 0;
                 const isFirstOfYear = !seenYears.has(event.year);
                 if (isFirstOfYear) {
@@ -157,8 +206,6 @@ export const TimelineFeature: React.FC = () => {
                     className="timeline-milestone-item relative flex items-center w-full scroll-mt-32 sm:scroll-mt-36"
                   >
                     {/* Marcador de Ano sobre a Linha do Tempo */}
-                    {/* Mobile: posicionado em left-6 */}
-                    {/* Desktop (lg): posicionado em left-1/2 */}
                     <LayoutContainer
                       role="button"
                       tabIndex={0}
@@ -181,8 +228,6 @@ export const TimelineFeature: React.FC = () => {
                     </LayoutContainer>
 
                     {/* Container do Card de Conteúdo */}
-                    {/* Mobile: recuo para a direita (pl-14 sm:pl-16) ocupando largura cheia */}
-                    {/* Desktop (lg): ocupa metade da largura alternando esquerda ou direita */}
                     <LayoutContainer
                       className={`w-full pl-14 sm:pl-16 lg:pl-0 lg:w-[calc(50%-2.5rem)] ${
                         isEven ? 'lg:mr-auto' : 'lg:ml-auto'

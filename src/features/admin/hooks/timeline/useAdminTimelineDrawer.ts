@@ -55,6 +55,7 @@ const defaultEventValues: TimelineEventFormData = {
   isHighlighted: false,
   isActive: true,
   imageUrl: null,
+  galleryUrls: [],
 };
 
 export const useAdminTimelineDrawer = (onSuccess: () => void) => {
@@ -113,6 +114,7 @@ export const useAdminTimelineDrawer = (onSuccess: () => void) => {
       isHighlighted: Boolean(event.isHighlighted),
       isActive: event.isActive !== false,
       imageUrl: event.imageUrl || null,
+      galleryUrls: event.galleryUrls || [],
     });
     setPendingPhotoFile(null);
     setIsOpen(true);
@@ -151,6 +153,7 @@ export const useAdminTimelineDrawer = (onSuccess: () => void) => {
           isHighlighted: Boolean(data.isHighlighted),
           isActive: Boolean(data.isActive),
           imageUrl: resolvedPhotoUrl || undefined,
+          galleryUrls: data.galleryUrls || [],
         };
 
         if (editingId) {

@@ -33,6 +33,9 @@ import {
   Loader2,
   Clock,
   Compass,
+  ChevronLeft,
+  ChevronRight,
+  GripVertical,
 } from 'lucide-react';
 
 const ICON_MAP: Record<string, React.ElementType> = {
@@ -70,6 +73,7 @@ interface StadiumQuickFactsManagerProps {
   onAddCard: (card: Omit<StadiumQuickFact, 'id'>) => Promise<void> | void;
   onUpdateCard: (index: number, updatedCard: StadiumQuickFact) => Promise<void> | void;
   onRemoveCard: (index: number) => Promise<void> | void;
+  onReorderCards: (newQuickFacts: StadiumQuickFact[]) => Promise<void> | void;
 }
 
 export const StadiumQuickFactsManager: React.FC<StadiumQuickFactsManagerProps> = ({
@@ -77,6 +81,7 @@ export const StadiumQuickFactsManager: React.FC<StadiumQuickFactsManagerProps> =
   onAddCard,
   onUpdateCard,
   onRemoveCard,
+  onReorderCards,
 }) => {
   // Estado para novo card
   const [label, setLabel] = useState('');
@@ -94,6 +99,68 @@ export const StadiumQuickFactsManager: React.FC<StadiumQuickFactsManagerProps> =
   // Estado para exclusão com confirmação
   const [deletingIndex, setDeletingIndex] = useState<number | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // Estado para Drag and Drop
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+  const [isReordering, setIsReordering] = useState(false);
+
+  const handleMoveCard = async (currentIndex: number, direction: 'left' | 'right') => {
+    const targetIndex = direction === 'left' ? currentIndex - 1 : currentIndex + 1;
+    if (targetIndex < 0 || targetIndex >= quickFacts.length) return;
+
+    const reordered = [...quickFacts];
+    const [moved] = reordered.splice(currentIndex, 1);
+    reordered.splice(targetIndex, 0, moved);
+
+    // Recalcula o atributo order
+    const updated = reordered.map((item, idx) => ({ ...item, order: idx + 1 }));
+    try {
+      setIsReordering(true);
+      await onReorderCards(updated);
+    } finally {
+      setIsReordering(false);
+    }
+  };
+
+  const handleDragStart = (index: number) => {
+    setDraggedIndex(index);
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === index) return;
+    setDragOverIndex(index);
+  };
+
+  const handleDrop = async (e: React.DragEvent, dropIndex: number) => {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === dropIndex) {
+      setDraggedIndex(null);
+      setDragOverIndex(null);
+      return;
+    }
+
+    const reordered = [...quickFacts];
+    const [moved] = reordered.splice(draggedIndex, 1);
+    reordered.splice(dropIndex, 0, moved);
+
+    const updated = reordered.map((item, idx) => ({ ...item, order: idx + 1 }));
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+
+    try {
+      setIsReordering(true);
+      await onReorderCards(updated);
+    } finally {
+      setIsReordering(false);
+    }
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+  };
 
   const handleAdd = async () => {
     if (!label.trim() || !value.trim()) return;
@@ -249,13 +316,37 @@ export const StadiumQuickFactsManager: React.FC<StadiumQuickFactsManagerProps> =
         <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {quickFacts.map((card, index) => {
             const Icon = (card.icon && ICON_MAP[card.icon]) || Info;
+            const isDragging = draggedIndex === index;
+            const isDragTarget = dragOverIndex === index;
+            const canMoveLeft = index > 0;
+            const canMoveRight = index < quickFacts.length - 1;
+
             return (
               <LayoutContainer
                 key={card.id || index}
-                className="p-4 rounded-2xl bg-background border border-border hover:border-primary/50 transition-all flex flex-col justify-between gap-3 shadow-xs group"
+                draggable={!isReordering}
+                onDragStart={() => handleDragStart(index)}
+                onDragOver={(e) => handleDragOver(e, index)}
+                onDrop={(e) => handleDrop(e, index)}
+                onDragEnd={handleDragEnd}
+                className={`p-4 rounded-2xl bg-background border transition-all flex flex-col justify-between gap-3 shadow-xs group cursor-grab active:cursor-grabbing select-none ${
+                  isDragging
+                    ? 'opacity-40 border-dashed border-primary'
+                    : isDragTarget
+                    ? 'border-primary ring-2 ring-primary/40 scale-[1.02]'
+                    : 'border-border hover:border-primary/50'
+                }`}
               >
                 <LayoutContainer className="flex items-start justify-between gap-2">
                   <LayoutContainer className="flex items-center gap-2.5">
+                    {/* Drag Handle & Ícone */}
+                    <LayoutContainer
+                      className="text-text-secondary/50 group-hover:text-primary transition-colors cursor-grab"
+                      title={ADMIN_STADIUM_TEXTS.QUICK_FACTS.DRAG_HINT}
+                    >
+                      <GripVertical className="w-4 h-4" />
+                    </LayoutContainer>
+
                     <LayoutContainer className="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0 group-hover:bg-primary group-hover:text-black transition-colors">
                       <Icon className="w-4 h-4" />
                     </LayoutContainer>
@@ -269,14 +360,49 @@ export const StadiumQuickFactsManager: React.FC<StadiumQuickFactsManagerProps> =
                     </LayoutContainer>
                   </LayoutContainer>
 
-                  {/* Ações */}
+                  {/* Ações: Reordenar (< >) + Editar + Excluir */}
                   <LayoutContainer className="flex items-center gap-1 shrink-0">
+                    {/* Mover para Esquerda */}
                     <Button
                       type="button"
                       size="none"
                       variant="custom"
-                      onClick={() => handleStartEdit(index)}
-                      className="w-8 h-8 rounded-lg bg-surface hover:bg-primary text-text-secondary hover:text-black border border-border/80 shadow-xs flex items-center justify-center transition-all cursor-pointer"
+                      disabled={!canMoveLeft || isReordering}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleMoveCard(index, 'left');
+                      }}
+                      className="w-7 h-7 rounded-lg bg-surface hover:bg-primary text-text-secondary hover:text-black disabled:opacity-25 disabled:hover:bg-surface disabled:hover:text-text-secondary border border-border/80 shadow-xs flex items-center justify-center transition-all cursor-pointer"
+                      title={ADMIN_STADIUM_TEXTS.QUICK_FACTS.MOVE_LEFT_TOOLTIP}
+                    >
+                      <ChevronLeft className="w-3.5 h-3.5" />
+                    </Button>
+
+                    {/* Mover para Direita */}
+                    <Button
+                      type="button"
+                      size="none"
+                      variant="custom"
+                      disabled={!canMoveRight || isReordering}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleMoveCard(index, 'right');
+                      }}
+                      className="w-7 h-7 rounded-lg bg-surface hover:bg-primary text-text-secondary hover:text-black disabled:opacity-25 disabled:hover:bg-surface disabled:hover:text-text-secondary border border-border/80 shadow-xs flex items-center justify-center transition-all cursor-pointer"
+                      title={ADMIN_STADIUM_TEXTS.QUICK_FACTS.MOVE_RIGHT_TOOLTIP}
+                    >
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </Button>
+
+                    <Button
+                      type="button"
+                      size="none"
+                      variant="custom"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleStartEdit(index);
+                      }}
+                      className="w-7 h-7 rounded-lg bg-surface hover:bg-primary text-text-secondary hover:text-black border border-border/80 shadow-xs flex items-center justify-center transition-all cursor-pointer"
                       title={ADMIN_STADIUM_TEXTS.QUICK_FACTS.EDIT_CARD_TOOLTIP}
                     >
                       <Edit3 className="w-3.5 h-3.5" />
@@ -285,8 +411,11 @@ export const StadiumQuickFactsManager: React.FC<StadiumQuickFactsManagerProps> =
                       type="button"
                       size="none"
                       variant="custom"
-                      onClick={() => setDeletingIndex(index)}
-                      className="w-8 h-8 rounded-lg bg-surface hover:bg-[#ea580c] text-text-secondary hover:text-white border border-border/80 shadow-xs flex items-center justify-center transition-all cursor-pointer"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDeletingIndex(index);
+                      }}
+                      className="w-7 h-7 rounded-lg bg-surface hover:bg-[#ea580c] text-text-secondary hover:text-white border border-border/80 shadow-xs flex items-center justify-center transition-all cursor-pointer"
                       title={ADMIN_STADIUM_TEXTS.QUICK_FACTS.DELETE_CARD_TOOLTIP}
                     >
                       <Trash2 className="w-3.5 h-3.5" />
