@@ -45,6 +45,15 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: '/timeline',
+        destination: '/historia',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

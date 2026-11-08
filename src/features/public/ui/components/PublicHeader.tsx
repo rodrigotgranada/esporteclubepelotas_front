@@ -11,6 +11,7 @@ import { ThemeToggle } from '@/shared/ui/components/molecules/ThemeToggle';
 import { useSettingsStore } from '@/store/useSettingsStore';
 import { PUBLIC_HEADER_TEXTS } from './PublicHeader.constants';
 import { PublicNavigationDrawer } from './PublicNavigationDrawer';
+import { HeaderReadingProgressBar } from './HeaderReadingProgressBar';
 
 export const PublicHeader = () => {
   const { user, logout } = useAuthStore();
@@ -44,7 +45,7 @@ export const PublicHeader = () => {
     <>
       <LayoutContainer
         as="header"
-        className="sticky top-0 z-40 w-full bg-header/95 backdrop-blur-md border-b border-header-border transition-colors duration-200"
+        className="sticky top-0 z-40 w-full bg-header/95 backdrop-blur-md border-b border-header-border transition-colors duration-200 relative"
       >
         <LayoutContainer className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 relative flex items-center justify-between">
           {/* LADO ESQUERDO: Botão de Menu Hamburguer (Mobile, Tablet e Desktop) */}
@@ -153,6 +154,9 @@ export const PublicHeader = () => {
             )}
           </LayoutContainer>
         </LayoutContainer>
+
+        {/* Barra de Progresso de Leitura Áureo-Cerúlea Fixada Exatamente na Borda Inferior do Header */}
+        <HeaderReadingProgressBar />
       </LayoutContainer>
 
       {/* Unified Mobile & Desktop Mega Navigation Drawer (contém o alternador de temas no mobile) */}

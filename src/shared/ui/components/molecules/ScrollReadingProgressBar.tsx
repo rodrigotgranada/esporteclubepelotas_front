@@ -63,3 +63,4 @@ export const ScrollReadingProgressBar: React.FC<ScrollReadingProgressBarProps> =
     </LayoutContainer>
   );
 };
+

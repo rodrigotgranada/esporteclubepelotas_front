@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { LayoutContainer, Title, Text, Button, ScrollReadingProgressBar } from '@/shared/ui/components';
+import { LayoutContainer, Title, Text, Button } from '@/shared/ui/components';
 import { useStadium } from '../../hooks/useStadium';
 import { STADIUM_TEXTS } from '../../constants/stadium.constants';
 import { StadiumHero } from '../components/StadiumHero';
@@ -48,9 +48,6 @@ export const StadiumFeature: React.FC = () => {
 
   return (
     <LayoutContainer as="main" className="w-full min-h-screen bg-background">
-      {/* Barra de Progresso de Leitura Fixa no Topo */}
-      <ScrollReadingProgressBar />
-
       {/* 1. Hero Monumental (Capa, Título e Olho Editorial) */}
       <StadiumHero
         title={stadium?.title}

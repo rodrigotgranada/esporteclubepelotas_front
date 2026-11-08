@@ -30,7 +30,6 @@ import { PUBLIC_NEWS_TEXTS } from '../../constants/news.constants';
 import { useNewsArticle } from '../../hooks/useNewsArticle';
 import { NewsRenderer } from '../components/NewsRenderer';
 import { NewsCard } from '../components/NewsCard';
-import { NewsReadingProgressBar } from '../components/NewsReadingProgressBar';
 import { NewsSocialShareBar } from '../components/NewsSocialShareBar';
 import { NewsReactions } from '../components/NewsReactions';
 import { NewsSocioBanner } from '../components/NewsSocioBanner';
@@ -118,7 +117,6 @@ export const NewsDetailFeature: React.FC<NewsDetailFeatureProps> = ({ slug }) =>
 
   return (
     <>
-      <NewsReadingProgressBar />
       <LayoutContainer className="flex flex-col gap-10 py-8 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto w-full">
       {/* Back button */}
       <LayoutContainer>

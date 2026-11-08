@@ -1,4 +1,5 @@
 export * from './PublicHeader';
+export * from './HeaderReadingProgressBar';
 export * from './PublicFooter';
 export * from './PublicNavigationDrawer';
 export * from './PelotasWatermarkBackground';
