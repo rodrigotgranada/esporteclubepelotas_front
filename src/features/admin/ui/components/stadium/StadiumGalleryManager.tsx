@@ -33,13 +33,13 @@ import { toast } from 'react-hot-toast';
 interface StadiumGalleryManagerProps {
   gallery: StadiumGalleryImage[];
   onAddImage: (file: File | Blob, caption: string) => Promise<void>;
-  onUpdateImage: (index: number, updated: Partial<StadiumGalleryImage>) => void;
-  onRemoveImage: (index: number) => void;
+  onUpdateImage: (index: number, updated: Partial<StadiumGalleryImage>) => Promise<void> | void;
+  onRemoveImage: (index: number) => Promise<void> | void;
 }
 
 type CropTarget =
   | { type: 'new'; file: File }
-  | { type: 'existing'; index: number; currentUrl: string };
+  | { type: 'existing'; index: number; currentUrl: string; file?: File };
 
 export const StadiumGalleryManager: React.FC<StadiumGalleryManagerProps> = ({
   gallery,
@@ -60,9 +60,11 @@ export const StadiumGalleryManager: React.FC<StadiumGalleryManagerProps> = ({
   // Estados de Edição da Foto / Legenda
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editCaption, setEditCaption] = useState<string>('');
+  const [isSavingCaption, setIsSavingCaption] = useState(false);
 
   // Estados de Exclusão com Confirmação
   const [deletingIndex, setDeletingIndex] = useState<number | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Ao selecionar um arquivo novo do computador para upload
   const handleSelectNewFile = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -87,6 +89,7 @@ export const StadiumGalleryManager: React.FC<StadiumGalleryManagerProps> = ({
         type: 'existing',
         index: editingIndex,
         currentUrl: existingPhoto?.url || '',
+        file,
       });
       setIsCropModalOpen(true);
       e.target.value = '';
@@ -117,11 +120,14 @@ export const StadiumGalleryManager: React.FC<StadiumGalleryManagerProps> = ({
         setCaption('');
       } else {
         const uploadRes = await stadiumService.uploadGalleryImage(croppedBlob);
-        onUpdateImage(cropTarget.index, { url: uploadRes.url });
+        await onUpdateImage(cropTarget.index, { url: uploadRes.url });
       }
       setIsCropModalOpen(false);
       setCropSourceImage('');
       setCropTarget(null);
+      if (editingIndex !== null) {
+        setEditingIndex(null);
+      }
     } catch (err) {
       console.error('Erro ao processar imagem recortada:', err);
       toast.error('Erro ao salvar imagem recortada');
@@ -139,10 +145,16 @@ export const StadiumGalleryManager: React.FC<StadiumGalleryManagerProps> = ({
       if (cropTarget.type === 'new') {
         await onAddImage(cropTarget.file, caption);
         setCaption('');
+      } else if (cropTarget.file) {
+        const uploadRes = await stadiumService.uploadGalleryImage(cropTarget.file);
+        await onUpdateImage(cropTarget.index, { url: uploadRes.url });
       }
       setIsCropModalOpen(false);
       setCropSourceImage('');
       setCropTarget(null);
+      if (editingIndex !== null) {
+        setEditingIndex(null);
+      }
     } catch (err) {
       console.error('Erro ao salvar imagem original:', err);
       toast.error('Erro ao salvar imagem');
@@ -159,18 +171,28 @@ export const StadiumGalleryManager: React.FC<StadiumGalleryManagerProps> = ({
     setEditCaption(photo.caption || '');
   };
 
-  const handleSaveEditCaption = () => {
+  const handleSaveEditCaption = async () => {
     if (editingIndex === null) return;
-    onUpdateImage(editingIndex, { caption: editCaption.trim() });
-    setEditingIndex(null);
-    setEditCaption('');
+    try {
+      setIsSavingCaption(true);
+      await onUpdateImage(editingIndex, { caption: editCaption.trim() });
+      setEditingIndex(null);
+      setEditCaption('');
+    } finally {
+      setIsSavingCaption(false);
+    }
   };
 
   // Executa exclusão confirmada
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (deletingIndex === null) return;
-    onRemoveImage(deletingIndex);
-    setDeletingIndex(null);
+    try {
+      setIsDeleting(true);
+      await onRemoveImage(deletingIndex);
+      setDeletingIndex(null);
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   const photoBeingEdited = editingIndex !== null ? gallery[editingIndex] : null;
@@ -405,6 +427,7 @@ export const StadiumGalleryManager: React.FC<StadiumGalleryManagerProps> = ({
             <Button
               type="button"
               variant="ghost"
+              disabled={isSavingCaption}
               onClick={() => setEditingIndex(null)}
               className="cursor-pointer"
             >
@@ -413,11 +436,18 @@ export const StadiumGalleryManager: React.FC<StadiumGalleryManagerProps> = ({
             <Button
               type="button"
               variant="primary"
+              disabled={isSavingCaption}
               onClick={handleSaveEditCaption}
               className="cursor-pointer font-bold shadow-sm"
             >
-              <Check className="w-4 h-4 mr-1.5" />
-              <Text as="span">{ADMIN_STADIUM_TEXTS.GALLERY.UPDATE_CAPTION_BUTTON}</Text>
+              {isSavingCaption ? (
+                <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />
+              ) : (
+                <Check className="w-4 h-4 mr-1.5" />
+              )}
+              <Text as="span">
+                {isSavingCaption ? 'Salvando...' : ADMIN_STADIUM_TEXTS.GALLERY.UPDATE_CAPTION_BUTTON}
+              </Text>
             </Button>
           </LayoutContainer>
         </LayoutContainer>
@@ -426,7 +456,7 @@ export const StadiumGalleryManager: React.FC<StadiumGalleryManagerProps> = ({
       {/* Modal de Confirmação de Exclusão de Foto */}
       <Modal
         isOpen={deletingIndex !== null}
-        onClose={() => setDeletingIndex(null)}
+        onClose={() => !isDeleting && setDeletingIndex(null)}
         size="md"
       >
         <LayoutContainer className="flex flex-col gap-5 p-2">
@@ -453,6 +483,7 @@ export const StadiumGalleryManager: React.FC<StadiumGalleryManagerProps> = ({
             <Button
               type="button"
               variant="ghost"
+              disabled={isDeleting}
               onClick={() => setDeletingIndex(null)}
               className="cursor-pointer"
             >
@@ -460,11 +491,18 @@ export const StadiumGalleryManager: React.FC<StadiumGalleryManagerProps> = ({
             </Button>
             <Button
               type="button"
+              disabled={isDeleting}
               onClick={handleConfirmDelete}
-              className="bg-[#ea580c] hover:bg-[#c2410c] text-white font-bold cursor-pointer transition-colors shadow-sm"
+              className="bg-[#ea580c] hover:bg-[#c2410c] text-white font-bold cursor-pointer transition-colors shadow-sm disabled:opacity-50"
             >
-              <Trash2 className="w-4 h-4 mr-1.5" />
-              <Text as="span">{ADMIN_STADIUM_TEXTS.GALLERY.CONFIRM_DELETE_BUTTON}</Text>
+              {isDeleting ? (
+                <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />
+              ) : (
+                <Trash2 className="w-4 h-4 mr-1.5" />
+              )}
+              <Text as="span">
+                {isDeleting ? 'Excluindo...' : ADMIN_STADIUM_TEXTS.GALLERY.CONFIRM_DELETE_BUTTON}
+              </Text>
             </Button>
           </LayoutContainer>
         </LayoutContainer>

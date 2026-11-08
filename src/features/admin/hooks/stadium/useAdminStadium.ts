@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'react-hot-toast';
-import { useTransactionalSave, stripBlobUrl } from '@/shared/hooks/useTransactionalSave';
+import { useTransactionalSave, stripBlobUrl, verifyUploadedUrl } from '@/shared/hooks/useTransactionalSave';
 import { stadiumService } from '@/features/stadium/services/stadium.service';
 import {
   updateStadiumSchema,
@@ -104,24 +104,96 @@ export const useAdminStadium = () => {
     setCoverPreviewUrl(objectUrl);
   };
 
-  const handleAddGalleryImage = async (file: File | Blob, caption: string) => {
-    try {
-      const uploadRes = await stadiumService.uploadGalleryImage(file);
-      const currentGallery = form.getValues('gallery') || [];
-      const newPhoto: StadiumGalleryImage = {
-        url: uploadRes.url,
-        caption: caption.trim(),
-        order: currentGallery.length + 1,
-      };
-      form.setValue('gallery', [...currentGallery, newPhoto], { shouldDirty: true });
-      toast.success(ADMIN_STADIUM_TEXTS.GALLERY.SUCCESS_UPLOAD);
-    } catch (err) {
-      console.error('Erro ao subir foto da galeria:', err);
-      toast.error(ADMIN_STADIUM_TEXTS.FEEDBACK.UPLOAD_GALLERY_ERROR);
-    }
+  const persistStadiumMutation = async (
+    overrideData: Partial<UpdateStadiumFormData>,
+    successMessage: string,
+  ) => {
+    const currentValues = form.getValues();
+    const payload: UpdateStadiumFormData = {
+      ...currentValues,
+      ...overrideData,
+      coverImageUrl: stripBlobUrl(overrideData.coverImageUrl ?? currentValues.coverImageUrl, ''),
+    };
+
+    return await runTransactionalSave({
+      saveToDb: async () => {
+        return await stadiumService.updateStadiumInfo(payload);
+      },
+      onConfirmed: async (updated) => {
+        form.reset({
+          title: updated.title,
+          subtitle: updated.subtitle || '',
+          coverImageUrl: updated.coverImageUrl || '',
+          inaugurationDate: updated.inaugurationDate || '',
+          capacity: updated.capacity || '',
+          pitchDimensions: updated.pitchDimensions || '',
+          address: updated.address || '',
+          mapsDirectUrl: updated.mapsDirectUrl || '',
+          mapsEmbedUrl: updated.mapsEmbedUrl || '',
+          contentHtml: updated.contentHtml,
+          gallery: updated.gallery || [],
+          facts: updated.facts || [],
+          isActive: updated.isActive !== undefined ? updated.isActive : true,
+        });
+        setCoverPreviewUrl(updated.coverImageUrl || '');
+        toast.success(successMessage);
+      },
+      onError: (err) => {
+        console.error('Falha ao persistir dados do estádio no banco:', err);
+        toast.error(ADMIN_STADIUM_TEXTS.FEEDBACK.SAVE_ERROR);
+      },
+    });
   };
 
-  const handleUpdateGalleryImage = (index: number, updated: Partial<StadiumGalleryImage>) => {
+  const handleAddGalleryImage = async (file: File | Blob, caption: string) => {
+    await runTransactionalSave({
+      hasPendingMedia: true,
+      uploadMedia: async () => {
+        const uploadRes = await stadiumService.uploadGalleryImage(file);
+        return verifyUploadedUrl(uploadRes.url, ADMIN_STADIUM_TEXTS.FEEDBACK.UPLOAD_GALLERY_ERROR);
+      },
+      saveToDb: async (uploadedUrl: string) => {
+        const currentGallery = form.getValues('gallery') || [];
+        const newPhoto: StadiumGalleryImage = {
+          url: uploadedUrl,
+          caption: caption.trim(),
+          order: currentGallery.length + 1,
+        };
+        const updatedGallery = [...currentGallery, newPhoto];
+        const currentValues = form.getValues();
+        return await stadiumService.updateStadiumInfo({
+          ...currentValues,
+          gallery: updatedGallery,
+          coverImageUrl: stripBlobUrl(currentValues.coverImageUrl, ''),
+        });
+      },
+      onConfirmed: async (updated) => {
+        form.reset({
+          title: updated.title,
+          subtitle: updated.subtitle || '',
+          coverImageUrl: updated.coverImageUrl || '',
+          inaugurationDate: updated.inaugurationDate || '',
+          capacity: updated.capacity || '',
+          pitchDimensions: updated.pitchDimensions || '',
+          address: updated.address || '',
+          mapsDirectUrl: updated.mapsDirectUrl || '',
+          mapsEmbedUrl: updated.mapsEmbedUrl || '',
+          contentHtml: updated.contentHtml,
+          gallery: updated.gallery || [],
+          facts: updated.facts || [],
+          isActive: updated.isActive !== undefined ? updated.isActive : true,
+        });
+        setCoverPreviewUrl(updated.coverImageUrl || '');
+        toast.success(ADMIN_STADIUM_TEXTS.GALLERY.SUCCESS_UPLOAD);
+      },
+      onError: (err) => {
+        console.error('Erro ao adicionar foto à galeria:', err);
+        toast.error(ADMIN_STADIUM_TEXTS.FEEDBACK.UPLOAD_GALLERY_ERROR);
+      },
+    });
+  };
+
+  const handleUpdateGalleryImage = async (index: number, updated: Partial<StadiumGalleryImage>) => {
     const currentGallery = form.getValues('gallery') || [];
     const updatedGallery = currentGallery.map((item, idx) => {
       if (idx === index) {
@@ -129,35 +201,32 @@ export const useAdminStadium = () => {
       }
       return item;
     });
-    form.setValue('gallery', updatedGallery, { shouldDirty: true });
-    toast.success(ADMIN_STADIUM_TEXTS.GALLERY.SUCCESS_UPDATE);
+
+    await persistStadiumMutation({ gallery: updatedGallery }, ADMIN_STADIUM_TEXTS.GALLERY.SUCCESS_UPDATE);
   };
 
-  const handleRemoveGalleryImage = (index: number) => {
+  const handleRemoveGalleryImage = async (index: number) => {
     const currentGallery = form.getValues('gallery') || [];
     const updated = currentGallery.filter((_, idx) => idx !== index);
-    form.setValue('gallery', updated, { shouldDirty: true });
-    toast.success(ADMIN_STADIUM_TEXTS.GALLERY.SUCCESS_DELETE);
+    await persistStadiumMutation({ gallery: updated }, ADMIN_STADIUM_TEXTS.GALLERY.SUCCESS_DELETE);
   };
 
-  const handleAddFact = (fact: StadiumFact) => {
+  const handleAddFact = async (fact: StadiumFact) => {
     const currentFacts = form.getValues('facts') || [];
-    form.setValue('facts', [...currentFacts, fact], { shouldDirty: true });
-    toast.success(ADMIN_STADIUM_TEXTS.FACTS.SUCCESS_ADD);
+    const updatedFacts = [...currentFacts, fact];
+    await persistStadiumMutation({ facts: updatedFacts }, ADMIN_STADIUM_TEXTS.FACTS.SUCCESS_ADD);
   };
 
-  const handleUpdateFact = (index: number, updatedFact: StadiumFact) => {
+  const handleUpdateFact = async (index: number, updatedFact: StadiumFact) => {
     const currentFacts = form.getValues('facts') || [];
     const updatedFacts = currentFacts.map((item, idx) => (idx === index ? updatedFact : item));
-    form.setValue('facts', updatedFacts, { shouldDirty: true });
-    toast.success(ADMIN_STADIUM_TEXTS.FACTS.SUCCESS_UPDATE);
+    await persistStadiumMutation({ facts: updatedFacts }, ADMIN_STADIUM_TEXTS.FACTS.SUCCESS_UPDATE);
   };
 
-  const handleRemoveFact = (index: number) => {
+  const handleRemoveFact = async (index: number) => {
     const currentFacts = form.getValues('facts') || [];
     const updated = currentFacts.filter((_, idx) => idx !== index);
-    form.setValue('facts', updated, { shouldDirty: true });
-    toast.success(ADMIN_STADIUM_TEXTS.FACTS.SUCCESS_DELETE);
+    await persistStadiumMutation({ facts: updated }, ADMIN_STADIUM_TEXTS.FACTS.SUCCESS_DELETE);
   };
 
   const onSubmit = form.handleSubmit(async (data: UpdateStadiumFormData) => {

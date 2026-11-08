@@ -13,13 +13,13 @@ import {
 } from '@/shared/ui/components';
 import { StadiumFact } from '@/features/stadium/types/stadium.types';
 import { ADMIN_STADIUM_TEXTS } from '../../../constants/admin-stadium.constants';
-import { History, Plus, Trash2, Edit3, Check, X, AlertTriangle } from 'lucide-react';
+import { History, Plus, Trash2, Edit3, Check, X, AlertTriangle, Loader2 } from 'lucide-react';
 
 interface StadiumFactsManagerProps {
   facts: StadiumFact[];
-  onAddFact: (fact: StadiumFact) => void;
-  onUpdateFact: (index: number, updatedFact: StadiumFact) => void;
-  onRemoveFact: (index: number) => void;
+  onAddFact: (fact: StadiumFact) => Promise<void> | void;
+  onUpdateFact: (index: number, updatedFact: StadiumFact) => Promise<void> | void;
+  onRemoveFact: (index: number) => Promise<void> | void;
 }
 
 export const StadiumFactsManager: React.FC<StadiumFactsManagerProps> = ({
@@ -32,26 +32,34 @@ export const StadiumFactsManager: React.FC<StadiumFactsManagerProps> = ({
   const [year, setYear] = useState('');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [isAdding, setIsAdding] = useState(false);
 
   // Estado para edição in-place de marco existente
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editYear, setEditYear] = useState('');
   const [editTitle, setEditTitle] = useState('');
   const [editDescription, setEditDescription] = useState('');
+  const [isSavingEdit, setIsSavingEdit] = useState(false);
 
   // Estado para exclusão com confirmação
   const [deletingIndex, setDeletingIndex] = useState<number | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
     if (!year.trim() || !title.trim() || !description.trim()) return;
-    onAddFact({
-      year: year.trim(),
-      title: title.trim(),
-      description: description.trim(),
-    });
-    setYear('');
-    setTitle('');
-    setDescription('');
+    try {
+      setIsAdding(true);
+      await onAddFact({
+        year: year.trim(),
+        title: title.trim(),
+        description: description.trim(),
+      });
+      setYear('');
+      setTitle('');
+      setDescription('');
+    } finally {
+      setIsAdding(false);
+    }
   };
 
   const handleStartEdit = (index: number) => {
@@ -70,21 +78,31 @@ export const StadiumFactsManager: React.FC<StadiumFactsManagerProps> = ({
     setEditDescription('');
   };
 
-  const handleSaveEdit = () => {
+  const handleSaveEdit = async () => {
     if (editingIndex === null) return;
     if (!editYear.trim() || !editTitle.trim() || !editDescription.trim()) return;
-    onUpdateFact(editingIndex, {
-      year: editYear.trim(),
-      title: editTitle.trim(),
-      description: editDescription.trim(),
-    });
-    handleCancelEdit();
+    try {
+      setIsSavingEdit(true);
+      await onUpdateFact(editingIndex, {
+        year: editYear.trim(),
+        title: editTitle.trim(),
+        description: editDescription.trim(),
+      });
+      handleCancelEdit();
+    } finally {
+      setIsSavingEdit(false);
+    }
   };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (deletingIndex === null) return;
-    onRemoveFact(deletingIndex);
-    setDeletingIndex(null);
+    try {
+      setIsDeleting(true);
+      await onRemoveFact(deletingIndex);
+      setDeletingIndex(null);
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   const factToDelete = deletingIndex !== null ? facts[deletingIndex] : null;
@@ -145,12 +163,18 @@ export const StadiumFactsManager: React.FC<StadiumFactsManagerProps> = ({
             <Button
               type="button"
               variant="primary"
-              disabled={!year.trim() || !title.trim() || !description.trim()}
+              disabled={isAdding || !year.trim() || !title.trim() || !description.trim()}
               onClick={handleAdd}
               className="w-full flex items-center justify-center gap-2 font-bold cursor-pointer h-10"
             >
-              <Plus className="w-4 h-4" />
-              <Text as="span">{ADMIN_STADIUM_TEXTS.FACTS.ADD_FACT_BUTTON}</Text>
+              {isAdding ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Plus className="w-4 h-4" />
+              )}
+              <Text as="span">
+                {isAdding ? 'Adicionando...' : ADMIN_STADIUM_TEXTS.FACTS.ADD_FACT_BUTTON}
+              </Text>
             </Button>
           </LayoutContainer>
         </LayoutContainer>
@@ -224,12 +248,18 @@ export const StadiumFactsManager: React.FC<StadiumFactsManagerProps> = ({
                       <Button
                         type="button"
                         variant="primary"
-                        disabled={!editYear.trim() || !editTitle.trim() || !editDescription.trim()}
+                        disabled={isSavingEdit || !editYear.trim() || !editTitle.trim() || !editDescription.trim()}
                         onClick={handleSaveEdit}
                         className="w-full flex items-center justify-center gap-1.5 font-bold cursor-pointer h-10 shadow-xs"
                       >
-                        <Check className="w-4 h-4" />
-                        <Text as="span">{ADMIN_STADIUM_TEXTS.FACTS.SAVE_EDIT_BUTTON}</Text>
+                        {isSavingEdit ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Check className="w-4 h-4" />
+                        )}
+                        <Text as="span">
+                          {isSavingEdit ? 'Salvando...' : ADMIN_STADIUM_TEXTS.FACTS.SAVE_EDIT_BUTTON}
+                        </Text>
                       </Button>
                     </LayoutContainer>
                   </LayoutContainer>
@@ -295,7 +325,7 @@ export const StadiumFactsManager: React.FC<StadiumFactsManagerProps> = ({
       {/* Modal de Confirmação de Exclusão */}
       <Modal
         isOpen={deletingIndex !== null}
-        onClose={() => setDeletingIndex(null)}
+        onClose={() => !isDeleting && setDeletingIndex(null)}
         size="md"
       >
         <LayoutContainer className="flex flex-col gap-5 p-2">
@@ -322,6 +352,7 @@ export const StadiumFactsManager: React.FC<StadiumFactsManagerProps> = ({
             <Button
               type="button"
               variant="ghost"
+              disabled={isDeleting}
               onClick={() => setDeletingIndex(null)}
               className="cursor-pointer"
             >
@@ -329,11 +360,18 @@ export const StadiumFactsManager: React.FC<StadiumFactsManagerProps> = ({
             </Button>
             <Button
               type="button"
+              disabled={isDeleting}
               onClick={handleConfirmDelete}
-              className="bg-[#ea580c] hover:bg-[#c2410c] text-white font-bold cursor-pointer transition-colors shadow-sm"
+              className="bg-[#ea580c] hover:bg-[#c2410c] text-white font-bold cursor-pointer transition-colors shadow-sm disabled:opacity-50"
             >
-              <Trash2 className="w-4 h-4 mr-1.5" />
-              <Text as="span">{ADMIN_STADIUM_TEXTS.FACTS.CONFIRM_DELETE_BUTTON}</Text>
+              {isDeleting ? (
+                <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />
+              ) : (
+                <Trash2 className="w-4 h-4 mr-1.5" />
+              )}
+              <Text as="span">
+                {isDeleting ? 'Excluindo...' : ADMIN_STADIUM_TEXTS.FACTS.CONFIRM_DELETE_BUTTON}
+              </Text>
             </Button>
           </LayoutContainer>
         </LayoutContainer>

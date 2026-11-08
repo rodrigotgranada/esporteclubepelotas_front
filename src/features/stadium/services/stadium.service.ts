@@ -3,12 +3,24 @@ import { StadiumData, UpdateStadiumInput } from '../types/stadium.types';
 
 export const stadiumService = {
   getStadiumInfo: async (): Promise<StadiumData> => {
-    const response = await api.get<StadiumData>('/stadium');
+    const response = await api.get<StadiumData>('/stadium', {
+      params: { _t: Date.now() },
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        Pragma: 'no-cache',
+      },
+    });
     return response.data;
   },
 
   getStadiumForAdmin: async (): Promise<StadiumData> => {
-    const response = await api.get<StadiumData>('/admin/stadium');
+    const response = await api.get<StadiumData>('/admin/stadium', {
+      params: { _t: Date.now() },
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        Pragma: 'no-cache',
+      },
+    });
     return response.data;
   },
 
