@@ -287,3 +287,4 @@ export function useStadiumGalleryManager({
 }
 
 export type UseStadiumGalleryManagerReturn = ReturnType<typeof useStadiumGalleryManager>;
+

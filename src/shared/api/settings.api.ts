@@ -1,5 +1,6 @@
 import { api } from '@/services/api';
 import { Settings } from '@/store/useSettingsStore';
+import { uploadMedia } from '@/shared/services/media-upload.service';
 
 export const settingsApi = {
   getSettings: async (): Promise<Settings> => {
@@ -8,15 +9,12 @@ export const settingsApi = {
   },
 
   uploadLogoMedia: async (file: File): Promise<string> => {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('logo', file);
-    const response = await api.post('/settings/upload-logo', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
+    const res = await uploadMedia(file, {
+      endpoint: '/settings/upload-logo',
+      folder: 'settings',
+      legacyFieldName: 'logo',
     });
-    return response.data?.url || response.data;
+    return res.url;
   },
 
   updateSettings: async (data: any, file?: File): Promise<Settings> => {

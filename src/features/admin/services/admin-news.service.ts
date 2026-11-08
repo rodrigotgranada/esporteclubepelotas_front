@@ -1,4 +1,5 @@
 import { api } from '@/services/api';
+import { uploadMedia, uploadMultipleMedia } from '@/shared/services/media-upload.service';
 
 export interface NewsCategoryData {
   _id: string;
@@ -166,58 +167,48 @@ export const adminNewsService = {
   },
 
   uploadCover: async (id: string, file: File): Promise<{ url: string }> => {
-    const formData = new FormData();
-    formData.append('cover', file);
-    const response = await api.post(`/news/admin/${id}/cover`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+    return uploadMedia(file, {
+      endpoint: `/news/admin/${id}/cover`,
+      legacyFieldName: 'cover',
+      folder: 'news',
     });
-    return response.data;
   },
 
   uploadCoverMedia: async (file: File, folderId?: string): Promise<{ url: string }> => {
-    const formData = new FormData();
-    formData.append('cover', file);
-    if (folderId) {
-      formData.append('folderId', folderId);
-    }
-    const response = await api.post('/news/admin/upload-cover', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+    return uploadMedia(file, {
+      endpoint: '/news/admin/upload-cover',
+      legacyFieldName: 'cover',
+      folderId,
+      folder: 'news',
     });
-    return response.data;
   },
 
   uploadGalleryMedia: async (files: File[], folderId?: string): Promise<{ urls: string[] }> => {
-    const formData = new FormData();
-    files.forEach((f) => formData.append('gallery', f));
-    if (folderId) {
-      formData.append('folderId', folderId);
-    }
-    const response = await api.post('/news/admin/upload-gallery', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+    const urls = await uploadMultipleMedia(files, {
+      endpoint: '/news/admin/upload-gallery',
+      legacyFieldName: 'gallery',
+      folderId,
+      folder: 'news',
     });
-    return response.data;
+    return { urls };
   },
 
   uploadContentImage: async (file: File | Blob): Promise<{ url: string }> => {
-    const formData = new FormData();
-    const uploadFile =
-      file instanceof File
-        ? file
-        : new File([file], `content-${Date.now()}.png`, { type: file.type || 'image/png' });
-    formData.append('image', uploadFile);
-    const response = await api.post('/news/admin/upload-image', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+    return uploadMedia(file, {
+      endpoint: '/news/admin/upload-image',
+      legacyFieldName: 'image',
+      prefix: 'content',
+      folder: 'news',
     });
-    return response.data;
   },
 
   uploadGallery: async (id: string, files: File[]): Promise<{ urls: string[] }> => {
-    const formData = new FormData();
-    files.forEach(f => formData.append('gallery', f));
-    const response = await api.post(`/news/admin/${id}/gallery`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+    const urls = await uploadMultipleMedia(files, {
+      endpoint: `/news/admin/${id}/gallery`,
+      legacyFieldName: 'gallery',
+      folder: 'news',
     });
-    return response.data;
+    return { urls };
   },
 
   getCategories: async (): Promise<NewsCategoryData[]> => {

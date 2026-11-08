@@ -1,5 +1,6 @@
 import { api } from '@/services/api';
 import { StadiumData, UpdateStadiumInput } from '../types/stadium.types';
+import { uploadMedia } from '@/shared/services/media-upload.service';
 
 export const stadiumService = {
   getStadiumInfo: async (): Promise<StadiumData> => {
@@ -30,29 +31,19 @@ export const stadiumService = {
   },
 
   uploadCover: async (file: File | Blob): Promise<{ url: string }> => {
-    const formData = new FormData();
-    const uploadFile =
-      file instanceof File
-        ? file
-        : new File([file], `stadium-cover-${Date.now()}.png`, { type: file.type || 'image/png' });
-    formData.append('file', uploadFile);
-    const response = await api.post<{ url: string }>('/admin/stadium/upload-cover', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+    return uploadMedia(file, {
+      endpoint: '/admin/stadium/upload-cover',
+      folder: 'stadium',
+      prefix: 'stadium-cover',
     });
-    return response.data;
   },
 
   uploadGalleryImage: async (file: File | Blob): Promise<{ url: string }> => {
-    const formData = new FormData();
-    const uploadFile =
-      file instanceof File
-        ? file
-        : new File([file], `stadium-gallery-${Date.now()}.png`, { type: file.type || 'image/png' });
-    formData.append('file', uploadFile);
-    const response = await api.post<{ url: string }>('/admin/stadium/upload-gallery', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+    return uploadMedia(file, {
+      endpoint: '/admin/stadium/upload-gallery',
+      folder: 'stadium',
+      prefix: 'stadium-gallery',
     });
-    return response.data;
   },
 };
 

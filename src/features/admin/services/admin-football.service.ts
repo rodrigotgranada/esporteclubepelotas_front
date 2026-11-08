@@ -1,3 +1,4 @@
+import { uploadMedia } from '@/shared/services/media-upload.service';
 import { api } from '@/services/api';
 import {
   AthleteData,
@@ -40,13 +41,12 @@ export const adminFootballService = {
     file: File,
     folderId?: string,
   ): Promise<{ url: string; photoUrl: string }> => {
-    const formData = new FormData();
-    formData.append('file', file);
-    if (folderId) formData.append('folderId', folderId);
-    const response = await api.post('/athletes/admin/upload-photo', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+    const res = await uploadMedia(file, {
+      endpoint: '/athletes/admin/upload-photo',
+      folderId,
+      folder: 'athletes',
     });
-    return response.data;
+    return { url: res.url, photoUrl: res.url };
   },
 
   createAthlete: async (data: Partial<AthleteData>): Promise<AthleteData> => {
@@ -71,12 +71,11 @@ export const adminFootballService = {
     id: string,
     file: File,
   ): Promise<{ photoUrl: string }> => {
-    const formData = new FormData();
-    formData.append('file', file);
-    const response = await api.post(`/athletes/admin/${id}/photo`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+    const res = await uploadMedia(file, {
+      endpoint: `/athletes/admin/${id}/photo`,
+      folder: 'athletes',
     });
-    return response.data;
+    return { photoUrl: res.url };
   },
 
   // --- Elencos / Temporadas ---
@@ -102,13 +101,12 @@ export const adminFootballService = {
     file: File,
     folderId?: string,
   ): Promise<{ url: string; coverUrl: string }> => {
-    const formData = new FormData();
-    formData.append('file', file);
-    if (folderId) formData.append('folderId', folderId);
-    const response = await api.post('/squads/admin/upload-cover', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+    const res = await uploadMedia(file, {
+      endpoint: '/squads/admin/upload-cover',
+      folderId,
+      folder: 'squads',
     });
-    return response.data;
+    return { url: res.url, coverUrl: res.url };
   },
 
   createSquad: async (data: Partial<SquadData>): Promise<SquadData> => {
@@ -147,12 +145,11 @@ export const adminFootballService = {
     id: string,
     file: File,
   ): Promise<{ coverUrl: string }> => {
-    const formData = new FormData();
-    formData.append('file', file);
-    const response = await api.post(`/squads/admin/${id}/cover`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+    const res = await uploadMedia(file, {
+      endpoint: `/squads/admin/${id}/cover`,
+      folder: 'squads',
     });
-    return response.data;
+    return { coverUrl: res.url };
   },
 
   // --- Portal da Base (/base) ---

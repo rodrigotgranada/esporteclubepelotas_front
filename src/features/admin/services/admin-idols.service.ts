@@ -1,3 +1,4 @@
+import { uploadMedia, uploadMultipleMedia } from '@/shared/services/media-upload.service';
 import { api } from '@/services/api';
 import {
   IdolCategory,
@@ -62,26 +63,26 @@ export const adminIdolsService = {
     file: File,
     folderId?: string,
   ): Promise<{ url: string; photoUrl: string }> => {
-    const formData = new FormData();
-    formData.append('photo', file);
-    if (folderId) formData.append('folderId', folderId);
-    const response = await api.post('/idols/admin/upload-photo', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+    const res = await uploadMedia(file, {
+      endpoint: '/idols/admin/upload-photo',
+      legacyFieldName: 'photo',
+      folderId,
+      folder: 'idols',
     });
-    return response.data;
+    return { url: res.url, photoUrl: res.url };
   },
 
   uploadGalleryMedia: async (
     files: File[],
     folderId?: string,
   ): Promise<{ urls: string[]; gallery: string[] }> => {
-    const formData = new FormData();
-    files.forEach((file) => formData.append('gallery', file));
-    if (folderId) formData.append('folderId', folderId);
-    const response = await api.post('/idols/admin/upload-gallery', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+    const urls = await uploadMultipleMedia(files, {
+      endpoint: '/idols/admin/upload-gallery',
+      legacyFieldName: 'gallery',
+      folderId,
+      folder: 'idols',
     });
-    return response.data;
+    return { urls, gallery: urls };
   },
 
   createIdol: async (dto: CreateAdminIdolDto): Promise<IdolData> => {
@@ -100,20 +101,20 @@ export const adminIdolsService = {
   },
 
   uploadPhoto: async (id: string, file: File): Promise<{ photoUrl: string; message: string }> => {
-    const formData = new FormData();
-    formData.append('photo', file);
-    const response = await api.post(`/idols/admin/${id}/photo`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+    const res = await uploadMedia(file, {
+      endpoint: `/idols/admin/${id}/photo`,
+      legacyFieldName: 'photo',
+      folder: 'idols',
     });
-    return response.data;
+    return { photoUrl: res.url, message: 'Foto atualizada com sucesso.' };
   },
 
   uploadGallery: async (id: string, files: File[]): Promise<{ gallery: string[]; message: string }> => {
-    const formData = new FormData();
-    files.forEach((file) => formData.append('gallery', file));
-    const response = await api.post(`/idols/admin/${id}/gallery`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+    const urls = await uploadMultipleMedia(files, {
+      endpoint: `/idols/admin/${id}/gallery`,
+      legacyFieldName: 'gallery',
+      folder: 'idols',
     });
-    return response.data;
+    return { gallery: urls, message: 'Galeria atualizada com sucesso.' };
   },
 };

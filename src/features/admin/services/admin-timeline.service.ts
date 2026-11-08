@@ -1,3 +1,4 @@
+import { uploadMedia } from '@/shared/services/media-upload.service';
 import { api } from '@/services/api';
 import { TimelineEventData, TimelineCategoryData } from '@/features/timeline/services/timeline.service';
 
@@ -79,15 +80,13 @@ export const adminTimelineService = {
   },
 
   uploadPhotoMedia: async (file: File, folderId?: string): Promise<string> => {
-    const formData = new FormData();
-    formData.append('photo', file);
-    if (folderId) {
-      formData.append('folderId', folderId);
-    }
-    const response = await api.post('/timeline/admin/upload-photo', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+    const res = await uploadMedia(file, {
+      endpoint: '/timeline/admin/upload-photo',
+      legacyFieldName: 'photo',
+      folderId,
+      folder: 'timeline',
     });
-    return response.data?.url || response.data;
+    return res.url;
   },
 
   createEvent: async (data: CreateTimelineEventInput, photoFile?: File): Promise<TimelineEventData> => {
