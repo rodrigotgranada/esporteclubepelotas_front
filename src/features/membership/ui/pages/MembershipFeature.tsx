@@ -1,25 +1,29 @@
 'use client';
 
 import React, { useRef } from 'react';
+import Link from 'next/link';
 import {
   LayoutContainer,
   Title,
   Text,
   Badge,
+  Button,
   Spinner,
 } from '@/shared/ui/components';
 import { MEMBERSHIP_TEXTS } from '../../constants/membership.constants';
 import { useMembershipPlans } from '../../hooks/useMembershipPlans';
 import { useMembershipLeadModal } from '../../hooks/useMembershipLeadModal';
+import { useMembershipLink } from '../../hooks/useMembershipLink';
 import { MembershipHero } from '../components/MembershipHero';
 import { MembershipPlanCard } from '../components/MembershipPlanCard';
 import { MembershipPlanModal } from '../components/MembershipPlanModal';
 import { QuickLeadModal } from '../components/QuickLeadModal';
 import { MembershipFaqSection } from '../components/MembershipFaqSection';
-import { Sparkles, AlertCircle } from 'lucide-react';
+import { Sparkles, AlertCircle, Ticket, ExternalLink } from 'lucide-react';
 
 export const MembershipFeature: React.FC = () => {
   const { plans, isLoading, error } = useMembershipPlans();
+  const membershipLink = useMembershipLink();
   const plansSectionRef = useRef<HTMLDivElement>(null);
 
   const {
@@ -43,7 +47,48 @@ export const MembershipFeature: React.FC = () => {
       {/* 1. Hero Monumental do Quadro Social */}
       <MembershipHero onScrollToPlans={handleScrollToPlans} />
 
-      {/* 2. Seção de Planos de Sócios */}
+      {/* 2. Banner de Aviso Oficial quando ElevenTickets for o Provedor Principal */}
+      {membershipLink.provider === 'ELEVENTICKETS' && (
+        <LayoutContainer className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+          <LayoutContainer className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-primary/20 via-surface to-surface border-2 border-primary/40 p-6 sm:p-8 shadow-md flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+            <LayoutContainer className="flex-1 flex flex-col gap-2">
+              <LayoutContainer className="flex items-center gap-2">
+                <Badge variant="primary" size="sm" className="font-black text-[10px] uppercase tracking-wider">
+                  <Ticket className="w-3.5 h-3.5 mr-1" />
+                  {MEMBERSHIP_TEXTS.ELEVENTICKETS_BANNER_BADGE}
+                </Badge>
+              </LayoutContainer>
+              <Title level="h3" className="text-xl sm:text-2xl font-black text-text-primary">
+                {MEMBERSHIP_TEXTS.ELEVENTICKETS_BANNER_TITLE}
+              </Title>
+              <Text as="p" className="text-xs sm:text-sm text-text-secondary leading-relaxed max-w-3xl">
+                {MEMBERSHIP_TEXTS.ELEVENTICKETS_BANNER_DESC}
+              </Text>
+            </LayoutContainer>
+
+            <LayoutContainer className="shrink-0 w-full sm:w-auto">
+              <Link
+                href={membershipLink.externalUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full sm:w-auto block"
+              >
+                <Button
+                  variant="primary"
+                  size="md"
+                  fullWidth
+                  rightIcon={<ExternalLink className="w-4 h-4" />}
+                  className="font-black text-blue-950 px-6 py-3 shadow-md hover:scale-105 transition-transform"
+                >
+                  {MEMBERSHIP_TEXTS.ELEVENTICKETS_BANNER_BUTTON}
+                </Button>
+              </Link>
+            </LayoutContainer>
+          </LayoutContainer>
+        </LayoutContainer>
+      )}
+
+      {/* 3. Seção de Planos de Sócios */}
       <LayoutContainer
         ref={plansSectionRef}
         className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24"
@@ -116,10 +161,10 @@ export const MembershipFeature: React.FC = () => {
         )}
       </LayoutContainer>
 
-      {/* 3. Seção de Perguntas Frequentes (FAQ) */}
+      {/* 4. Seção de Perguntas Frequentes (FAQ) */}
       <MembershipFaqSection />
 
-      {/* 4. Modal de Detalhes do Plano */}
+      {/* 5. Modal de Detalhes do Plano */}
       <MembershipPlanModal
         isOpen={isDetailsOpen}
         onClose={handleCloseDetails}
@@ -128,7 +173,7 @@ export const MembershipFeature: React.FC = () => {
         isSubmitting={isSubmitting}
       />
 
-      {/* 5. Modal de Cadastro Rápido de Lead (para não autenticados) */}
+      {/* 6. Modal de Cadastro Rápido de Lead (para não autenticados) */}
       <QuickLeadModal
         isOpen={isQuickLeadOpen}
         onClose={handleCloseQuickLead}

@@ -33,6 +33,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { useSettingsStore } from '@/store/useSettingsStore';
 import { useThemeStore } from '@/store/useThemeStore';
 import { useSystemModulesStore } from '@/store/useSystemModulesStore';
+import { useMembershipLink } from '@/features/membership/hooks/useMembershipLink';
 import { PUBLIC_DRAWER_TEXTS } from './PublicNavigationDrawer.constants';
 
 export interface PublicNavigationDrawerProps {
@@ -48,6 +49,7 @@ export const PublicNavigationDrawer: React.FC<PublicNavigationDrawerProps> = ({
   const { settings } = useSettingsStore();
   const { mode, setMode } = useThemeStore();
   const { isLoaded: isModulesLoaded, isModuleActive } = useSystemModulesStore();
+  const membershipLink = useMembershipLink();
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [isDark, setIsDark] = useState(false);
@@ -190,7 +192,13 @@ export const PublicNavigationDrawer: React.FC<PublicNavigationDrawerProps> = ({
                 {PUBLIC_DRAWER_TEXTS.MEMBERSHIP_CARD_DESC}
               </Text>
 
-              <Link href="/socio" onClick={onClose} className="pt-1">
+              <Link
+                href={membershipLink.url}
+                target={membershipLink.target}
+                rel={membershipLink.rel}
+                onClick={onClose}
+                className="pt-1"
+              >
                 <Button variant="primary" size="sm" className="w-full font-extrabold uppercase tracking-wide justify-between text-xs py-2.5 shadow-xs">
                   <span>{PUBLIC_DRAWER_TEXTS.MEMBERSHIP_CARD_BTN}</span>
                   <ChevronRight className="w-4 h-4" />

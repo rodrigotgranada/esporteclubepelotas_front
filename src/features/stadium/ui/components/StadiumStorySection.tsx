@@ -3,6 +3,7 @@
 import React, { useMemo } from 'react';
 import Link from 'next/link';
 import { LayoutContainer, Title, Text, Badge, Button } from '@/shared/ui/components';
+import { useMembershipLink } from '@/features/membership/hooks/useMembershipLink';
 import { STADIUM_TEXTS } from '../../constants/stadium.constants';
 import { StadiumFact } from '../../types/stadium.types';
 import { BookOpen, Clock, History, Award, ArrowRight } from 'lucide-react';
@@ -21,6 +22,7 @@ export const StadiumStorySection: React.FC<StadiumStorySectionProps> = ({
   contentHtml,
   facts = [],
 }) => {
+  const membershipLink = useMembershipLink();
   const displayTitle = storyTitle || STADIUM_TEXTS.STORY_SECTION.TITLE;
   const displaySubtitle = storySubtitle || STADIUM_TEXTS.STORY_SECTION.SUBTITLE;
 
@@ -159,7 +161,12 @@ export const StadiumStorySection: React.FC<StadiumStorySectionProps> = ({
                 {STADIUM_TEXTS.MEMBERSHIP_CTA.SUBTITLE}
               </Text>
 
-              <Link href="/socio" className="w-full">
+              <Link
+                href={membershipLink.url}
+                target={membershipLink.target}
+                rel={membershipLink.rel}
+                className="w-full"
+              >
                 <Button
                   variant="primary"
                   className="w-full flex items-center justify-center gap-2 font-bold cursor-pointer"

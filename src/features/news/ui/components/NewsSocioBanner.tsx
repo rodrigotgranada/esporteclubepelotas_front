@@ -2,11 +2,14 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ArrowRight, ShieldCheck, Sparkles } from 'lucide-react';
+import { ArrowRight, Sparkles } from 'lucide-react';
 import { LayoutContainer, Title, Text, Badge, Button } from '@/shared/ui/components';
+import { useMembershipLink } from '@/features/membership/hooks/useMembershipLink';
 import { PUBLIC_NEWS_TEXTS } from '../../constants/news.constants';
 
 export const NewsSocioBanner: React.FC = () => {
+  const membershipLink = useMembershipLink();
+
   return (
     <LayoutContainer className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/15 via-surface to-surface border border-primary/30 p-6 sm:p-8 shadow-md">
       {/* Elemento Decorativo de Fundo */}
@@ -31,7 +34,12 @@ export const NewsSocioBanner: React.FC = () => {
         </LayoutContainer>
 
         <LayoutContainer className="shrink-0 w-full sm:w-auto">
-          <Link href="/planos" className="w-full sm:w-auto block">
+          <Link
+            href={membershipLink.url}
+            target={membershipLink.target}
+            rel={membershipLink.rel}
+            className="w-full sm:w-auto block"
+          >
             <Button
               variant="primary"
               size="md"
@@ -47,4 +55,3 @@ export const NewsSocioBanner: React.FC = () => {
     </LayoutContainer>
   );
 };
-

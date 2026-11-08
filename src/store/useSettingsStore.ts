@@ -50,6 +50,8 @@ export interface Settings {
   stadiumAddress?: string;
   googleMapsEmbedUrl?: string;
   copyrightText?: string;
+  membershipSystemProvider?: 'ELEVENTICKETS' | 'NATIVE';
+  membershipExternalUrl?: string;
 }
 
 interface SettingsState {

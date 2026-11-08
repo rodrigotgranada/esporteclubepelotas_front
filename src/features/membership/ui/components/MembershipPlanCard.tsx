@@ -118,3 +118,4 @@ export const MembershipPlanCard: React.FC<MembershipPlanCardProps> = ({
     </LayoutContainer>
   );
 };
+

@@ -126,3 +126,4 @@ export const MembershipPlanModal: React.FC<MembershipPlanModalProps> = ({
     </Modal>
   );
 };
+

@@ -9,6 +9,13 @@ export const MEMBERSHIP_TEXTS = {
   HERO_STATS_DISCOUNT: 'Até 15% de desconto na loja',
   HERO_STATS_TRADITION: 'Desde 1908 fazendo história',
 
+  // ElevenTickets Oficial Banner
+  ELEVENTICKETS_BANNER_BADGE: 'SISTEMA OFICIAL EM OPERAÇÃO',
+  ELEVENTICKETS_BANNER_TITLE: 'Quadro Social Oficial operando via ElevenTickets',
+  ELEVENTICKETS_BANNER_DESC:
+    'O Esporte Clube Pelotas utiliza oficialmente a plataforma parceira ElevenTickets para a emissão de carteirinhas, planos e mensalidades. Clique abaixo para ser direcionado ao portal oficial ou explore a vitrine de planos abaixo.',
+  ELEVENTICKETS_BANNER_BUTTON: 'Acessar ElevenTickets Oficial',
+
   // Grid
   PLANS_SECTION_BADGE: 'PLANOS DE SÓCIO',
   PLANS_SECTION_TITLE: 'Escolha o plano ideal para a sua paixão',
@@ -145,3 +152,4 @@ export const buildMembershipWhatsAppUrl = (params: {
   const message = encodeURIComponent(lines.join('\n'));
   return `https://wa.me/${cleanPhone}?text=${message}`;
 };
+

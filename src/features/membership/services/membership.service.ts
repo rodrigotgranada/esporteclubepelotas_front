@@ -59,6 +59,16 @@ export const membershipService = {
     await api.delete(`/admin/membership/plans/${id}`);
   },
 
+  getSystemConfig: async (): Promise<{ provider: 'ELEVENTICKETS' | 'NATIVE'; externalUrl: string }> => {
+    const response = await api.get<{ provider: 'ELEVENTICKETS' | 'NATIVE'; externalUrl: string }>('/admin/membership/system-config');
+    return response.data;
+  },
+
+  updateSystemConfig: async (data: { provider: 'ELEVENTICKETS' | 'NATIVE'; externalUrl?: string }): Promise<{ provider: 'ELEVENTICKETS' | 'NATIVE'; externalUrl: string }> => {
+    const response = await api.put<{ provider: 'ELEVENTICKETS' | 'NATIVE'; externalUrl: string }>('/admin/membership/system-config', data);
+    return response.data;
+  },
+
   getAdminLeads: async (params?: { status?: string; page?: number; limit?: number }) => {
     const response = await api.get<{
       content: MembershipLead[];
@@ -77,3 +87,4 @@ export const membershipService = {
     return response.data;
   },
 };
+

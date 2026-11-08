@@ -13,6 +13,7 @@ import { useAdminMembershipLeads } from '@/features/admin/hooks/membership/useAd
 import { MembershipPlansTab } from './components/MembershipPlansTab';
 import { MembershipLeadsTab } from './components/MembershipLeadsTab';
 import { MembershipPlanDrawer } from './components/MembershipPlanDrawer';
+import { MembershipSystemSelectorCard } from './components/MembershipSystemSelectorCard';
 import { UserCheck, MessageSquare } from 'lucide-react';
 
 export const AdminMembershipFeature: React.FC = () => {
@@ -59,6 +60,9 @@ export const AdminMembershipFeature: React.FC = () => {
           </Text>
         </LayoutContainer>
       </LayoutContainer>
+
+      {/* Seletor de Provedor Oficial (ElevenTickets vs Portal Nativo) */}
+      <MembershipSystemSelectorCard />
 
       {/* Navegador de Abas */}
       <LayoutContainer className="flex items-center gap-2 border-b border-border pb-1">
@@ -143,3 +147,4 @@ export const AdminMembershipFeature: React.FC = () => {
     </LayoutContainer>
   );
 };
+

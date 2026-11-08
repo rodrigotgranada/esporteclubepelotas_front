@@ -78,3 +78,4 @@ export const MembershipFaqSection: React.FC = () => {
     </LayoutContainer>
   );
 };
+

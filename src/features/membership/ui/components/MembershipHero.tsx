@@ -87,3 +87,4 @@ export const MembershipHero: React.FC<MembershipHeroProps> = ({
     </LayoutContainer>
   );
 };
+
