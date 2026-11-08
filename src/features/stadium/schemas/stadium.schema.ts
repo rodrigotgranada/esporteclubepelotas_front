@@ -33,6 +33,8 @@ export const updateStadiumSchema = z.object({
   address: z.string().max(255, 'O endereço não pode ultrapassar 255 caracteres'),
   mapsDirectUrl: z.string(),
   mapsEmbedUrl: z.string(),
+  storyTitle: z.string().max(255, 'O título da reportagem não pode ultrapassar 255 caracteres').optional(),
+  storySubtitle: z.string().max(500, 'O subtítulo da reportagem não pode ultrapassar 500 caracteres').optional(),
   contentHtml: z.string().min(10, 'A história do estádio deve ter pelo menos 10 caracteres'),
   gallery: z.array(stadiumGalleryImageSchema),
   facts: z.array(stadiumFactSchema),

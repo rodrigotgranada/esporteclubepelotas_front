@@ -65,6 +65,8 @@ export const StadiumFeature: React.FC = () => {
 
       {/* 3. A Grande Reportagem (A História Viva da Boca do Lobo + Linha do Tempo) */}
       <StadiumStorySection
+        storyTitle={stadium?.storyTitle}
+        storySubtitle={stadium?.storySubtitle}
         contentHtml={stadium?.contentHtml}
         facts={stadium?.facts}
       />

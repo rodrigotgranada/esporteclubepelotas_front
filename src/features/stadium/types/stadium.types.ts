@@ -29,6 +29,8 @@ export interface StadiumData {
   address: string;
   mapsDirectUrl?: string;
   mapsEmbedUrl?: string;
+  storyTitle?: string;
+  storySubtitle?: string;
   contentHtml: string;
   gallery: StadiumGalleryImage[];
   facts: StadiumFact[];
@@ -48,6 +50,8 @@ export interface UpdateStadiumInput {
   address?: string;
   mapsDirectUrl?: string;
   mapsEmbedUrl?: string;
+  storyTitle?: string;
+  storySubtitle?: string;
   contentHtml: string;
   gallery: StadiumGalleryImage[];
   facts: StadiumFact[];

@@ -9,14 +9,21 @@ import { BookOpen, Clock, History, Award, ArrowRight } from 'lucide-react';
 import { NewsRenderer } from '@/features/news/ui/components/NewsRenderer';
 
 interface StadiumStorySectionProps {
+  storyTitle?: string;
+  storySubtitle?: string;
   contentHtml?: string;
   facts?: StadiumFact[];
 }
 
 export const StadiumStorySection: React.FC<StadiumStorySectionProps> = ({
+  storyTitle,
+  storySubtitle,
   contentHtml,
   facts = [],
 }) => {
+  const displayTitle = storyTitle || STADIUM_TEXTS.STORY_SECTION.TITLE;
+  const displaySubtitle = storySubtitle || STADIUM_TEXTS.STORY_SECTION.SUBTITLE;
+
   const tiptapJson = useMemo(() => {
     if (!contentHtml || typeof contentHtml !== 'string') return null;
     const trimmed = contentHtml.trim();
@@ -55,11 +62,11 @@ export const StadiumStorySection: React.FC<StadiumStorySectionProps> = ({
           </LayoutContainer>
 
           <Title level="h2" className="text-2xl sm:text-3xl md:text-4xl font-black text-text-primary tracking-tight">
-            {STADIUM_TEXTS.STORY_SECTION.TITLE}
+            {displayTitle}
           </Title>
 
           <Text className="text-base sm:text-lg text-text-secondary leading-relaxed">
-            {STADIUM_TEXTS.STORY_SECTION.SUBTITLE}
+            {displaySubtitle}
           </Text>
         </LayoutContainer>
 

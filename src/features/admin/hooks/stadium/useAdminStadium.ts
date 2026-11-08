@@ -41,6 +41,8 @@ export const useAdminStadium = () => {
       address: '',
       mapsDirectUrl: '',
       mapsEmbedUrl: '',
+      storyTitle: 'A História Viva da Boca do Lobo',
+      storySubtitle: 'Uma viagem pelas memórias, pelo pioneirismo e pela paixão do caldeirão áureo-cerúleo',
       contentHtml: '',
       gallery: [],
       facts: [],
@@ -63,6 +65,8 @@ export const useAdminStadium = () => {
         address: data.address || '',
         mapsDirectUrl: data.mapsDirectUrl || '',
         mapsEmbedUrl: data.mapsEmbedUrl || '',
+        storyTitle: data.storyTitle || 'A História Viva da Boca do Lobo',
+        storySubtitle: data.storySubtitle || 'Uma viagem pelas memórias, pelo pioneirismo e pela paixão do caldeirão áureo-cerúleo',
         contentHtml: data.contentHtml || '',
         gallery: data.gallery || [],
         facts: data.facts || [],
@@ -85,6 +89,10 @@ export const useAdminStadium = () => {
         address: FALLBACK_STADIUM_DATA.address,
         mapsDirectUrl: FALLBACK_STADIUM_DATA.mapsDirectUrl || '',
         mapsEmbedUrl: FALLBACK_STADIUM_DATA.mapsEmbedUrl || '',
+        storyTitle: FALLBACK_STADIUM_DATA.storyTitle || 'A História Viva da Boca do Lobo',
+        storySubtitle:
+          FALLBACK_STADIUM_DATA.storySubtitle ||
+          'Uma viagem pelas memórias, pelo pioneirismo e pela paixão do caldeirão áureo-cerúleo',
         contentHtml: FALLBACK_STADIUM_DATA.contentHtml,
         gallery: FALLBACK_STADIUM_DATA.gallery || [],
         facts: FALLBACK_STADIUM_DATA.facts || [],
@@ -133,6 +141,10 @@ export const useAdminStadium = () => {
           address: updated.address || '',
           mapsDirectUrl: updated.mapsDirectUrl || '',
           mapsEmbedUrl: updated.mapsEmbedUrl || '',
+          storyTitle: updated.storyTitle || 'A História Viva da Boca do Lobo',
+          storySubtitle:
+            updated.storySubtitle ||
+            'Uma viagem pelas memórias, pelo pioneirismo e pela paixão do caldeirão áureo-cerúleo',
           contentHtml: updated.contentHtml,
           gallery: updated.gallery || [],
           facts: updated.facts || [],
@@ -182,6 +194,10 @@ export const useAdminStadium = () => {
           address: updated.address || '',
           mapsDirectUrl: updated.mapsDirectUrl || '',
           mapsEmbedUrl: updated.mapsEmbedUrl || '',
+          storyTitle: updated.storyTitle || 'A História Viva da Boca do Lobo',
+          storySubtitle:
+            updated.storySubtitle ||
+            'Uma viagem pelas memórias, pelo pioneirismo e pela paixão do caldeirão áureo-cerúleo',
           contentHtml: updated.contentHtml,
           gallery: updated.gallery || [],
           facts: updated.facts || [],
@@ -287,6 +303,10 @@ export const useAdminStadium = () => {
           address: updated.address || '',
           mapsDirectUrl: updated.mapsDirectUrl || '',
           mapsEmbedUrl: updated.mapsEmbedUrl || '',
+          storyTitle: updated.storyTitle || 'A História Viva da Boca do Lobo',
+          storySubtitle:
+            updated.storySubtitle ||
+            'Uma viagem pelas memórias, pelo pioneirismo e pela paixão do caldeirão áureo-cerúleo',
           contentHtml: updated.contentHtml,
           gallery: updated.gallery || [],
           facts: updated.facts || [],

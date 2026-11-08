@@ -11,11 +11,17 @@ export const ADMIN_STADIUM_TEXTS = {
   },
 
   FORM: {
-    SECTION_BASIC: 'Informações Principais & Capa',
-    TITLE_LABEL: 'Título da Matéria / Memorial',
-    TITLE_PLACEHOLDER: 'Ex: Estádio Boca do Lobo: A Fortaleza Centenária...',
-    SUBTITLE_LABEL: 'Subtítulo / Resumo Editorial',
-    SUBTITLE_PLACEHOLDER: 'Uma breve introdução apaixonada sobre a história...',
+    SECTION_BASIC: 'Informações Principais & Capa (Hero do Topo)',
+    TITLE_LABEL: 'Título Principal do Estádio (Hero do Topo)',
+    TITLE_PLACEHOLDER: 'Ex: Estádio Boca do Lobo: A Fortaleza Centenária do Futebol Gaúcho',
+    SUBTITLE_LABEL: 'Subtítulo / Apresentação do Templo (Hero do Topo)',
+    SUBTITLE_PLACEHOLDER: 'Ex: Fundado em 1908, o mais antigo estádio de futebol em atividade do Rio Grande do Sul...',
+
+    STORY_HEADER_SECTION: 'Cabeçalho da Grande Reportagem Histórica',
+    STORY_TITLE_LABEL: 'Título da Grande Reportagem',
+    STORY_TITLE_PLACEHOLDER: 'Ex: A História Viva da Boca do Lobo',
+    STORY_SUBTITLE_LABEL: 'Subtítulo / Introdução da Reportagem',
+    STORY_SUBTITLE_PLACEHOLDER: 'Ex: Uma viagem pelas memórias, pelo pioneirismo e pela paixão do caldeirão áureo-cerúleo',
 
     COVER_LABEL: 'Imagem de Capa (Proporção Panorâmica 16:9)',
     COVER_HINT: 'Selecione uma imagem de alta definição. Resolução recomendada: 1920x1080.',
