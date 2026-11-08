@@ -467,7 +467,7 @@ export const AdminShowcaseTab: React.FC = () => {
                       size="none"
                       onClick={() => handleSetMain(article)}
                       className="px-2 py-1 rounded-md bg-primary/10 hover:bg-primary text-primary hover:text-background text-[10px] font-bold border border-primary/20 transition-all cursor-pointer whitespace-nowrap"
-                      title="Definir como Manchetão"
+                      title="Definir como Destaque Principal"
                     >
                       {texts.BTN_ADD_MAIN}
                     </Button>

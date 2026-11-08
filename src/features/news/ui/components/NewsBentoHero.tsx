@@ -176,7 +176,7 @@ export const NewsBentoHero: React.FC<NewsBentoHeroProps> = ({
                     src={subArticle.coverImage}
                     alt={subArticle.title}
                     fill
-                    sizes="(max-width: 1024px) 100vw, 35vw"
+                    priority sizes="(max-width: 1024px) 100vw, 35vw"
                     className="object-cover transition-transform duration-500 group-hover:scale-105"
                   />
 

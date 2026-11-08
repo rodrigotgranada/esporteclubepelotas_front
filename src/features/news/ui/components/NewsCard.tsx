@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Eye, Calendar, Sparkles, Clock, Video, Image as ImageIcon, Pin } from 'lucide-react';
+import { Eye, Calendar, Clock, Video, Pin } from 'lucide-react';
 import { LayoutContainer, Title, Text, Badge, SafeImage } from '@/shared/ui/components';
 import { NewsArticleData } from '@/features/admin/services/admin-news.service';
 import { calculateReadingTime, formatNewsDate, getCategoryName } from '../../utils/news.utils';
@@ -26,7 +26,7 @@ export const NewsCard: React.FC<NewsCardProps> = ({ article, className = '' }) =
   return (
     <Link
       href={`/noticias/${article.slug}`}
-      className={`group block focus:outline-none ${className}`}
+      className={`group block h-full focus:outline-none ${className}`}
     >
       <LayoutContainer className="h-full flex flex-col rounded-2xl overflow-hidden bg-surface border border-border shadow-xs transition-all duration-300 group-hover:shadow-md group-hover:border-primary/50 group-hover:-translate-y-1">
         {/* 16:9 Image Container */}
@@ -51,29 +51,17 @@ export const NewsCard: React.FC<NewsCardProps> = ({ article, className = '' }) =
                 Vídeo
               </Badge>
             )}
-
-            {article.gallery && article.gallery.length > 0 && (
-              <Badge variant="default" size="sm" className="bg-black/70 text-white border-white/20 backdrop-blur-xs flex items-center gap-1">
-                <ImageIcon className="w-3 h-3 text-primary" />
-                Fotos
-              </Badge>
-            )}
           </LayoutContainer>
 
-          <LayoutContainer className="absolute top-3 right-3 z-10 flex items-center gap-1.5">
-            {article.isPinned && (
+          {/* Fixado Badge on top right if pinned */}
+          {article.isPinned && (
+            <LayoutContainer className="absolute top-3 right-3 z-10 flex items-center gap-1.5">
               <Badge variant="default" size="sm" className="bg-surface/95 text-primary font-bold border-primary/30 flex items-center gap-1 shadow-sm">
                 <Pin className="w-3 h-3 text-primary" />
                 Fixado
               </Badge>
-            )}
-            {article.isFeatured && (
-              <Badge variant="default" size="sm" className="bg-surface/95 text-amber-500 font-bold border-amber-500/30 flex items-center gap-1 shadow-sm">
-                <Sparkles className="w-3 h-3 text-amber-500" />
-                {article.featuredSlot === 'MAIN' ? 'Manchetão' : 'Destaque'}
-              </Badge>
-            )}
-          </LayoutContainer>
+            </LayoutContainer>
+          )}
         </LayoutContainer>
 
         {/* Content Body */}
@@ -109,25 +97,26 @@ export const NewsCard: React.FC<NewsCardProps> = ({ article, className = '' }) =
             {/* Title */}
             <Title
               level="h3"
-              className="text-base sm:text-lg font-bold text-text-primary line-clamp-2 leading-snug group-hover:text-primary transition-colors"
+              className="text-base sm:text-lg font-bold text-text-primary group-hover:text-primary transition-colors line-clamp-2 leading-snug"
             >
               {article.title}
             </Title>
 
-            {/* Subtitle / Summary */}
-            {(article.subtitle || article.summary) && (
+            {/* Subtitle / Excerpt */}
+            {article.subtitle && (
               <Text as="p" className="text-xs sm:text-sm text-text-secondary line-clamp-2 leading-relaxed">
-                {article.subtitle || article.summary}
+                {article.subtitle}
               </Text>
             )}
           </LayoutContainer>
 
-          {/* Footer author */}
-          <LayoutContainer className="pt-3 border-t border-border/60 flex items-center justify-between text-xs text-text-secondary">
-            <Text as="span" className="font-medium">
-              Por {authorName}
+          {/* Author & Footer Link */}
+          <LayoutContainer className="pt-3 border-t border-border flex items-center justify-between text-xs text-text-secondary">
+            <Text as="span" className="font-medium truncate max-w-[150px]">
+              {authorName}
             </Text>
-            <Text as="span" className="text-primary font-bold group-hover:translate-x-0.5 transition-transform">
+
+            <Text as="span" className="font-bold text-primary group-hover:translate-x-0.5 transition-transform">
               Ler mais →
             </Text>
           </LayoutContainer>

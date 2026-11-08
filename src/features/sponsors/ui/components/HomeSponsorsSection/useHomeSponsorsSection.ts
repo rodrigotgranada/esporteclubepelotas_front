@@ -47,3 +47,4 @@ export const useHomeSponsorsSection = () => {
     handleSponsorClick,
   };
 };
+

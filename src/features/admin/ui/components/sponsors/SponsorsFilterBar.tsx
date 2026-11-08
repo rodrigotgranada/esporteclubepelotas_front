@@ -78,3 +78,4 @@ export const SponsorsFilterBar: React.FC<SponsorsFilterBarProps> = ({
     </LayoutContainer>
   );
 };
+

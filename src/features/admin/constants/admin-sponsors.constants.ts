@@ -88,3 +88,4 @@ export const ADMIN_SPONSORS_TEXTS = {
     ERROR_LOGO_REQUIRED: 'O upload do logotipo do patrocinador é obrigatório.',
   },
 };
+

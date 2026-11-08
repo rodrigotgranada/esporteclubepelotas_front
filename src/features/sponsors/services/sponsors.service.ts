@@ -26,3 +26,4 @@ export const sponsorsService = {
     return response.data;
   },
 };
+

@@ -110,3 +110,4 @@ export const HomeSponsorsSection = () => {
     </LayoutContainer>
   );
 };
+

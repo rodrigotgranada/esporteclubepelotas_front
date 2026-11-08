@@ -58,3 +58,4 @@ export interface SponsorReorderItem {
   id: string;
   displayOrder: number;
 }
+

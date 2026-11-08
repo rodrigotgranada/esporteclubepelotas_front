@@ -48,3 +48,4 @@ export const adminSponsorsService = {
     await api.patch('/admin/sponsors/reorder', items);
   },
 };
+

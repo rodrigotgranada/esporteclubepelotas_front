@@ -1,6 +1,6 @@
 export const NEWS_BENTO_HERO_TEXTS = {
-  BADGE_FEATURED: 'Destaque',
-  BADGE_MAIN: 'Manchete Principal',
+  BADGE_FEATURED: 'Destaque Principal',
+  BADGE_MAIN: 'Destaque Principal',
   BADGE_VIDEO: 'Vídeo',
   BADGE_GALLERY: 'Fotos',
   CTA_READ_MORE: 'Ler matéria completa',
@@ -8,4 +8,3 @@ export const NEWS_BENTO_HERO_TEXTS = {
   FALLBACK_CATEGORY: 'E.C. Pelotas',
   AUTHOR_PREFIX: 'Por',
 };
-

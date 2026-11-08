@@ -12,3 +12,4 @@ export const HOME_SPONSORS_SECTION_TEXTS = {
   BUTTON_BECOME_SPONSOR: 'Seja um Patrocinador',
   LOGO_ALT: (name: string) => `Logotipo oficial de ${name}`,
 };
+
