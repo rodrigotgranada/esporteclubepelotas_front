@@ -147,6 +147,16 @@ export const useSponsorAdminDrawer = ({
     setImageToCrop(null);
   };
 
+  const handleUseOriginal = useCallback(() => {
+    if (!imageToCrop) return;
+    fetch(imageToCrop)
+      .then((res) => res.blob())
+      .then(handleCropComplete)
+      .catch((err) => {
+        console.error('Erro ao usar imagem original do logotipo:', err);
+      });
+  }, [imageToCrop]);
+
   // Submissão com Pipeline Transacional Media-First
   const onSubmit = form.handleSubmit((data: SponsorFormData) => {
     if (!fileToUpload && (!data.logoUrl || data.logoUrl.startsWith('blob:'))) {
@@ -218,6 +228,7 @@ export const useSponsorAdminDrawer = ({
     handleFileChange,
     handleCropComplete,
     handleCropCancel,
+    handleUseOriginal,
     onSubmit,
   };
 };

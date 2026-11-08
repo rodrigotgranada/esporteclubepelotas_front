@@ -5,7 +5,6 @@ import {
   LayoutContainer,
   Title,
   Text,
-  Badge,
   SafeImage,
 } from '@/shared/ui/components';
 import { useHomeSponsorsSection } from './useHomeSponsorsSection';
@@ -68,15 +67,6 @@ export const HomeSponsorsSection = () => {
                   : 'border-border/60 bg-surface/50 hover:border-primary/40 hover:bg-surface/80'
               } ${isClickable ? 'cursor-pointer' : 'cursor-default'}`}
             >
-              {/* Badge de Destaque no topo do card se isFeatured for true */}
-              {sponsor.isFeatured && (
-                <LayoutContainer className="absolute top-2.5 right-2.5">
-                  <Badge variant="primary" size="sm" className="text-[10px] py-0.5 px-1.5 font-bold">
-                    {HOME_SPONSORS_SECTION_TEXTS.FEATURED_BADGE}
-                  </Badge>
-                </LayoutContainer>
-              )}
-
               {/* Logo do Patrocinador */}
               <LayoutContainer className="relative h-14 sm:h-16 w-full max-w-[140px] flex items-center justify-center my-2">
                 <SafeImage

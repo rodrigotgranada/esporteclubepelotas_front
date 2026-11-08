@@ -49,6 +49,7 @@ export const SponsorAdminDrawer: React.FC<SponsorAdminDrawerProps> = ({
     handleFileChange,
     handleCropComplete,
     handleCropCancel,
+    handleUseOriginal,
     onSubmit,
   } = useSponsorAdminDrawer({
     isOpen,
@@ -342,20 +343,14 @@ export const SponsorAdminDrawer: React.FC<SponsorAdminDrawerProps> = ({
         )}
       </Drawer>
 
-      {/* Modal de Crop do Logotipo */}
+      {/* Modal de Crop do Logotipo (Livre, idêntico ao restante do sistema) */}
       {imageToCrop && (
         <CropModal
           isOpen={isCropOpen}
           imageSrc={imageToCrop}
           onClose={handleCropCancel}
           onCropSave={handleCropComplete}
-          onUseOriginal={() => {
-            fetch(imageToCrop)
-              .then((res) => res.blob())
-              .then(handleCropComplete);
-          }}
-          aspect={2}
-          fixedShape="rect"
+          onUseOriginal={handleUseOriginal}
         />
       )}
     </>
