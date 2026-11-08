@@ -1,12 +1,17 @@
 import { Metadata } from 'next';
-import { ComingSoonFeature } from '@/features/public/ui/pages/ComingSoonFeature';
+import { MembershipFeature } from '@/features/membership/ui/pages/MembershipFeature';
 
 export const metadata: Metadata = {
-  title: 'Quadro Social | E.C. Pelotas',
-  description: 'Seja sócio do Esporte Clube Pelotas. Conheça nossos planos e apoie o Lobo da Boca do Lobo.',
+  title: 'Quadro Social | Planos de Sócio | Esporte Clube Pelotas',
+  description:
+    'Seja sócio do Esporte Clube Pelotas. Conheça nossos planos oficiais, garanta seu acesso aos jogos na Boca do Lobo e apoie o eterno Lobo da Boca do Lobo.',
+  openGraph: {
+    title: 'Quadro Social | Planos de Sócio | Esporte Clube Pelotas',
+    description:
+      'Jogue junto com o Lobo dentro e fora de campo. Escolha seu plano e torne-se sócio do Esporte Clube Pelotas.',
+  },
 };
 
 export default function SocioPage() {
-  return <ComingSoonFeature variant="socio" />;
+  return <MembershipFeature />;
 }
-

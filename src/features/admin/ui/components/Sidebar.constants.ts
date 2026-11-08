@@ -12,6 +12,7 @@ export const SIDEBAR_TEXTS = {
     TIMELINE: 'História & Linha do Tempo',
     STADIUM: 'Estádio Boca do Lobo',
     SPONSORS: 'Patrocinadores',
+    MEMBERSHIP: 'Quadro Social (Sócios)',
     MODULES: 'Módulos do Sistema',
     ROLES: 'Cargos e Permissões',
     SETTINGS: 'Configurações',
