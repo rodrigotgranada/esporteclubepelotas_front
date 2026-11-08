@@ -12,6 +12,14 @@ export const stadiumFactSchema = z.object({
   description: z.string().min(1, 'A descrição do marco é obrigatória'),
 });
 
+export const stadiumQuickFactSchema = z.object({
+  id: z.string(),
+  label: z.string().min(1, 'O rótulo do card é obrigatório').max(80, 'Máximo 80 caracteres'),
+  value: z.string().min(1, 'O valor é obrigatório').max(120, 'Máximo 120 caracteres'),
+  icon: z.string().optional(),
+  order: z.number().int().optional(),
+});
+
 export const updateStadiumSchema = z.object({
   title: z
     .string()
@@ -28,6 +36,7 @@ export const updateStadiumSchema = z.object({
   contentHtml: z.string().min(10, 'A história do estádio deve ter pelo menos 10 caracteres'),
   gallery: z.array(stadiumGalleryImageSchema),
   facts: z.array(stadiumFactSchema),
+  quickFacts: z.array(stadiumQuickFactSchema).optional(),
   isActive: z.boolean(),
 });
 

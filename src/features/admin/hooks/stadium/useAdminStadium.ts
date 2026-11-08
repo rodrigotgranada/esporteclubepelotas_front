@@ -10,7 +10,7 @@ import {
   updateStadiumSchema,
   UpdateStadiumFormData,
 } from '@/features/stadium/schemas/stadium.schema';
-import { StadiumFact, StadiumGalleryImage } from '@/features/stadium/types/stadium.types';
+import { StadiumFact, StadiumGalleryImage, StadiumQuickFact } from '@/features/stadium/types/stadium.types';
 import { ADMIN_STADIUM_TEXTS } from '../../constants/admin-stadium.constants';
 import { FALLBACK_STADIUM_DATA } from '@/features/stadium/constants/stadium.constants';
 
@@ -44,6 +44,7 @@ export const useAdminStadium = () => {
       contentHtml: '',
       gallery: [],
       facts: [],
+      quickFacts: [],
       isActive: true,
     },
   });
@@ -65,6 +66,7 @@ export const useAdminStadium = () => {
         contentHtml: data.contentHtml || '',
         gallery: data.gallery || [],
         facts: data.facts || [],
+        quickFacts: data.quickFacts || [],
         isActive: data.isActive !== undefined ? data.isActive : true,
       });
       setCoverPreviewUrl(data.coverImageUrl || '');
@@ -86,6 +88,7 @@ export const useAdminStadium = () => {
         contentHtml: FALLBACK_STADIUM_DATA.contentHtml,
         gallery: FALLBACK_STADIUM_DATA.gallery || [],
         facts: FALLBACK_STADIUM_DATA.facts || [],
+        quickFacts: FALLBACK_STADIUM_DATA.quickFacts || [],
         isActive: true,
       });
       setCoverPreviewUrl(FALLBACK_STADIUM_DATA.coverImageUrl || '');
@@ -133,6 +136,7 @@ export const useAdminStadium = () => {
           contentHtml: updated.contentHtml,
           gallery: updated.gallery || [],
           facts: updated.facts || [],
+          quickFacts: updated.quickFacts || [],
           isActive: updated.isActive !== undefined ? updated.isActive : true,
         });
         setCoverPreviewUrl(updated.coverImageUrl || '');
@@ -181,6 +185,7 @@ export const useAdminStadium = () => {
           contentHtml: updated.contentHtml,
           gallery: updated.gallery || [],
           facts: updated.facts || [],
+          quickFacts: updated.quickFacts || [],
           isActive: updated.isActive !== undefined ? updated.isActive : true,
         });
         setCoverPreviewUrl(updated.coverImageUrl || '');
@@ -229,6 +234,29 @@ export const useAdminStadium = () => {
     await persistStadiumMutation({ facts: updated }, ADMIN_STADIUM_TEXTS.FACTS.SUCCESS_DELETE);
   };
 
+  const handleAddQuickFact = async (card: Omit<StadiumQuickFact, 'id'>) => {
+    const currentQuickFacts = form.getValues('quickFacts') || [];
+    const newCard: StadiumQuickFact = {
+      ...card,
+      id: `fact-${Date.now()}`,
+      order: currentQuickFacts.length + 1,
+    };
+    const updated = [...currentQuickFacts, newCard];
+    await persistStadiumMutation({ quickFacts: updated }, ADMIN_STADIUM_TEXTS.QUICK_FACTS.SUCCESS_ADD);
+  };
+
+  const handleUpdateQuickFact = async (index: number, updatedCard: StadiumQuickFact) => {
+    const currentQuickFacts = form.getValues('quickFacts') || [];
+    const updated = currentQuickFacts.map((item, idx) => (idx === index ? updatedCard : item));
+    await persistStadiumMutation({ quickFacts: updated }, ADMIN_STADIUM_TEXTS.QUICK_FACTS.SUCCESS_UPDATE);
+  };
+
+  const handleRemoveQuickFact = async (index: number) => {
+    const currentQuickFacts = form.getValues('quickFacts') || [];
+    const updated = currentQuickFacts.filter((_, idx) => idx !== index);
+    await persistStadiumMutation({ quickFacts: updated }, ADMIN_STADIUM_TEXTS.QUICK_FACTS.SUCCESS_DELETE);
+  };
+
   const onSubmit = form.handleSubmit(async (data: UpdateStadiumFormData) => {
     await runTransactionalSave({
       hasPendingMedia: Boolean(pendingCoverFileRef.current),
@@ -262,6 +290,7 @@ export const useAdminStadium = () => {
           contentHtml: updated.contentHtml,
           gallery: updated.gallery || [],
           facts: updated.facts || [],
+          quickFacts: updated.quickFacts || [],
           isActive: updated.isActive !== undefined ? updated.isActive : true,
         });
         setCoverPreviewUrl(updated.coverImageUrl || '');
@@ -285,6 +314,9 @@ export const useAdminStadium = () => {
     handleAddFact,
     handleUpdateFact,
     handleRemoveFact,
+    handleAddQuickFact,
+    handleUpdateQuickFact,
+    handleRemoveQuickFact,
     onSubmit,
   };
 };

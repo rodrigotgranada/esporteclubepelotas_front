@@ -32,6 +32,9 @@ export const AdminStadiumFeature: React.FC = () => {
     handleAddFact,
     handleUpdateFact,
     handleRemoveFact,
+    handleAddQuickFact,
+    handleUpdateQuickFact,
+    handleRemoveQuickFact,
     onSubmit,
   } = useAdminStadium();
 
@@ -129,6 +132,9 @@ export const AdminStadiumFeature: React.FC = () => {
             form={form}
             coverPreviewUrl={coverPreviewUrl}
             onSelectCoverFile={handleSelectCoverFile}
+            onAddQuickFact={handleAddQuickFact}
+            onUpdateQuickFact={handleUpdateQuickFact}
+            onRemoveQuickFact={handleRemoveQuickFact}
           />
         )}
 

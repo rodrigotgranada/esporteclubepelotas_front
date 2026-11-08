@@ -22,7 +22,7 @@ export const ADMIN_STADIUM_TEXTS = {
     CHANGE_COVER: 'Alterar Capa',
     UPLOAD_COVER: 'Enviar Capa',
 
-    SECTION_FACTS: 'Ficha Técnica Rápida',
+    SECTION_FACTS: 'Ficha Técnica da Boca do Lobo',
     INAUGURATION_LABEL: 'Data / Ano de Inauguração',
     INAUGURATION_PLACEHOLDER: 'Ex: 25 de Outubro de 1908',
     CAPACITY_LABEL: 'Capacidade Oficial de Público',
@@ -99,6 +99,29 @@ export const ADMIN_STADIUM_TEXTS = {
     SUCCESS_ADD: 'Marco histórico adicionado com sucesso!',
     SUCCESS_UPDATE: 'Marco histórico atualizado com sucesso!',
     SUCCESS_DELETE: 'Marco histórico removido com sucesso.',
+  },
+
+  QUICK_FACTS: {
+    TITLE: 'Ficha Técnica da Boca do Lobo',
+    SUBTITLE: 'Gerencie os cards com os números oficiais, marcos e dados do estádio exibidos no portal.',
+    ADD_CARD_BUTTON: 'Adicionar Card',
+    LABEL_FIELD: 'Título / Rótulo',
+    LABEL_PLACEHOLDER: 'Ex: Capacidade Oficial, Dimensões...',
+    VALUE_FIELD: 'Valor / Informação',
+    VALUE_PLACEHOLDER: 'Ex: 23.336 espectadores, 105m x 68m...',
+    ICON_FIELD: 'Ícone do Card',
+    EDIT_CARD_TITLE: 'Editar Item da Ficha Técnica',
+    SAVE_EDIT_BUTTON: 'Salvar Alterações',
+    CANCEL_EDIT_BUTTON: 'Cancelar',
+    DELETE_CARD_TOOLTIP: 'Excluir este card',
+    EDIT_CARD_TOOLTIP: 'Editar este card',
+    DELETE_CONFIRM_TITLE: 'Excluir Item da Ficha Técnica',
+    DELETE_CONFIRM_DESC: 'Tem certeza que deseja remover este card da ficha técnica da Boca do Lobo? Esta ação não pode ser desfeita.',
+    CONFIRM_DELETE_BUTTON: 'Sim, Excluir',
+    EMPTY: 'Nenhum card cadastrado na ficha técnica. Adicione o primeiro item acima.',
+    SUCCESS_ADD: 'Item da ficha técnica adicionado com sucesso!',
+    SUCCESS_UPDATE: 'Item da ficha técnica atualizado com sucesso!',
+    SUCCESS_DELETE: 'Item removido da ficha técnica.',
   },
 
   FEEDBACK: {

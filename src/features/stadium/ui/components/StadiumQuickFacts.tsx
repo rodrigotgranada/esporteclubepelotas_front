@@ -3,9 +3,41 @@
 import React from 'react';
 import { LayoutContainer, Title, Text } from '@/shared/ui/components';
 import { STADIUM_TEXTS } from '../../constants/stadium.constants';
-import { Calendar, Users, Maximize2, MapPin, Zap, Flame } from 'lucide-react';
+import { StadiumQuickFact } from '../../types/stadium.types';
+import {
+  Calendar,
+  Users,
+  Maximize2,
+  MapPin,
+  Zap,
+  Flame,
+  Trophy,
+  Shield,
+  Star,
+  Award,
+  Info,
+  Clock,
+  Compass,
+} from 'lucide-react';
+
+const ICON_MAP: Record<string, React.ElementType> = {
+  calendar: Calendar,
+  users: Users,
+  maximize: Maximize2,
+  flame: Flame,
+  zap: Zap,
+  mapPin: MapPin,
+  trophy: Trophy,
+  shield: Shield,
+  star: Star,
+  award: Award,
+  info: Info,
+  clock: Clock,
+  compass: Compass,
+};
 
 interface StadiumQuickFactsProps {
+  quickFacts?: StadiumQuickFact[];
   inaugurationDate?: string;
   capacity?: string;
   pitchDimensions?: string;
@@ -13,43 +45,53 @@ interface StadiumQuickFactsProps {
 }
 
 export const StadiumQuickFacts: React.FC<StadiumQuickFactsProps> = ({
+  quickFacts,
   inaugurationDate,
   capacity,
   pitchDimensions,
   address,
 }) => {
-  const items = [
-    {
-      icon: Calendar,
-      label: STADIUM_TEXTS.QUICK_FACTS.INAUGURATION_LABEL,
-      value: inaugurationDate || STADIUM_TEXTS.QUICK_FACTS.INAUGURATION_DEFAULT,
-    },
-    {
-      icon: Users,
-      label: STADIUM_TEXTS.QUICK_FACTS.CAPACITY_LABEL,
-      value: capacity || STADIUM_TEXTS.QUICK_FACTS.CAPACITY_DEFAULT,
-    },
-    {
-      icon: Maximize2,
-      label: STADIUM_TEXTS.QUICK_FACTS.PITCH_LABEL,
-      value: pitchDimensions || STADIUM_TEXTS.QUICK_FACTS.PITCH_DEFAULT,
-    },
-    {
-      icon: Flame,
-      label: STADIUM_TEXTS.QUICK_FACTS.NICKNAME_LABEL,
-      value: STADIUM_TEXTS.QUICK_FACTS.NICKNAME_DEFAULT,
-    },
-    {
-      icon: Zap,
-      label: STADIUM_TEXTS.QUICK_FACTS.LIGHTING_LABEL,
-      value: STADIUM_TEXTS.QUICK_FACTS.LIGHTING_DEFAULT,
-    },
-    {
-      icon: MapPin,
-      label: STADIUM_TEXTS.QUICK_FACTS.LOCATION_LABEL,
-      value: address ? address.split(',')[0] : STADIUM_TEXTS.QUICK_FACTS.LOCATION_DEFAULT,
-    },
-  ];
+  // Se houver cards dinâmicos cadastrados pelo Admin, renderiza-os
+  const hasDynamicCards = Boolean(quickFacts && quickFacts.length > 0);
+
+  const displayItems = hasDynamicCards
+    ? (quickFacts || []).map((fact) => ({
+        icon: (fact.icon && ICON_MAP[fact.icon]) || Info,
+        label: fact.label,
+        value: fact.value,
+      }))
+    : [
+        {
+          icon: Calendar,
+          label: STADIUM_TEXTS.QUICK_FACTS.INAUGURATION_LABEL,
+          value: inaugurationDate || STADIUM_TEXTS.QUICK_FACTS.INAUGURATION_DEFAULT,
+        },
+        {
+          icon: Users,
+          label: STADIUM_TEXTS.QUICK_FACTS.CAPACITY_LABEL,
+          value: capacity || STADIUM_TEXTS.QUICK_FACTS.CAPACITY_DEFAULT,
+        },
+        {
+          icon: Maximize2,
+          label: STADIUM_TEXTS.QUICK_FACTS.PITCH_LABEL,
+          value: pitchDimensions || STADIUM_TEXTS.QUICK_FACTS.PITCH_DEFAULT,
+        },
+        {
+          icon: Flame,
+          label: STADIUM_TEXTS.QUICK_FACTS.NICKNAME_LABEL,
+          value: STADIUM_TEXTS.QUICK_FACTS.NICKNAME_DEFAULT,
+        },
+        {
+          icon: Zap,
+          label: STADIUM_TEXTS.QUICK_FACTS.LIGHTING_LABEL,
+          value: STADIUM_TEXTS.QUICK_FACTS.LIGHTING_DEFAULT,
+        },
+        {
+          icon: MapPin,
+          label: STADIUM_TEXTS.QUICK_FACTS.LOCATION_LABEL,
+          value: address ? address.split(',')[0] : STADIUM_TEXTS.QUICK_FACTS.LOCATION_DEFAULT,
+        },
+      ];
 
   return (
     <LayoutContainer className="w-full bg-surface/50 border-b border-border py-8 sm:py-10">
@@ -64,7 +106,7 @@ export const StadiumQuickFacts: React.FC<StadiumQuickFactsProps> = ({
         </LayoutContainer>
 
         <LayoutContainer className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
-          {items.map((item, idx) => {
+          {displayItems.map((item, idx) => {
             const Icon = item.icon;
             return (
               <LayoutContainer
@@ -75,7 +117,7 @@ export const StadiumQuickFacts: React.FC<StadiumQuickFactsProps> = ({
                   <Icon className="w-4 h-4" />
                 </LayoutContainer>
                 <LayoutContainer className="flex flex-col">
-                  <Text as="span" className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">
+                  <Text as="span" className="text-[11px] font-bold text-text-secondary uppercase tracking-wider line-clamp-1">
                     {item.label}
                   </Text>
                   <Text as="span" className="text-sm sm:text-base font-extrabold text-text-primary line-clamp-2">

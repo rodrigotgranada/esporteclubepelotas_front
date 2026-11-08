@@ -54,8 +54,9 @@ export const StadiumFeature: React.FC = () => {
         coverImageUrl={stadium?.coverImageUrl}
       />
 
-      {/* 2. Ficha Técnica Rápida (Badges e Dados do Templo) */}
+      {/* 2. Ficha Técnica da Boca do Lobo (Badges e Dados do Estádio) */}
       <StadiumQuickFacts
+        quickFacts={stadium?.quickFacts}
         inaugurationDate={stadium?.inaugurationDate}
         capacity={stadium?.capacity}
         pitchDimensions={stadium?.pitchDimensions}

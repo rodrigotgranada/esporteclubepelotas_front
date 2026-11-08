@@ -13,19 +13,27 @@ import {
   CropModal,
 } from '@/shared/ui/components';
 import { UpdateStadiumFormData } from '@/features/stadium/schemas/stadium.schema';
+import { StadiumQuickFact } from '@/features/stadium/types/stadium.types';
 import { ADMIN_STADIUM_TEXTS } from '../../../constants/admin-stadium.constants';
-import { Upload, Image as ImageIcon } from 'lucide-react';
+import { StadiumQuickFactsManager } from './StadiumQuickFactsManager';
+import { Upload, Image as ImageIcon, MapPin } from 'lucide-react';
 
 interface StadiumGeneralFormProps {
   form: UseFormReturn<UpdateStadiumFormData>;
   coverPreviewUrl: string;
   onSelectCoverFile: (file: File) => void;
+  onAddQuickFact: (card: Omit<StadiumQuickFact, 'id'>) => Promise<void> | void;
+  onUpdateQuickFact: (index: number, updatedCard: StadiumQuickFact) => Promise<void> | void;
+  onRemoveQuickFact: (index: number) => Promise<void> | void;
 }
 
 export const StadiumGeneralForm: React.FC<StadiumGeneralFormProps> = ({
   form,
   coverPreviewUrl,
   onSelectCoverFile,
+  onAddQuickFact,
+  onUpdateQuickFact,
+  onRemoveQuickFact,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isCropModalOpen, setIsCropModalOpen] = useState(false);
@@ -145,34 +153,20 @@ export const StadiumGeneralForm: React.FC<StadiumGeneralFormProps> = ({
         </LayoutContainer>
       </LayoutContainer>
 
-      {/* 2. Ficha Técnica do Estádio */}
+      {/* 2. Ficha Técnica da Boca do Lobo (Cards Dinâmicos) */}
+      <StadiumQuickFactsManager
+        quickFacts={watch('quickFacts') || []}
+        onAddCard={onAddQuickFact}
+        onUpdateCard={onUpdateQuickFact}
+        onRemoveCard={onRemoveQuickFact}
+      />
+
+      {/* 3. Localização & Configurações de Exibição */}
       <LayoutContainer className="p-6 rounded-2xl bg-surface border border-border shadow-sm flex flex-col gap-5">
-        <Title level="h3" className="text-lg font-bold text-text-primary">
-          {ADMIN_STADIUM_TEXTS.FORM.SECTION_FACTS}
+        <Title level="h3" className="text-lg font-bold text-text-primary flex items-center gap-2">
+          <MapPin className="w-4 h-4 text-primary" />
+          Localização & Configurações de Exibição
         </Title>
-
-        <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          <FormField label={ADMIN_STADIUM_TEXTS.FORM.INAUGURATION_LABEL} error={errors.inaugurationDate?.message}>
-            <Input
-              placeholder={ADMIN_STADIUM_TEXTS.FORM.INAUGURATION_PLACEHOLDER}
-              {...register('inaugurationDate')}
-            />
-          </FormField>
-
-          <FormField label={ADMIN_STADIUM_TEXTS.FORM.CAPACITY_LABEL} error={errors.capacity?.message}>
-            <Input
-              placeholder={ADMIN_STADIUM_TEXTS.FORM.CAPACITY_PLACEHOLDER}
-              {...register('capacity')}
-            />
-          </FormField>
-
-          <FormField label={ADMIN_STADIUM_TEXTS.FORM.PITCH_LABEL} error={errors.pitchDimensions?.message}>
-            <Input
-              placeholder={ADMIN_STADIUM_TEXTS.FORM.PITCH_PLACEHOLDER}
-              {...register('pitchDimensions')}
-            />
-          </FormField>
-        </LayoutContainer>
 
         <LayoutContainer className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <LayoutContainer className="sm:col-span-3">

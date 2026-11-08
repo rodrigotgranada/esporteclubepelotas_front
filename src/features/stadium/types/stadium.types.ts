@@ -10,6 +10,14 @@ export interface StadiumFact {
   description: string;
 }
 
+export interface StadiumQuickFact {
+  id: string;
+  label: string;
+  value: string;
+  icon?: string;
+  order?: number;
+}
+
 export interface StadiumData {
   id: number;
   title: string;
@@ -24,6 +32,7 @@ export interface StadiumData {
   contentHtml: string;
   gallery: StadiumGalleryImage[];
   facts: StadiumFact[];
+  quickFacts?: StadiumQuickFact[];
   isActive: boolean;
   createdAt?: string;
   updatedAt?: string;
@@ -42,6 +51,7 @@ export interface UpdateStadiumInput {
   contentHtml: string;
   gallery: StadiumGalleryImage[];
   facts: StadiumFact[];
+  quickFacts?: StadiumQuickFact[];
   isActive?: boolean;
 }
 
