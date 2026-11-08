@@ -168,3 +168,4 @@ export async function uploadMultipleMedia(
 
   return returnedUrls.filter((url) => typeof url === 'string' && !url.startsWith('blob:'));
 }
+
