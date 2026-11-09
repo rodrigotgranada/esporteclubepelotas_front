@@ -9,7 +9,7 @@ export const SYMBOLS_TEXTS = {
 
   // Tabs Públicas
   TAB_MASCOT: 'Mascote Oficial',
-  TAB_SHIELD: 'Escudo & Evolução',
+  TAB_SHIELD: 'Escudo',
   TAB_FLAG_COLORS: 'Pavilhão & Cores',
 
   // Seção Mascote
@@ -19,13 +19,16 @@ export const SYMBOLS_TEXTS = {
   MASCOT_GALLERY_EMPTY: 'Nenhum mascote antigo cadastrado no momento.',
 
   // Seção Escudo
-  SHIELD_OFFICIAL_BADGE: 'Distintivo Atual',
-  SHIELD_EVOLUTION_TITLE: 'Evolução Cronológica dos Distintivos',
-  SHIELD_EVOLUTION_SUBTITLE: 'A transformação visual dos escudos do Pelotas por ordem de período desde 1908',
+  SHIELD_OFFICIAL_BADGE: 'Escudo Atual',
+  SHIELD_EVOLUTION_TITLE: 'Escudos & Versões Anteriores',
+  SHIELD_EVOLUTION_SUBTITLE: 'Registros cronológicos e evolução dos escudos por ordem de período desde 1908',
   SHIELD_EVOLUTION_EMPTY: 'Nenhum escudo antigo cadastrado no momento.',
 
   // Seção Bandeira & Cores
   FLAG_OFFICIAL_BADGE: 'Pavilhão Atual',
+  FLAG_GALLERY_TITLE: 'Pavilhões & Versões Anteriores',
+  FLAG_GALLERY_SUBTITLE: 'Registros cronológicos e bandeiras de época por ordem de período',
+  FLAG_GALLERY_EMPTY: 'Nenhum pavilhão antigo cadastrado no momento.',
   COLORS_TITLE: 'O Significado das Cores',
   COLORS_GOLD_TITLE: 'Amarelo Ouro (Áureo)',
   COLORS_GOLD_DESC: 'Evoca a nobreza, a energia solar, o triunfo e a glória imortal da conquista do Gauchão de 1930.',

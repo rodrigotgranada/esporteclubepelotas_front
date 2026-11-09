@@ -1,5 +1,5 @@
 import React from 'react';
-import { Flag, Palette, Sparkles, ZoomIn, BookOpen, Calendar } from 'lucide-react';
+import { Flag, Palette, Sparkles, ZoomIn, BookOpen, Calendar, Image as ImageIcon } from 'lucide-react';
 import {
   LayoutContainer,
   Title,
@@ -59,7 +59,7 @@ export const FlagAndColorsSection: React.FC<FlagAndColorsSectionProps> = ({
               </LayoutContainer>
             </LayoutContainer>
 
-            {/* Descrição da Bandeira */}
+            {/* Informações do Pavilhão Atual */}
             <LayoutContainer className="lg:col-span-7 flex flex-col gap-3 text-left">
               <LayoutContainer className="flex items-center gap-2">
                 <Badge
@@ -87,6 +87,40 @@ export const FlagAndColorsSection: React.FC<FlagAndColorsSectionProps> = ({
                   {officialFlag.subtitle}
                 </Text>
               )}
+
+              {/* Fotos complementares se houver */}
+              {officialFlag.galleryUrls && officialFlag.galleryUrls.length > 0 && (
+                <LayoutContainer className="pt-3 border-t border-border/60">
+                  <Text className="text-xs font-bold text-text-secondary mb-2 flex items-center gap-1.5">
+                    <ImageIcon className="w-3.5 h-3.5 text-primary" />
+                    Fotos Complementares do Pavilhão Oficial:
+                  </Text>
+                  <LayoutContainer className="flex flex-wrap gap-2.5">
+                    {officialFlag.galleryUrls.map((url, idx) => (
+                      <LayoutContainer
+                        key={idx}
+                        onClick={() =>
+                          onOpenLightbox(
+                            url,
+                            officialFlag.name || 'Pavilhão Oficial',
+                            `Registro ${idx + 1}`
+                          )
+                        }
+                        className="relative w-14 h-14 rounded-xl border border-border overflow-hidden bg-background cursor-pointer hover:border-primary transition-colors"
+                      >
+                        <SafeImage
+                          src={url}
+                          alt={`Registro ${idx + 1}`}
+                          fill
+                          sizes="56px"
+                          className="object-cover"
+                          fallbackSrc="/images/pelotas-logo.png"
+                        />
+                      </LayoutContainer>
+                    ))}
+                  </LayoutContainer>
+                </LayoutContainer>
+              )}
             </LayoutContainer>
           </LayoutContainer>
         </LayoutContainer>
@@ -105,7 +139,7 @@ export const FlagAndColorsSection: React.FC<FlagAndColorsSectionProps> = ({
               className="font-extrabold uppercase text-[10px] tracking-wider px-2.5 py-0.5 inline-flex items-center gap-1.5 shadow-xs w-fit mb-1"
             >
               <Sparkles className="w-3 h-3" />
-              <Text as="span">Pavilhão & Cores</Text>
+              <Text as="span">História & Significado</Text>
             </Badge>
             <Title level="h2" className="text-xl sm:text-3xl font-black text-text-primary">
               {overview.title}
@@ -121,7 +155,93 @@ export const FlagAndColorsSection: React.FC<FlagAndColorsSectionProps> = ({
         </Text>
       </LayoutContainer>
 
-      {/* 3. As Cores Áureo-Cerúleas */}
+      {/* 3. Pavilhões & Versões Anteriores por Ordem Cronológica de Período */}
+      <LayoutContainer className="flex flex-col gap-6">
+        <LayoutContainer className="flex items-center gap-3 pb-3 border-b border-border/60">
+          <LayoutContainer className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+            <Flag className="w-5 h-5" />
+          </LayoutContainer>
+          <LayoutContainer className="flex flex-col text-left">
+            <Title level="h3" className="text-xl sm:text-2xl font-black text-text-primary">
+              {SYMBOLS_TEXTS.FLAG_GALLERY_TITLE}
+            </Title>
+            <Text className="text-xs sm:text-sm text-text-secondary">
+              {SYMBOLS_TEXTS.FLAG_GALLERY_SUBTITLE}
+            </Text>
+          </LayoutContainer>
+        </LayoutContainer>
+
+        {historicalFlags.length === 0 ? (
+          <LayoutContainer className="p-8 rounded-2xl bg-surface/50 border border-border text-center">
+            <Text className="text-sm text-text-secondary italic">
+              {SYMBOLS_TEXTS.FLAG_GALLERY_EMPTY}
+            </Text>
+          </LayoutContainer>
+        ) : (
+          <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {historicalFlags.map((flag) => (
+              <LayoutContainer
+                key={flag.id}
+                className="rounded-2xl border border-border/80 bg-surface/70 backdrop-blur-xs p-5 flex flex-col justify-between hover:border-primary/40 transition-all shadow-md group text-left"
+              >
+                <LayoutContainer className="flex flex-col gap-3">
+                  <LayoutContainer
+                    onClick={() =>
+                      flag.imageUrl &&
+                      onOpenLightbox(
+                        flag.imageUrl,
+                        flag.name || 'Pavilhão Histórico',
+                        flag.subtitle || undefined
+                      )
+                    }
+                    className="relative w-full h-44 rounded-xl overflow-hidden bg-background/50 border border-border/60 cursor-pointer flex items-center justify-center p-3"
+                  >
+                    <SafeImage
+                      src={flag.imageUrl || '/images/pelotas-logo.png'}
+                      alt={flag.name || 'Bandeira'}
+                      fill
+                      sizes="300px"
+                      className="object-contain p-2 group-hover:scale-105 transition-transform duration-300"
+                      fallbackSrc="/images/pelotas-logo.png"
+                    />
+                    <LayoutContainer className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 text-white text-xs font-bold">
+                      <ZoomIn className="w-4 h-4 text-primary" />
+                      <Text as="span">Ampliar</Text>
+                    </LayoutContainer>
+                  </LayoutContainer>
+
+                  <LayoutContainer className="flex items-center gap-2 pt-1">
+                    <Badge variant="primary" size="sm" className="text-[11px] font-bold">
+                      <Calendar className="w-3 h-3 mr-1" />
+                      <Text as="span">
+                        {flag.yearStart && flag.yearEnd
+                          ? `${flag.yearStart} – ${flag.yearEnd}`
+                          : flag.yearStart
+                          ? `Ano ${flag.yearStart}`
+                          : 'Registro Histórico'}
+                      </Text>
+                    </Badge>
+                  </LayoutContainer>
+
+                  {flag.name && (
+                    <Title level="h4" className="text-base font-black text-text-primary leading-snug">
+                      {flag.name}
+                    </Title>
+                  )}
+
+                  {flag.subtitle && (
+                    <Text className="text-xs font-semibold text-primary">
+                      {flag.subtitle}
+                    </Text>
+                  )}
+                </LayoutContainer>
+              </LayoutContainer>
+            ))}
+          </LayoutContainer>
+        )}
+      </LayoutContainer>
+
+      {/* 4. As Cores Áureo-Cerúleas */}
       <LayoutContainer className="flex flex-col gap-6">
         <LayoutContainer className="flex items-center gap-3 pb-3 border-b border-border/60">
           <LayoutContainer className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
@@ -185,75 +305,6 @@ export const FlagAndColorsSection: React.FC<FlagAndColorsSectionProps> = ({
           </LayoutContainer>
         </LayoutContainer>
       </LayoutContainer>
-
-      {/* 4. Pavilhões Antigos (se houver) */}
-      {historicalFlags.length > 0 && (
-        <LayoutContainer className="flex flex-col gap-6 pt-4">
-          <LayoutContainer className="flex items-center gap-3 pb-3 border-b border-border/60">
-            <LayoutContainer className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
-              <Flag className="w-5 h-5" />
-            </LayoutContainer>
-            <Title level="h3" className="text-xl sm:text-2xl font-black text-text-primary">
-              Pavilhões & Bandeiras Históricas
-            </Title>
-          </LayoutContainer>
-
-          <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {historicalFlags.map((flag) => (
-              <LayoutContainer
-                key={flag.id}
-                className="rounded-2xl border border-border/80 bg-surface/70 backdrop-blur-xs p-5 flex flex-col justify-between hover:border-primary/40 transition-all shadow-md group text-left"
-              >
-                <LayoutContainer className="flex flex-col gap-3">
-                  <LayoutContainer
-                    onClick={() =>
-                      flag.imageUrl &&
-                      onOpenLightbox(
-                        flag.imageUrl,
-                        flag.name || 'Pavilhão Histórico',
-                        flag.subtitle || undefined
-                      )
-                    }
-                    className="relative w-full h-44 rounded-xl overflow-hidden bg-background/50 border border-border/60 cursor-pointer flex items-center justify-center p-3"
-                  >
-                    <SafeImage
-                      src={flag.imageUrl || '/images/pelotas-logo.png'}
-                      alt={flag.name || 'Bandeira'}
-                      fill
-                      sizes="300px"
-                      className="object-contain p-2 group-hover:scale-105 transition-transform duration-300"
-                      fallbackSrc="/images/pelotas-logo.png"
-                    />
-                    <LayoutContainer className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 text-white text-xs font-bold">
-                      <ZoomIn className="w-4 h-4 text-primary" />
-                      <Text as="span">Ampliar</Text>
-                    </LayoutContainer>
-                  </LayoutContainer>
-
-                  <LayoutContainer className="flex items-center gap-2 pt-1">
-                    <Badge variant="primary" size="sm" className="text-[11px] font-bold">
-                      <Calendar className="w-3 h-3 mr-1" />
-                      <Text as="span">
-                        {flag.yearStart && flag.yearEnd
-                          ? `${flag.yearStart} – ${flag.yearEnd}`
-                          : flag.yearStart
-                          ? `Ano ${flag.yearStart}`
-                          : 'Registro Histórico'}
-                      </Text>
-                    </Badge>
-                  </LayoutContainer>
-
-                  {flag.name && (
-                    <Title level="h4" className="text-base font-black text-text-primary leading-snug">
-                      {flag.name}
-                    </Title>
-                  )}
-                </LayoutContainer>
-              </LayoutContainer>
-            ))}
-          </LayoutContainer>
-        </LayoutContainer>
-      )}
     </LayoutContainer>
   );
 };

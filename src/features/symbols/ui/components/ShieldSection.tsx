@@ -1,5 +1,5 @@
 import React from 'react';
-import { Shield, Calendar, Sparkles, ZoomIn, History, BookOpen } from 'lucide-react';
+import { Shield, Calendar, Sparkles, ZoomIn, History, BookOpen, Image as ImageIcon } from 'lucide-react';
 import {
   LayoutContainer,
   Title,
@@ -36,7 +36,7 @@ export const ShieldSection: React.FC<ShieldSectionProps> = ({
                   officialShield.imageUrl &&
                   onOpenLightbox(
                     officialShield.imageUrl,
-                    officialShield.name || 'Distintivo Centenário',
+                    officialShield.name || 'Escudo Oficial Centenário',
                     officialShield.subtitle || (officialShield.yearStart ? `Desde ${officialShield.yearStart}` : undefined)
                   )
                 }
@@ -77,7 +77,7 @@ export const ShieldSection: React.FC<ShieldSectionProps> = ({
               </LayoutContainer>
 
               <Title level="h3" className="text-2xl sm:text-4xl font-black text-text-primary">
-                {officialShield.name || 'Distintivo Oficial Centenário'}
+                {officialShield.name || 'Escudo Oficial Centenário'}
               </Title>
 
               {officialShield.subtitle && (
@@ -85,12 +85,46 @@ export const ShieldSection: React.FC<ShieldSectionProps> = ({
                   {officialShield.subtitle}
                 </Text>
               )}
+
+              {/* Fotos complementares se houver */}
+              {officialShield.galleryUrls && officialShield.galleryUrls.length > 0 && (
+                <LayoutContainer className="pt-3 border-t border-border/60">
+                  <Text className="text-xs font-bold text-text-secondary mb-2 flex items-center gap-1.5">
+                    <ImageIcon className="w-3.5 h-3.5 text-primary" />
+                    Fotos Complementares do Escudo Oficial:
+                  </Text>
+                  <LayoutContainer className="flex flex-wrap gap-2.5">
+                    {officialShield.galleryUrls.map((url, idx) => (
+                      <LayoutContainer
+                        key={idx}
+                        onClick={() =>
+                          onOpenLightbox(
+                            url,
+                            officialShield.name || 'Escudo Oficial',
+                            `Registro ${idx + 1}`
+                          )
+                        }
+                        className="relative w-14 h-14 rounded-xl border border-border overflow-hidden bg-background cursor-pointer hover:border-primary transition-colors"
+                      >
+                        <SafeImage
+                          src={url}
+                          alt={`Registro ${idx + 1}`}
+                          fill
+                          sizes="56px"
+                          className="object-cover"
+                          fallbackSrc="/images/pelotas-logo.png"
+                        />
+                      </LayoutContainer>
+                    ))}
+                  </LayoutContainer>
+                </LayoutContainer>
+              )}
             </LayoutContainer>
           </LayoutContainer>
         </LayoutContainer>
       )}
 
-      {/* 2. Narrativa Geral do Distintivo (História Geral da Seção no Meio) */}
+      {/* 2. Narrativa Geral do Escudo (História Geral da Seção no Meio) */}
       <LayoutContainer className="rounded-3xl border border-border/80 bg-surface/90 backdrop-blur-md p-6 sm:p-10 shadow-lg text-left flex flex-col gap-4">
         <LayoutContainer className="flex items-center gap-3">
           <LayoutContainer className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
@@ -119,7 +153,7 @@ export const ShieldSection: React.FC<ShieldSectionProps> = ({
         </Text>
       </LayoutContainer>
 
-      {/* 3. Evolução dos Escudos Antigos por Ordem Cronológica de Período */}
+      {/* 3. Escudos & Versões Anteriores por Ordem Cronológica de Período */}
       <LayoutContainer className="flex flex-col gap-6">
         <LayoutContainer className="flex items-center gap-3 pb-3 border-b border-border/60">
           <LayoutContainer className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
@@ -155,7 +189,7 @@ export const ShieldSection: React.FC<ShieldSectionProps> = ({
                       shield.imageUrl &&
                       onOpenLightbox(
                         shield.imageUrl,
-                        shield.name || (shield.yearStart ? `Escudo (${shield.yearStart}` : 'Escudo Histórico'),
+                        shield.name || (shield.yearStart ? `Escudo (${shield.yearStart})` : 'Escudo Histórico'),
                         shield.subtitle || undefined
                       )
                     }
