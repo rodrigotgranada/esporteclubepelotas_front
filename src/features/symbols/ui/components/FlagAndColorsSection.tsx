@@ -155,29 +155,23 @@ export const FlagAndColorsSection: React.FC<FlagAndColorsSectionProps> = ({
         </Text>
       </LayoutContainer>
 
-      {/* 3. Pavilhões & Versões Anteriores por Ordem Cronológica de Período */}
-      <LayoutContainer className="flex flex-col gap-6">
-        <LayoutContainer className="flex items-center gap-3 pb-3 border-b border-border/60">
-          <LayoutContainer className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
-            <Flag className="w-5 h-5" />
+      {/* 3. Pavilhões & Versões Anteriores por Ordem Cronológica de Período (apenas se houver) */}
+      {historicalFlags.length > 0 && (
+        <LayoutContainer className="flex flex-col gap-6">
+          <LayoutContainer className="flex items-center gap-3 pb-3 border-b border-border/60">
+            <LayoutContainer className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+              <Flag className="w-5 h-5" />
+            </LayoutContainer>
+            <LayoutContainer className="flex flex-col text-left">
+              <Title level="h3" className="text-xl sm:text-2xl font-black text-text-primary">
+                {SYMBOLS_TEXTS.FLAG_GALLERY_TITLE}
+              </Title>
+              <Text className="text-xs sm:text-sm text-text-secondary">
+                {SYMBOLS_TEXTS.FLAG_GALLERY_SUBTITLE}
+              </Text>
+            </LayoutContainer>
           </LayoutContainer>
-          <LayoutContainer className="flex flex-col text-left">
-            <Title level="h3" className="text-xl sm:text-2xl font-black text-text-primary">
-              {SYMBOLS_TEXTS.FLAG_GALLERY_TITLE}
-            </Title>
-            <Text className="text-xs sm:text-sm text-text-secondary">
-              {SYMBOLS_TEXTS.FLAG_GALLERY_SUBTITLE}
-            </Text>
-          </LayoutContainer>
-        </LayoutContainer>
 
-        {historicalFlags.length === 0 ? (
-          <LayoutContainer className="p-8 rounded-2xl bg-surface/50 border border-border text-center">
-            <Text className="text-sm text-text-secondary italic">
-              {SYMBOLS_TEXTS.FLAG_GALLERY_EMPTY}
-            </Text>
-          </LayoutContainer>
-        ) : (
           <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {historicalFlags.map((flag) => (
               <LayoutContainer
@@ -238,8 +232,8 @@ export const FlagAndColorsSection: React.FC<FlagAndColorsSectionProps> = ({
               </LayoutContainer>
             ))}
           </LayoutContainer>
-        )}
-      </LayoutContainer>
+        </LayoutContainer>
+      )}
 
       {/* 4. As Cores Áureo-Cerúleas */}
       <LayoutContainer className="flex flex-col gap-6">
