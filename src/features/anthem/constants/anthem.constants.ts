@@ -39,12 +39,14 @@ export const ANTHEM_TEXTS = {
   HISTORY_DEFAULT_AUTHOR: 'José Walter de Oliveira (Valmúrio)',
   HISTORY_DEFAULT_YEAR: '1918',
 
-  // Versões Alternativas
+  // Versões Alternativas & Paralelas
   BTN_ALL_VERSIONS: 'Ouvir Outras Versões',
   VERSIONS_MODAL_TITLE: 'Versões e Gravações do Hino',
   VERSIONS_MODAL_DESC: 'Explore diferentes interpretações históricas do hino do Lobo.',
   VERSIONS_OFFICIAL_BADGE: 'Oficial',
   BTN_SELECT_VERSION: 'Ouvir Esta Versão',
+  PARALLEL_VERSIONS_TITLE: 'Versões Paralelas & Acervo Histórico',
+  PARALLEL_VERSIONS_SUBTITLE: 'Gravações comemorativas, arranjos de época e interpretações especiais',
 
   // Admin
   ADMIN_TITLE: 'Hino Oficial & Versões Históricas',
@@ -74,7 +76,7 @@ export const ANTHEM_TEXTS = {
   FIELD_SUBTITLE: 'Subtítulo ou Tema',
   FIELD_SUBTITLE_PLACEHOLDER: 'Ex: Orgulho-me de ser Áureo-Cerúleo',
   FIELD_LYRICS: 'Letra Completa (Estrofes)',
-  FIELD_LYRICS_PLACEHOLDER: 'Digite a letra oficial com quebras de linha entre as estrofes...',
+  FIELD_LYRICS_PLACEHOLDER: 'Digite a letra do hino com quebras de linha entre as estrofes...',
   FIELD_AUTHOR_LYRICS: 'Autor da Letra',
   FIELD_AUTHOR_LYRICS_PLACEHOLDER: 'Ex: José Walter de Oliveira (Valmúrio)',
   FIELD_AUTHOR_MUSIC: 'Autor da Música / Melodia',
@@ -86,11 +88,7 @@ export const ANTHEM_TEXTS = {
   FIELD_AUDIO_URL_PLACEHOLDER: 'https://...',
   FIELD_VIDEO_URL: 'Link do Vídeo no YouTube',
   FIELD_VIDEO_URL_PLACEHOLDER: 'https://www.youtube.com/watch?v=...',
-  FIELD_COVER_IMAGE: 'Imagem de Capa / Ilustração',
-  FIELD_HISTORY_TITLE: 'Título da Narrativa Histórica',
-  FIELD_HISTORY_TITLE_PLACEHOLDER: 'Ex: A Poesia Imortal de Valmúrio',
-  FIELD_HISTORY_TEXT: 'Texto Histórico / Bastidores da Criação',
-  FIELD_HISTORY_TEXT_PLACEHOLDER: 'Conte a história de como o hino foi criado e sua importância...',
+  FIELD_COVER_IMAGE: 'Imagem de Capa (Opcional)',
   FIELD_IS_OFFICIAL: 'Definir como Hino Oficial Principal do Portal',
   FIELD_IS_OFFICIAL_HELP: 'Ao marcar, esta será a versão tocada por padrão na página pública /hino.',
   FIELD_IS_ACTIVE: 'Versão Ativa e Visível no Portal',
@@ -107,6 +105,5 @@ export const ANTHEM_TEXTS = {
   TOAST_SAVE_SUCCESS: 'Versão do hino salva com sucesso!',
   TOAST_DELETE_SUCCESS: 'Versão do hino excluída com sucesso!',
   TOAST_SET_OFFICIAL_SUCCESS: 'Versão definida como hino oficial do clube!',
-  TOAST_GENERIC_ERROR: 'Ocorreu um erro ao processar a operação. Tente novamente.',
+  TOAST_GENERIC_ERROR: 'Ocorreu um erro ao processar a operação. Verifique os dados ou o arquivo de áudio e tente novamente.',
 };
-

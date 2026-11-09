@@ -8,8 +8,8 @@ import { anthemService } from '../services/anthem.service';
 import { ANTHEM_TEXTS } from '../constants/anthem.constants';
 
 const anthemSchema = z.object({
-  title: z.string().min(1, 'O título é obrigatório').max(200, 'Máximo 200 caracteres'),
-  subtitle: z.string().max(300, 'Máximo 300 caracteres').optional(),
+  title: z.string().max(200).optional(),
+  subtitle: z.string().max(300).optional(),
   lyrics: z.string().min(1, 'A letra do hino é obrigatória'),
   authorLyrics: z.string().max(150, 'Máximo 150 caracteres').optional(),
   authorMusic: z.string().max(150, 'Máximo 150 caracteres').optional(),
@@ -17,8 +17,6 @@ const anthemSchema = z.object({
   audioUrl: z.string().optional(),
   videoUrl: z.string().optional(),
   coverImageUrl: z.string().optional(),
-  historyTitle: z.string().max(200, 'Máximo 200 caracteres').optional(),
-  historyText: z.string().optional(),
   isActive: z.boolean(),
   isOfficial: z.boolean(),
   displayOrder: z.union([z.number(), z.string()]),
@@ -54,8 +52,6 @@ export const useAdminAnthemDrawer = ({
       audioUrl: '',
       videoUrl: '',
       coverImageUrl: '',
-      historyTitle: '',
-      historyText: '',
       isActive: true,
       isOfficial: false,
       displayOrder: 0,
@@ -74,8 +70,6 @@ export const useAdminAnthemDrawer = ({
         audioUrl: anthem.audioUrl || '',
         videoUrl: anthem.videoUrl || '',
         coverImageUrl: anthem.coverImageUrl || '',
-        historyTitle: anthem.historyTitle || '',
-        historyText: anthem.historyText || '',
         isActive: anthem.isActive ?? true,
         isOfficial: anthem.isOfficial ?? false,
         displayOrder: anthem.displayOrder ?? 0,
@@ -95,8 +89,6 @@ export const useAdminAnthemDrawer = ({
         audioUrl: '',
         videoUrl: '',
         coverImageUrl: '',
-        historyTitle: '',
-        historyText: '',
         isActive: true,
         isOfficial: false,
         displayOrder: 0,
@@ -146,18 +138,23 @@ export const useAdminAnthemDrawer = ({
         finalCoverUrl = uploadResult.url;
       }
 
+      const cleanYear = values.compositionYear ? Number(values.compositionYear) : null;
+      const cleanAuthor = values.authorLyrics?.trim() || values.authorMusic?.trim() || '';
+
+      const resolvedTitle =
+        values.title?.trim() ||
+        (cleanYear ? `Versão (${cleanYear})` : cleanAuthor ? `Hino - ${cleanAuthor}` : 'Hino Oficial do Pelotas');
+
       const payload: ClubAnthemFormData = {
-        title: values.title.trim(),
+        title: resolvedTitle,
         subtitle: values.subtitle?.trim() || undefined,
         lyrics: values.lyrics.trim(),
         authorLyrics: values.authorLyrics?.trim() || undefined,
-        authorMusic: values.authorMusic?.trim() || undefined,
-        compositionYear: values.compositionYear ? Number(values.compositionYear) : null,
+        authorMusic: values.authorMusic?.trim() || values.authorLyrics?.trim() || undefined,
+        compositionYear: cleanYear,
         audioUrl: finalAudioUrl || undefined,
         videoUrl: values.videoUrl?.trim() || undefined,
         coverImageUrl: finalCoverUrl || undefined,
-        historyTitle: values.historyTitle?.trim() || undefined,
-        historyText: values.historyText?.trim() || undefined,
         isActive: Boolean(values.isActive),
         isOfficial: Boolean(values.isOfficial),
         displayOrder: Number(values.displayOrder) || 0,
@@ -184,7 +181,9 @@ export const useAdminAnthemDrawer = ({
   return {
     form,
     isSaving,
+    pendingAudioFile,
     pendingAudioName,
+    pendingCoverFile,
     coverPreviewUrl,
     handleSelectAudioFile,
     handleSelectCoverFile,
@@ -192,4 +191,3 @@ export const useAdminAnthemDrawer = ({
     handleSubmit: form.handleSubmit(onSubmit),
   };
 };
-

@@ -2,11 +2,11 @@ import React, { useRef } from 'react';
 import {
   Drawer,
   LayoutContainer,
-  Title,
   Text,
   Input,
+  Textarea,
+  Checkbox,
   Button,
-  Spinner,
   SafeImage,
 } from '@/shared/ui/components';
 import { Upload, Music, Image as ImageIcon, X, Loader2 } from 'lucide-react';
@@ -52,44 +52,15 @@ export const AdminAnthemDrawer: React.FC<AdminAnthemDrawerProps> = ({
   const coverInputRef = useRef<HTMLInputElement | null>(null);
 
   const currentAudioUrl = watch('audioUrl');
-  const title = anthem
-    ? `${ANTHEM_TEXTS.DRAWER_TITLE_EDIT}: ${anthem.title}`
+  const drawerTitle = anthem
+    ? `${ANTHEM_TEXTS.DRAWER_TITLE_EDIT}${anthem.compositionYear ? ` (${anthem.compositionYear})` : ''}`
     : ANTHEM_TEXTS.DRAWER_TITLE_NEW;
 
   return (
-    <Drawer isOpen={isOpen} onClose={onClose} title={title} size="lg">
+    <Drawer isOpen={isOpen} onClose={onClose} title={drawerTitle} size="lg">
       <form onSubmit={handleSubmit} className="flex flex-col h-full justify-between">
-        <LayoutContainer className="flex flex-col gap-5 p-6 overflow-y-auto">
-          {/* Título e Subtítulo */}
-          <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <LayoutContainer className="flex flex-col gap-1.5">
-              <Text as="span" className="text-xs font-bold text-text-secondary">
-                {ANTHEM_TEXTS.FIELD_TITLE} *
-              </Text>
-              <Input
-                type="text"
-                placeholder={ANTHEM_TEXTS.FIELD_TITLE_PLACEHOLDER}
-                {...register('title')}
-                error={errors.title?.message}
-                className="text-sm py-2.5"
-              />
-            </LayoutContainer>
-
-            <LayoutContainer className="flex flex-col gap-1.5">
-              <Text as="span" className="text-xs font-bold text-text-secondary">
-                {ANTHEM_TEXTS.FIELD_SUBTITLE}
-              </Text>
-              <Input
-                type="text"
-                placeholder={ANTHEM_TEXTS.FIELD_SUBTITLE_PLACEHOLDER}
-                {...register('subtitle')}
-                error={errors.subtitle?.message}
-                className="text-sm py-2.5"
-              />
-            </LayoutContainer>
-          </LayoutContainer>
-
-          {/* Letra Oficial (Estrofes) */}
+        <LayoutContainer className="flex flex-col gap-6 p-6 overflow-y-auto">
+          {/* 1. Letra do Hino (Estrofes) */}
           <LayoutContainer className="flex flex-col gap-1.5">
             <LayoutContainer className="flex items-center justify-between">
               <Text as="span" className="text-xs font-bold text-text-secondary">
@@ -99,20 +70,16 @@ export const AdminAnthemDrawer: React.FC<AdminAnthemDrawerProps> = ({
                 Separe as estrofes com uma linha em branco
               </Text>
             </LayoutContainer>
-            <textarea
+            <Textarea
               rows={8}
               placeholder={ANTHEM_TEXTS.FIELD_LYRICS_PLACEHOLDER}
               {...register('lyrics')}
-              className="w-full p-3 rounded-xl bg-background border border-border focus:border-primary focus:ring-1 focus:ring-primary text-sm text-text-primary leading-relaxed font-serif focus:outline-none transition-colors"
+              error={errors.lyrics?.message}
+              className="font-serif leading-relaxed text-sm"
             />
-            {errors.lyrics && (
-              <Text className="text-xs text-[#ea580c] font-semibold">
-                {errors.lyrics.message}
-              </Text>
-            )}
           </LayoutContainer>
 
-          {/* Autores e Ano */}
+          {/* 2. Autores e Ano */}
           <LayoutContainer className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <LayoutContainer className="flex flex-col gap-1.5">
               <Text as="span" className="text-xs font-bold text-text-secondary">
@@ -151,7 +118,7 @@ export const AdminAnthemDrawer: React.FC<AdminAnthemDrawerProps> = ({
             </LayoutContainer>
           </LayoutContainer>
 
-          {/* Upload de Arquivo de Áudio */}
+          {/* 3. Arquivo de Áudio */}
           <LayoutContainer className="p-4 rounded-2xl bg-surface border border-border flex flex-col gap-3">
             <Text as="span" className="text-xs font-bold text-text-primary flex items-center gap-2">
               <Music className="w-4 h-4 text-primary" />
@@ -196,7 +163,6 @@ export const AdminAnthemDrawer: React.FC<AdminAnthemDrawerProps> = ({
               )}
             </LayoutContainer>
 
-            {/* Alternativa: URL Direta */}
             <LayoutContainer className="pt-2 border-t border-border/60">
               <Input
                 type="url"
@@ -207,7 +173,7 @@ export const AdminAnthemDrawer: React.FC<AdminAnthemDrawerProps> = ({
             </LayoutContainer>
           </LayoutContainer>
 
-          {/* Vídeo do YouTube */}
+          {/* 4. Vídeo no YouTube (Opcional) */}
           <LayoutContainer className="flex flex-col gap-1.5">
             <Text as="span" className="text-xs font-bold text-text-secondary">
               {ANTHEM_TEXTS.FIELD_VIDEO_URL}
@@ -220,7 +186,7 @@ export const AdminAnthemDrawer: React.FC<AdminAnthemDrawerProps> = ({
             />
           </LayoutContainer>
 
-          {/* Upload de Imagem de Capa */}
+          {/* 5. Imagem de Capa (Opcional) */}
           <LayoutContainer className="p-4 rounded-2xl bg-surface border border-border flex flex-col gap-3">
             <Text as="span" className="text-xs font-bold text-text-primary flex items-center gap-2">
               <ImageIcon className="w-4 h-4 text-primary" />
@@ -257,6 +223,7 @@ export const AdminAnthemDrawer: React.FC<AdminAnthemDrawerProps> = ({
                       src={coverPreviewUrl}
                       alt="Capa"
                       fill
+                      sizes="48px"
                       className="object-contain"
                       fallbackSrc="/images/pelotas-logo.png"
                     />
@@ -276,70 +243,23 @@ export const AdminAnthemDrawer: React.FC<AdminAnthemDrawerProps> = ({
             </LayoutContainer>
           </LayoutContainer>
 
-          {/* Seção Histórica: Título e Texto */}
-          <LayoutContainer className="flex flex-col gap-4 p-4 rounded-2xl bg-surface border border-border">
-            <Title level="h4" className="text-sm font-bold text-text-primary">
-              Narrativa Histórica & Bastidores
-            </Title>
-
-            <LayoutContainer className="flex flex-col gap-1.5">
-              <Text as="span" className="text-xs font-bold text-text-secondary">
-                {ANTHEM_TEXTS.FIELD_HISTORY_TITLE}
-              </Text>
-              <Input
-                type="text"
-                placeholder={ANTHEM_TEXTS.FIELD_HISTORY_TITLE_PLACEHOLDER}
-                {...register('historyTitle')}
-                className="text-sm py-2.5"
-              />
-            </LayoutContainer>
-
-            <LayoutContainer className="flex flex-col gap-1.5">
-              <Text as="span" className="text-xs font-bold text-text-secondary">
-                {ANTHEM_TEXTS.FIELD_HISTORY_TEXT}
-              </Text>
-              <textarea
-                rows={4}
-                placeholder={ANTHEM_TEXTS.FIELD_HISTORY_TEXT_PLACEHOLDER}
-                {...register('historyText')}
-                className="w-full p-3 rounded-xl bg-background border border-border focus:border-primary focus:ring-1 focus:ring-primary text-sm text-text-primary leading-relaxed focus:outline-none transition-colors"
-              />
-            </LayoutContainer>
-          </LayoutContainer>
-
-          {/* Opções e Switches: Oficial, Ativo, Ordem */}
+          {/* 6. Opções: Oficial, Ativo, Ordem */}
           <LayoutContainer className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
-            <label className="flex items-center gap-2.5 cursor-pointer p-3 rounded-xl bg-surface border border-border hover:border-primary/40 transition-colors">
-              <input
-                type="checkbox"
+            <LayoutContainer className="p-3 rounded-xl bg-surface border border-border">
+              <Checkbox
+                label="Versão Oficial"
+                description="Toca como principal no portal"
                 {...register('isOfficial')}
-                className="w-4 h-4 rounded text-primary focus:ring-primary accent-primary cursor-pointer"
               />
-              <LayoutContainer className="flex flex-col">
-                <Text as="span" className="text-xs font-bold text-text-primary">
-                  Versão Oficial
-                </Text>
-                <Text className="text-[10px] text-text-secondary">
-                  Toca no portal público
-                </Text>
-              </LayoutContainer>
-            </label>
+            </LayoutContainer>
 
-            <label className="flex items-center gap-2.5 cursor-pointer p-3 rounded-xl bg-surface border border-border hover:border-primary/40 transition-colors">
-              <input
-                type="checkbox"
+            <LayoutContainer className="p-3 rounded-xl bg-surface border border-border">
+              <Checkbox
+                label="Versão Ativa"
+                description="Visível para os torcedores"
                 {...register('isActive')}
-                className="w-4 h-4 rounded text-primary focus:ring-primary accent-primary cursor-pointer"
               />
-              <LayoutContainer className="flex flex-col">
-                <Text as="span" className="text-xs font-bold text-text-primary">
-                  Versão Ativa
-                </Text>
-                <Text className="text-[10px] text-text-secondary">
-                  Visível aos torcedores
-                </Text>
-              </LayoutContainer>
-            </label>
+            </LayoutContainer>
 
             <LayoutContainer className="flex flex-col gap-1">
               <Text as="span" className="text-xs font-bold text-text-secondary">

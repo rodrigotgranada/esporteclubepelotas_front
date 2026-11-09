@@ -6,19 +6,20 @@ import {
   Text,
   Badge,
   SafeImage,
+  Button,
 } from '@/shared/ui/components';
 import { ClubAnthem } from '../../types/anthem.types';
 import { ANTHEM_TEXTS } from '../../constants/anthem.constants';
 
 export interface AnthemHeroProps {
   anthem: ClubAnthem | null;
-  onOpenVersionsModal?: () => void;
+  onScrollToParallelVersions?: () => void;
   hasMultipleVersions?: boolean;
 }
 
 export const AnthemHero: React.FC<AnthemHeroProps> = ({
   anthem,
-  onOpenVersionsModal,
+  onScrollToParallelVersions,
   hasMultipleVersions = false,
 }) => {
   const title = anthem?.title || ANTHEM_TEXTS.DEFAULT_TITLE;
@@ -35,12 +36,13 @@ export const AnthemHero: React.FC<AnthemHeroProps> = ({
       />
 
       <LayoutContainer className="relative z-10 max-w-4xl mx-auto flex flex-col items-center text-center">
-        {/* Distintivo Oficial com Animação Suave */}
+        {/* Distintivo Oficial */}
         <LayoutContainer className="relative w-24 h-24 sm:w-28 sm:h-28 mb-6 drop-shadow-2xl hover:scale-105 transition-transform duration-300">
           <SafeImage
             src={anthem?.coverImageUrl || '/images/pelotas-logo.png'}
             alt="Esporte Clube Pelotas"
             fill
+            sizes="112px"
             className="object-contain"
             fallbackSrc="/images/pelotas-logo.png"
           />
@@ -99,15 +101,17 @@ export const AnthemHero: React.FC<AnthemHeroProps> = ({
             <span>{year}</span>
           </LayoutContainer>
 
-          {hasMultipleVersions && onOpenVersionsModal && (
+          {hasMultipleVersions && onScrollToParallelVersions && (
             <>
               <LayoutContainer className="w-1 h-1 rounded-full bg-border" />
-              <button
-                onClick={onOpenVersionsModal}
-                className="text-xs font-bold text-primary hover:underline cursor-pointer"
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onScrollToParallelVersions}
+                className="text-xs font-bold text-primary p-0 h-auto hover:bg-transparent hover:underline"
               >
                 {ANTHEM_TEXTS.BTN_ALL_VERSIONS}
-              </button>
+              </Button>
             </>
           )}
         </LayoutContainer>
@@ -115,4 +119,3 @@ export const AnthemHero: React.FC<AnthemHeroProps> = ({
     </LayoutContainer>
   );
 };
-
