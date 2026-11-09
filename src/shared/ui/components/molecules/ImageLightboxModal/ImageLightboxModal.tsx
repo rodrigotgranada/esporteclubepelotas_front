@@ -95,7 +95,7 @@ export const ImageLightboxModal: React.FC<ImageLightboxModalProps> = ({
           variant="custom"
           size="none"
           onClick={onClose}
-          className="p-2 rounded-full bg-neutral-900/80 hover:bg-neutral-800 text-neutral-300 hover:text-white transition-colors border border-neutral-700/60"
+          className="p-2 rounded-full bg-neutral-900/80 hover:bg-neutral-800 text-neutral-300 hover:text-white transition-colors border border-neutral-700/60 cursor-pointer"
           aria-label={IMAGE_LIGHTBOX_TEXTS.CLOSE}
         >
           <X className="w-5 h-5" />
@@ -111,7 +111,7 @@ export const ImageLightboxModal: React.FC<ImageLightboxModalProps> = ({
             variant="custom"
             size="none"
             onClick={handlePrev}
-            className="absolute left-2 sm:left-6 z-20 p-2.5 sm:p-3.5 rounded-full bg-black/60 hover:bg-black/90 text-white hover:text-primary transition-all border border-neutral-700/50 shadow-lg backdrop-blur-xs"
+            className="absolute left-2 sm:left-6 z-20 p-2.5 sm:p-3.5 rounded-full bg-black/60 hover:bg-black/90 text-white hover:text-primary transition-all border border-neutral-700/50 shadow-lg backdrop-blur-xs cursor-pointer"
             aria-label={IMAGE_LIGHTBOX_TEXTS.PREVIOUS}
           >
             <ChevronLeft className="w-6 h-6" />
@@ -137,7 +137,7 @@ export const ImageLightboxModal: React.FC<ImageLightboxModalProps> = ({
             variant="custom"
             size="none"
             onClick={handleNext}
-            className="absolute right-2 sm:right-6 z-20 p-2.5 sm:p-3.5 rounded-full bg-black/60 hover:bg-black/90 text-white hover:text-primary transition-all border border-neutral-700/50 shadow-lg backdrop-blur-xs"
+            className="absolute right-2 sm:right-6 z-20 p-2.5 sm:p-3.5 rounded-full bg-black/60 hover:bg-black/90 text-white hover:text-primary transition-all border border-neutral-700/50 shadow-lg backdrop-blur-xs cursor-pointer"
             aria-label={IMAGE_LIGHTBOX_TEXTS.NEXT}
           >
             <ChevronRight className="w-6 h-6" />
@@ -158,7 +158,7 @@ export const ImageLightboxModal: React.FC<ImageLightboxModalProps> = ({
                   variant="custom"
                   size="none"
                   onClick={() => setCurrentIndex(idx)}
-                  className={`relative w-12 h-12 sm:w-16 sm:h-16 rounded-lg overflow-hidden shrink-0 transition-all border-2 ${
+                  className={`relative w-12 h-12 sm:w-16 sm:h-16 rounded-lg overflow-hidden shrink-0 transition-all border-2 cursor-pointer ${
                     isActive
                       ? 'border-primary scale-105 shadow-md shadow-primary/20'
                       : 'border-transparent opacity-50 hover:opacity-100 hover:border-neutral-500'

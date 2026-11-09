@@ -34,7 +34,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     
     const baseStyles = variant !== 'custom' 
       ? 'flex items-center justify-center gap-2 rounded-xl transition-all cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed' 
-      : '';
+      : 'cursor-pointer disabled:cursor-not-allowed';
       
     const widthStyle = fullWidth ? 'w-full' : '';
 
