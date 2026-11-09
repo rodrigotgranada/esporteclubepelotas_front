@@ -1,11 +1,13 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { ClubKit, ClubKitCompetitionItem } from '../types/kits.types';
 import { kitsService } from '../services/kits.service';
+import { getKitDisplayTitle } from '../utils/kits.utils';
 import { useRealtimeEvents } from '@/shared/hooks/useRealtimeEvents';
 
 export interface KitLightboxState {
   isOpen: boolean;
   images: string[];
+  titles?: string[];
   initialIndex: number;
   title: string;
   subtitle?: string;
@@ -22,6 +24,7 @@ export const useKits = () => {
   const [lightbox, setLightbox] = useState<KitLightboxState>({
     isOpen: false,
     images: [],
+    titles: [],
     initialIndex: 0,
     title: '',
   });
@@ -81,19 +84,42 @@ export const useKits = () => {
     }
   }, []);
 
-  // Lightbox handlers com galeria completa (foto principal + fotos de detalhes)
-  const openLightbox = useCallback(
-    (kit: ClubKit, clickedImageIndex = 0) => {
-      const allImages = [kit.imageUrl, ...(kit.galleryUrls || [])].filter(Boolean);
+  // Abrir galeria de mantos da temporada atual em slides
+  const openCurrentKitsLightbox = useCallback(
+    (clickedIndex: number) => {
+      if (currentKits.length === 0) return;
+      const images = currentKits.map((k) => k.imageUrl);
+      const titles = currentKits.map(
+        (k) => `${getKitDisplayTitle(k)} • ${k.competition} (${k.seasonYear})`,
+      );
       setLightbox({
         isOpen: true,
-        images: allImages.length > 0 ? allImages : [kit.imageUrl],
-        initialIndex: clickedImageIndex,
-        title: kit.name,
-        subtitle: `${kit.competition} (${kit.seasonYear}) • ${kit.manufacturer || 'Esporte Clube Pelotas'}`,
+        images,
+        titles,
+        initialIndex: Math.max(0, Math.min(clickedIndex, images.length - 1)),
+        title: titles[clickedIndex] || '',
       });
     },
-    [],
+    [currentKits],
+  );
+
+  // Abrir galeria de mantos históricos da competição selecionada em slides
+  const openHistoricalKitsLightbox = useCallback(
+    (clickedIndex: number) => {
+      if (historicalKits.length === 0) return;
+      const images = historicalKits.map((k) => k.imageUrl);
+      const titles = historicalKits.map(
+        (k) => `${getKitDisplayTitle(k)} • ${k.competition} (${k.seasonYear})`,
+      );
+      setLightbox({
+        isOpen: true,
+        images,
+        titles,
+        initialIndex: Math.max(0, Math.min(clickedIndex, images.length - 1)),
+        title: titles[clickedIndex] || '',
+      });
+    },
+    [historicalKits],
   );
 
   const closeLightbox = useCallback(() => {
@@ -115,9 +141,9 @@ export const useKits = () => {
     hasHistoricalKits,
     lightbox,
     handleSelectCompetition,
-    openLightbox,
+    openCurrentKitsLightbox,
+    openHistoricalKitsLightbox,
     closeLightbox,
     reloadKits: loadInitialData,
   };
 };
-

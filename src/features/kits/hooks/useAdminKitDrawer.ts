@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import { ClubKit, ClubKitFormData, KitType } from '../types/kits.types';
 import { kitsService } from '../services/kits.service';
 import { kitFormSchema, KitFormSchema } from '../schemas/kit.schema';
+import { getKitTypeLabel } from '../utils/kits.utils';
 
 export interface UseAdminKitDrawerProps {
   kit: ClubKit | null;
@@ -177,8 +178,13 @@ export const useAdminKitDrawer = ({
         return;
       }
 
+      const resolvedName =
+        values.name && values.name.trim()
+          ? values.name.trim()
+          : getKitTypeLabel(values.kitType as KitType);
+
       const payload: ClubKitFormData = {
-        name: values.name.trim(),
+        name: resolvedName,
         kitType: values.kitType as KitType,
         competition: values.competition.trim(),
         seasonYear: Number(values.seasonYear),

@@ -15,6 +15,7 @@ export interface ImageLightboxModalProps {
   images: string[];
   initialIndex?: number;
   title?: string;
+  titles?: string[];
 }
 
 export const ImageLightboxModal: React.FC<ImageLightboxModalProps> = ({
@@ -23,6 +24,7 @@ export const ImageLightboxModal: React.FC<ImageLightboxModalProps> = ({
   images,
   initialIndex = 0,
   title,
+  titles,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [mounted, setMounted] = useState(false);
@@ -74,6 +76,7 @@ export const ImageLightboxModal: React.FC<ImageLightboxModalProps> = ({
   const currentImage = images[currentIndex];
   const total = images.length;
   const hasMultiple = total > 1;
+  const currentTitle = titles && titles[currentIndex] ? titles[currentIndex] : title;
 
   return createPortal(
     <LayoutContainer className="fixed inset-0 z-[99999] bg-black/95 backdrop-blur-md flex flex-col justify-between animate-in fade-in duration-200 select-none">
@@ -83,9 +86,9 @@ export const ImageLightboxModal: React.FC<ImageLightboxModalProps> = ({
           <Text className="text-xs sm:text-sm font-bold text-neutral-300">
             {IMAGE_LIGHTBOX_TEXTS.COUNTER(currentIndex + 1, total)}
           </Text>
-          {title && (
+          {currentTitle && (
             <Text className="hidden sm:inline text-xs text-neutral-400 border-l border-neutral-700 pl-3 max-w-md truncate">
-              {title}
+              {currentTitle}
             </Text>
           )}
         </LayoutContainer>
@@ -182,4 +185,3 @@ export const ImageLightboxModal: React.FC<ImageLightboxModalProps> = ({
     document.body
   );
 };
-

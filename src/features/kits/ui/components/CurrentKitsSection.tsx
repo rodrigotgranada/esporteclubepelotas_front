@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, ZoomIn, Shield, Building2 } from 'lucide-react';
+import { Sparkles, ZoomIn, Shield } from 'lucide-react';
 import {
   LayoutContainer,
   Title,
@@ -10,12 +10,12 @@ import {
 } from '@/shared/ui/components';
 import { ClubKit } from '../../types/kits.types';
 import { KITS_TEXTS } from '../../constants/kits.constants';
-import { getKitTypeLabel, getKitTypeBadgeVariant } from '../../utils/kits.utils';
+import { getKitTypeBadgeVariant, getKitDisplayTitle } from '../../utils/kits.utils';
 
 export interface CurrentKitsSectionProps {
   kits: ClubKit[];
   isLoading: boolean;
-  onOpenLightbox: (kit: ClubKit, imageIndex?: number) => void;
+  onOpenLightbox: (index: number) => void;
 }
 
 export const CurrentKitsSection: React.FC<CurrentKitsSectionProps> = ({
@@ -26,12 +26,12 @@ export const CurrentKitsSection: React.FC<CurrentKitsSectionProps> = ({
   if (isLoading) {
     return (
       <LayoutContainer className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <LayoutContainer className="h-8 w-64 bg-surface/80 rounded-lg animate-pulse mb-4" />
-        <LayoutContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[1, 2, 3].map((i) => (
+        <LayoutContainer className="h-8 w-64 bg-surface/80 rounded-lg animate-pulse mb-6" />
+        <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          {[1, 2, 3, 4].map((i) => (
             <LayoutContainer
               key={i}
-              className="h-96 rounded-2xl bg-surface/50 border border-border/60 animate-pulse"
+              className="h-80 rounded-2xl bg-surface/50 border border-border/60 animate-pulse"
             />
           ))}
         </LayoutContainer>
@@ -46,7 +46,7 @@ export const CurrentKitsSection: React.FC<CurrentKitsSectionProps> = ({
   return (
     <LayoutContainer className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
       {/* Cabeçalho da Seção */}
-      <LayoutContainer className="flex flex-col items-center sm:items-start text-center sm:text-left mb-8 sm:mb-10">
+      <LayoutContainer className="flex flex-col items-center sm:items-start text-center sm:text-left mb-8">
         <Badge
           variant="primary"
           size="sm"
@@ -66,51 +66,48 @@ export const CurrentKitsSection: React.FC<CurrentKitsSectionProps> = ({
         </Text>
       </LayoutContainer>
 
-      {/* Grid de Uniformes Atuais */}
-      <LayoutContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 sm:gap-8">
-        {kits.map((kit) => {
-          const typeLabel = getKitTypeLabel(kit.kitType);
+      {/* Grid de Uniformes Atuais: 1 ao lado do outro */}
+      <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        {kits.map((kit, index) => {
+          const displayTitle = getKitDisplayTitle(kit);
           const badgeVariant = getKitTypeBadgeVariant(kit.kitType);
-          const hasGallery = kit.galleryUrls && kit.galleryUrls.length > 0;
+          const isSpecial = kit.kitType === 'SPECIAL';
 
           return (
             <LayoutContainer
               key={kit.id}
-              className="flex flex-col bg-surface/90 hover:bg-surface border border-border/80 hover:border-primary/50 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 group"
+              onClick={() => onOpenLightbox(index)}
+              className="flex flex-col bg-surface/90 hover:bg-surface border border-border/80 hover:border-primary/50 rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 group cursor-pointer"
             >
-              {/* Imagem Principal do Manto */}
-              <LayoutContainer
-                onClick={() => onOpenLightbox(kit, 0)}
-                className="relative w-full h-72 sm:h-84 bg-gradient-to-b from-background/40 to-surface/80 flex items-center justify-center p-6 cursor-pointer overflow-hidden border-b border-border/60"
-              >
+              {/* Imagem do Manto em Foco */}
+              <LayoutContainer className="relative w-full h-64 sm:h-72 bg-gradient-to-b from-background/30 to-surface/90 flex items-center justify-center p-4 overflow-hidden border-b border-border/60">
                 <SafeImage
                   src={kit.imageUrl}
-                  alt={kit.name}
+                  alt={displayTitle}
                   fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  className="object-contain p-4 group-hover:scale-105 transition-transform duration-500 drop-shadow-xl"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                  className="object-contain p-2 group-hover:scale-105 transition-transform duration-500 drop-shadow-xl"
                   fallbackSrc="/images/pelotas-logo.png"
                 />
 
                 {/* Badge Flutuante do Tipo */}
-                <LayoutContainer className="absolute top-4 left-4 z-10 flex flex-wrap gap-2">
-                  <Badge variant={badgeVariant} size="sm" className="font-bold text-xs shadow-md">
-                    <Text as="span">{typeLabel}</Text>
-                  </Badge>
-                  <Badge variant="default" size="sm" className="font-semibold text-xs backdrop-blur-md bg-surface/80 shadow-md">
-                    <Text as="span">{kit.competition} • {kit.seasonYear}</Text>
+                <LayoutContainer className="absolute top-3 left-3 z-10">
+                  <Badge variant={badgeVariant} size="sm" className="font-bold text-[11px] shadow-md">
+                    <Text as="span">
+                      {isSpecial ? KITS_TEXTS.TYPE_SPECIAL : displayTitle}
+                    </Text>
                   </Badge>
                 </LayoutContainer>
 
                 {/* Botão Hover de Zoom */}
-                <LayoutContainer className="absolute bottom-4 right-4 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <LayoutContainer className="absolute bottom-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <Button
                     variant="primary"
                     size="sm"
-                    leftIcon={<ZoomIn className="w-4 h-4" />}
+                    leftIcon={<ZoomIn className="w-3.5 h-3.5" />}
                     onClick={(e) => {
                       e.stopPropagation();
-                      onOpenLightbox(kit, 0);
+                      onOpenLightbox(index);
                     }}
                     className="shadow-lg text-xs font-bold"
                   >
@@ -119,76 +116,27 @@ export const CurrentKitsSection: React.FC<CurrentKitsSectionProps> = ({
                 </LayoutContainer>
               </LayoutContainer>
 
-              {/* Informações Textuais do Manto */}
-              <LayoutContainer className="flex-1 flex flex-col p-6">
-                <Title
-                  level="h3"
-                  className="text-xl sm:text-2xl font-black text-text-primary tracking-tight mb-2"
-                >
-                  {kit.name}
-                </Title>
-
-                {kit.description && (
-                  <Text as="p" className="text-sm text-text-secondary leading-relaxed mb-4 line-clamp-3">
-                    {kit.description}
+              {/* Informações Simplificadas do Card */}
+              <LayoutContainer className="p-4 flex flex-col flex-1 text-center items-center justify-between gap-2">
+                <LayoutContainer className="flex flex-col items-center">
+                  <Title
+                    level="h3"
+                    className="text-base sm:text-lg font-black text-text-primary tracking-tight"
+                  >
+                    {displayTitle}
+                  </Title>
+                  <Text as="span" className="text-xs text-text-muted mt-0.5">
+                    {kit.competition} • {kit.seasonYear}
                   </Text>
-                )}
-
-                {/* Fornecedor e Patrocínio */}
-                <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-3 border-t border-border/60 mt-auto">
-                  {kit.manufacturer && (
-                    <LayoutContainer className="flex items-center gap-2">
-                      <Shield className="w-4 h-4 text-primary shrink-0" />
-                      <LayoutContainer className="flex flex-col">
-                        <Text as="span" className="text-[11px] font-bold text-text-muted uppercase">
-                          {KITS_TEXTS.CARD_MANUFACTURER_LABEL}
-                        </Text>
-                        <Text as="span" className="text-xs font-semibold text-text-primary">
-                          {kit.manufacturer}
-                        </Text>
-                      </LayoutContainer>
-                    </LayoutContainer>
-                  )}
-
-                  {kit.sponsor && (
-                    <LayoutContainer className="flex items-center gap-2">
-                      <Building2 className="w-4 h-4 text-primary shrink-0" />
-                      <LayoutContainer className="flex flex-col">
-                        <Text as="span" className="text-[11px] font-bold text-text-muted uppercase">
-                          {KITS_TEXTS.CARD_SPONSOR_LABEL}
-                        </Text>
-                        <Text as="span" className="text-xs font-semibold text-text-primary">
-                          {kit.sponsor}
-                        </Text>
-                      </LayoutContainer>
-                    </LayoutContainer>
-                  )}
                 </LayoutContainer>
 
-                {/* Miniaturas da Galeria Complementar */}
-                {hasGallery && (
-                  <LayoutContainer className="mt-4 pt-3 border-t border-border/60">
-                    <Text as="span" className="text-xs font-bold text-text-secondary mb-2 block">
-                      {KITS_TEXTS.COMPLEMENTARY_PHOTOS_TITLE}
+                {/* Fornecedor Esportivo Opcional */}
+                {kit.manufacturer && (
+                  <LayoutContainer className="flex items-center gap-1.5 pt-2 border-t border-border/50 text-xs text-text-muted w-full justify-center">
+                    <Shield className="w-3.5 h-3.5 text-primary shrink-0" />
+                    <Text as="span" className="font-semibold text-text-secondary">
+                      {kit.manufacturer}
                     </Text>
-                    <LayoutContainer className="flex items-center gap-2 overflow-x-auto pb-1">
-                      {kit.galleryUrls.map((galleryUrl, gIndex) => (
-                        <LayoutContainer
-                          key={gIndex}
-                          onClick={() => onOpenLightbox(kit, gIndex + 1)}
-                          className="relative w-14 h-14 rounded-lg overflow-hidden border border-border/80 hover:border-primary cursor-pointer shrink-0 transition-transform duration-200 hover:scale-105 bg-background/50"
-                        >
-                          <SafeImage
-                            src={galleryUrl}
-                            alt={`${kit.name} - Detalhe ${gIndex + 1}`}
-                            fill
-                            sizes="56px"
-                            className="object-cover"
-                            fallbackSrc="/images/pelotas-logo.png"
-                          />
-                        </LayoutContainer>
-                      ))}
-                    </LayoutContainer>
                   </LayoutContainer>
                 )}
               </LayoutContainer>
@@ -199,4 +147,3 @@ export const CurrentKitsSection: React.FC<CurrentKitsSectionProps> = ({
     </LayoutContainer>
   );
 };
-

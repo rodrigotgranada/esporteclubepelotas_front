@@ -22,9 +22,9 @@ export const KitLightboxModal: React.FC<KitLightboxModalProps> = ({
       isOpen={lightbox.isOpen}
       onClose={onClose}
       images={lightbox.images}
+      titles={lightbox.titles}
       title={displayTitle}
       initialIndex={lightbox.initialIndex}
     />
   );
 };
-

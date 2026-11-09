@@ -20,7 +20,8 @@ export const KitsFeature: React.FC = () => {
     hasHistoricalKits,
     lightbox,
     handleSelectCompetition,
-    openLightbox,
+    openCurrentKitsLightbox,
+    openHistoricalKitsLightbox,
     closeLightbox,
   } = useKits();
 
@@ -40,14 +41,14 @@ export const KitsFeature: React.FC = () => {
           </LayoutContainer>
         ) : (
           <LayoutContainer>
-            {/* Seção 1: Uniformes Atuais da Temporada em Destaque */}
+            {/* Seção 1: Uniformes Atuais da Temporada em Linha / 1 ao lado do outro */}
             <CurrentKitsSection
               kits={currentKits}
               isLoading={isLoading}
-              onOpenLightbox={openLightbox}
+              onOpenLightbox={openCurrentKitsLightbox}
             />
 
-            {/* Seção 2: Seletor de Competições e Mantos Anteriores */}
+            {/* Seção 2: Seletor de Torneios Anteriores com Dropdown e Mantos */}
             <HistoricalKitsSection
               competitions={competitions}
               selectedCompetition={selectedCompetition}
@@ -55,15 +56,14 @@ export const KitsFeature: React.FC = () => {
               isLoading={isHistoricalLoading}
               hasHistoricalKits={hasHistoricalKits}
               onSelectCompetition={handleSelectCompetition}
-              onOpenLightbox={openLightbox}
+              onOpenLightbox={openHistoricalKitsLightbox}
             />
           </LayoutContainer>
         )}
       </LayoutContainer>
 
-      {/* 3. Modal de Lightbox para Fotos e Detalhes dos Mantos */}
+      {/* 3. Modal de Lightbox em Formato de Slides com Todos os Mantos */}
       <KitLightboxModal lightbox={lightbox} onClose={closeLightbox} />
     </LayoutContainer>
   );
 };
-

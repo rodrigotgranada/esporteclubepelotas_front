@@ -29,3 +29,19 @@ export const getKitTypeBadgeVariant = (type: KitType): BadgeVariant => {
       return 'default';
   }
 };
+
+/**
+ * Retorna o título simplificado e limpo conforme regra de negócio:
+ * - Apenas Titular, Reserva, Terceiro Manto ou Goleiro
+ * - Quando for Edição Especial, exibe "Edição Especial: {nome}"
+ */
+export const getKitDisplayTitle = (kit: { kitType: KitType; name?: string }): string => {
+  if (kit.kitType === 'SPECIAL') {
+    const rawName = kit.name?.trim() || '';
+    if (rawName.toLowerCase().startsWith('edição especial') || rawName.toLowerCase().startsWith('edicao especial')) {
+      return rawName;
+    }
+    return rawName ? `Edição Especial: ${rawName}` : KITS_TEXTS.TYPE_SPECIAL;
+  }
+  return getKitTypeLabel(kit.kitType);
+};

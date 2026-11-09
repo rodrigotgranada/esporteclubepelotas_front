@@ -8,7 +8,6 @@ import {
   Sparkles,
   Trophy,
   Shield,
-  Building2,
 } from 'lucide-react';
 import {
   LayoutContainer,
@@ -21,7 +20,7 @@ import {
 } from '@/shared/ui/components';
 import { ClubKit } from '../../../../types/kits.types';
 import { KITS_TEXTS } from '../../../../constants/kits.constants';
-import { getKitTypeLabel, getKitTypeBadgeVariant } from '../../../../utils/kits.utils';
+import { getKitTypeLabel, getKitTypeBadgeVariant, getKitDisplayTitle } from '../../../../utils/kits.utils';
 
 export interface AdminKitsTableProps {
   kits: ClubKit[];
@@ -69,6 +68,7 @@ export const AdminKitsTable: React.FC<AdminKitsTableProps> = ({
       <LayoutContainer className="flex flex-col divide-y divide-border">
         {kits.map((kit) => {
           const typeLabel = getKitTypeLabel(kit.kitType);
+          const displayTitle = getKitDisplayTitle(kit);
           const badgeVariant = getKitTypeBadgeVariant(kit.kitType);
 
           return (
@@ -82,7 +82,7 @@ export const AdminKitsTable: React.FC<AdminKitsTableProps> = ({
                 <LayoutContainer className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-background/60 border border-border flex items-center justify-center shrink-0">
                   <SafeImage
                     src={kit.imageUrl}
-                    alt={kit.name}
+                    alt={displayTitle}
                     fill
                     sizes="80px"
                     className="object-contain p-1.5"
@@ -116,7 +116,7 @@ export const AdminKitsTable: React.FC<AdminKitsTableProps> = ({
                   </LayoutContainer>
 
                   <Title level="h4" className="text-base sm:text-lg font-bold text-text-primary truncate">
-                    {kit.name}
+                    {displayTitle}
                   </Title>
 
                   <LayoutContainer className="flex items-center gap-3 text-xs text-text-secondary mt-1 flex-wrap">
@@ -129,13 +129,6 @@ export const AdminKitsTable: React.FC<AdminKitsTableProps> = ({
                       <LayoutContainer className="flex items-center gap-1 text-text-muted">
                         <Shield className="w-3.5 h-3.5 shrink-0" />
                         <Text as="span">{kit.manufacturer}</Text>
-                      </LayoutContainer>
-                    )}
-
-                    {kit.sponsor && (
-                      <LayoutContainer className="flex items-center gap-1 text-text-muted">
-                        <Building2 className="w-3.5 h-3.5 shrink-0" />
-                        <Text as="span">{kit.sponsor}</Text>
                       </LayoutContainer>
                     )}
                   </LayoutContainer>
@@ -171,4 +164,3 @@ export const AdminKitsTable: React.FC<AdminKitsTableProps> = ({
     </LayoutContainer>
   );
 };
-

@@ -5,11 +5,7 @@ export const kitTypeSchema = z.enum(['HOME', 'AWAY', 'THIRD', 'GOALKEEPER', 'SPE
 });
 
 export const kitFormSchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(2, 'O nome do uniforme deve ter no mínimo 2 caracteres')
-    .max(160, 'O nome deve ter no máximo 160 caracteres'),
+  name: z.string().trim().max(160, 'O nome deve ter no máximo 160 caracteres').optional(),
   kitType: kitTypeSchema,
   competition: z
     .string()

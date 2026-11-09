@@ -7,7 +7,6 @@ import {
   LayoutContainer,
   Text,
   Input,
-  Textarea,
   Checkbox,
   Button,
   Select,
@@ -15,7 +14,7 @@ import {
   SafeImage,
   CropModal,
 } from '@/shared/ui/components';
-import { Upload, Image as ImageIcon, X, Loader2, Crop, Sparkles } from 'lucide-react';
+import { Upload, Image as ImageIcon, X, Loader2, Crop, Sparkles, Trophy } from 'lucide-react';
 import { ClubKit } from '../../../../types/kits.types';
 import { KITS_TEXTS } from '../../../../constants/kits.constants';
 import { useAdminKitDrawer } from '../../../../hooks/useAdminKitDrawer';
@@ -58,8 +57,12 @@ export const AdminKitDrawer: React.FC<AdminKitDrawerProps> = ({
   const {
     register,
     control,
+    watch,
     formState: { errors },
   } = form;
+
+  const currentKitType = watch('kitType');
+  const isSpecial = currentKitType === 'SPECIAL';
 
   const imageInputRef = useRef<HTMLInputElement | null>(null);
   const galleryInputRef = useRef<HTMLInputElement | null>(null);
@@ -73,25 +76,9 @@ export const AdminKitDrawer: React.FC<AdminKitDrawerProps> = ({
       <Drawer isOpen={isOpen} onClose={onClose} title={drawerTitle} size="xl">
         <form onSubmit={handleSubmit} className="flex flex-col h-full justify-between">
           <LayoutContainer className="flex flex-col gap-6 p-6 overflow-y-auto">
-            {/* 1. Nome do Uniforme e Tipo */}
+            {/* 1. Tipo do Uniforme e Nome */}
             <LayoutContainer className="grid grid-cols-1 sm:grid-cols-12 gap-4">
-              <LayoutContainer className="sm:col-span-8 flex flex-col gap-1.5">
-                <Text as="span" className="text-xs font-bold text-text-secondary">
-                  {KITS_TEXTS.FIELD_NAME} *
-                </Text>
-                <Input
-                  {...register('name')}
-                  placeholder={KITS_TEXTS.FIELD_NAME_PLACEHOLDER}
-                  className="w-full text-sm"
-                />
-                {errors.name && (
-                  <Text as="span" className="text-xs text-error font-medium">
-                    {errors.name.message}
-                  </Text>
-                )}
-              </LayoutContainer>
-
-              <LayoutContainer className="sm:col-span-4 flex flex-col gap-1.5">
+              <LayoutContainer className="sm:col-span-6 flex flex-col gap-1.5">
                 <Text as="span" className="text-xs font-bold text-text-secondary">
                   {KITS_TEXTS.FIELD_TYPE} *
                 </Text>
@@ -102,7 +89,7 @@ export const AdminKitDrawer: React.FC<AdminKitDrawerProps> = ({
                     <Select
                       value={field.value}
                       onChange={(e) => field.onChange(e.target.value)}
-                      className="w-full text-sm"
+                      className="w-full text-sm font-bold"
                     >
                       <Option value="HOME">{KITS_TEXTS.TYPE_HOME}</Option>
                       <Option value="AWAY">{KITS_TEXTS.TYPE_AWAY}</Option>
@@ -113,14 +100,37 @@ export const AdminKitDrawer: React.FC<AdminKitDrawerProps> = ({
                   )}
                 />
               </LayoutContainer>
+
+              <LayoutContainer className="sm:col-span-6 flex flex-col gap-1.5">
+                <Text as="span" className="text-xs font-bold text-text-secondary">
+                  {isSpecial ? 'Nome da Edição Especial *' : 'Variação / Nome (Opcional)'}
+                </Text>
+                <Input
+                  {...register('name')}
+                  placeholder={
+                    isSpecial
+                      ? 'Ex: Retrô Campeão Gaúcho de 1930'
+                      : 'Padrão automático pelo tipo'
+                  }
+                  className="w-full text-sm"
+                />
+                {errors.name && (
+                  <Text as="span" className="text-xs text-error font-medium">
+                    {errors.name.message}
+                  </Text>
+                )}
+              </LayoutContainer>
             </LayoutContainer>
 
             {/* 2. Campeonato Obrigatório e Ano da Temporada */}
             <LayoutContainer className="grid grid-cols-1 sm:grid-cols-12 gap-4">
               <LayoutContainer className="sm:col-span-8 flex flex-col gap-1.5">
-                <Text as="span" className="text-xs font-bold text-text-secondary">
-                  {KITS_TEXTS.FIELD_COMPETITION} *
-                </Text>
+                <LayoutContainer className="flex items-center gap-1.5">
+                  <Trophy className="w-3.5 h-3.5 text-primary" />
+                  <Text as="span" className="text-xs font-bold text-text-secondary">
+                    {KITS_TEXTS.FIELD_COMPETITION} *
+                  </Text>
+                </LayoutContainer>
                 <Input
                   {...register('competition')}
                   placeholder={KITS_TEXTS.FIELD_COMPETITION_PLACEHOLDER}
@@ -154,45 +164,19 @@ export const AdminKitDrawer: React.FC<AdminKitDrawerProps> = ({
               </LayoutContainer>
             </LayoutContainer>
 
-            {/* 3. Fornecedor Esportivo e Patrocínio */}
-            <LayoutContainer className="grid grid-cols-1 sm:grid-cols-12 gap-4">
-              <LayoutContainer className="sm:col-span-6 flex flex-col gap-1.5">
-                <Text as="span" className="text-xs font-bold text-text-secondary">
-                  {KITS_TEXTS.FIELD_MANUFACTURER}
-                </Text>
-                <Input
-                  {...register('manufacturer')}
-                  placeholder={KITS_TEXTS.FIELD_MANUFACTURER_PLACEHOLDER}
-                  className="w-full text-sm"
-                />
-              </LayoutContainer>
-
-              <LayoutContainer className="sm:col-span-6 flex flex-col gap-1.5">
-                <Text as="span" className="text-xs font-bold text-text-secondary">
-                  {KITS_TEXTS.FIELD_SPONSOR}
-                </Text>
-                <Input
-                  {...register('sponsor')}
-                  placeholder={KITS_TEXTS.FIELD_SPONSOR_PLACEHOLDER}
-                  className="w-full text-sm"
-                />
-              </LayoutContainer>
-            </LayoutContainer>
-
-            {/* 4. Descrição / Detalhes do Manto */}
+            {/* 3. Fornecedor Esportivo Opcional */}
             <LayoutContainer className="flex flex-col gap-1.5">
               <Text as="span" className="text-xs font-bold text-text-secondary">
-                {KITS_TEXTS.FIELD_DESCRIPTION}
+                {KITS_TEXTS.FIELD_MANUFACTURER}
               </Text>
-              <Textarea
-                {...register('description')}
-                rows={3}
-                placeholder={KITS_TEXTS.FIELD_DESCRIPTION_PLACEHOLDER}
+              <Input
+                {...register('manufacturer')}
+                placeholder={KITS_TEXTS.FIELD_MANUFACTURER_PLACEHOLDER}
                 className="w-full text-sm"
               />
             </LayoutContainer>
 
-            {/* 5. Foto Principal com CropModal */}
+            {/* 4. Foto Principal com CropModal */}
             <LayoutContainer className="flex flex-col gap-2 p-4 rounded-xl border border-border bg-background/50">
               <Text as="span" className="text-xs font-bold text-text-secondary">
                 {KITS_TEXTS.FIELD_IMAGE} *
@@ -268,7 +252,7 @@ export const AdminKitDrawer: React.FC<AdminKitDrawerProps> = ({
               )}
             </LayoutContainer>
 
-            {/* 6. Galeria de Fotos Complementares */}
+            {/* 5. Galeria de Fotos Complementares (Opcional) */}
             <LayoutContainer className="flex flex-col gap-2 p-4 rounded-xl border border-border bg-background/50">
               <LayoutContainer className="flex items-center justify-between">
                 <Text as="span" className="text-xs font-bold text-text-secondary">
@@ -332,7 +316,7 @@ export const AdminKitDrawer: React.FC<AdminKitDrawerProps> = ({
               )}
             </LayoutContainer>
 
-            {/* 7. Status e Opções: Definir como Oficial Atual / Ativo */}
+            {/* 6. Status e Opções: Definir como Oficial Atual / Ativo */}
             <LayoutContainer className="flex flex-col gap-3 p-4 rounded-xl border border-border bg-surface/50">
               <Controller
                 name="isCurrent"
@@ -421,4 +405,3 @@ export const AdminKitDrawer: React.FC<AdminKitDrawerProps> = ({
     </>
   );
 };
-
