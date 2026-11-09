@@ -15,11 +15,15 @@ export const SymbolsFeature: React.FC = () => {
     isLoading,
     activeTab,
     setActiveTab,
+    mascotOverview,
+    shieldOverview,
+    flagColorsOverview,
     officialMascot,
     historicalMascots,
     officialShield,
     historicalShields,
     officialFlag,
+    historicalFlags,
     colorsSymbol,
     lightbox,
     openLightbox,
@@ -44,6 +48,7 @@ export const SymbolsFeature: React.FC = () => {
           <LayoutContainer>
             {activeTab === 'MASCOT' && (
               <MascotSection
+                overview={mascotOverview}
                 officialMascot={officialMascot}
                 historicalMascots={historicalMascots}
                 onOpenLightbox={openLightbox}
@@ -52,6 +57,7 @@ export const SymbolsFeature: React.FC = () => {
 
             {activeTab === 'SHIELD' && (
               <ShieldSection
+                overview={shieldOverview}
                 officialShield={officialShield}
                 historicalShields={historicalShields}
                 onOpenLightbox={openLightbox}
@@ -60,7 +66,9 @@ export const SymbolsFeature: React.FC = () => {
 
             {activeTab === 'FLAG_COLORS' && (
               <FlagAndColorsSection
+                overview={flagColorsOverview}
                 officialFlag={officialFlag}
+                historicalFlags={historicalFlags}
                 colorsSymbol={colorsSymbol}
                 onOpenLightbox={openLightbox}
               />

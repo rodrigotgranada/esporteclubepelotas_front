@@ -149,3 +149,4 @@ export const useAdminSymbolsList = () => {
     refreshSymbols: fetchSymbols,
   };
 };
+

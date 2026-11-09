@@ -1,4 +1,5 @@
 export type SymbolCategory = 'MASCOT' | 'SHIELD' | 'FLAG' | 'COLORS';
+export type SymbolOverviewCategory = 'MASCOT' | 'SHIELD' | 'FLAG_COLORS';
 
 export interface ClubSymbol {
   id: string;
@@ -19,7 +20,7 @@ export interface ClubSymbol {
 
 export interface ClubSymbolFormData {
   category: SymbolCategory;
-  name: string;
+  name?: string;
   subtitle?: string;
   description?: string;
   imageUrl?: string;
@@ -29,4 +30,16 @@ export interface ClubSymbolFormData {
   isOfficial: boolean;
   isActive: boolean;
   displayOrder: number;
+}
+
+export interface ClubSymbolOverview {
+  category: SymbolOverviewCategory;
+  title: string;
+  description: string;
+  updatedAt?: string;
+}
+
+export interface ClubSymbolOverviewFormData {
+  title: string;
+  description: string;
 }

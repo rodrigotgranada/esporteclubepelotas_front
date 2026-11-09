@@ -9,7 +9,7 @@ import { SYMBOLS_TEXTS } from '../constants/symbols.constants';
 
 const symbolSchema = z.object({
   category: z.enum(['MASCOT', 'SHIELD', 'FLAG', 'COLORS']),
-  name: z.string().min(1, 'O nome é obrigatório').max(150, 'Máximo 150 caracteres'),
+  name: z.string().max(150, 'Máximo 150 caracteres').optional(),
   subtitle: z.string().max(250, 'Máximo 250 caracteres').optional(),
   description: z.string().optional(),
   imageUrl: z.string().optional(),
@@ -33,8 +33,15 @@ export const useAdminSymbolDrawer = ({
 }) => {
   const inFlightRef = useRef(false);
   const [isSaving, setIsSaving] = useState(false);
+
+  // Upload e Recorte (CropModal)
   const [pendingImageFile, setPendingImageFile] = useState<File | null>(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string>('');
+  const [isCropModalOpen, setIsCropModalOpen] = useState(false);
+  const [cropSourceImage, setCropSourceImage] = useState<string>('');
+  const [selectedRawFile, setSelectedRawFile] = useState<File | null>(null);
+
+  // Galeria de Fotos Complementares
   const [galleryUrls, setGalleryUrls] = useState<string[]>([]);
   const [isUploadingGallery, setIsUploadingGallery] = useState(false);
 
@@ -58,7 +65,7 @@ export const useAdminSymbolDrawer = ({
     if (symbol) {
       form.reset({
         category: symbol.category,
-        name: symbol.name,
+        name: symbol.name || '',
         subtitle: symbol.subtitle || '',
         description: symbol.description || '',
         imageUrl: symbol.imageUrl || '',
@@ -90,10 +97,43 @@ export const useAdminSymbolDrawer = ({
     }
   }, [symbol, form]);
 
+  // Iniciar fluxo de seleção de arquivo abrindo o CropModal
   const handleSelectImageFile = (file: File) => {
-    setPendingImageFile(file);
-    const objectUrl = URL.createObjectURL(file);
-    setImagePreviewUrl(objectUrl);
+    setSelectedRawFile(file);
+    const reader = new FileReader();
+    reader.onload = () => {
+      setCropSourceImage(reader.result?.toString() || '');
+      setIsCropModalOpen(true);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Salvar recorte do CropModal
+  const handleCropSave = (croppedBlob: Blob) => {
+    const fileName = selectedRawFile?.name || 'symbol-cropped.png';
+    const croppedFile = new File([croppedBlob], fileName, {
+      type: croppedBlob.type || 'image/png',
+    });
+    setPendingImageFile(croppedFile);
+    setImagePreviewUrl(URL.createObjectURL(croppedBlob));
+    setIsCropModalOpen(false);
+    setCropSourceImage('');
+  };
+
+  // Usar imagem original sem recorte
+  const handleUseOriginal = () => {
+    if (selectedRawFile) {
+      setPendingImageFile(selectedRawFile);
+      setImagePreviewUrl(URL.createObjectURL(selectedRawFile));
+    }
+    setIsCropModalOpen(false);
+    setCropSourceImage('');
+  };
+
+  const handleCloseCropModal = () => {
+    setIsCropModalOpen(false);
+    setCropSourceImage('');
+    setSelectedRawFile(null);
   };
 
   const handleRemoveImage = () => {
@@ -128,15 +168,17 @@ export const useAdminSymbolDrawer = ({
     try {
       let finalImageUrl = values.imageUrl || '';
 
-      // 1. Upload de imagem principal se houver pendência
+      // 1. Upload Media-First se houver arquivo pendente
       if (pendingImageFile) {
         const uploadResult = await symbolsService.uploadImage(pendingImageFile);
         finalImageUrl = uploadResult.url;
       }
 
+      const rawName = values.name?.trim();
+
       const payload: ClubSymbolFormData = {
         category: values.category as SymbolCategory,
-        name: values.name.trim(),
+        name: rawName || undefined,
         subtitle: values.subtitle?.trim() || undefined,
         description: values.description?.trim() || undefined,
         imageUrl: finalImageUrl || undefined,
@@ -170,9 +212,14 @@ export const useAdminSymbolDrawer = ({
     form,
     isSaving,
     imagePreviewUrl,
+    isCropModalOpen,
+    cropSourceImage,
     galleryUrls,
     isUploadingGallery,
     handleSelectImageFile,
+    handleCropSave,
+    handleUseOriginal,
+    handleCloseCropModal,
     handleRemoveImage,
     handleAddGalleryImage,
     handleRemoveGalleryImage,

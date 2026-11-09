@@ -4,12 +4,12 @@ import React from 'react';
 import {
   Edit2,
   Trash2,
-  Award,
   Sparkles,
   Shield,
   Dog,
   Flag,
   Palette,
+  Calendar,
 } from 'lucide-react';
 import {
   LayoutContainer,
@@ -27,7 +27,6 @@ export interface AdminSymbolsTableProps {
   symbols: ClubSymbol[];
   isLoading: boolean;
   onEdit: (symbol: ClubSymbol) => void;
-  onSetOfficial: (id: string) => void;
   onDelete: (symbol: ClubSymbol) => void;
 }
 
@@ -35,7 +34,6 @@ export const AdminSymbolsTable: React.FC<AdminSymbolsTableProps> = ({
   symbols,
   isLoading,
   onEdit,
-  onSetOfficial,
   onDelete,
 }) => {
   if (isLoading) {
@@ -75,18 +73,28 @@ export const AdminSymbolsTable: React.FC<AdminSymbolsTableProps> = ({
     }
   };
 
+  const formatPeriod = (symbol: ClubSymbol) => {
+    if (symbol.yearStart && symbol.yearEnd) {
+      return `${symbol.yearStart} – ${symbol.yearEnd}`;
+    }
+    if (symbol.yearStart) {
+      return `Desde ${symbol.yearStart}`;
+    }
+    return 'Registro Histórico';
+  };
+
   return (
     <LayoutContainer className="w-full bg-surface rounded-2xl border border-border overflow-hidden shadow-xs">
       <LayoutContainer className="overflow-x-auto">
-        <table className="w-full text-left text-sm border-collapse">
+        <table className="w-full text-left text-sm border-collapse min-w-[760px]">
           <thead>
             <tr className="border-b border-border bg-background/50 text-text-secondary text-xs uppercase tracking-wider">
-              <th className="py-4 px-6 font-bold">{SYMBOLS_TEXTS.COL_IMAGE}</th>
+              <th className="py-4 px-6 font-bold w-20">{SYMBOLS_TEXTS.COL_IMAGE}</th>
               <th className="py-4 px-6 font-bold">{SYMBOLS_TEXTS.COL_NAME}</th>
-              <th className="py-4 px-6 font-bold">{SYMBOLS_TEXTS.COL_CATEGORY}</th>
-              <th className="py-4 px-6 font-bold">{SYMBOLS_TEXTS.COL_PERIOD}</th>
-              <th className="py-4 px-6 font-bold">{SYMBOLS_TEXTS.COL_STATUS}</th>
-              <th className="py-4 px-6 font-bold text-right">{SYMBOLS_TEXTS.COL_ACTIONS}</th>
+              <th className="py-4 px-6 font-bold w-36">{SYMBOLS_TEXTS.COL_CATEGORY}</th>
+              <th className="py-4 px-6 font-bold w-40">{SYMBOLS_TEXTS.COL_PERIOD}</th>
+              <th className="py-4 px-6 font-bold w-44">{SYMBOLS_TEXTS.COL_STATUS}</th>
+              <th className="py-4 px-6 font-bold text-right w-44 min-w-[176px]">{SYMBOLS_TEXTS.COL_ACTIONS}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
@@ -100,7 +108,7 @@ export const AdminSymbolsTable: React.FC<AdminSymbolsTableProps> = ({
                   <LayoutContainer className="relative w-12 h-12 rounded-xl overflow-hidden bg-background border border-border/80 flex items-center justify-center p-1">
                     <SafeImage
                       src={symbol.imageUrl || '/images/pelotas-logo.png'}
-                      alt={symbol.name}
+                      alt={symbol.name || 'Símbolo'}
                       fill
                       sizes="48px"
                       className="object-contain p-1"
@@ -113,7 +121,7 @@ export const AdminSymbolsTable: React.FC<AdminSymbolsTableProps> = ({
                 <td className="py-4 px-6">
                   <LayoutContainer className="flex flex-col">
                     <Text className="font-bold text-text-primary text-sm group-hover:text-primary transition-colors">
-                      {symbol.name}
+                      {symbol.name || formatPeriod(symbol)}
                     </Text>
                     {symbol.subtitle && (
                       <Text className="text-xs text-text-secondary line-clamp-1">
@@ -137,13 +145,10 @@ export const AdminSymbolsTable: React.FC<AdminSymbolsTableProps> = ({
 
                 {/* Período / Ano */}
                 <td className="py-4 px-6">
-                  <Text className="text-xs font-semibold text-text-secondary">
-                    {symbol.yearStart && symbol.yearEnd
-                      ? `${symbol.yearStart} - ${symbol.yearEnd}`
-                      : symbol.yearStart
-                      ? `Desde ${symbol.yearStart}`
-                      : '—'}
-                  </Text>
+                  <LayoutContainer className="inline-flex items-center gap-1.5 text-xs font-semibold text-text-secondary">
+                    <Calendar className="w-3.5 h-3.5 text-primary shrink-0" />
+                    <Text as="span">{formatPeriod(symbol)}</Text>
+                  </LayoutContainer>
                 </td>
 
                 {/* Status & Oficial */}
@@ -169,40 +174,29 @@ export const AdminSymbolsTable: React.FC<AdminSymbolsTableProps> = ({
                   </LayoutContainer>
                 </td>
 
-                {/* Ações */}
-                <td className="py-4 px-6 text-right">
-                  <LayoutContainer className="inline-flex items-center justify-end gap-1.5">
-                    {!symbol.isOfficial && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => onSetOfficial(symbol.id)}
-                        className="h-8 px-2.5 text-xs text-primary hover:bg-primary/10 font-bold"
-                        title="Tornar Oficial desta categoria"
-                      >
-                        <Award className="w-4 h-4 mr-1" />
-                        <Text as="span" className="hidden sm:inline">Definir Oficial</Text>
-                      </Button>
-                    )}
-
+                {/* Ações ESTRITAMENTE Editar e Excluir com rótulo visível */}
+                <td className="py-4 px-6 text-right w-44 min-w-[176px]">
+                  <LayoutContainer className="inline-flex items-center justify-end gap-2">
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => onEdit(symbol)}
-                      className="h-8 w-8 p-0 text-text-secondary hover:text-primary hover:bg-primary/10 rounded-lg"
-                      title="Editar Símbolo"
+                      className="h-8 px-2.5 text-xs text-text-primary hover:text-primary hover:bg-primary/10 font-bold inline-flex items-center gap-1.5 cursor-pointer rounded-lg border border-border/60 hover:border-primary/40 shadow-xs"
+                      title={SYMBOLS_TEXTS.BTN_EDIT}
                     >
-                      <Edit2 className="w-4 h-4" />
+                      <Edit2 className="w-3.5 h-3.5 text-primary" />
+                      <Text as="span">{SYMBOLS_TEXTS.BTN_EDIT}</Text>
                     </Button>
 
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => onDelete(symbol)}
-                      className="h-8 w-8 p-0 text-text-secondary hover:text-error hover:bg-error/10 rounded-lg"
-                      title="Excluir Símbolo"
+                      className="h-8 px-2.5 text-xs text-error hover:bg-error/10 font-bold inline-flex items-center gap-1.5 cursor-pointer rounded-lg border border-error/30 hover:border-error/60 shadow-xs"
+                      title={SYMBOLS_TEXTS.BTN_DELETE}
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 className="w-3.5 h-3.5 text-error" />
+                      <Text as="span">{SYMBOLS_TEXTS.BTN_DELETE}</Text>
                     </Button>
                   </LayoutContainer>
                 </td>

@@ -38,3 +38,4 @@ export const AdminSymbolDeleteModal: React.FC<AdminSymbolDeleteModalProps> = ({
     />
   );
 };
+

@@ -1,6 +1,12 @@
 import { api } from '@/services/api';
 import { uploadMedia } from '@/shared/services/media-upload.service';
-import { ClubSymbol, ClubSymbolFormData, SymbolCategory } from '../types/symbols.types';
+import {
+  ClubSymbol,
+  ClubSymbolFormData,
+  SymbolCategory,
+  ClubSymbolOverview,
+  ClubSymbolOverviewFormData,
+} from '../types/symbols.types';
 
 export const symbolsService = {
   /**
@@ -25,6 +31,30 @@ export const symbolsService = {
   async publicGetOfficial(category: SymbolCategory): Promise<ClubSymbol | null> {
     try {
       const response = await api.get<ClubSymbol>(`/symbols/category/${category}/official`);
+      return response.data || null;
+    } catch {
+      return null;
+    }
+  },
+
+  /**
+   * Público: Listar narrativas e textos gerais de todas as seções
+   */
+  async publicGetOverviews(): Promise<ClubSymbolOverview[]> {
+    try {
+      const response = await api.get<ClubSymbolOverview[]>('/symbols/overview');
+      return response.data || [];
+    } catch {
+      return [];
+    }
+  },
+
+  /**
+   * Público: Obter texto geral de uma seção específica
+   */
+  async publicGetOverviewByCategory(category: string): Promise<ClubSymbolOverview | null> {
+    try {
+      const response = await api.get<ClubSymbolOverview>(`/symbols/overview/${category}`);
       return response.data || null;
     } catch {
       return null;
@@ -68,6 +98,20 @@ export const symbolsService = {
    */
   async adminDelete(id: string): Promise<void> {
     await api.delete(`/admin/symbols/${id}`);
+  },
+
+  /**
+   * Admin: Atualizar narrativa geral / texto institucional de uma categoria
+   */
+  async adminUpdateOverview(
+    category: string,
+    data: ClubSymbolOverviewFormData
+  ): Promise<ClubSymbolOverview> {
+    const response = await api.put<ClubSymbolOverview>(
+      `/admin/symbols/overview/${category}`,
+      data
+    );
+    return response.data;
   },
 
   /**

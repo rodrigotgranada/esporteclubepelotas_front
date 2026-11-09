@@ -30,3 +30,4 @@ export const SymbolLightboxModal: React.FC<SymbolLightboxModalProps> = ({
     />
   );
 };
+
