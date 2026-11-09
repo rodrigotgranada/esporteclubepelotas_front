@@ -10,6 +10,7 @@ export const SIDEBAR_TEXTS = {
     YOUTH: 'Categorias de Base',
     IDOLS: 'Ídolos & Memorial',
     TIMELINE: 'História & Linha do Tempo',
+    ANTHEM: 'Hino Oficial',
     STADIUM: 'Estádio Boca do Lobo',
     SPONSORS: 'Patrocinadores',
     MEMBERSHIP: 'Quadro Social (Sócios)',

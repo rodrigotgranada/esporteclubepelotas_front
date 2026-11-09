@@ -30,6 +30,7 @@ export const PUBLIC_DRAWER_TEXTS = {
   STADIUM_BADGE: 'Centenário',
   LINK_IDOLS: 'Galeria de Ídolos',
   LINK_HISTORY: 'Linha do Tempo',
+  LINK_ANTHEM: 'Hino Oficial',
 
   THEME_TITLE: 'Aparência',
   THEME_LIGHT: 'Modo Claro',

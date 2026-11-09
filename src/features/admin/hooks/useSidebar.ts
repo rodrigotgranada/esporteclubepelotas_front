@@ -4,7 +4,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useSystemModulesStore } from '@/store/useSystemModulesStore';
 import { startTransition, useEffect } from 'react';
-import { Home, Users, Settings, Layers, Shield, Newspaper, Trophy, Shirt, Sprout, History, Landmark, Handshake, UserCheck } from 'lucide-react';
+import { Home, Users, Settings, Layers, Shield, Newspaper, Trophy, Shirt, Sprout, History, Landmark, Handshake, UserCheck, Music } from 'lucide-react';
 import { SIDEBAR_TEXTS } from '../ui/components/Sidebar.constants';
 
 export const useSidebar = () => {
@@ -38,6 +38,7 @@ export const useSidebar = () => {
     { label: SIDEBAR_TEXTS.NAV.YOUTH, href: '/gestao/base', icon: Sprout, show: true },
     { label: SIDEBAR_TEXTS.NAV.IDOLS, href: '/gestao/idols', icon: Trophy, show: true },
     { label: SIDEBAR_TEXTS.NAV.TIMELINE, href: '/gestao/timeline', icon: History, show: true },
+    { label: SIDEBAR_TEXTS.NAV.ANTHEM, href: '/gestao/hino', icon: Music, show: true },
     { label: SIDEBAR_TEXTS.NAV.STADIUM, href: '/gestao/stadium', icon: Landmark, show: true },
     { label: SIDEBAR_TEXTS.NAV.SPONSORS, href: '/gestao/sponsors', icon: Handshake, show: true },
     { label: SIDEBAR_TEXTS.NAV.MEMBERSHIP, href: '/gestao/membership', icon: UserCheck, show: true },
