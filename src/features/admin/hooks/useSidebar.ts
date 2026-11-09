@@ -40,6 +40,7 @@ export const useSidebar = () => {
     { label: SIDEBAR_TEXTS.NAV.TIMELINE, href: '/gestao/timeline', icon: History, show: true },
     { label: SIDEBAR_TEXTS.NAV.ANTHEM, href: '/gestao/hino', icon: Music, show: true },
     { label: SIDEBAR_TEXTS.NAV.SYMBOLS, href: '/gestao/simbolos', icon: Sparkles, show: true },
+    { label: SIDEBAR_TEXTS.NAV.KITS, href: '/gestao/uniformes', icon: Shirt, show: true },
     { label: SIDEBAR_TEXTS.NAV.STADIUM, href: '/gestao/stadium', icon: Landmark, show: true },
     { label: SIDEBAR_TEXTS.NAV.SPONSORS, href: '/gestao/sponsors', icon: Handshake, show: true },
     { label: SIDEBAR_TEXTS.NAV.MEMBERSHIP, href: '/gestao/membership', icon: UserCheck, show: true },

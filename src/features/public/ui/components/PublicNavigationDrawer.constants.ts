@@ -32,6 +32,7 @@ export const PUBLIC_DRAWER_TEXTS = {
   LINK_HISTORY: 'Linha do Tempo',
   LINK_ANTHEM: 'Hino Oficial',
   LINK_SYMBOLS: 'Símbolos & Mascote',
+  LINK_KITS: 'Mantos & Uniformes',
 
   THEME_TITLE: 'Aparência',
   THEME_LIGHT: 'Modo Claro',
