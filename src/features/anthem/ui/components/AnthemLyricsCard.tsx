@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
-import { Copy, Check, FileText } from 'lucide-react';
+import { Copy, Check, FileText, Music } from 'lucide-react';
 import {
   LayoutContainer,
   Title,
@@ -11,9 +11,17 @@ import { ANTHEM_TEXTS } from '../../constants/anthem.constants';
 
 export interface AnthemLyricsCardProps {
   lyrics: string;
+  authorLyrics?: string | null;
+  authorMusic?: string | null;
+  compositionYear?: number | null;
 }
 
-export const AnthemLyricsCard: React.FC<AnthemLyricsCardProps> = ({ lyrics }) => {
+export const AnthemLyricsCard: React.FC<AnthemLyricsCardProps> = ({
+  lyrics,
+  authorLyrics,
+  authorMusic,
+  compositionYear,
+}) => {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
@@ -33,37 +41,30 @@ export const AnthemLyricsCard: React.FC<AnthemLyricsCardProps> = ({ lyrics }) =>
     .map((s) => s.trim())
     .filter(Boolean);
 
+  const authorName =
+    authorLyrics && authorMusic && authorLyrics === authorMusic
+      ? authorLyrics
+      : authorLyrics || authorMusic || ANTHEM_TEXTS.HISTORY_DEFAULT_AUTHOR;
+
   return (
     <LayoutContainer className="relative rounded-3xl border border-border/80 bg-surface/70 backdrop-blur-xs p-6 sm:p-10 shadow-lg">
       {/* Cabeçalho do Card */}
-      <LayoutContainer className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 mb-8 border-b border-border/60">
-        <LayoutContainer className="flex items-center gap-3">
-          <LayoutContainer className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
-            <FileText className="w-5 h-5" />
-          </LayoutContainer>
-          <LayoutContainer className="flex flex-col">
-            <Title level="h2" className="text-xl sm:text-2xl font-black text-text-primary">
-              {ANTHEM_TEXTS.LYRICS_TITLE}
-            </Title>
-            <Text className="text-xs sm:text-sm text-text-secondary">
-              {ANTHEM_TEXTS.LYRICS_SUBTITLE}
-            </Text>
-          </LayoutContainer>
+      <LayoutContainer className="flex items-center gap-3 pb-6 mb-8 border-b border-border/60">
+        <LayoutContainer className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+          <FileText className="w-5 h-5" />
         </LayoutContainer>
-
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleCopy}
-          leftIcon={copied ? <Check className="w-3.5 h-3.5 text-primary" /> : <Copy className="w-3.5 h-3.5" />}
-          className="font-bold text-xs"
-        >
-          {copied ? 'Copiado!' : ANTHEM_TEXTS.BTN_COPY_LYRICS}
-        </Button>
+        <LayoutContainer className="flex flex-col">
+          <Title level="h2" className="text-xl sm:text-2xl font-black text-text-primary">
+            {ANTHEM_TEXTS.LYRICS_TITLE}
+          </Title>
+          <Text className="text-xs sm:text-sm text-text-secondary">
+            {ANTHEM_TEXTS.LYRICS_SUBTITLE}
+          </Text>
+        </LayoutContainer>
       </LayoutContainer>
 
       {/* Grid de Estrofes */}
-      <LayoutContainer className="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-10">
+      <LayoutContainer className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
         {stanzas.map((stanza, idx) => (
           <LayoutContainer
             key={idx}
@@ -86,7 +87,34 @@ export const AnthemLyricsCard: React.FC<AnthemLyricsCardProps> = ({ lyrics }) =>
           </LayoutContainer>
         ))}
       </LayoutContainer>
+
+      {/* Rodapé Direto: Autor, Ano e Ação de Cópia */}
+      <LayoutContainer className="mt-8 pt-6 border-t border-border/60 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <LayoutContainer className="flex items-center gap-2 text-xs sm:text-sm">
+          <Music className="w-4 h-4 text-primary shrink-0" />
+          <Text as="span" className="text-text-secondary">
+            Autor:
+          </Text>
+          <Text as="span" className="text-text-primary font-bold">
+            {authorName}
+          </Text>
+          {compositionYear && (
+            <Text as="span" className="text-text-secondary">
+              • Ano {compositionYear}
+            </Text>
+          )}
+        </LayoutContainer>
+
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleCopy}
+          leftIcon={copied ? <Check className="w-3.5 h-3.5 text-primary" /> : <Copy className="w-3.5 h-3.5" />}
+          className="font-bold text-xs"
+        >
+          {copied ? 'Copiado!' : ANTHEM_TEXTS.BTN_COPY_LYRICS}
+        </Button>
+      </LayoutContainer>
     </LayoutContainer>
   );
 };
-
