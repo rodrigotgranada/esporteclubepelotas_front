@@ -116,15 +116,6 @@ export const FlagAndColorsSection: React.FC<FlagAndColorsSectionProps> = ({
                   {officialFlag.subtitle}
                 </Text>
               )}
-
-              {officialFlag.description && (
-                <Text
-                  as="p"
-                  className="text-sm text-text-secondary leading-relaxed font-sans mt-1 whitespace-pre-line"
-                >
-                  {officialFlag.description}
-                </Text>
-              )}
             </LayoutContainer>
           </LayoutContainer>
         </LayoutContainer>

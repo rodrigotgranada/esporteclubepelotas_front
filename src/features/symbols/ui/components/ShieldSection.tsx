@@ -114,15 +114,6 @@ export const ShieldSection: React.FC<ShieldSectionProps> = ({
                   {officialShield.subtitle}
                 </Text>
               )}
-
-              {officialShield.description && (
-                <Text
-                  as="p"
-                  className="text-sm text-text-secondary leading-relaxed font-sans mt-1 whitespace-pre-line"
-                >
-                  {officialShield.description}
-                </Text>
-              )}
             </LayoutContainer>
           </LayoutContainer>
         </LayoutContainer>

@@ -115,15 +115,6 @@ export const MascotSection: React.FC<MascotSectionProps> = ({
                 </Text>
               )}
 
-              {officialMascot.description && (
-                <Text
-                  as="p"
-                  className="text-sm text-text-secondary leading-relaxed font-sans mt-1 whitespace-pre-line"
-                >
-                  {officialMascot.description}
-                </Text>
-              )}
-
               {/* Fotos complementares se houver */}
               {officialMascot.galleryUrls && officialMascot.galleryUrls.length > 0 && (
                 <LayoutContainer className="pt-3 border-t border-border/60">

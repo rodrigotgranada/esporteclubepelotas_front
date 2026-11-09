@@ -172,3 +172,4 @@ export const AdminSymbolsOverviewDrawer: React.FC<AdminSymbolsOverviewDrawerProp
     </Drawer>
   );
 };
+
