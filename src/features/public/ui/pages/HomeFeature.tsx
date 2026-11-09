@@ -13,6 +13,8 @@ import {
 } from '@/shared/ui/components';
 import { HOME_FEATURE_TEXTS } from './HomeFeature.constants';
 import { useSettingsStore } from '@/store/useSettingsStore';
+import { useAuthStore } from '@/store/useAuthStore';
+import { useMembershipLink } from '@/features/membership/hooks/useMembershipLink';
 import { newsService } from '@/features/news/services/news.service';
 import { NewsArticleData } from '@/features/admin/services/admin-news.service';
 import { NewsBentoHero } from '@/features/news/ui/components/NewsBentoHero';
@@ -22,6 +24,8 @@ import { useRealtimeEvents } from '@/shared/hooks/useRealtimeEvents';
 
 export const HomeFeature = () => {
   const { settings } = useSettingsStore();
+  const { user } = useAuthStore();
+  const membershipLink = useMembershipLink();
   const [featuredNews, setFeaturedNews] = useState<NewsArticleData[]>([]);
   const [latestNews, setLatestNews] = useState<NewsArticleData[]>([]);
 
@@ -147,16 +151,30 @@ export const HomeFeature = () => {
           </Text>
 
           <LayoutContainer className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full sm:w-auto px-4 max-w-xs sm:max-w-none mx-auto">
-            <Link href="/register" className="w-full sm:w-auto">
+            <Link
+              href={membershipLink.url}
+              target={membershipLink.target}
+              rel={membershipLink.rel}
+              className="w-full sm:w-auto"
+            >
               <Button variant="primary" size="lg" className="w-full sm:w-auto px-6 py-3 font-bold text-sm sm:text-base shadow-md">
-                {HOME_FEATURE_TEXTS.BUTTON_REGISTER}
+                {user?.isSocio ? HOME_FEATURE_TEXTS.BUTTON_SOCIO_ACTIVE : HOME_FEATURE_TEXTS.BUTTON_REGISTER}
               </Button>
             </Link>
-            <Link href="/login" className="w-full sm:w-auto">
-              <Button variant="secondary" size="lg" className="w-full sm:w-auto px-6 py-3 font-bold text-sm sm:text-base">
-                {HOME_FEATURE_TEXTS.BUTTON_LOGIN}
-              </Button>
-            </Link>
+
+            {user ? (
+              <Link href="/profile" className="w-full sm:w-auto">
+                <Button variant="secondary" size="lg" className="w-full sm:w-auto px-6 py-3 font-bold text-sm sm:text-base">
+                  {HOME_FEATURE_TEXTS.BUTTON_PROFILE}
+                </Button>
+              </Link>
+            ) : (
+              <Link href="/login" className="w-full sm:w-auto">
+                <Button variant="secondary" size="lg" className="w-full sm:w-auto px-6 py-3 font-bold text-sm sm:text-base">
+                  {HOME_FEATURE_TEXTS.BUTTON_LOGIN}
+                </Button>
+              </Link>
+            )}
           </LayoutContainer>
         </LayoutContainer>
       </LayoutContainer>

@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Sparkles, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { LayoutContainer, Title, Text, Button } from '@/shared/ui/components';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useMembershipLink } from '@/features/membership/hooks/useMembershipLink';
 import { MEMBERSHIP_CTA_CONSTANTS } from './MembershipCtaCard.constants';
 
 export interface MembershipCtaCardProps {
@@ -29,20 +30,26 @@ export const MembershipCtaCard: React.FC<MembershipCtaCardProps> = ({
   description = MEMBERSHIP_CTA_CONSTANTS.DEFAULT_DESCRIPTION,
   badgeText = MEMBERSHIP_CTA_CONSTANTS.DEFAULT_BADGE,
   buttonText = MEMBERSHIP_CTA_CONSTANTS.DEFAULT_BUTTON_TEXT,
-  buttonLink = MEMBERSHIP_CTA_CONSTANTS.DEFAULT_BUTTON_LINK,
+  buttonLink,
   showBenefits = true,
   hideIfSocio = true,
   className = '',
 }) => {
   const { user } = useAuthStore();
+  const membershipLink = useMembershipLink();
 
   // Verifica se o usuário autenticado já é sócio do clube
-  const isSocio = user?.role?.name?.toUpperCase() === 'SOCIO';
+  const roleName = user?.role?.name || '';
+  const isSocio = Boolean(user?.isSocio) || roleName.toUpperCase() === 'SOCIO';
 
   // Se o usuário já for sócio, não exibe o convite para associação
   if (hideIfSocio && isSocio) {
     return null;
   }
+
+  const finalLink = buttonLink || membershipLink.url;
+  const linkTarget = buttonLink ? undefined : membershipLink.target;
+  const linkRel = buttonLink ? undefined : membershipLink.rel;
 
   const benefitsList = [
     MEMBERSHIP_CTA_CONSTANTS.BENEFIT_1,
@@ -116,7 +123,13 @@ export const MembershipCtaCard: React.FC<MembershipCtaCardProps> = ({
         )}
 
         {/* Botão de Chamada para Ação */}
-        <Link href={buttonLink} className="inline-block" aria-label={MEMBERSHIP_CTA_CONSTANTS.ARIA_CTA_LABEL}>
+        <Link
+          href={finalLink}
+          target={linkTarget}
+          rel={linkRel}
+          className="inline-block"
+          aria-label={MEMBERSHIP_CTA_CONSTANTS.ARIA_CTA_LABEL}
+        >
           <Button
             variant="primary"
             size="lg"

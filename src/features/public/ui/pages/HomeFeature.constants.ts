@@ -4,6 +4,8 @@ export const HOME_FEATURE_TEXTS = {
   TITLE_HIGHLIGHT: 'Pelotas',
   DESCRIPTION: 'Junte-se à alcatéia. Seja sócio, compre ingressos e viva a emoção de torcer pelo Lobo.',
   BUTTON_REGISTER: 'Seja Sócio Áureo-Cerúleo',
+  BUTTON_SOCIO_ACTIVE: 'Ver Meu Plano de Sócio',
+  BUTTON_PROFILE: 'Meu Perfil',
   BUTTON_LOGIN: 'Já sou cadastrado',
   SECTION_MATCH_TITLE: 'Próximo Jogo',
   SECTION_MATCH_DESC: 'Em breve...',
