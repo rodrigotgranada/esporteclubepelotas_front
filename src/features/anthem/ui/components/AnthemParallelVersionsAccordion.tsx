@@ -86,3 +86,4 @@ export const AnthemParallelVersionsAccordion: React.FC<AnthemParallelVersionsAcc
     </LayoutContainer>
   );
 };
+

@@ -11,6 +11,7 @@ export const SIDEBAR_TEXTS = {
     IDOLS: 'Ídolos & Memorial',
     TIMELINE: 'História & Linha do Tempo',
     ANTHEM: 'Hino Oficial',
+    SYMBOLS: 'Símbolos & Mascote',
     STADIUM: 'Estádio Boca do Lobo',
     SPONSORS: 'Patrocinadores',
     MEMBERSHIP: 'Quadro Social (Sócios)',

@@ -57,6 +57,7 @@ export const PUBLIC_FOOTER_TEXTS = {
     { label: 'Memorial & Ídolos', url: '/idolos', isVisible: true, isExternal: false },
     { label: 'História & Linha do Tempo', url: '/historia', isVisible: true, isExternal: false },
     { label: 'Hino Oficial', url: '/hino', isVisible: true, isExternal: false },
+    { label: 'Símbolos & Mascote', url: '/simbolos', isVisible: true, isExternal: false },
     { label: 'Estádio Boca do Lobo', url: '/estadio', isVisible: true, isExternal: false },
     { label: 'Quadro Social (Seja Sócio)', url: '/socio', isVisible: true, isExternal: false },
     { label: 'Ingressos e Jogos', url: '/ingressos', isVisible: true, isExternal: false },

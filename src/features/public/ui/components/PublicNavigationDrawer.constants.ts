@@ -31,6 +31,7 @@ export const PUBLIC_DRAWER_TEXTS = {
   LINK_IDOLS: 'Galeria de Ídolos',
   LINK_HISTORY: 'Linha do Tempo',
   LINK_ANTHEM: 'Hino Oficial',
+  LINK_SYMBOLS: 'Símbolos & Mascote',
 
   THEME_TITLE: 'Aparência',
   THEME_LIGHT: 'Modo Claro',
