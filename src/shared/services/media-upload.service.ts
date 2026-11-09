@@ -169,3 +169,27 @@ export async function uploadMultipleMedia(
   return returnedUrls.filter((url) => typeof url === 'string' && !url.startsWith('blob:'));
 }
 
+/**
+ * Upload de arquivo binário genérico (ex: planilhas CSV, documentos PDF)
+ * respeitando o contrato canônico multipart ('file').
+ */
+export async function uploadMultipartFile<T = unknown>(
+  file: File,
+  endpoint: string,
+  onProgress?: (percent: number) => void
+): Promise<T> {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const response = await api.post<T>(endpoint, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+    onUploadProgress: (progressEvent: AxiosProgressEvent) => {
+      if (onProgress && progressEvent.total) {
+        const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+        onProgress(percent);
+      }
+    },
+  });
+
+  return response.data;
+}

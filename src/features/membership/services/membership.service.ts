@@ -1,4 +1,5 @@
 import { api } from '@/services/api';
+import { uploadMultipartFile } from '@/shared/services/media-upload.service';
 import {
   MembershipPlan,
   CreateMembershipPlanInput,
@@ -6,6 +7,10 @@ import {
   MembershipLead,
   CreateMembershipLeadInput,
   UpdateMembershipLeadStatusInput,
+  EleventicketsImportSummary,
+  EleventicketsSummary,
+  EleventicketsMember,
+  ManualSocioOverridePayload,
 } from '../types/membership.types';
 
 export const membershipService = {
@@ -86,5 +91,49 @@ export const membershipService = {
     const response = await api.patch<MembershipLead>(`/admin/membership/leads/${id}/status`, input);
     return response.data;
   },
-};
 
+  // Sincronização ElevenTickets & Base de Sócios
+  importEleventicketsCsv: async (file: File): Promise<EleventicketsImportSummary> => {
+    return uploadMultipartFile<EleventicketsImportSummary>(file, '/admin/membership/import-eleventickets');
+  },
+
+  getEleventicketsSummary: async (): Promise<EleventicketsSummary> => {
+    const response = await api.get<EleventicketsSummary>('/admin/membership/eleventickets-summary');
+    return response.data;
+  },
+
+  getEleventicketsMembers: async (params?: {
+    search?: string;
+    isSocio?: boolean;
+    status?: string;
+    syncMode?: string;
+    page?: number;
+    limit?: number;
+  }) => {
+    const response = await api.get<{
+      content: EleventicketsMember[];
+      totalElements: number;
+      totalPages: number;
+      number: number;
+    }>('/admin/membership/members', { params });
+    return response.data;
+  },
+
+  overrideMemberStatus: async (
+    userId: string,
+    payload: ManualSocioOverridePayload
+  ): Promise<EleventicketsMember> => {
+    const response = await api.post<EleventicketsMember>(
+      `/admin/membership/members/${userId}/override`,
+      payload
+    );
+    return response.data;
+  },
+
+  releaseMemberOverride: async (userId: string): Promise<EleventicketsMember> => {
+    const response = await api.post<EleventicketsMember>(
+      `/admin/membership/members/${userId}/release-override`
+    );
+    return response.data;
+  },
+};

@@ -37,6 +37,15 @@ export interface User {
   birthDate?: string;
   createdAt?: string;
   updatedAt?: string;
+
+  // Quadro Social / ElevenTickets
+  isSocio?: boolean;
+  eleventicketsId?: string;
+  socioPlanName?: string;
+  socioStatus?: string;
+  socioSyncMode?: string;
+  socioSince?: string;
+
   addresses?: Address[];
   phones?: Phone[];
   preferences?: {
@@ -73,9 +82,10 @@ export const useAuthStore = create<AuthState>()(
         set({ token, user, pendingVerificationEmail: null });
       },
       setPendingVerificationEmail: (email) => set({ pendingVerificationEmail: email }),
-      updateUser: (updates) => set((state) => ({ 
-        user: state.user ? { ...state.user, ...updates } : null 
-      })),
+      updateUser: (updates) =>
+        set((state) => ({
+          user: state.user ? { ...state.user, ...updates } : null,
+        })),
       logout: () => {
         Cookies.remove('ecp_access_token', { path: '/' });
         set({ token: null, user: null, pendingVerificationEmail: null });

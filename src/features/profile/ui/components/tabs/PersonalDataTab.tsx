@@ -3,6 +3,7 @@ import {
   LayoutContainer,
   Title,
   Text,
+  Badge,
   Button,
   Input,
   FormField,
@@ -12,7 +13,7 @@ import {
   DateText,
   isUnoptimizedImageUrl,
 } from '@/shared/ui/components';
-import { User as UserIcon, Edit2, Check, Trash2, Plus, Pencil, Loader2 } from 'lucide-react';
+import { User as UserIcon, Edit2, Check, Trash2, Plus, Pencil, Loader2, ShieldCheck } from 'lucide-react';
 import Image from 'next/image';
 import { PROFILE_TEXTS } from '../../../constants';
 import { usePersonalData } from '../../../hooks/usePersonalData';
@@ -74,6 +75,36 @@ export const PersonalDataTab = () => {
           </LayoutContainer>
         )}
       </LayoutContainer>
+
+      {/* Card Institucional de Sócio Oficial da Boca do Lobo */}
+      {user.isSocio && (
+        <LayoutContainer className="mb-8 p-5 rounded-3xl bg-gradient-to-r from-primary/20 via-surface to-surface border-2 border-primary/40 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <LayoutContainer className="flex items-center gap-3.5">
+            <LayoutContainer className="p-3 rounded-2xl bg-primary/20 text-primary shrink-0">
+              <ShieldCheck className="w-7 h-7" />
+            </LayoutContainer>
+            <LayoutContainer className="flex flex-col">
+              <LayoutContainer className="flex items-center gap-2">
+                <Badge variant="primary" size="sm" className="font-black text-[10px] uppercase">
+                  Sócio Oficial da Boca do Lobo
+                </Badge>
+              </LayoutContainer>
+              <Title level="h3" className="text-base font-black text-text-primary mt-0.5">
+                {user.socioPlanName || 'Plano de Sócios'}
+              </Title>
+              {user.eleventicketsId && (
+                <Text as="span" className="text-xs text-text-secondary">
+                  Matrícula ElevenTickets: <strong className="font-mono text-text-primary">{user.eleventicketsId}</strong>
+                </Text>
+              )}
+            </LayoutContainer>
+          </LayoutContainer>
+
+          <Badge variant="primary" size="md" className="font-black text-xs uppercase px-3 py-1">
+            Status: Ativo
+          </Badge>
+        </LayoutContainer>
+      )}
 
       <Form onSubmit={handleSave}>
         <LayoutContainer className="flex flex-col md:flex-row gap-8 items-start">

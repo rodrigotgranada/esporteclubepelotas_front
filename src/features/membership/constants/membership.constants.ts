@@ -50,16 +50,62 @@ export const MEMBERSHIP_TEXTS = {
   LEAD_SUBMITTING: 'Conectando à secretaria...',
   LEAD_DATA_SECURITY: 'Seus dados serão utilizados exclusivamente pela secretaria do clube para formalizar sua adesão.',
 
-  // Admin
+  // Admin Geral
   ADMIN_TITLE: 'Quadro Social & Planos de Sócios',
   ADMIN_SUBTITLE: 'Gerencie os planos de associação, vantagens e acompanhe os torcedores interessados.',
   ADMIN_TAB_PLANS: 'Planos de Sócios',
   ADMIN_TAB_LEADS: 'Leads & Contatos de Adesão',
+  ADMIN_TAB_MEMBERS: 'Base de Sócios (ElevenTickets)',
   ADMIN_NEW_PLAN: 'Novo Plano',
   ADMIN_EMPTY_LEADS: 'Nenhum lead de adesão registrado até o momento.',
   ADMIN_EMPTY_PLANS: 'Nenhum plano cadastrado.',
+  ADMIN_EMPTY_MEMBERS: 'Nenhum sócio encontrado com os filtros atuais.',
   ADMIN_CONFIRM_DELETE_TITLE: 'Excluir Plano',
   ADMIN_CONFIRM_DELETE_MSG: 'Tem certeza que deseja inativar este plano? Os leads vinculados permanecerão salvos.',
+
+  // Sincronização ElevenTickets
+  SYNC_CARD_TITLE: 'Sincronização de Sócios ElevenTickets',
+  SYNC_CARD_DESC: 'Importe a planilha CSV exportada da ElevenTickets para atualizar a base de sócios do portal. O sistema cruza os CPFs, ativa os torcedores cadastrados e pré-autoriza novos usuários.',
+  SYNC_BUTTON_IMPORT: 'Importar Planilha CSV',
+  SYNC_SELECT_FILE: 'Selecionar arquivo CSV',
+  SYNC_DROP_HINT: 'Clique aqui ou arraste o arquivo CSV da ElevenTickets',
+  SYNC_FILE_SELECTED: 'Arquivo selecionado:',
+  SYNC_IMPORTING: 'Processando planilha e atualizando sócios...',
+  SYNC_METRIC_ACTIVE: 'Sócios Ativos no Portal',
+  SYNC_METRIC_CACHE: 'Pré-autorizados no Cache',
+  SYNC_METRIC_OVERRIDES: 'Travas Manuais do Admin',
+  SYNC_METRIC_INACTIVE: 'Ex-Sócios / Inativos',
+  SYNC_FILTER_ALL: 'Todos os Status',
+  SYNC_FILTER_ACTIVE: 'Apenas Sócios Ativos',
+  SYNC_FILTER_OVERDUE: 'Apenas Inadimplentes',
+  SYNC_FILTER_INACTIVE: 'Apenas Inativos',
+  SYNC_FILTER_MODE_ALL: 'Todos os Modos',
+  SYNC_FILTER_MODE_AUTO: 'Modo Automático (Eleven)',
+  SYNC_FILTER_MODE_MANUAL: 'Trava Manual do Admin',
+  SYNC_SEARCH_PLACEHOLDER: 'Buscar por nome, CPF ou matrícula...',
+
+  // Colunas da Tabela
+  SYNC_COL_MEMBER: 'Torcedor',
+  SYNC_COL_IDENTIFIER: 'CPF / Matrícula',
+  SYNC_COL_PLAN: 'Plano',
+  SYNC_COL_STATUS: 'Status',
+  SYNC_COL_MODE: 'Sincronização',
+  SYNC_COL_ACTIONS: 'Ações',
+  SYNC_MODE_AUTO: 'Automático',
+  SYNC_MODE_OVERRIDE: 'Trava Manual',
+
+  // Modal de Trava Manual
+  OVERRIDE_MODAL_TITLE: 'Ajuste Manual de Sócio',
+  OVERRIDE_MODAL_DESC: 'Aplique uma alteração manual no status deste torcedor. O portal ativará uma trava manual (MANUAL_OVERRIDE) para que futuras importações de planilhas não desfaçam sua decisão sem aviso.',
+  OVERRIDE_LABEL_STATUS: 'Definir Status',
+  OVERRIDE_STATUS_ACTIVE: 'Ativar como Sócio',
+  OVERRIDE_STATUS_SUSPENDED: 'Suspender Sócio (Disciplinar / Bloqueio)',
+  OVERRIDE_STATUS_INACTIVE: 'Inativar / Desvincular Sócio',
+  OVERRIDE_REASON_LABEL: 'Justificativa da Alteração (Obrigatório)',
+  OVERRIDE_REASON_PLACEHOLDER: 'Ex: Suspensão preventiva por 30 dias / Cancelamento solicitado na secretaria.',
+  OVERRIDE_BTN_CONFIRM: 'Salvar Decisão Manual',
+  OVERRIDE_BTN_RELEASE: 'Restaurar Modo Automático',
+  OVERRIDE_SAVING: 'Salvando...',
 
   // Status
   STATUS_NEW: 'Novo',
@@ -72,6 +118,9 @@ export const MEMBERSHIP_TEXTS = {
   TOAST_SAVE_SUCCESS: 'Plano salvo com sucesso!',
   TOAST_DELETE_SUCCESS: 'Plano excluído com sucesso!',
   TOAST_STATUS_SUCCESS: 'Status do lead atualizado com sucesso!',
+  TOAST_IMPORT_SUCCESS: 'Planilha processada com sucesso!',
+  TOAST_OVERRIDE_SUCCESS: 'Trava manual aplicada com sucesso!',
+  TOAST_RELEASE_SUCCESS: 'Sincronização automática restaurada!',
   TOAST_GENERIC_ERROR: 'Ocorreu um erro ao processar a solicitação.',
 } as const;
 
@@ -152,4 +201,3 @@ export const buildMembershipWhatsAppUrl = (params: {
   const message = encodeURIComponent(lines.join('\n'));
   return `https://wa.me/${cleanPhone}?text=${message}`;
 };
-

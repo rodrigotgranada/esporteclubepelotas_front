@@ -12,12 +12,13 @@ import { useAdminMembershipPlans } from '@/features/admin/hooks/membership/useAd
 import { useAdminMembershipLeads } from '@/features/admin/hooks/membership/useAdminMembershipLeads';
 import { MembershipPlansTab } from './components/MembershipPlansTab';
 import { MembershipLeadsTab } from './components/MembershipLeadsTab';
+import { MembershipSyncTab } from './components/MembershipSyncTab';
 import { MembershipPlanDrawer } from './components/MembershipPlanDrawer';
 import { MembershipSystemSelectorCard } from './components/MembershipSystemSelectorCard';
-import { UserCheck, MessageSquare } from 'lucide-react';
+import { UserCheck, MessageSquare, Users } from 'lucide-react';
 
 export const AdminMembershipFeature: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'plans' | 'leads'>('plans');
+  const [activeTab, setActiveTab] = useState<'plans' | 'leads' | 'sync'>('plans');
 
   const {
     plans,
@@ -65,12 +66,12 @@ export const AdminMembershipFeature: React.FC = () => {
       <MembershipSystemSelectorCard />
 
       {/* Navegador de Abas */}
-      <LayoutContainer className="flex items-center gap-2 border-b border-border pb-1">
+      <LayoutContainer className="flex items-center gap-2 border-b border-border pb-1 overflow-x-auto">
         <Button
           variant="ghost"
           size="sm"
           onClick={() => setActiveTab('plans')}
-          className={`font-bold text-xs uppercase tracking-wider px-5 py-2.5 rounded-xl inline-flex items-center gap-2 transition-all cursor-pointer ${
+          className={`font-bold text-xs uppercase tracking-wider px-5 py-2.5 rounded-xl inline-flex items-center gap-2 transition-all cursor-pointer shrink-0 ${
             activeTab === 'plans'
               ? 'bg-primary text-background shadow-xs hover:bg-primary/90'
               : 'text-text-secondary hover:text-text-primary hover:bg-surface'
@@ -84,7 +85,7 @@ export const AdminMembershipFeature: React.FC = () => {
           variant="ghost"
           size="sm"
           onClick={() => setActiveTab('leads')}
-          className={`font-bold text-xs uppercase tracking-wider px-5 py-2.5 rounded-xl inline-flex items-center gap-2 transition-all cursor-pointer ${
+          className={`font-bold text-xs uppercase tracking-wider px-5 py-2.5 rounded-xl inline-flex items-center gap-2 transition-all cursor-pointer shrink-0 ${
             activeTab === 'leads'
               ? 'bg-primary text-background shadow-xs hover:bg-primary/90'
               : 'text-text-secondary hover:text-text-primary hover:bg-surface'
@@ -104,6 +105,20 @@ export const AdminMembershipFeature: React.FC = () => {
               {totalLeads}
             </Text>
           )}
+        </Button>
+
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setActiveTab('sync')}
+          className={`font-bold text-xs uppercase tracking-wider px-5 py-2.5 rounded-xl inline-flex items-center gap-2 transition-all cursor-pointer shrink-0 ${
+            activeTab === 'sync'
+              ? 'bg-primary text-background shadow-xs hover:bg-primary/90'
+              : 'text-text-secondary hover:text-text-primary hover:bg-surface'
+          }`}
+        >
+          <Users className="w-4 h-4" />
+          <span>{MEMBERSHIP_TEXTS.ADMIN_TAB_MEMBERS}</span>
         </Button>
       </LayoutContainer>
 
@@ -137,6 +152,9 @@ export const AdminMembershipFeature: React.FC = () => {
         />
       )}
 
+      {/* Conteúdo da Aba 3: Sócios ElevenTickets & Base */}
+      {activeTab === 'sync' && <MembershipSyncTab />}
+
       {/* Drawer de Cadastro / Edição de Plano */}
       <MembershipPlanDrawer
         isOpen={isDrawerOpen}
@@ -147,4 +165,3 @@ export const AdminMembershipFeature: React.FC = () => {
     </LayoutContainer>
   );
 };
-
