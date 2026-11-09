@@ -27,36 +27,7 @@ export const FlagAndColorsSection: React.FC<FlagAndColorsSectionProps> = ({
 }) => {
   return (
     <LayoutContainer className="flex flex-col gap-10 sm:gap-14">
-      {/* 1. Narrativa Geral do Pavilhão & Cores */}
-      <LayoutContainer className="rounded-3xl border border-border/80 bg-surface/90 backdrop-blur-md p-6 sm:p-10 shadow-lg text-left flex flex-col gap-4">
-        <LayoutContainer className="flex items-center gap-3">
-          <LayoutContainer className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
-            <BookOpen className="w-5 h-5" />
-          </LayoutContainer>
-          <LayoutContainer className="flex flex-col">
-            <Badge
-              variant="primary"
-              size="sm"
-              className="font-extrabold uppercase text-[10px] tracking-wider px-2.5 py-0.5 inline-flex items-center gap-1.5 shadow-xs w-fit mb-1"
-            >
-              <Sparkles className="w-3 h-3" />
-              <Text as="span">Pavilhão & Cores</Text>
-            </Badge>
-            <Title level="h2" className="text-xl sm:text-3xl font-black text-text-primary">
-              {overview.title}
-            </Title>
-          </LayoutContainer>
-        </LayoutContainer>
-
-        <Text
-          as="p"
-          className="text-sm sm:text-base text-text-secondary leading-relaxed font-sans whitespace-pre-line pt-2 border-t border-border/50"
-        >
-          {overview.description}
-        </Text>
-      </LayoutContainer>
-
-      {/* 2. O Pavilhão Oficial Ativo */}
+      {/* 1. O Pavilhão Oficial Ativo (Foco Principal no Topo) */}
       {officialFlag && (
         <LayoutContainer className="relative overflow-hidden rounded-3xl border-2 border-primary/40 bg-gradient-to-br from-primary/10 via-surface to-background p-6 sm:p-10 shadow-xl shadow-primary/5">
           <LayoutContainer className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
@@ -120,6 +91,35 @@ export const FlagAndColorsSection: React.FC<FlagAndColorsSectionProps> = ({
           </LayoutContainer>
         </LayoutContainer>
       )}
+
+      {/* 2. Narrativa Geral do Pavilhão & Cores (História Geral da Seção no Meio) */}
+      <LayoutContainer className="rounded-3xl border border-border/80 bg-surface/90 backdrop-blur-md p-6 sm:p-10 shadow-lg text-left flex flex-col gap-4">
+        <LayoutContainer className="flex items-center gap-3">
+          <LayoutContainer className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+            <BookOpen className="w-5 h-5" />
+          </LayoutContainer>
+          <LayoutContainer className="flex flex-col">
+            <Badge
+              variant="primary"
+              size="sm"
+              className="font-extrabold uppercase text-[10px] tracking-wider px-2.5 py-0.5 inline-flex items-center gap-1.5 shadow-xs w-fit mb-1"
+            >
+              <Sparkles className="w-3 h-3" />
+              <Text as="span">Pavilhão & Cores</Text>
+            </Badge>
+            <Title level="h2" className="text-xl sm:text-3xl font-black text-text-primary">
+              {overview.title}
+            </Title>
+          </LayoutContainer>
+        </LayoutContainer>
+
+        <Text
+          as="p"
+          className="text-sm sm:text-base text-text-secondary leading-relaxed font-sans whitespace-pre-line pt-2 border-t border-border/50"
+        >
+          {overview.description}
+        </Text>
+      </LayoutContainer>
 
       {/* 3. As Cores Áureo-Cerúleas */}
       <LayoutContainer className="flex flex-col gap-6">
