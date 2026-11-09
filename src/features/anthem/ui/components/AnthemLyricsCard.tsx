@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
-import { Copy, Check, FileText, Music } from 'lucide-react';
+import { Copy, Check, FileText, Music, Quote } from 'lucide-react';
 import {
   LayoutContainer,
   Title,
@@ -35,12 +35,6 @@ export const AnthemLyricsCard: React.FC<AnthemLyricsCardProps> = ({
     }
   };
 
-  // Separa as estrofes por quebra de linha dupla
-  const stanzas = lyrics
-    .split(/\n\s*\n/)
-    .map((s) => s.trim())
-    .filter(Boolean);
-
   const authorName =
     authorLyrics && authorMusic && authorLyrics === authorMusic
       ? authorLyrics
@@ -63,29 +57,15 @@ export const AnthemLyricsCard: React.FC<AnthemLyricsCardProps> = ({
         </LayoutContainer>
       </LayoutContainer>
 
-      {/* Grid de Estrofes */}
-      <LayoutContainer className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
-        {stanzas.map((stanza, idx) => (
-          <LayoutContainer
-            key={idx}
-            className="p-6 rounded-2xl bg-background/50 border border-border/50 hover:border-primary/40 transition-colors flex flex-col justify-center relative overflow-hidden group"
-          >
-            {/* Linha Áureo-Cerúlea no Início da Estrofe */}
-            <LayoutContainer className="absolute top-0 left-0 w-1.5 h-full bg-primary/40 group-hover:bg-primary transition-colors" />
-
-            <LayoutContainer className="pl-3">
-              <Text className="text-[11px] font-black uppercase tracking-widest text-primary/80 mb-2">
-                {`Estrofe ${idx + 1}`}
-              </Text>
-              <Text
-                as="p"
-                className="text-base sm:text-lg font-serif italic text-text-primary leading-relaxed whitespace-pre-line"
-              >
-                {stanza}
-              </Text>
-            </LayoutContainer>
-          </LayoutContainer>
-        ))}
+      {/* Letra como Texto Único Monumental */}
+      <LayoutContainer className="relative max-w-2xl mx-auto my-2 p-6 sm:p-8 rounded-2xl bg-background/40 border border-border/50 text-center">
+        <Quote className="w-8 h-8 text-primary/30 mx-auto mb-4" />
+        <Text
+          as="p"
+          className="text-base sm:text-xl font-serif italic text-text-primary leading-loose sm:leading-loose whitespace-pre-line tracking-wide"
+        >
+          {lyrics.trim()}
+        </Text>
       </LayoutContainer>
 
       {/* Rodapé Direto: Autor, Ano e Ação de Cópia */}

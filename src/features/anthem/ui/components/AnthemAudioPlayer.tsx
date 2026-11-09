@@ -105,7 +105,7 @@ export const AnthemAudioPlayer: React.FC<AnthemAudioPlayerProps> = ({ anthem }) 
               value={progressPercent}
               onChange={handleSeekChange}
               aria-label={ANTHEM_TEXTS.PLAYER_SEEK}
-              className="w-full h-2 rounded-lg bg-surface border border-border/60 appearance-none cursor-pointer accent-primary focus:outline-none"
+              className="w-full h-2 rounded-lg bg-surface border border-border/80 appearance-none cursor-pointer accent-primary focus:outline-none"
             />
           </LayoutContainer>
 
@@ -120,37 +120,41 @@ export const AnthemAudioPlayer: React.FC<AnthemAudioPlayerProps> = ({ anthem }) 
           {/* Lado Esquerdo: Play/Pause e Reiniciar */}
           <LayoutContainer className="flex items-center gap-3">
             <Button
-              variant="primary"
-              size="lg"
+              variant="custom"
+              size="none"
               onClick={togglePlayPause}
               disabled={isLoadingAudio}
-              className="rounded-full w-14 h-14 p-0 flex items-center justify-center font-black shadow-lg shadow-primary/25 hover:scale-105 transition-all text-blue-950 cursor-pointer"
+              className="w-14 h-14 rounded-full bg-primary hover:brightness-110 flex items-center justify-center font-black shadow-lg shadow-primary/30 hover:scale-105 active:scale-95 transition-all text-[#0b1a32] shrink-0 cursor-pointer"
               title={isPlaying ? ANTHEM_TEXTS.PLAYER_PAUSE : ANTHEM_TEXTS.PLAYER_PLAY}
               aria-label={isPlaying ? ANTHEM_TEXTS.PLAYER_PAUSE : ANTHEM_TEXTS.PLAYER_PLAY}
             >
               {isLoadingAudio ? (
-                <Loader2 className="w-6 h-6 animate-spin" />
+                <Loader2 className="w-6 h-6 animate-spin text-[#0b1a32]" />
               ) : isPlaying ? (
-                <Pause className="w-6 h-6 fill-current" />
+                <Pause className="w-6 h-6 text-[#0b1a32] fill-[#0b1a32]" />
               ) : (
-                <Play className="w-6 h-6 fill-current ml-0.5" />
+                <Play className="w-6 h-6 text-[#0b1a32] fill-[#0b1a32] ml-0.5" />
               )}
             </Button>
 
-            <button
+            <Button
+              variant="outline"
+              size="none"
               onClick={restart}
               className="w-10 h-10 rounded-full bg-surface border border-border/70 flex items-center justify-center text-text-secondary hover:text-primary hover:border-primary/50 transition-colors cursor-pointer"
               title={ANTHEM_TEXTS.PLAYER_RESTART}
               aria-label={ANTHEM_TEXTS.PLAYER_RESTART}
             >
               <RotateCcw className="w-4 h-4" />
-            </button>
+            </Button>
           </LayoutContainer>
 
           {/* Lado Direito: Controle de Volume e Download */}
           <LayoutContainer className="flex items-center gap-4">
             <LayoutContainer className="flex items-center gap-2">
-              <button
+              <Button
+                variant="outline"
+                size="none"
                 onClick={toggleMute}
                 className="w-9 h-9 rounded-full bg-surface border border-border/70 flex items-center justify-center text-text-secondary hover:text-text-primary transition-colors cursor-pointer"
                 title={isMuted ? ANTHEM_TEXTS.PLAYER_UNMUTE : ANTHEM_TEXTS.PLAYER_MUTE}
@@ -161,7 +165,7 @@ export const AnthemAudioPlayer: React.FC<AnthemAudioPlayerProps> = ({ anthem }) 
                 ) : (
                   <Volume2 className="w-4 h-4" />
                 )}
-              </button>
+              </Button>
 
               <input
                 type="range"
@@ -181,7 +185,7 @@ export const AnthemAudioPlayer: React.FC<AnthemAudioPlayerProps> = ({ anthem }) 
                 download="hino-esporte-clube-pelotas.mp3"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-9 h-9 rounded-full bg-surface border border-border/70 flex items-center justify-center text-text-secondary hover:text-primary hover:border-primary/50 transition-colors"
+                className="w-9 h-9 rounded-full bg-surface border border-border/70 flex items-center justify-center text-text-secondary hover:text-primary hover:border-primary/50 transition-colors inline-flex"
                 title={ANTHEM_TEXTS.PLAYER_DOWNLOADING}
                 aria-label={ANTHEM_TEXTS.PLAYER_DOWNLOADING}
               >
