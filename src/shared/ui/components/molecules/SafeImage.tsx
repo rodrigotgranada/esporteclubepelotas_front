@@ -63,6 +63,7 @@ export const SafeImage: React.FC<SafeImageProps> = ({
       key={currentSrc}
       src={currentSrc}
       alt={alt}
+      sizes={props.sizes || (props.fill ? '100vw' : undefined)}
       loading={props.priority ? undefined : loading}
       className={className}
       unoptimized={unoptimized ?? (isUnoptimizedImageUrl(currentSrc) || hasFailed)}
