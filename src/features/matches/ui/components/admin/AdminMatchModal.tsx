@@ -11,10 +11,9 @@ import {
   Option,
   Button,
 } from '@/shared/ui/components/atoms';
-import { CropModal } from '@/shared/ui/components/molecules/CropModal';
-import { SafeImage } from '@/shared/ui/components/molecules/SafeImage';
+import { Radio } from 'lucide-react';
 import { Championship, Match } from '../../../types/matches.types';
-import { MATCHES_CONSTANTS, MATCH_STATUS_LABELS, DEFAULT_OPPONENT_BADGE } from '../../../constants/matches.constants';
+import { MATCHES_CONSTANTS, MATCH_STATUS_LABELS } from '../../../constants/matches.constants';
 import { useAdminMatchModal } from '../../../hooks/useAdminMatchModal';
 import { AdminOpponentModal } from '@/features/opponents/ui/components/AdminOpponentModal';
 import { OpponentSearchCombobox } from './OpponentSearchCombobox';
@@ -55,12 +54,6 @@ export const AdminMatchModal: React.FC<AdminMatchModalProps> = ({
     handleSelectOpponentClub,
     handleQuickClubSuccess,
     handleHomeAwayChange,
-    logoPreviewUrl,
-    isCropModalOpen,
-    cropSourceImage,
-    handleSelectRawFile,
-    handleCropSave,
-    handleCropCancel,
     onSubmit,
   } = useAdminMatchModal({
     match,
@@ -73,12 +66,11 @@ export const AdminMatchModal: React.FC<AdminMatchModalProps> = ({
   const currentHomeAway = watch('homeAway');
   const currentStatus = watch('status');
   const hasLiveCoverage = watch('hasLiveCoverage');
-  const currentSlug = watch('slug');
 
   return (
     <>
-      <Modal isOpen={isOpen} onClose={onClose} size="4xl">
-        <LayoutContainer className="space-y-6">
+      <Modal isOpen={isOpen} onClose={onClose} size="2xl">
+        <LayoutContainer className="space-y-5">
           {/* Cabeçalho */}
           <LayoutContainer className="border-b border-border/60 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <LayoutContainer>
@@ -127,92 +119,104 @@ export const AdminMatchModal: React.FC<AdminMatchModalProps> = ({
           )}
 
           {/* Formulário Principal */}
-          <form onSubmit={onSubmit} className="space-y-5">
+          <form onSubmit={onSubmit} className="space-y-4">
             {/* ================= DADOS DA PARTIDA ================= */}
             {(activeTab === 'match' || !isEditing) && (
               <LayoutContainer className="space-y-4 animate-in fade-in duration-150">
-                {/* Linha 1: Campeonato */}
-                <LayoutContainer className="space-y-1">
-                  <Text className="text-xs font-semibold text-text-secondary">
-                    {MATCH_DRAWER.CHAMPIONSHIP_LABEL}
-                  </Text>
-                  <Select
-                    {...register('championshipId')}
-                    className="w-full"
-                  >
-                    {championships.map((champ) => (
-                      <Option key={champ.id} value={champ.id}>
-                        {champ.name} {champ.seasonYear} ({champ.category})
-                      </Option>
-                    ))}
-                  </Select>
-                  {errors.championshipId && (
-                    <Text className="text-xs text-orange-500 font-medium">
-                      {errors.championshipId.message}
+                {/* Linha 1: Campeonato (50%) & Minuto a Minuto Ao Vivo (50%) */}
+                <LayoutContainer className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+                  {/* Campeonato Oficial */}
+                  <LayoutContainer className="space-y-1">
+                    <Text className="text-xs font-semibold text-text-secondary">
+                      {MATCH_DRAWER.CHAMPIONSHIP_LABEL}
                     </Text>
-                  )}
+                    <Select
+                      {...register('championshipId')}
+                      className="w-full"
+                    >
+                      {championships.map((champ) => (
+                        <Option key={champ.id} value={champ.id}>
+                          {champ.name} {champ.seasonYear} ({champ.category})
+                        </Option>
+                      ))}
+                    </Select>
+                    {errors.championshipId && (
+                      <Text className="text-xs text-orange-500 font-medium">
+                        {errors.championshipId.message}
+                      </Text>
+                    )}
+                  </LayoutContainer>
+
+                  {/* Switch: Minuto a Minuto Ao Vivo */}
+                  <LayoutContainer className="space-y-1">
+                    <Text className="text-xs font-semibold text-text-secondary">
+                      {MATCH_DRAWER.LIVE_COVERAGE_LABEL}
+                    </Text>
+                    <button
+                      type="button"
+                      role="switch"
+                      aria-checked={hasLiveCoverage}
+                      onClick={() => setValue('hasLiveCoverage', !hasLiveCoverage)}
+                      className={`w-full h-[42px] px-3.5 rounded-xl border flex items-center justify-between transition-all cursor-pointer select-none ${
+                        hasLiveCoverage
+                          ? 'bg-secondary/15 border-secondary/60 text-secondary'
+                          : 'bg-surface-hover/50 border-border text-text-secondary hover:border-border/90'
+                      }`}
+                    >
+                      <LayoutContainer className="flex items-center gap-2">
+                        <Radio size={16} className={hasLiveCoverage ? 'text-secondary animate-pulse' : 'text-text-muted'} />
+                        <Text className="text-xs font-bold text-text-primary">
+                          Lance a Lance
+                        </Text>
+                      </LayoutContainer>
+
+                      <LayoutContainer className="flex items-center gap-2.5">
+                        <span className={`text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full ${
+                          hasLiveCoverage
+                            ? 'bg-secondary text-primary shadow-xs'
+                            : 'bg-surface text-text-muted border border-border/50'
+                        }`}>
+                          {hasLiveCoverage ? 'Ativado' : 'Desativado'}
+                        </span>
+
+                        {/* Toggle Track & Knob */}
+                        <div className={`w-11 h-6 rounded-full transition-colors relative flex items-center p-0.5 ${
+                          hasLiveCoverage ? 'bg-secondary' : 'bg-surface-hover border border-border'
+                        }`}>
+                          <div className={`w-5 h-5 rounded-full bg-white shadow-md transform transition-transform duration-200 ease-in-out ${
+                            hasLiveCoverage ? 'translate-x-5' : 'translate-x-0'
+                          }`} />
+                        </div>
+                      </LayoutContainer>
+                    </button>
+                  </LayoutContainer>
                 </LayoutContainer>
 
-                {/* Linha 2: Seleção do Clube Adversário (Combobox com Search Dropdown) */}
-                <LayoutContainer className="p-4 rounded-xl border border-border/60 bg-surface/30 space-y-3">
+                {/* Linha 2: Seleção do Clube Adversário (100% de largura) */}
+                <LayoutContainer className="space-y-1.5">
                   <LayoutContainer className="flex items-center justify-between">
                     <Text className="text-xs font-semibold text-text-secondary">
-                      Clube Adversário *
+                      {MATCH_DRAWER.OPPONENT_LABEL}
                     </Text>
                     <Button
                       type="button"
                       variant="outline"
                       size="sm"
                       onClick={() => handleOpenQuickClub(selectedOpponentName)}
-                      className="text-xs font-bold border-secondary/40 text-secondary hover:bg-secondary/10 cursor-pointer"
+                      className="text-xs font-bold border-secondary/40 text-secondary hover:bg-secondary/10 cursor-pointer h-7 px-2.5"
                     >
                       + Cadastrar Novo Clube
                     </Button>
                   </LayoutContainer>
 
-                  <LayoutContainer className="grid grid-cols-1 md:grid-cols-3 gap-3 items-center">
-                    {/* Input com Dropdown Filtrável */}
-                    <LayoutContainer className="md:col-span-2">
-                      <OpponentSearchCombobox
-                        opponents={opponents}
-                        value={selectedOpponentName || ''}
-                        onChange={(val) => setValue('opponentName', val, { shouldValidate: true })}
-                        onSelectClub={handleSelectOpponentClub}
-                        onOpenQuickCreate={handleOpenQuickClub}
-                        error={errors.opponentName?.message}
-                      />
-                    </LayoutContainer>
-
-                    {/* Escudo do Adversário */}
-                    <LayoutContainer className="flex items-center gap-3 p-2 rounded-xl bg-surface-card border border-border/60">
-                      <LayoutContainer className="w-12 h-12 rounded-lg bg-surface flex items-center justify-center p-1 overflow-hidden shrink-0">
-                        <SafeImage
-                          src={logoPreviewUrl || DEFAULT_OPPONENT_BADGE}
-                          alt={selectedOpponentName || 'Escudo'}
-                          width={40}
-                          height={40}
-                          className="object-contain max-h-10"
-                        />
-                      </LayoutContainer>
-                      <LayoutContainer className="space-y-1 overflow-hidden">
-                        <label className="text-[11px] font-bold text-secondary cursor-pointer hover:underline block truncate">
-                          Trocar Escudo
-                          <input
-                            type="file"
-                            accept="image/png, image/jpeg, image/webp"
-                            className="hidden"
-                            onChange={(e) => {
-                              const file = e.target.files?.[0];
-                              if (file) handleSelectRawFile(file);
-                            }}
-                          />
-                        </label>
-                        <Text className="text-[10px] text-text-muted block truncate">
-                          Proporção 1:1
-                        </Text>
-                      </LayoutContainer>
-                    </LayoutContainer>
-                  </LayoutContainer>
+                  <OpponentSearchCombobox
+                    opponents={opponents}
+                    value={selectedOpponentName || ''}
+                    onChange={(val) => setValue('opponentName', val, { shouldValidate: true })}
+                    onSelectClub={handleSelectOpponentClub}
+                    onOpenQuickCreate={handleOpenQuickClub}
+                    error={errors.opponentName?.message}
+                  />
                 </LayoutContainer>
 
                 {/* Linha 3: Mando de Campo */}
@@ -226,7 +230,7 @@ export const AdminMatchModal: React.FC<AdminMatchModalProps> = ({
                       variant="custom"
                       size="none"
                       onClick={() => handleHomeAwayChange('HOME')}
-                      className={`p-3 rounded-xl border text-center transition-all cursor-pointer ${
+                      className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer ${
                         currentHomeAway === 'HOME'
                           ? 'border-secondary bg-secondary/10 text-secondary font-bold shadow-xs'
                           : 'border-border/60 bg-surface/50 text-text-secondary hover:bg-surface'
@@ -243,7 +247,7 @@ export const AdminMatchModal: React.FC<AdminMatchModalProps> = ({
                       variant="custom"
                       size="none"
                       onClick={() => handleHomeAwayChange('AWAY')}
-                      className={`p-3 rounded-xl border text-center transition-all cursor-pointer ${
+                      className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer ${
                         currentHomeAway === 'AWAY'
                           ? 'border-secondary bg-secondary/10 text-secondary font-bold shadow-xs'
                           : 'border-border/60 bg-surface/50 text-text-secondary hover:bg-surface'
@@ -334,82 +338,18 @@ export const AdminMatchModal: React.FC<AdminMatchModalProps> = ({
                   </LayoutContainer>
                 </LayoutContainer>
 
-                {/* Linha 6: Minuto a Minuto Ao Vivo & Transmissão (Abaixo de tudo) */}
-                <LayoutContainer className="p-4 rounded-xl border border-border/60 bg-surface/30 space-y-4 pt-4 mt-2">
-                  {/* Switch para Habilitar Cobertura Minuto a Minuto */}
-                  <LayoutContainer className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-xl bg-surface-card border border-border/50">
-                    <LayoutContainer className="space-y-0.5">
-                      <Text className="text-xs font-bold text-text-primary block">
-                        {MATCH_DRAWER.LIVE_COVERAGE_LABEL}
-                      </Text>
-                      <Text className="text-[11px] text-text-muted block">
-                        {MATCH_DRAWER.LIVE_COVERAGE_DESC}
-                      </Text>
-                    </LayoutContainer>
-
-                    <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                      <input
-                        type="checkbox"
-                        checked={hasLiveCoverage}
-                        onChange={(e) => setValue('hasLiveCoverage', e.target.checked)}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-surface-hover peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-border after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
-                    </label>
-                  </LayoutContainer>
-
-                  {/* Slug da Partida (URL do Minuto a Minuto) */}
-                  <LayoutContainer className="space-y-1">
-                    <LayoutContainer className="flex items-center justify-between">
-                      <Text className="text-xs font-semibold text-text-secondary">
-                        {MATCH_DRAWER.SLUG_LABEL}
-                      </Text>
-                      <Text className="text-[10px] text-text-muted">
-                        URL: /jogos/{currentSlug || 'slug-automatico'}/ao-vivo
-                      </Text>
-                    </LayoutContainer>
-                    <Input
-                      placeholder={MATCH_DRAWER.SLUG_PLACEHOLDER}
-                      {...register('slug')}
-                    />
-                  </LayoutContainer>
-
-                  {/* Link da Transmissão Oficial Ao Vivo */}
-                  <LayoutContainer className="space-y-1">
-                    <Text className="text-xs font-semibold text-text-secondary">
-                      {MATCH_DRAWER.TRANSMISSION_URL_LABEL}
-                    </Text>
-                    <Input
-                      placeholder={MATCH_DRAWER.TRANSMISSION_URL_PLACEHOLDER}
-                      {...register('transmissionUrl')}
-                    />
-                    <Text className="text-[10px] text-text-muted block">
-                      Cole o link direto do YouTube, Federação ou streaming ao vivo.
-                    </Text>
-                  </LayoutContainer>
-
-                  {/* Canal de TV / Rádio e Observações */}
-                  <LayoutContainer className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <LayoutContainer className="space-y-1">
-                      <Text className="text-xs font-semibold text-text-secondary">
-                        {MATCH_DRAWER.BROADCAST_CHANNEL_LABEL}
-                      </Text>
-                      <Input
-                        placeholder={MATCH_DRAWER.BROADCAST_CHANNEL_PLACEHOLDER}
-                        {...register('broadcastChannel')}
-                      />
-                    </LayoutContainer>
-
-                    <LayoutContainer className="space-y-1">
-                      <Text className="text-xs font-semibold text-text-secondary">
-                        {MATCH_DRAWER.NOTES_LABEL}
-                      </Text>
-                      <Input
-                        placeholder={MATCH_DRAWER.NOTES_PLACEHOLDER}
-                        {...register('notes')}
-                      />
-                    </LayoutContainer>
-                  </LayoutContainer>
+                {/* Linha 6: Link da Transmissão Oficial Ao Vivo */}
+                <LayoutContainer className="space-y-1">
+                  <Text className="text-xs font-semibold text-text-secondary">
+                    {MATCH_DRAWER.TRANSMISSION_URL_LABEL}
+                  </Text>
+                  <Input
+                    placeholder={MATCH_DRAWER.TRANSMISSION_URL_PLACEHOLDER}
+                    {...register('transmissionUrl')}
+                  />
+                  <Text className="text-[10px] text-text-muted block">
+                    Link opcional para canal oficial do YouTube, Federação ou streaming ao vivo.
+                  </Text>
                 </LayoutContainer>
               </LayoutContainer>
             )}
@@ -460,31 +400,32 @@ export const AdminMatchModal: React.FC<AdminMatchModalProps> = ({
                   </LayoutContainer>
                 </LayoutContainer>
 
-                <LayoutContainer className="pt-2">
-                  <Text className="text-xs font-semibold text-text-muted mb-2 block">
-                    Decisão por Pênaltis (Opcional - Mata-Mata)
+                {/* Pênaltis Opcionais */}
+                <LayoutContainer className="border-t border-border/40 pt-3 space-y-2">
+                  <Text className="text-xs font-semibold text-text-secondary block">
+                    Disputa de Pênaltis (Caso aplicável)
                   </Text>
                   <LayoutContainer className="grid grid-cols-2 gap-4">
                     <LayoutContainer className="space-y-1">
-                      <Text className="text-xs text-text-muted">
+                      <Text className="text-xs font-semibold text-text-secondary">
                         {MATCH_DRAWER.PENALTIES_PELOTAS_LABEL}
                       </Text>
                       <Input
                         type="number"
                         min={0}
-                        placeholder="Ex: 5"
+                        placeholder="0"
                         {...register('penaltyPelotasScore')}
                       />
                     </LayoutContainer>
 
                     <LayoutContainer className="space-y-1">
-                      <Text className="text-xs text-text-muted">
+                      <Text className="text-xs font-semibold text-text-secondary">
                         {MATCH_DRAWER.PENALTIES_OPPONENT_LABEL}
                       </Text>
                       <Input
                         type="number"
                         min={0}
-                        placeholder="Ex: 4"
+                        placeholder="0"
                         {...register('penaltyOpponentScore')}
                       />
                     </LayoutContainer>
@@ -493,7 +434,7 @@ export const AdminMatchModal: React.FC<AdminMatchModalProps> = ({
               </LayoutContainer>
             )}
 
-            {/* Rodapé de Ações */}
+            {/* Rodapé com Botões de Ação */}
             <LayoutContainer className="flex items-center justify-end space-x-3 pt-4 border-t border-border/60">
               <Button
                 type="button"
@@ -526,17 +467,6 @@ export const AdminMatchModal: React.FC<AdminMatchModalProps> = ({
           initialName={quickClubInitialName}
           onSuccess={handleQuickClubSuccess}
           isQuickMode={true}
-        />
-      )}
-
-      {/* Modal de Recorte Oficial 1:1 do Escudo */}
-      {isCropModalOpen && cropSourceImage && (
-        <CropModal
-          isOpen={isCropModalOpen}
-          imageSrc={cropSourceImage}
-          aspect={1}
-          onCropSave={handleCropSave}
-          onClose={handleCropCancel}
         />
       )}
     </>

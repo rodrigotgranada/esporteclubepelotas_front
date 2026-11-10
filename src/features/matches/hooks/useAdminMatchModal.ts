@@ -36,12 +36,6 @@ export const useAdminMatchModal = ({
   const [isQuickClubModalOpen, setIsQuickClubModalOpen] = useState(false);
   const [quickClubInitialName, setQuickClubInitialName] = useState<string>('');
 
-  // Recorte manual de Escudo (caso queira subir arquivo direto)
-  const [pendingLogoFile, setPendingLogoFile] = useState<File | null>(null);
-  const [logoPreviewUrl, setLogoPreviewUrl] = useState<string>('');
-  const [isCropModalOpen, setIsCropModalOpen] = useState(false);
-  const [cropSourceImage, setCropSourceImage] = useState<string>('');
-
   const isEditing = Boolean(match);
 
   const form = useForm<MatchSchemaType>({
@@ -127,8 +121,6 @@ export const useAdminMatchModal = ({
         notes: match.notes || '',
         displayOrder: match.displayOrder ?? 0,
       });
-      setPendingLogoFile(null);
-      setLogoPreviewUrl(match.opponentLogoUrl || '');
     } else {
       form.reset({
         championshipId: championships[0]?.id || '',
@@ -152,8 +144,6 @@ export const useAdminMatchModal = ({
         notes: '',
         displayOrder: 0,
       });
-      setPendingLogoFile(null);
-      setLogoPreviewUrl('');
     }
   }, [match, championships, form]);
 
@@ -162,8 +152,6 @@ export const useAdminMatchModal = ({
     setValue('opponentName', club.name, { shouldValidate: true });
     const badge = club.badgeUrl || DEFAULT_OPPONENT_BADGE;
     setValue('opponentLogoUrl', badge);
-    setLogoPreviewUrl(badge);
-    setPendingLogoFile(null);
 
     // Se o mando for fora (visitante), preenche automaticamente com o estádio e cidade do adversário
     if (currentHomeAway === 'AWAY') {
@@ -213,33 +201,6 @@ export const useAdminMatchModal = ({
     }
   };
 
-  // Upload e Recorte de Escudo Avulso
-  const handleSelectRawFile = (file: File) => {
-    const objectUrl = URL.createObjectURL(file);
-    setCropSourceImage(objectUrl);
-    setIsCropModalOpen(true);
-  };
-
-  const handleCropSave = (croppedBlob: Blob) => {
-    const croppedFile = new File([croppedBlob], `opponent-logo-${Date.now()}.png`, {
-      type: 'image/png',
-    });
-    setPendingLogoFile(croppedFile);
-    setLogoPreviewUrl(URL.createObjectURL(croppedBlob));
-    setIsCropModalOpen(false);
-  };
-
-  const handleCropCancel = () => {
-    setIsCropModalOpen(false);
-    setCropSourceImage('');
-  };
-
-  const handleRemoveLogo = () => {
-    setPendingLogoFile(null);
-    setLogoPreviewUrl('');
-    setValue('opponentLogoUrl', '');
-  };
-
   // Submissão do formulário
   const onSubmit = async (values: MatchSchemaType) => {
     if (inFlightRef.current) return;
@@ -248,10 +209,6 @@ export const useAdminMatchModal = ({
 
     try {
       let finalLogoUrl = values.opponentLogoUrl || '';
-
-      if (pendingLogoFile) {
-        finalLogoUrl = await matchesService.adminUploadMatchImage(pendingLogoFile);
-      }
 
       if (!finalLogoUrl || !finalLogoUrl.trim() || finalLogoUrl === '/images/pelotas-logo.png') {
         finalLogoUrl = DEFAULT_OPPONENT_BADGE;
@@ -282,7 +239,7 @@ export const useAdminMatchModal = ({
         city: values.city?.trim() || undefined,
         matchDate: dateUtc,
         roundName: values.roundName.trim(),
-        slug: values.slug?.trim() || undefined,
+        slug: undefined, // Gerado automaticamente pelo backend
         hasLiveCoverage: Boolean(values.hasLiveCoverage),
         status: values.status as MatchStatus,
         pelotasScore,
@@ -290,9 +247,9 @@ export const useAdminMatchModal = ({
         penaltyPelotasScore: penaltyPelotas,
         penaltyOpponentScore: penaltyOpponent,
         ticketUrl: undefined,
-        broadcastChannel: values.broadcastChannel?.trim() || undefined,
+        broadcastChannel: undefined,
         transmissionUrl: values.transmissionUrl?.trim() || undefined,
-        notes: values.notes?.trim() || undefined,
+        notes: undefined,
         displayOrder: Number(values.displayOrder || 0),
       };
 
@@ -330,14 +287,6 @@ export const useAdminMatchModal = ({
     handleSelectOpponentClub,
     handleQuickClubSuccess,
     handleHomeAwayChange,
-    // Imagem / Recorte
-    logoPreviewUrl,
-    isCropModalOpen,
-    cropSourceImage,
-    handleSelectRawFile,
-    handleCropSave,
-    handleCropCancel,
-    handleRemoveLogo,
     onSubmit: form.handleSubmit(onSubmit),
   };
 };
