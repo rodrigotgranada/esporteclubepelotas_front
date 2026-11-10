@@ -7,7 +7,6 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
 import { LayoutContainer, Button, ShieldPlaceholder, isUnoptimizedImageUrl } from '@/shared/ui/components';
 import { Menu, User, Settings, LogOut } from 'lucide-react';
-import { ThemeToggle } from '@/shared/ui/components/molecules/ThemeToggle';
 import { useSettingsStore } from '@/store/useSettingsStore';
 import { PUBLIC_HEADER_TEXTS } from './PublicHeader.constants';
 import { PublicNavigationDrawer } from './PublicNavigationDrawer';
@@ -83,13 +82,8 @@ export const PublicHeader = () => {
             </Link>
           </LayoutContainer>
 
-          {/* LADO DIREITO: ThemeToggle (apenas Desktop) + Sessão do Usuário / Botão Entrar */}
+          {/* LADO DIREITO: Sessão do Usuário / Botão Entrar */}
           <LayoutContainer className="flex items-center gap-2 sm:gap-3 shrink-0">
-            {/* Theme Toggle (visível apenas no Desktop; no mobile fica dentro do menu) */}
-            <LayoutContainer className="hidden md:flex shrink-0">
-              <ThemeToggle />
-            </LayoutContainer>
-
             {/* Sessão do Usuário ou Botão Entrar */}
             {user ? (
               <LayoutContainer className="relative" ref={dropdownRef}>

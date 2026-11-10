@@ -103,6 +103,7 @@ export const ThemesSettingsTab = () => {
                         ? theme._id
                         : (theme._id as any)?.$oid || index;
                     const status = getThemeStatus(theme);
+                    const palette = theme.dark || theme.light;
 
                     return (
                       <TableRow
@@ -146,18 +147,18 @@ export const ThemesSettingsTab = () => {
                           <LayoutContainer className="flex items-center gap-2">
                             <LayoutContainer
                               className="w-6 h-6 rounded-full border border-border"
-                              style={{ backgroundColor: theme.light.primary }}
-                              title={`Primary (Light): ${theme.light.primary}`}
+                              style={{ backgroundColor: palette.primary }}
+                              title={`Primária: ${palette.primary}`}
                             />
                             <LayoutContainer
                               className="w-6 h-6 rounded-full border border-border"
-                              style={{ backgroundColor: theme.light.background }}
-                              title={`Background (Light): ${theme.light.background}`}
+                              style={{ backgroundColor: palette.secondary }}
+                              title={`Secundária: ${palette.secondary}`}
                             />
                             <LayoutContainer
                               className="w-6 h-6 rounded-full border border-border"
-                              style={{ backgroundColor: theme.dark.background }}
-                              title={`Background (Dark): ${theme.dark.background}`}
+                              style={{ backgroundColor: palette.background }}
+                              title={`Fundo: ${palette.background}`}
                             />
                           </LayoutContainer>
                         </TableCell>

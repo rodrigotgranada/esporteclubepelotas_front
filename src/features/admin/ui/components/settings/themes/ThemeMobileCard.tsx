@@ -30,6 +30,7 @@ export const ThemeMobileCard = ({
     typeof theme._id === 'string' ? theme._id : (theme._id as any)?.$oid;
   const isPreviewed = previewTheme?._id === theme._id;
   const status = getThemeStatus(theme);
+  const palette = theme.dark || theme.light;
 
   const formatDate = (date?: string | Date) => {
     if (!date) return '';
@@ -79,18 +80,18 @@ export const ThemeMobileCard = ({
         <Text className="text-xs text-text-secondary mr-2">Cores:</Text>
         <LayoutContainer
           className="w-6 h-6 rounded-full border border-border"
-          style={{ backgroundColor: theme.light.primary }}
-          title={`Primary (Light): ${theme.light.primary}`}
+          style={{ backgroundColor: palette.primary }}
+          title={`Primária: ${palette.primary}`}
         />
         <LayoutContainer
           className="w-6 h-6 rounded-full border border-border"
-          style={{ backgroundColor: theme.light.background }}
-          title={`Background (Light): ${theme.light.background}`}
+          style={{ backgroundColor: palette.secondary }}
+          title={`Secundária: ${palette.secondary}`}
         />
         <LayoutContainer
           className="w-6 h-6 rounded-full border border-border"
-          style={{ backgroundColor: theme.dark.background }}
-          title={`Background (Dark): ${theme.dark.background}`}
+          style={{ backgroundColor: palette.background }}
+          title={`Fundo: ${palette.background}`}
         />
       </LayoutContainer>
 
@@ -119,13 +120,13 @@ export const ThemeMobileCard = ({
                 handleDeactivate(rowKey);
               }}
             >
-              {SETTINGS_TEXTS.THEMES.BTN_DEACTIVATE}
+              Desativar
             </Button>
           )
         )}
         <Button
           type="button"
-          variant="outline"
+          variant="ghost"
           size="sm"
           onClick={(e) => {
             e.stopPropagation();

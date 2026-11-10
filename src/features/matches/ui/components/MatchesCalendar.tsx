@@ -1,9 +1,10 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import Link from 'next/link';
 import { LayoutContainer, Title, Text, Badge, Button } from '@/shared/ui/components/atoms';
 import { SafeImage } from '@/shared/ui/components/molecules/SafeImage';
+import { SearchableSelect, SearchableSelectOption } from '@/shared/ui/components/molecules';
 import { Championship, Match } from '../../types/matches.types';
 import { MATCHES_CONSTANTS, DEFAULT_OPPONENT_BADGE } from '../../constants/matches.constants';
 
@@ -44,43 +45,32 @@ export const MatchesCalendar: React.FC<MatchesCalendarProps> = ({
 
   const pelotasLogo = '/images/pelotas-logo.png';
 
+  // Opções para o Combobox Pesquisável de Competições
+  const championshipOptions: SearchableSelectOption[] = useMemo(() => {
+    const list = championships.map((champ) => ({
+      value: champ.id,
+      label: `${champ.name} ${champ.seasonYear}`,
+      badge: String(champ.seasonYear),
+    }));
+    return [{ value: 'ALL', label: 'Todas as Competições' }, ...list];
+  }, [championships]);
+
   return (
     <LayoutContainer className="space-y-8 mt-10">
-      {/* Seletor de Campeonatos */}
+      {/* Seletor de Campeonatos (Combobox Pesquisável) */}
       {championships.length > 0 && (
-        <LayoutContainer className="flex flex-col space-y-3">
-          <Text className="text-xs md:text-sm font-semibold uppercase tracking-wider text-text-muted">
-            {CALENDAR.CHAMPIONSHIP_SELECTOR_LABEL}
-          </Text>
-
-          <LayoutContainer className="flex flex-wrap gap-2">
-            {championships.map((champ) => {
-              const isSelected = selectedChampionshipId === champ.id;
-              return (
-                <Button
-                  key={champ.id}
-                  variant={isSelected ? 'primary' : 'outline'}
-                  size="sm"
-                  onClick={() => onSelectChampionship(champ.id)}
-                  className={`rounded-xl px-4 py-2 text-xs md:text-sm transition-all flex items-center space-x-2 ${
-                    isSelected
-                      ? 'bg-secondary text-primary hover:bg-secondary-hover shadow-md font-bold'
-                      : 'border-border/60 text-text-muted hover:border-primary/40 hover:text-text-primary'
-                  }`}
-                >
-                  {champ.logoUrl && (
-                    <SafeImage
-                      src={champ.logoUrl}
-                      alt={champ.name}
-                      width={18}
-                      height={18}
-                      className="object-contain"
-                    />
-                  )}
-                  <span>{champ.name} {champ.seasonYear}</span>
-                </Button>
-              );
-            })}
+        <LayoutContainer className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 max-w-md">
+          <LayoutContainer className="space-y-1.5 w-full">
+            <Text className="text-xs md:text-sm font-semibold uppercase tracking-wider text-text-muted">
+              {CALENDAR.CHAMPIONSHIP_SELECTOR_LABEL}
+            </Text>
+            <SearchableSelect
+              options={championshipOptions}
+              value={selectedChampionshipId || 'ALL'}
+              onChange={(val) => onSelectChampionship(val === 'ALL' ? null : val)}
+              placeholder="Todas as Competições"
+              searchPlaceholder="Digite para buscar competição..."
+            />
           </LayoutContainer>
         </LayoutContainer>
       )}
@@ -105,78 +95,87 @@ export const MatchesCalendar: React.FC<MatchesCalendarProps> = ({
               return (
                 <LayoutContainer
                   key={match.id}
-                  className="rounded-2xl bg-surface-card border border-border/60 hover:border-primary/40 p-5 space-y-4 transition-all shadow-sm"
+                  className="rounded-2xl border border-border/60 bg-surface-card p-5 space-y-4 hover:border-secondary/40 transition-colors shadow-sm"
                 >
-                  <LayoutContainer className="flex items-center justify-between border-b border-border/40 pb-3">
-                    <Badge variant="default" className="border-secondary/40 text-secondary text-[11px] font-semibold">
+                  <LayoutContainer className="flex items-center justify-between text-xs text-text-muted border-b border-border/40 pb-2">
+                    <Badge variant="default" className="text-[11px] font-semibold border-secondary/40 text-secondary bg-secondary/10">
                       {match.roundName}
                     </Badge>
-                    <Text className="text-xs text-text-muted font-medium">
+                    <span>
                       {formatDate(match.matchDate)} às {formatTime(match.matchDate)}
-                    </Text>
+                    </span>
                   </LayoutContainer>
 
-                  <LayoutContainer className="grid grid-cols-3 items-center gap-2">
-                    {/* Time Mandante */}
+                  {/* Confronto */}
+                  <LayoutContainer className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 py-2">
+                    {/* Mandante */}
                     <LayoutContainer className="flex flex-col items-center text-center space-y-1">
-                      <SafeImage
-                        src={isPelotasHome ? pelotasLogo : opponentLogo}
-                        alt={isPelotasHome ? NEXT_MATCH.PELOTAS_NAME : match.opponentName}
-                        width={40}
-                        height={40}
-                        className="object-contain max-h-10 max-w-10"
-                      />
-                      <Text className="text-xs md:text-sm font-bold text-text-primary truncate max-w-full">
-                        {isPelotasHome ? NEXT_MATCH.PELOTAS_NAME : match.opponentName}
+                      <LayoutContainer className="w-12 h-12 rounded-xl bg-surface border border-border flex items-center justify-center p-1.5 shadow-xs">
+                        <SafeImage
+                          src={isPelotasHome ? pelotasLogo : opponentLogo}
+                          alt={isPelotasHome ? 'Pelotas' : match.opponentName}
+                          width={36}
+                          height={36}
+                          className="object-contain"
+                        />
+                      </LayoutContainer>
+                      <Text className="text-xs font-bold text-text-primary">
+                        {isPelotasHome ? 'Pelotas' : match.opponentName}
                       </Text>
                     </LayoutContainer>
 
-                    {/* Centro */}
-                    <LayoutContainer className="flex flex-col items-center justify-center text-center">
-                      <Text className="text-xs font-black text-text-muted uppercase">VS</Text>
-                      <Text className="text-[10px] text-text-muted mt-1 truncate max-w-[120px]">
+                    {/* Divisor VS e Estádio */}
+                    <LayoutContainer className="flex flex-col items-center space-y-1 text-center px-2">
+                      <span className="text-xs font-black text-text-muted bg-surface px-2 py-0.5 rounded-full border border-border/60">
+                        VS
+                      </span>
+                      <Text className="text-[10px] text-text-muted line-clamp-1 max-w-[120px]">
                         {match.stadiumName}
                       </Text>
                     </LayoutContainer>
 
-                    {/* Time Visitante */}
+                    {/* Visitante */}
                     <LayoutContainer className="flex flex-col items-center text-center space-y-1">
-                      <SafeImage
-                        src={isPelotasHome ? opponentLogo : pelotasLogo}
-                        alt={isPelotasHome ? match.opponentName : NEXT_MATCH.PELOTAS_NAME}
-                        width={40}
-                        height={40}
-                        className="object-contain max-h-10 max-w-10"
-                      />
-                      <Text className="text-xs md:text-sm font-bold text-text-primary truncate max-w-full">
-                        {isPelotasHome ? match.opponentName : NEXT_MATCH.PELOTAS_NAME}
+                      <LayoutContainer className="w-12 h-12 rounded-xl bg-surface border border-border flex items-center justify-center p-1.5 shadow-xs">
+                        <SafeImage
+                          src={isPelotasHome ? opponentLogo : pelotasLogo}
+                          alt={isPelotasHome ? match.opponentName : 'Pelotas'}
+                          width={36}
+                          height={36}
+                          className="object-contain"
+                        />
+                      </LayoutContainer>
+                      <Text className="text-xs font-bold text-text-primary">
+                        {isPelotasHome ? match.opponentName : 'Pelotas'}
                       </Text>
                     </LayoutContainer>
                   </LayoutContainer>
 
-                  {/* Ações / Transmissão & Minuto a Minuto */}
-                  {(match.hasLiveCoverage || match.transmissionUrl) && (
-                    <LayoutContainer className="flex items-center justify-end gap-2 pt-2 border-t border-border/40">
-                      {match.hasLiveCoverage && (
-                        <Link
-                          href={`/jogos/${match.slug || match.id}/ao-vivo`}
-                          className="inline-flex items-center text-xs bg-secondary/15 border border-secondary/40 text-secondary hover:bg-secondary/25 py-1 px-3 rounded-lg font-bold transition-colors"
+                  {/* Ações da Partida */}
+                  <LayoutContainer className="pt-2 border-t border-border/40 flex items-center justify-center gap-3">
+                    {match.hasLiveCoverage && (
+                      <Link href={`/jogos/${match.slug || match.id}/ao-vivo`}>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-xs font-bold text-secondary hover:text-secondary-hover flex items-center gap-1 cursor-pointer"
                         >
-                          🔴 Lance a Lance
-                        </Link>
-                      )}
-                      {match.transmissionUrl && (
-                        <a
-                          href={match.transmissionUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center text-xs text-text-secondary hover:text-text-primary py-1 px-2.5 font-semibold transition-colors"
-                        >
-                          Transmissão ↗
-                        </a>
-                      )}
-                    </LayoutContainer>
-                  )}
+                          <span className="w-2 h-2 rounded-full bg-secondary animate-pulse" />
+                          Lance a Lance
+                        </Button>
+                      </Link>
+                    )}
+                    {match.transmissionUrl && (
+                      <a
+                        href={match.transmissionUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs font-semibold text-text-muted hover:text-secondary flex items-center gap-1 transition-colors cursor-pointer"
+                      >
+                        Transmissão ↗
+                      </a>
+                    )}
+                  </LayoutContainer>
                 </LayoutContainer>
               );
             })}
@@ -185,7 +184,7 @@ export const MatchesCalendar: React.FC<MatchesCalendarProps> = ({
       </LayoutContainer>
 
       {/* Resultados Anteriores */}
-      <LayoutContainer className="space-y-4 pt-6">
+      <LayoutContainer className="space-y-4">
         <Title level="h2" className="text-xl md:text-2xl font-bold text-text-primary flex items-center space-x-2">
           <span>🏆</span>
           <span>{CALENDAR.PAST_MATCHES}</span>
@@ -193,78 +192,105 @@ export const MatchesCalendar: React.FC<MatchesCalendarProps> = ({
 
         {pastMatches.length === 0 ? (
           <LayoutContainer className="p-8 text-center rounded-2xl bg-surface-card border border-border/50">
-            <Text className="text-sm text-text-muted">Nenhum resultado registrado para esta competição até o momento.</Text>
+            <Text className="text-sm text-text-muted">Nenhum resultado registrado para esta competição.</Text>
           </LayoutContainer>
         ) : (
           <LayoutContainer className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {pastMatches.map((match) => {
               const isPelotasHome = match.homeAway === 'HOME';
               const opponentLogo = match.opponentLogoUrl || DEFAULT_OPPONENT_BADGE;
-              const homeScore = isPelotasHome ? match.pelotasScore : match.opponentScore;
-              const awayScore = isPelotasHome ? match.opponentScore : match.pelotasScore;
+              const pelotasScore = match.pelotasScore ?? 0;
+              const opponentScore = match.opponentScore ?? 0;
+
+              const isPelotasWinner = pelotasScore > opponentScore;
+              const isDraw = pelotasScore === opponentScore;
 
               return (
                 <LayoutContainer
                   key={match.id}
-                  className="rounded-2xl bg-surface-card border border-border/60 p-5 space-y-4 shadow-sm"
+                  className="rounded-2xl border border-border/60 bg-surface-card p-5 space-y-4 shadow-sm"
                 >
-                  <LayoutContainer className="flex items-center justify-between border-b border-border/40 pb-3">
-                    <Badge variant="default" className="border-border text-text-muted text-[11px]">
+                  <LayoutContainer className="flex items-center justify-between text-xs text-text-muted border-b border-border/40 pb-2">
+                    <Badge variant="default" className="text-[11px] font-semibold border-border">
                       {match.roundName}
                     </Badge>
-                    <Text className="text-xs text-text-muted">
-                      {formatDate(match.matchDate)} • Encerrado
-                    </Text>
+                    <span>{formatDate(match.matchDate)}</span>
                   </LayoutContainer>
 
-                  <LayoutContainer className="grid grid-cols-3 items-center gap-2">
-                    {/* Time Mandante */}
+                  {/* Confronto e Placar Final */}
+                  <LayoutContainer className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 py-2">
+                    {/* Mandante */}
                     <LayoutContainer className="flex flex-col items-center text-center space-y-1">
-                      <SafeImage
-                        src={isPelotasHome ? pelotasLogo : opponentLogo}
-                        alt={isPelotasHome ? NEXT_MATCH.PELOTAS_NAME : match.opponentName}
-                        width={36}
-                        height={36}
-                        className="object-contain max-h-9 max-w-9"
-                      />
-                      <Text className="text-xs md:text-sm font-bold text-text-primary truncate max-w-full">
-                        {isPelotasHome ? NEXT_MATCH.PELOTAS_NAME : match.opponentName}
+                      <LayoutContainer className="w-12 h-12 rounded-xl bg-surface border border-border flex items-center justify-center p-1.5 shadow-xs">
+                        <SafeImage
+                          src={isPelotasHome ? pelotasLogo : opponentLogo}
+                          alt={isPelotasHome ? 'Pelotas' : match.opponentName}
+                          width={36}
+                          height={36}
+                          className="object-contain"
+                        />
+                      </LayoutContainer>
+                      <Text className="text-xs font-bold text-text-primary">
+                        {isPelotasHome ? 'Pelotas' : match.opponentName}
                       </Text>
+                      <span className="text-2xl font-black text-text-primary">
+                        {isPelotasHome ? pelotasScore : opponentScore}
+                      </span>
                     </LayoutContainer>
 
-                    {/* Placar Central */}
-                    <LayoutContainer className="flex flex-col items-center justify-center text-center">
-                      <LayoutContainer className="flex items-center space-x-2 text-xl md:text-2xl font-black text-text-primary">
-                        <span>{homeScore ?? 0}</span>
-                        <span className="text-text-muted text-sm font-normal">x</span>
-                        <span>{awayScore ?? 0}</span>
-                      </LayoutContainer>
-
-                      {match.penaltyPelotasScore !== null && match.penaltyPelotasScore !== undefined && (
-                        <Text className="text-[10px] text-text-muted mt-1">
-                          Pen: {isPelotasHome ? match.penaltyPelotasScore : match.penaltyOpponentScore} x {isPelotasHome ? match.penaltyOpponentScore : match.penaltyPelotasScore}
-                        </Text>
-                      )}
-
-                      <Text className="text-[10px] text-text-muted mt-1 truncate max-w-[120px]">
+                    {/* Badge de Resultado */}
+                    <LayoutContainer className="flex flex-col items-center space-y-1 text-center px-2">
+                      <Badge
+                        variant="default"
+                        className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${
+                          isDraw
+                            ? 'bg-surface border-border text-text-muted'
+                            : isPelotasWinner
+                            ? 'bg-secondary/15 text-secondary border-secondary/40'
+                            : 'bg-surface text-text-muted border-border'
+                        }`}
+                      >
+                        {isDraw ? 'Empate' : isPelotasWinner ? 'Vitória' : 'Derrota'}
+                      </Badge>
+                      <Text className="text-[10px] text-text-muted line-clamp-1 max-w-[120px]">
                         {match.stadiumName}
                       </Text>
                     </LayoutContainer>
 
-                    {/* Time Visitante */}
+                    {/* Visitante */}
                     <LayoutContainer className="flex flex-col items-center text-center space-y-1">
-                      <SafeImage
-                        src={isPelotasHome ? opponentLogo : pelotasLogo}
-                        alt={isPelotasHome ? match.opponentName : NEXT_MATCH.PELOTAS_NAME}
-                        width={36}
-                        height={36}
-                        className="object-contain max-h-9 max-w-9"
-                      />
-                      <Text className="text-xs md:text-sm font-bold text-text-primary truncate max-w-full">
-                        {isPelotasHome ? match.opponentName : NEXT_MATCH.PELOTAS_NAME}
+                      <LayoutContainer className="w-12 h-12 rounded-xl bg-surface border border-border flex items-center justify-center p-1.5 shadow-xs">
+                        <SafeImage
+                          src={isPelotasHome ? opponentLogo : pelotasLogo}
+                          alt={isPelotasHome ? match.opponentName : 'Pelotas'}
+                          width={36}
+                          height={36}
+                          className="object-contain"
+                        />
+                      </LayoutContainer>
+                      <Text className="text-xs font-bold text-text-primary">
+                        {isPelotasHome ? match.opponentName : 'Pelotas'}
                       </Text>
+                      <span className="text-2xl font-black text-text-primary">
+                        {isPelotasHome ? opponentScore : pelotasScore}
+                      </span>
                     </LayoutContainer>
                   </LayoutContainer>
+
+                  {/* Ações pós-jogo */}
+                  {match.hasLiveCoverage && (
+                    <LayoutContainer className="pt-2 border-t border-border/40 flex items-center justify-center">
+                      <Link href={`/jogos/${match.slug || match.id}/ao-vivo`}>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-xs font-semibold text-secondary hover:text-secondary-hover cursor-pointer"
+                        >
+                          Ver Resumo dos Lances ➔
+                        </Button>
+                      </Link>
+                    </LayoutContainer>
+                  )}
                 </LayoutContainer>
               );
             })}

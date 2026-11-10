@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { LayoutContainer, Text, IconButton, Badge } from '@/shared/ui/components';
+import React from 'react';
+import { LayoutContainer, Text, Badge } from '@/shared/ui/components';
 import { ThemeDocument } from '@/services/theme.service';
-import { Moon, Sun } from 'lucide-react';
+import { Moon } from 'lucide-react';
 import { SETTINGS_TEXTS } from '../../../../constants/settings.constants';
 
 interface ThemePreviewPanelProps {
@@ -9,8 +9,6 @@ interface ThemePreviewPanelProps {
 }
 
 export const ThemePreviewPanel = ({ previewTheme }: ThemePreviewPanelProps) => {
-  const [mode, setMode] = useState<'light' | 'dark'>('dark');
-
   if (!previewTheme) {
     return (
       <LayoutContainer className="h-full flex flex-col items-center justify-center bg-surface border border-border rounded-2xl p-8 text-center text-text-secondary">
@@ -19,7 +17,7 @@ export const ThemePreviewPanel = ({ previewTheme }: ThemePreviewPanelProps) => {
     );
   }
 
-  const palette = previewTheme[mode] || previewTheme.light;
+  const palette = previewTheme.dark || previewTheme.light;
 
   return (
     <LayoutContainer className="h-full flex flex-col bg-surface border border-border rounded-2xl p-6">
@@ -36,25 +34,9 @@ export const ThemePreviewPanel = ({ previewTheme }: ThemePreviewPanelProps) => {
           )}
         </LayoutContainer>
 
-        <LayoutContainer className="flex bg-background rounded-lg p-1 border border-border gap-1">
-          <IconButton
-            onClick={() => setMode('light')}
-            icon={<Sun size={16} />}
-            variant="ghost"
-            className={`transition-colors h-8 w-8 ${mode === 'light'
-                ? 'bg-surface text-text-primary shadow-sm'
-                : 'text-text-secondary hover:text-text-primary'
-              }`}
-          />
-          <IconButton
-            onClick={() => setMode('dark')}
-            icon={<Moon size={16} />}
-            variant="ghost"
-            className={`transition-colors h-8 w-8 ${mode === 'dark'
-                ? 'bg-surface text-text-primary shadow-sm'
-                : 'text-text-secondary hover:text-text-primary'
-              }`}
-          />
+        <LayoutContainer className="flex items-center gap-1.5 px-3 py-1 bg-background rounded-lg border border-border text-xs text-text-secondary">
+          <Moon size={14} className="text-secondary" />
+          <span>Modo Escuro</span>
         </LayoutContainer>
       </LayoutContainer>
 
@@ -98,67 +80,82 @@ export const ThemePreviewPanel = ({ previewTheme }: ThemePreviewPanelProps) => {
               />
             </LayoutContainer>
             <LayoutContainer
-              className="h-8 w-8 rounded-full"
-              style={{ backgroundColor: palette.primary }}
-            />
-          </LayoutContainer>
-
-          {/* Cards */}
-          <LayoutContainer className="grid grid-cols-2 gap-4 mt-4">
-            <LayoutContainer
-              className="p-4 rounded-xl shadow-sm border"
-              style={{
-                backgroundColor: palette.surface,
-                borderColor: palette.border,
-              }}
-            >
-              <LayoutContainer
-                className="h-3 w-20 rounded mb-4"
-                style={{ backgroundColor: palette.textSecondary }}
-              />
-              <LayoutContainer
-                className="h-6 w-12 rounded"
-                style={{ backgroundColor: palette.primary }}
-              />
-            </LayoutContainer>
-            <LayoutContainer
-              className="p-4 rounded-xl shadow-sm border"
-              style={{
-                backgroundColor: palette.surface,
-                borderColor: palette.border,
-              }}
-            >
-              <LayoutContainer
-                className="h-3 w-20 rounded mb-4"
-                style={{ backgroundColor: palette.textSecondary }}
-              />
-              <LayoutContainer
-                className="h-6 w-12 rounded"
-                style={{ backgroundColor: palette.secondary }}
-              />
-            </LayoutContainer>
-          </LayoutContainer>
-
-          {/* Action Button */}
-          <LayoutContainer className="mt-auto pt-4 flex justify-end gap-2">
-            <LayoutContainer
-              className="px-4 py-2 rounded-lg text-sm font-bold opacity-80 border"
-              style={{
-                borderColor: palette.border,
-                color: palette.textPrimary,
-              }}
-            >
-              {SETTINGS_TEXTS.THEMES.PREVIEW_PANEL_BTN_CANCEL}
-            </LayoutContainer>
-            <LayoutContainer
-              className="px-4 py-2 rounded-lg text-sm font-bold shadow-md"
+              className="h-8 px-4 rounded-lg flex items-center justify-center font-bold text-xs"
               style={{
                 backgroundColor: palette.primary,
-                color: '#ffffff',
+                color: palette.buttonPrimaryText || '#000000',
               }}
             >
-              {SETTINGS_TEXTS.THEMES.PREVIEW_PANEL_BTN_MAIN}
+              Ação
             </LayoutContainer>
+          </LayoutContainer>
+
+          {/* Cards Grid */}
+          <LayoutContainer className="grid grid-cols-2 gap-4">
+            <LayoutContainer
+              className="p-4 rounded-xl border flex flex-col justify-between h-24"
+              style={{
+                backgroundColor: palette.card,
+                borderColor: palette.border,
+              }}
+            >
+              <LayoutContainer
+                className="h-3 w-12 rounded"
+                style={{
+                  backgroundColor: palette.textSecondary,
+                  opacity: 0.5,
+                }}
+              />
+              <LayoutContainer
+                className="h-6 w-16 rounded font-black text-xl flex items-center"
+                style={{ color: palette.primary }}
+              >
+                1908
+              </LayoutContainer>
+            </LayoutContainer>
+            <LayoutContainer
+              className="p-4 rounded-xl border flex flex-col justify-between h-24"
+              style={{
+                backgroundColor: palette.card,
+                borderColor: palette.border,
+              }}
+            >
+              <LayoutContainer
+                className="h-3 w-16 rounded"
+                style={{
+                  backgroundColor: palette.textSecondary,
+                  opacity: 0.5,
+                }}
+              />
+              <LayoutContainer
+                className="h-6 w-24 rounded font-bold text-sm flex items-center"
+                style={{ color: palette.secondary }}
+              >
+                Pelotas
+              </LayoutContainer>
+            </LayoutContainer>
+          </LayoutContainer>
+
+          {/* Table Mock */}
+          <LayoutContainer
+            className="flex-1 rounded-xl border overflow-hidden p-3 flex flex-col gap-2"
+            style={{
+              backgroundColor: palette.table,
+              borderColor: palette.border,
+            }}
+          >
+            <LayoutContainer
+              className="h-4 w-full rounded opacity-30"
+              style={{ backgroundColor: palette.textSecondary }}
+            />
+            <LayoutContainer
+              className="h-4 w-5/6 rounded opacity-20"
+              style={{ backgroundColor: palette.textSecondary }}
+            />
+            <LayoutContainer
+              className="h-4 w-4/6 rounded opacity-20"
+              style={{ backgroundColor: palette.textSecondary }}
+            />
           </LayoutContainer>
         </LayoutContainer>
       </LayoutContainer>

@@ -30,7 +30,6 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useSettingsStore } from '@/store/useSettingsStore';
-import { useThemeStore } from '@/store/useThemeStore';
 import { useSystemModulesStore } from '@/store/useSystemModulesStore';
 import { useMembershipLink } from '@/features/membership/hooks/useMembershipLink';
 import { PUBLIC_DRAWER_TEXTS } from './PublicNavigationDrawer.constants';
@@ -47,12 +46,10 @@ export const PublicNavigationDrawer: React.FC<PublicNavigationDrawerProps> = ({
 }) => {
   const { user, logout } = useAuthStore();
   const { settings } = useSettingsStore();
-  const { mode, setMode } = useThemeStore();
   const { isLoaded: isModulesLoaded, isModuleActive } = useSystemModulesStore();
   const membershipLink = useMembershipLink();
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
-  const [isDark, setIsDark] = useState(false);
 
   const idolsActive = isModulesLoaded ? isModuleActive('idols') : true;
   const footballActive = isModulesLoaded ? isModuleActive('football') : true;
@@ -60,24 +57,6 @@ export const PublicNavigationDrawer: React.FC<PublicNavigationDrawerProps> = ({
   useEffect(() => {
     setMounted(true);
   }, []);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      if (mode === 'dark') {
-        setIsDark(true);
-      } else if (mode === 'light') {
-        setIsDark(false);
-      } else {
-        setIsDark(window.matchMedia('(prefers-color-scheme: dark)').matches);
-      }
-    }
-  }, [mode]);
-
-  const toggleTheme = () => {
-    const nextMode = isDark ? 'light' : 'dark';
-    setMode(nextMode);
-    setIsDark(!isDark);
-  };
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -480,13 +459,11 @@ export const PublicNavigationDrawer: React.FC<PublicNavigationDrawerProps> = ({
             </LayoutContainer>
           </LayoutContainer>
 
-          {/* Bottom Footer of Drawer (User Session / Auth + Clean Light/Dark Switch) */}
+          {/* Bottom Footer of Drawer (User Session / Auth + Dark Theme Indicator) */}
           <PublicDrawerFooter
             user={user}
             onClose={onClose}
             onLogout={handleLogout}
-            isDark={isDark}
-            onToggleTheme={toggleTheme}
           />
         </LayoutContainer>
       </LayoutContainer>

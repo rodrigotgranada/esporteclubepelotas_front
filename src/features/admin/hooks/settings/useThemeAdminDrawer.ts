@@ -191,7 +191,7 @@ export const useThemeAdminDrawer = (
         data.isCampaign && data.endDate
           ? new Date(`${data.endDate}T23:59:59.999Z`)
           : undefined,
-      light: data.light,
+      light: data.dark,
       dark: data.dark,
     };
 

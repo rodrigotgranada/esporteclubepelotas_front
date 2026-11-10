@@ -14,7 +14,6 @@ import {
   Settings as SettingsIcon,
   LogOut,
   LogIn,
-  Sun,
   Moon,
 } from 'lucide-react';
 import { PUBLIC_DRAWER_TEXTS } from './PublicNavigationDrawer.constants';
@@ -23,16 +22,12 @@ interface PublicDrawerFooterProps {
   user: any;
   onClose: () => void;
   onLogout: () => void;
-  isDark: boolean;
-  onToggleTheme: () => void;
 }
 
 export const PublicDrawerFooter: React.FC<PublicDrawerFooterProps> = ({
   user,
   onClose,
   onLogout,
-  isDark,
-  onToggleTheme,
 }) => {
   return (
     <LayoutContainer className="p-5 sm:p-6 border-t border-border/80 bg-surface/40 flex flex-col gap-4 mt-auto shrink-0 pb-8">
@@ -68,7 +63,7 @@ export const PublicDrawerFooter: React.FC<PublicDrawerFooterProps> = ({
               <Button
                 variant="outline"
                 size="sm"
-                className="w-full text-xs font-bold justify-center"
+                className="w-full text-xs font-bold justify-center cursor-pointer"
                 leftIcon={<UserIcon className="w-3.5 h-3.5" />}
               >
                 {PUBLIC_DRAWER_TEXTS.BTN_PROFILE}
@@ -80,7 +75,7 @@ export const PublicDrawerFooter: React.FC<PublicDrawerFooterProps> = ({
                 <Button
                   variant="outline"
                   size="sm"
-                  className="w-full text-xs font-bold justify-center"
+                  className="w-full text-xs font-bold justify-center cursor-pointer"
                   leftIcon={<SettingsIcon className="w-3.5 h-3.5" />}
                 >
                   {PUBLIC_DRAWER_TEXTS.BTN_ADMIN}
@@ -93,7 +88,7 @@ export const PublicDrawerFooter: React.FC<PublicDrawerFooterProps> = ({
             variant="ghost"
             size="sm"
             onClick={onLogout}
-            className="text-error hover:bg-error/10 w-full justify-center text-xs font-bold"
+            className="text-orange-500 hover:bg-orange-500/10 w-full justify-center text-xs font-bold cursor-pointer"
             leftIcon={<LogOut className="w-3.5 h-3.5" />}
           >
             {PUBLIC_DRAWER_TEXTS.BTN_LOGOUT}
@@ -105,7 +100,7 @@ export const PublicDrawerFooter: React.FC<PublicDrawerFooterProps> = ({
             <Button
               variant="primary"
               size="md"
-              className="w-full font-extrabold uppercase tracking-wide text-xs sm:text-sm py-2.5 shadow-md hover:shadow-lg justify-center"
+              className="w-full font-extrabold uppercase tracking-wide text-xs sm:text-sm py-2.5 shadow-md hover:shadow-lg justify-center cursor-pointer"
               leftIcon={<LogIn className="w-4 h-4" />}
             >
               {PUBLIC_DRAWER_TEXTS.BTN_LOGIN}
@@ -116,7 +111,7 @@ export const PublicDrawerFooter: React.FC<PublicDrawerFooterProps> = ({
             <Link
               href="/register"
               onClick={onClose}
-              className="font-bold text-primary hover:underline"
+              className="font-bold text-secondary hover:underline cursor-pointer"
             >
               {PUBLIC_DRAWER_TEXTS.REGISTER_LINK}
             </Link>
@@ -124,33 +119,20 @@ export const PublicDrawerFooter: React.FC<PublicDrawerFooterProps> = ({
         </LayoutContainer>
       )}
 
-      {/* Simple Binary Light / Dark Switch */}
+      {/* Indicador do Modo Noturno Oficial do Clube */}
       <LayoutContainer className="pt-2 border-t border-border flex items-center justify-between p-2.5 rounded-xl bg-surface/70 border border-border/80">
         <LayoutContainer className="flex items-center gap-2.5">
-          <LayoutContainer className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-            {isDark ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
+          <LayoutContainer className="w-7 h-7 rounded-lg bg-secondary/10 flex items-center justify-center text-secondary">
+            <Moon className="w-4 h-4" />
           </LayoutContainer>
           <Text className="text-xs font-bold text-text-primary">
-            {isDark ? PUBLIC_DRAWER_TEXTS.THEME_DARK : PUBLIC_DRAWER_TEXTS.THEME_LIGHT}
+            {PUBLIC_DRAWER_TEXTS.THEME_DARK}
           </Text>
         </LayoutContainer>
 
-        <button
-          type="button"
-          role="switch"
-          aria-checked={isDark}
-          aria-label={PUBLIC_DRAWER_TEXTS.THEME_SWITCH_ARIA}
-          onClick={onToggleTheme}
-          className="relative inline-flex h-7 w-13 shrink-0 cursor-pointer rounded-full border border-border bg-background transition-colors duration-200 focus:outline-none"
-        >
-          <span
-            className={`pointer-events-none flex h-5 w-5 transform items-center justify-center rounded-full bg-primary text-black font-bold shadow-sm transition-transform duration-200 ease-in-out mt-0.5 ml-0.5 ${
-              isDark ? 'translate-x-6' : 'translate-x-0'
-            }`}
-          >
-            {isDark ? <Moon className="w-3 h-3" /> : <Sun className="w-3 h-3" />}
-          </span>
-        </button>
+        <span className="text-[10px] uppercase font-bold text-secondary bg-secondary/10 px-2 py-0.5 rounded-full border border-secondary/20">
+          Ativo
+        </span>
       </LayoutContainer>
 
       <Text className="text-[10px] text-text-secondary text-center">
@@ -159,4 +141,3 @@ export const PublicDrawerFooter: React.FC<PublicDrawerFooterProps> = ({
     </LayoutContainer>
   );
 };
-

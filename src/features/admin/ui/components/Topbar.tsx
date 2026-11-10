@@ -3,7 +3,6 @@ import { Bell, Menu } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { LayoutContainer, Text, IconButton, isUnoptimizedImageUrl } from '@/shared/ui/components';
 import Image from 'next/image';
-import { ThemeToggle } from '@/shared/ui/components/molecules/ThemeToggle';
 import { TOPBAR_TEXTS } from './Topbar.constants';
 import { USER_ROLE_MAP } from '../../constants/admin.constants';
 
@@ -30,8 +29,6 @@ export const Topbar = ({ onMenuClick }: { onMenuClick?: () => void }) => {
       </LayoutContainer>
 
       <LayoutContainer className="flex items-center gap-6">
-        <ThemeToggle />
-        
         <LayoutContainer className="relative">
           <IconButton icon={<Bell size={20} />} variant="ghost" className="text-text-secondary hover:text-primary" />
           <LayoutContainer className="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full" />

@@ -48,11 +48,10 @@ export const ThemeAdminDrawer = ({
 
   const isCampaign = form.watch('isCampaign');
   const campaignColor = form.watch('campaignColor');
-  const lightPalette = form.watch('light');
   const darkPalette = form.watch('dark');
 
-  const renderColorInput = (label: string, field: string, mode: 'light' | 'dark') => {
-    const fieldName = `${mode}.${field}` as any;
+  const renderColorInput = (label: string, field: string) => {
+    const fieldName = `dark.${field}` as any;
     return (
       <Controller
         name={fieldName}
@@ -83,17 +82,8 @@ export const ThemeAdminDrawer = ({
       >
         <Form onSubmit={handleSave} className="flex flex-col h-full">
           <LayoutContainer className="flex-1 overflow-y-auto space-y-6 pr-2">
-            {/* Mode Switcher */}
+            {/* Alternador de Modo: Campanha Sazonal vs Paleta Oficial */}
             <LayoutContainer className="bg-surface p-1 rounded-xl border border-border flex gap-1">
-              <Button
-                type="button"
-                variant={!isCampaign ? 'primary' : 'ghost'}
-                size="sm"
-                className="flex-1 text-xs"
-                onClick={() => handleToggleMode(false)}
-              >
-                {SETTINGS_TEXTS.THEMES.MODE_CUSTOM_LABEL}
-              </Button>
               <Button
                 type="button"
                 variant={isCampaign ? 'primary' : 'ghost'}
@@ -103,13 +93,22 @@ export const ThemeAdminDrawer = ({
               >
                 {SETTINGS_TEXTS.THEMES.MODE_CAMPAIGN_LABEL}
               </Button>
+              <Button
+                type="button"
+                variant={!isCampaign ? 'primary' : 'ghost'}
+                size="sm"
+                className="flex-1 text-xs"
+                onClick={() => handleToggleMode(false)}
+              >
+                {SETTINGS_TEXTS.THEMES.MODE_CUSTOM_LABEL}
+              </Button>
             </LayoutContainer>
 
-            {/* Campaign Preset Chips & Information */}
+            {/* Presets Rápidos de Campanhas Sazonais */}
             {isCampaign && (
-              <LayoutContainer className="bg-surface/60 border border-primary/30 rounded-2xl p-4 space-y-3">
+              <LayoutContainer className="bg-surface/60 border border-secondary/30 rounded-2xl p-4 space-y-3 shadow-sm">
                 <LayoutContainer className="flex items-center gap-2">
-                  <Badge variant="success">
+                  <Badge variant="default" className="bg-secondary/20 text-secondary border-secondary/40 font-bold">
                     {SETTINGS_TEXTS.THEMES.BADGE_CAMPAIGN}
                   </Badge>
                   <Text className="text-xs font-semibold text-text-primary">
@@ -117,7 +116,7 @@ export const ThemeAdminDrawer = ({
                   </Text>
                 </LayoutContainer>
                 <Text className="text-xs text-text-secondary leading-relaxed">
-                  {SETTINGS_TEXTS.THEMES.CAMPAIGN_INFO_DESC}
+                  Escolha um preset ou defina a cor principal. O portal aplica automaticamente o cálculo dinâmico sobre a base escura oficial do clube.
                 </Text>
 
                 <LayoutContainer className="pt-2">
@@ -131,7 +130,7 @@ export const ThemeAdminDrawer = ({
                         type="button"
                         variant="outline"
                         size="sm"
-                        className="text-xs flex items-center gap-1.5 py-1 px-2.5 hover:border-primary"
+                        className="text-xs flex items-center gap-1.5 py-1 px-2.5 hover:border-secondary cursor-pointer"
                         onClick={() => handleSelectPreset(p)}
                       >
                         <LayoutContainer
@@ -148,7 +147,7 @@ export const ThemeAdminDrawer = ({
               </LayoutContainer>
             )}
 
-            {/* Name Input */}
+            {/* Nome da Campanha / Tema */}
             <FormField
               name="name"
               control={form.control}
@@ -158,27 +157,27 @@ export const ThemeAdminDrawer = ({
                 <Input
                   {...field}
                   placeholder={SETTINGS_TEXTS.THEMES.FIELD_NAME_PLACEHOLDER}
-                  required
+                  error={form.formState.errors.name?.message}
                 />
               )}
             />
 
-            {/* Campaign Specific Inputs: Seed Color & Dates */}
+            {/* Seletor da Cor da Campanha e Vigência */}
             {isCampaign && (
               <LayoutContainer className="space-y-4">
                 <Controller
                   name="campaignColor"
                   control={form.control}
-                  render={({ field: f }) => (
+                  render={({ field }) => (
                     <ColorInput
                       label={SETTINGS_TEXTS.THEMES.FIELD_CAMPAIGN_COLOR}
-                      value={f.value || campaignColor || '#ec4899'}
+                      value={field.value || campaignColor}
                       onChange={(e) => handleCampaignColorChange(e.target.value)}
                     />
                   )}
                 />
 
-                <LayoutContainer className="grid grid-cols-2 gap-3">
+                <LayoutContainer className="grid grid-cols-2 gap-4">
                   <FormField
                     name="startDate"
                     control={form.control}
@@ -186,7 +185,9 @@ export const ThemeAdminDrawer = ({
                     render={({ field }) => (
                       <Input
                         type="date"
-                        {...field}
+                        value={field.value ? String(field.value).split('T')[0] : ''}
+                        onChange={(e) => field.onChange(e.target.value)}
+                        placeholder="AAAA-MM-DD"
                       />
                     )}
                   />
@@ -197,7 +198,9 @@ export const ThemeAdminDrawer = ({
                     render={({ field }) => (
                       <Input
                         type="date"
-                        {...field}
+                        value={field.value ? String(field.value).split('T')[0] : ''}
+                        onChange={(e) => field.onChange(e.target.value)}
+                        placeholder="AAAA-MM-DD"
                       />
                     )}
                   />
@@ -206,68 +209,42 @@ export const ThemeAdminDrawer = ({
                   {SETTINGS_TEXTS.THEMES.FIELD_DATES_HINT}
                 </Text>
 
-                {/* Live Preview Bar of Calculated Colors */}
-                <LayoutContainer className="p-3 bg-surface border border-border rounded-xl space-y-2">
-                  <Text className="text-xs font-medium text-text-secondary">
-                    Prévia Automática de Contraste (Light & Dark)
+                {/* Prévia da Paleta Calculada no Fundo Escuro */}
+                <LayoutContainer className="p-3.5 bg-surface border border-border rounded-xl space-y-2">
+                  <Text className="text-xs font-semibold text-text-secondary">
+                    Prévia do Contraste em Modo Escuro
                   </Text>
-                  <LayoutContainer className="flex items-center gap-3">
+                  <LayoutContainer
+                    className="p-3 rounded-lg border border-border flex items-center justify-between"
+                    style={{
+                      backgroundColor: darkPalette?.background || '#0b1a32',
+                      color: darkPalette?.textPrimary || '#f8fafc',
+                    }}
+                  >
+                    <Text
+                      className="text-xs font-bold"
+                      style={{ color: darkPalette?.primary || campaignColor }}
+                    >
+                      Destaque da Campanha
+                    </Text>
                     <LayoutContainer
-                      className="flex-1 p-2.5 rounded-lg border border-border flex items-center justify-between"
+                      className="px-2.5 py-1 rounded text-[10px] font-bold shadow-xs"
                       style={{
-                        backgroundColor: lightPalette?.background,
-                        color: lightPalette?.textPrimary,
+                        backgroundColor: darkPalette?.primary || campaignColor,
+                        color: (darkPalette as any)?.buttonPrimaryText || '#0b1a32',
                       }}
                     >
-                      <Text
-                        className="text-xs font-bold"
-                        style={{ color: lightPalette?.primary }}
-                      >
-                        Claro
-                      </Text>
-                      <LayoutContainer
-                        className="px-2 py-0.5 rounded text-[10px] font-bold"
-                        style={{
-                          backgroundColor: lightPalette?.primary,
-                          color: '#ffffff',
-                        }}
-                      >
-                        Botão
-                      </LayoutContainer>
-                    </LayoutContainer>
-
-                    <LayoutContainer
-                      className="flex-1 p-2.5 rounded-lg border border-border flex items-center justify-between"
-                      style={{
-                        backgroundColor: darkPalette?.background,
-                        color: darkPalette?.textPrimary,
-                      }}
-                    >
-                      <Text
-                        className="text-xs font-bold"
-                        style={{ color: darkPalette?.primary }}
-                      >
-                        Escuro
-                      </Text>
-                      <LayoutContainer
-                        className="px-2 py-0.5 rounded text-[10px] font-bold"
-                        style={{
-                          backgroundColor: darkPalette?.primary,
-                          color: '#ffffff',
-                        }}
-                      >
-                        Botão
-                      </LayoutContainer>
+                      Botão Oficial
                     </LayoutContainer>
                   </LayoutContainer>
                 </LayoutContainer>
 
-                <LayoutContainer className="pt-2">
+                <LayoutContainer className="pt-1">
                   <Button
                     type="button"
                     variant="ghost"
                     size="sm"
-                    className="text-xs text-primary underline"
+                    className="text-xs text-secondary underline cursor-pointer"
                     onClick={() => setShowAdvanced(!showAdvanced)}
                   >
                     {showAdvanced
@@ -278,60 +255,24 @@ export const ThemeAdminDrawer = ({
               </LayoutContainer>
             )}
 
-            {/* Individual Hex Inputs for Light & Dark */}
+            {/* Inputs de Cores em Modo Escuro (Apenas quando não for campanha ou modo avançado) */}
             {(!isCampaign || showAdvanced) && (
-              <LayoutContainer className="space-y-6">
-                <LayoutContainer>
-                  <Text className="font-bold text-text-primary mb-3 border-b border-border pb-2 text-sm">
-                    {SETTINGS_TEXTS.THEMES.PALETTE_LIGHT}
-                  </Text>
-                  {renderColorInput(SETTINGS_TEXTS.THEMES.COLOR_PRIMARY, 'primary', 'light')}
-                  {renderColorInput(SETTINGS_TEXTS.THEMES.COLOR_SECONDARY, 'secondary', 'light')}
-                  {renderColorInput(
-                    SETTINGS_TEXTS.THEMES.COLOR_BUTTON_SECONDARY,
-                    'buttonSecondary',
-                    'light'
-                  )}
-                  {renderColorInput(SETTINGS_TEXTS.THEMES.COLOR_BACKGROUND, 'background', 'light')}
-                  {renderColorInput(SETTINGS_TEXTS.THEMES.COLOR_SURFACE, 'surface', 'light')}
-                  {renderColorInput(SETTINGS_TEXTS.THEMES.COLOR_HEADER, 'header', 'light')}
-                  {renderColorInput(SETTINGS_TEXTS.THEMES.COLOR_CARD, 'card', 'light')}
-                  {renderColorInput(SETTINGS_TEXTS.THEMES.COLOR_DRAWER, 'drawer', 'light')}
-                  {renderColorInput(SETTINGS_TEXTS.THEMES.COLOR_TABLE, 'table', 'light')}
-                  {renderColorInput(SETTINGS_TEXTS.THEMES.COLOR_TEXT_PRIMARY, 'textPrimary', 'light')}
-                  {renderColorInput(
-                    SETTINGS_TEXTS.THEMES.COLOR_TEXT_SECONDARY,
-                    'textSecondary',
-                    'light'
-                  )}
-                  {renderColorInput(SETTINGS_TEXTS.THEMES.COLOR_BORDER, 'border', 'light')}
-                </LayoutContainer>
-
-                <LayoutContainer>
-                  <Text className="font-bold text-text-primary mb-3 border-b border-border pb-2 text-sm">
-                    {SETTINGS_TEXTS.THEMES.PALETTE_DARK}
-                  </Text>
-                  {renderColorInput(SETTINGS_TEXTS.THEMES.COLOR_PRIMARY, 'primary', 'dark')}
-                  {renderColorInput(SETTINGS_TEXTS.THEMES.COLOR_SECONDARY, 'secondary', 'dark')}
-                  {renderColorInput(
-                    SETTINGS_TEXTS.THEMES.COLOR_BUTTON_SECONDARY,
-                    'buttonSecondary',
-                    'dark'
-                  )}
-                  {renderColorInput(SETTINGS_TEXTS.THEMES.COLOR_BACKGROUND, 'background', 'dark')}
-                  {renderColorInput(SETTINGS_TEXTS.THEMES.COLOR_SURFACE, 'surface', 'dark')}
-                  {renderColorInput(SETTINGS_TEXTS.THEMES.COLOR_HEADER, 'header', 'dark')}
-                  {renderColorInput(SETTINGS_TEXTS.THEMES.COLOR_CARD, 'card', 'dark')}
-                  {renderColorInput(SETTINGS_TEXTS.THEMES.COLOR_DRAWER, 'drawer', 'dark')}
-                  {renderColorInput(SETTINGS_TEXTS.THEMES.COLOR_TABLE, 'table', 'dark')}
-                  {renderColorInput(SETTINGS_TEXTS.THEMES.COLOR_TEXT_PRIMARY, 'textPrimary', 'dark')}
-                  {renderColorInput(
-                    SETTINGS_TEXTS.THEMES.COLOR_TEXT_SECONDARY,
-                    'textSecondary',
-                    'dark'
-                  )}
-                  {renderColorInput(SETTINGS_TEXTS.THEMES.COLOR_BORDER, 'border', 'dark')}
-                </LayoutContainer>
+              <LayoutContainer className="space-y-4">
+                <Text className="font-bold text-text-primary border-b border-border pb-2 text-sm">
+                  Paleta Noturna Oficial do Clube
+                </Text>
+                {renderColorInput(SETTINGS_TEXTS.THEMES.COLOR_PRIMARY, 'primary')}
+                {renderColorInput(SETTINGS_TEXTS.THEMES.COLOR_SECONDARY, 'secondary')}
+                {renderColorInput(SETTINGS_TEXTS.THEMES.COLOR_BUTTON_SECONDARY, 'buttonSecondary')}
+                {renderColorInput(SETTINGS_TEXTS.THEMES.COLOR_BACKGROUND, 'background')}
+                {renderColorInput(SETTINGS_TEXTS.THEMES.COLOR_SURFACE, 'surface')}
+                {renderColorInput(SETTINGS_TEXTS.THEMES.COLOR_HEADER, 'header')}
+                {renderColorInput(SETTINGS_TEXTS.THEMES.COLOR_CARD, 'card')}
+                {renderColorInput(SETTINGS_TEXTS.THEMES.COLOR_DRAWER, 'drawer')}
+                {renderColorInput(SETTINGS_TEXTS.THEMES.COLOR_TABLE, 'table')}
+                {renderColorInput(SETTINGS_TEXTS.THEMES.COLOR_TEXT_PRIMARY, 'textPrimary')}
+                {renderColorInput(SETTINGS_TEXTS.THEMES.COLOR_TEXT_SECONDARY, 'textSecondary')}
+                {renderColorInput(SETTINGS_TEXTS.THEMES.COLOR_BORDER, 'border')}
               </LayoutContainer>
             )}
           </LayoutContainer>
@@ -342,7 +283,7 @@ export const ThemeAdminDrawer = ({
                 type="button"
                 variant="outline"
                 size="md"
-                className="text-error hover:bg-error/10 border-error/30"
+                className="text-orange-500 hover:bg-orange-500/10 border-orange-500/30 cursor-pointer"
                 onClick={() => setIsDeleteModalOpen(true)}
               >
                 {SETTINGS_TEXTS.THEMES.BTN_DELETE}
@@ -351,10 +292,10 @@ export const ThemeAdminDrawer = ({
               <LayoutContainer />
             )}
             <LayoutContainer className="flex gap-4">
-              <Button type="button" variant="ghost" size="md" onClick={onClose}>
+              <Button type="button" variant="ghost" size="md" onClick={onClose} className="cursor-pointer">
                 {SETTINGS_TEXTS.THEMES.BTN_CANCEL}
               </Button>
-              <Button type="submit" variant="primary" size="md" isLoading={isLoading}>
+              <Button type="submit" variant="primary" size="md" isLoading={isLoading} className="cursor-pointer">
                 {theme ? SETTINGS_TEXTS.THEMES.BTN_SAVE : SETTINGS_TEXTS.THEMES.BTN_CREATE}
               </Button>
             </LayoutContainer>
