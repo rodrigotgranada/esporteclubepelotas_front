@@ -44,7 +44,7 @@ export const PublicMatchLiveFeature: React.FC<PublicMatchLiveFeatureProps> = ({ 
 
   if (isLoading) {
     return (
-      <LayoutContainer className="max-w-4xl mx-auto px-4 py-16 text-center space-y-4">
+      <LayoutContainer className="max-w-6xl mx-auto px-4 py-16 text-center space-y-4">
         <LayoutContainer className="w-10 h-10 border-3 border-secondary border-t-transparent rounded-full animate-spin mx-auto" />
         <Text className="text-sm text-text-muted">Conectando à cobertura ao vivo...</Text>
       </LayoutContainer>
@@ -53,7 +53,7 @@ export const PublicMatchLiveFeature: React.FC<PublicMatchLiveFeatureProps> = ({ 
 
   if (!match) {
     return (
-      <LayoutContainer className="max-w-4xl mx-auto px-4 py-16 text-center space-y-4">
+      <LayoutContainer className="max-w-6xl mx-auto px-4 py-16 text-center space-y-4">
         <Title level="h2" className="text-2xl font-bold text-text-primary">
           Partida não encontrada
         </Title>
@@ -141,8 +141,8 @@ export const PublicMatchLiveFeature: React.FC<PublicMatchLiveFeatureProps> = ({ 
   const youtubeEmbedUrl = getYouTubeEmbedUrl(match.transmissionUrl);
 
   return (
-    <LayoutContainer className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-      {/* Voltar e Header da Competição */}
+    <LayoutContainer className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      {/* Voltar e Header de Status */}
       <LayoutContainer className="flex items-center justify-between gap-3">
         <Link href="/jogos">
           <Button
@@ -164,86 +164,185 @@ export const PublicMatchLiveFeature: React.FC<PublicMatchLiveFeatureProps> = ({ 
         </LayoutContainer>
       </LayoutContainer>
 
-      {/* Card Monumental do Placar Ao Vivo */}
-      <LayoutContainer className="p-6 sm:p-10 rounded-3xl bg-surface/80 border border-secondary/40 shadow-2xl relative overflow-hidden backdrop-blur-md space-y-6">
-        <LayoutContainer className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-primary via-secondary to-primary" />
+      {/* Grid Principal: Placar e Lances Lado a Lado no Desktop */}
+      <LayoutContainer className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* Coluna da Esquerda: Card Monumental do Placar */}
+        <LayoutContainer className="lg:col-span-5 p-6 sm:p-8 rounded-3xl bg-surface/80 border border-secondary/40 shadow-2xl relative overflow-hidden backdrop-blur-md space-y-6">
+          <LayoutContainer className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-primary via-secondary to-primary" />
 
-        {/* Cronômetro e Cabeçalho do Confronto */}
-        <LayoutContainer className="flex flex-col items-center justify-center text-center space-y-1">
-          <Text className="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-secondary">
-            {match.championshipName || 'Campeonato Oficial'} • {match.roundName}
-          </Text>
+          {/* Campeonato e Cronômetro */}
+          <LayoutContainer className="flex flex-col items-center justify-center text-center space-y-1 pt-1">
+            <Text className="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-secondary">
+              {match.championshipName || 'Campeonato Oficial'} • {match.roundName}
+            </Text>
 
-          <LayoutContainer className="flex items-center gap-2 pt-1">
-            <Clock size={18} className={isTimerRunning ? 'text-secondary animate-spin' : 'text-text-muted'} />
-            <span className="text-3xl sm:text-5xl font-black text-text-primary tracking-tight font-mono">
-              {match.status === 'IN_PROGRESS' ? `${elapsedDisplayMinute}'` : match.status === 'FINISHED' ? 'Fim de Jogo' : 'Em Breve'}
-            </span>
+            <LayoutContainer className="flex items-center gap-2 pt-1">
+              <Clock size={18} className={isTimerRunning ? 'text-secondary animate-spin' : 'text-text-muted'} />
+              <span className="text-3xl sm:text-4xl font-black text-text-primary tracking-tight font-mono">
+                {match.status === 'IN_PROGRESS' ? `${elapsedDisplayMinute}'` : match.status === 'FINISHED' ? 'Fim de Jogo' : 'Em Breve'}
+              </span>
+            </LayoutContainer>
+          </LayoutContainer>
+
+          {/* Placar Oficial com Escudos */}
+          <LayoutContainer className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 sm:gap-6 max-w-xl mx-auto py-2">
+            {/* Mandante (ou Pelotas) */}
+            <LayoutContainer className="flex flex-col items-center text-center space-y-2">
+              <LayoutContainer className="w-18 h-18 sm:w-24 sm:h-24 rounded-2xl bg-surface border border-border flex items-center justify-center p-2.5 shadow-lg">
+                <SafeImage
+                  src={isPelotasHome ? pelotasLogo : opponentLogo}
+                  alt={isPelotasHome ? 'Pelotas' : match.opponentName}
+                  width={68}
+                  height={68}
+                  className="object-contain max-h-14 sm:max-h-18"
+                />
+              </LayoutContainer>
+              <Text className="text-sm sm:text-base font-black text-text-primary truncate max-w-[120px] sm:max-w-[150px]">
+                {isPelotasHome ? 'Pelotas' : match.opponentName}
+              </Text>
+              <span className="text-4xl sm:text-6xl font-black text-secondary">
+                {isPelotasHome ? (match.pelotasScore ?? 0) : (match.opponentScore ?? 0)}
+              </span>
+            </LayoutContainer>
+
+            {/* Divisor X */}
+            <LayoutContainer className="flex flex-col items-center justify-center pt-4">
+              <span className="text-lg sm:text-2xl font-black text-text-muted tracking-widest bg-surface px-3 py-1 rounded-full border border-border/40">
+                VS
+              </span>
+            </LayoutContainer>
+
+            {/* Visitante */}
+            <LayoutContainer className="flex flex-col items-center text-center space-y-2">
+              <LayoutContainer className="w-18 h-18 sm:w-24 sm:h-24 rounded-2xl bg-surface border border-border flex items-center justify-center p-2.5 shadow-lg">
+                <SafeImage
+                  src={isPelotasHome ? opponentLogo : pelotasLogo}
+                  alt={isPelotasHome ? match.opponentName : 'Pelotas'}
+                  width={68}
+                  height={68}
+                  className="object-contain max-h-14 sm:max-h-18"
+                />
+              </LayoutContainer>
+              <Text className="text-sm sm:text-base font-black text-text-primary truncate max-w-[120px] sm:max-w-[150px]">
+                {isPelotasHome ? match.opponentName : 'Pelotas'}
+              </Text>
+              <span className="text-4xl sm:text-6xl font-black text-secondary">
+                {isPelotasHome ? (match.opponentScore ?? 0) : (match.pelotasScore ?? 0)}
+              </span>
+            </LayoutContainer>
+          </LayoutContainer>
+
+          {/* Informações de Local e Estádio */}
+          <LayoutContainer className="pt-4 border-t border-border/40 flex flex-col gap-2 text-xs text-text-muted text-center sm:text-left">
+            <LayoutContainer className="flex items-center justify-center sm:justify-start gap-1.5">
+              <MapPin size={14} className="text-secondary shrink-0" />
+              <span>{match.stadiumName} {match.city ? `(${match.city})` : ''}</span>
+            </LayoutContainer>
+            <LayoutContainer className="flex items-center justify-center sm:justify-start gap-1.5">
+              <Calendar size={14} className="text-secondary shrink-0" />
+              <span>{new Date(match.matchDate).toLocaleDateString('pt-BR', { dateStyle: 'long' })}</span>
+            </LayoutContainer>
           </LayoutContainer>
         </LayoutContainer>
 
-        {/* Placar Oficial com Escudos Grandes */}
-        <LayoutContainer className="grid grid-cols-[1fr_auto_1fr] items-center gap-4 sm:gap-10 max-w-2xl mx-auto">
-          {/* Mandante (ou Pelotas) */}
-          <LayoutContainer className="flex flex-col items-center text-center space-y-2">
-            <LayoutContainer className="w-20 h-20 sm:w-28 sm:h-28 rounded-2xl bg-surface border border-border flex items-center justify-center p-3 shadow-lg">
-              <SafeImage
-                src={isPelotasHome ? pelotasLogo : opponentLogo}
-                alt={isPelotasHome ? 'Pelotas' : match.opponentName}
-                width={80}
-                height={80}
-                className="object-contain max-h-16 sm:max-h-20"
-              />
+        {/* Coluna da Direita: Feed do Lance a Lance em Tempo Real */}
+        <LayoutContainer className="lg:col-span-7 p-6 rounded-3xl bg-surface/80 border border-border/70 shadow-xl backdrop-blur-md space-y-4">
+          <LayoutContainer className="flex items-center justify-between border-b border-border/60 pb-3">
+            <LayoutContainer className="flex items-center gap-2">
+              <Radio size={18} className="text-secondary animate-pulse" />
+              <Title level="h3" className="text-base sm:text-lg font-black text-text-primary">
+                {PUBLIC_LIVE.TIMELINE_TITLE}
+              </Title>
             </LayoutContainer>
-            <Text className="text-sm sm:text-lg font-black text-text-primary">
-              {isPelotasHome ? 'Pelotas' : match.opponentName}
-            </Text>
-            <span className="text-5xl sm:text-7xl font-black text-secondary">
-              {isPelotasHome ? (match.pelotasScore ?? 0) : (match.opponentScore ?? 0)}
-            </span>
+            <Badge variant="default" className="text-xs border-secondary/40 text-secondary">
+              {events.length} lance(s)
+            </Badge>
           </LayoutContainer>
 
-          {/* Divisor X */}
-          <LayoutContainer className="flex flex-col items-center justify-center pt-8">
-            <span className="text-2xl sm:text-3xl font-black text-text-muted tracking-widest bg-surface px-3 py-1 rounded-full border border-border/40">
-              VS
-            </span>
-          </LayoutContainer>
-
-          {/* Visitante */}
-          <LayoutContainer className="flex flex-col items-center text-center space-y-2">
-            <LayoutContainer className="w-20 h-20 sm:w-28 sm:h-28 rounded-2xl bg-surface border border-border flex items-center justify-center p-3 shadow-lg">
-              <SafeImage
-                src={isPelotasHome ? opponentLogo : pelotasLogo}
-                alt={isPelotasHome ? match.opponentName : 'Pelotas'}
-                width={80}
-                height={80}
-                className="object-contain max-h-16 sm:max-h-20"
-              />
+          {/* Lista com Rolagem Suave dos Lances */}
+          {events.length === 0 ? (
+            <LayoutContainer className="p-12 rounded-2xl bg-surface/30 border border-border/60 text-center space-y-2">
+              <Text className="text-sm text-text-muted">
+                {PUBLIC_LIVE.EMPTY_TIMELINE}
+              </Text>
             </LayoutContainer>
-            <Text className="text-sm sm:text-lg font-black text-text-primary">
-              {isPelotasHome ? match.opponentName : 'Pelotas'}
-            </Text>
-            <span className="text-5xl sm:text-7xl font-black text-secondary">
-              {isPelotasHome ? (match.opponentScore ?? 0) : (match.pelotasScore ?? 0)}
-            </span>
-          </LayoutContainer>
-        </LayoutContainer>
+          ) : (
+            <LayoutContainer className="space-y-3 max-h-[520px] overflow-y-auto pr-1">
+              {events.map((event: MatchEvent) => {
+                const isPelotasGoal = event.eventType === 'GOAL_PELOTAS';
 
-        {/* Informações de Local e Estádio */}
-        <LayoutContainer className="pt-4 border-t border-border/40 flex flex-wrap items-center justify-center gap-6 text-xs text-text-muted">
-          <LayoutContainer className="flex items-center gap-1.5">
-            <MapPin size={15} className="text-secondary" />
-            <span>{match.stadiumName} {match.city ? `(${match.city})` : ''}</span>
-          </LayoutContainer>
-          <LayoutContainer className="flex items-center gap-1.5">
-            <Calendar size={15} className="text-secondary" />
-            <span>{new Date(match.matchDate).toLocaleDateString('pt-BR', { dateStyle: 'long' })}</span>
-          </LayoutContainer>
+                return (
+                  <LayoutContainer
+                    key={event.id}
+                    className={`p-3.5 sm:p-4 rounded-2xl border transition-all animate-in fade-in slide-in-from-top-1 duration-300 flex items-start gap-3.5 ${
+                      isPelotasGoal
+                        ? 'bg-secondary/15 border-secondary/60 shadow-md ring-1 ring-secondary/30'
+                        : 'bg-surface/70 border-border/70 hover:border-border'
+                    }`}
+                  >
+                    {/* Minuto do Lance */}
+                    <LayoutContainer className="px-2 py-0.5 rounded-lg bg-surface border border-border font-mono font-black text-xs text-secondary shrink-0 shadow-2xs">
+                      {event.formattedMinute}
+                    </LayoutContainer>
+
+                    {/* Ícone */}
+                    <LayoutContainer className="pt-0.5 shrink-0">
+                      {getEventIcon(event.eventType)}
+                    </LayoutContainer>
+
+                    {/* Conteúdo do Lance */}
+                    <LayoutContainer className="min-w-0 space-y-1 flex-1">
+                      <LayoutContainer className="flex items-center gap-2 flex-wrap">
+                        <Text
+                          className={`text-sm font-black ${
+                            isPelotasGoal ? 'text-secondary' : 'text-text-primary'
+                          }`}
+                        >
+                          {event.title}
+                        </Text>
+
+                        {event.scorePelotasMoment !== null && event.scoreOpponentMoment !== null && (
+                          <Badge
+                            variant="default"
+                            className="text-[10px] font-bold bg-surface border-border text-text-secondary px-1.5 py-0"
+                          >
+                            Placar: {event.scorePelotasMoment} x {event.scoreOpponentMoment}
+                          </Badge>
+                        )}
+                      </LayoutContainer>
+
+                      {event.description && (
+                        <Text className="text-xs text-text-secondary leading-relaxed">
+                          {event.description}
+                        </Text>
+                      )}
+
+                      {event.playerName && (
+                        <LayoutContainer className="flex items-center gap-1.5 pt-0.5">
+                          {event.playerPhotoUrl && (
+                            <SafeImage
+                              src={event.playerPhotoUrl}
+                              alt={event.playerName}
+                              width={20}
+                              height={20}
+                              className="w-5 h-5 rounded-full object-cover border border-secondary/30"
+                            />
+                          )}
+                          <Text className="text-[11px] text-text-muted">
+                            Atleta: <span className="font-semibold text-text-secondary">{event.playerName}</span>
+                          </Text>
+                        </LayoutContainer>
+                      )}
+                    </LayoutContainer>
+                  </LayoutContainer>
+                );
+              })}
+            </LayoutContainer>
+          )}
         </LayoutContainer>
       </LayoutContainer>
 
-      {/* Transmissão Oficial Ao Vivo (Embed do YouTube ou Link) */}
+      {/* Transmissão Oficial Ao Vivo (Abaixo do Placar e dos Lances) */}
       {match.transmissionUrl && (
         <LayoutContainer className="p-6 rounded-3xl bg-surface/50 border border-border/70 space-y-4">
           <LayoutContainer className="flex items-center justify-between">
@@ -255,7 +354,7 @@ export const PublicMatchLiveFeature: React.FC<PublicMatchLiveFeatureProps> = ({ 
               href={match.transmissionUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs text-secondary hover:text-secondary-hover font-bold"
+              className="text-xs text-secondary hover:text-secondary-hover font-bold cursor-pointer"
             >
               {PUBLIC_LIVE.TRANSMISSION_OPEN_YOUTUBE}
             </a>
@@ -288,102 +387,6 @@ export const PublicMatchLiveFeature: React.FC<PublicMatchLiveFeatureProps> = ({ 
           )}
         </LayoutContainer>
       )}
-
-      {/* Linha do Tempo: Lance a Lance em Tempo Real */}
-      <LayoutContainer className="space-y-4">
-        <LayoutContainer className="flex items-center justify-between border-b border-border/60 pb-3">
-          <LayoutContainer className="flex items-center gap-2">
-            <Radio size={18} className="text-secondary animate-pulse" />
-            <Title level="h3" className="text-lg font-black text-text-primary">
-              {PUBLIC_LIVE.TIMELINE_TITLE}
-            </Title>
-          </LayoutContainer>
-          <Badge variant="default" className="text-xs border-secondary/40 text-secondary">
-            {events.length} lance(s)
-          </Badge>
-        </LayoutContainer>
-
-        {events.length === 0 ? (
-          <LayoutContainer className="p-10 rounded-2xl bg-surface/30 border border-border/60 text-center space-y-2">
-            <Text className="text-sm text-text-muted">
-              {PUBLIC_LIVE.EMPTY_TIMELINE}
-            </Text>
-          </LayoutContainer>
-        ) : (
-          <LayoutContainer className="space-y-3">
-            {events.map((event: MatchEvent) => {
-              const isPelotasGoal = event.eventType === 'GOAL_PELOTAS';
-
-              return (
-                <LayoutContainer
-                  key={event.id}
-                  className={`p-4 rounded-2xl border transition-all animate-in fade-in slide-in-from-top-1 duration-300 flex items-start gap-4 ${
-                    isPelotasGoal
-                      ? 'bg-secondary/15 border-secondary/60 shadow-md ring-1 ring-secondary/30'
-                      : 'bg-surface/70 border-border/70 hover:border-border'
-                  }`}
-                >
-                  {/* Minuto do Lance */}
-                  <LayoutContainer className="px-2.5 py-1 rounded-xl bg-surface border border-border font-mono font-black text-xs text-secondary shrink-0 shadow-2xs">
-                    {event.formattedMinute}
-                  </LayoutContainer>
-
-                  {/* Ícone */}
-                  <LayoutContainer className="pt-0.5 shrink-0">
-                    {getEventIcon(event.eventType)}
-                  </LayoutContainer>
-
-                  {/* Conteúdo do Lance */}
-                  <LayoutContainer className="min-w-0 space-y-1">
-                    <LayoutContainer className="flex items-center gap-2 flex-wrap">
-                      <Text
-                        className={`text-sm font-black ${
-                          isPelotasGoal ? 'text-secondary' : 'text-text-primary'
-                        }`}
-                      >
-                        {event.title}
-                      </Text>
-
-                      {event.scorePelotasMoment !== null && event.scoreOpponentMoment !== null && (
-                        <Badge
-                          variant="default"
-                          className="text-[10px] font-bold bg-surface border-border text-text-secondary px-1.5 py-0"
-                        >
-                          Placar: {event.scorePelotasMoment} x {event.scoreOpponentMoment}
-                        </Badge>
-                      )}
-                    </LayoutContainer>
-
-                    {event.description && (
-                      <Text className="text-xs text-text-secondary leading-relaxed">
-                        {event.description}
-                      </Text>
-                    )}
-
-                    {event.playerName && (
-                      <LayoutContainer className="flex items-center gap-1.5 pt-0.5">
-                        {event.playerPhotoUrl && (
-                          <SafeImage
-                            src={event.playerPhotoUrl}
-                            alt={event.playerName}
-                            width={20}
-                            height={20}
-                            className="w-5 h-5 rounded-full object-cover border border-secondary/30"
-                          />
-                        )}
-                        <Text className="text-[11px] text-text-muted">
-                          Atleta: <span className="font-semibold text-text-secondary">{event.playerName}</span>
-                        </Text>
-                      </LayoutContainer>
-                    )}
-                  </LayoutContainer>
-                </LayoutContainer>
-              );
-            })}
-          </LayoutContainer>
-        )}
-      </LayoutContainer>
     </LayoutContainer>
   );
 };
-
