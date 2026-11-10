@@ -21,24 +21,17 @@ interface UseSponsorAdminDrawerProps {
   onClose: () => void;
 }
 
-export type LogoTarget = 'light' | 'dark';
-
 export const useSponsorAdminDrawer = ({
   isOpen,
   sponsorId,
   onSaveSuccess,
   onClose,
 }: UseSponsorAdminDrawerProps) => {
-  const fileInputLightRef = useRef<HTMLInputElement>(null);
-  const fileInputDarkRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [logoLightPreview, setLogoLightPreview] = useState<string | null>(null);
-  const [fileLightToUpload, setFileLightToUpload] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [fileToUpload, setFileToUpload] = useState<File | null>(null);
 
-  const [logoDarkPreview, setLogoDarkPreview] = useState<string | null>(null);
-  const [fileDarkToUpload, setFileDarkToUpload] = useState<File | null>(null);
-
-  const [cropTarget, setCropTarget] = useState<LogoTarget | null>(null);
   const [isCropOpen, setIsCropOpen] = useState(false);
   const [imageToCrop, setImageToCrop] = useState<string | null>(null);
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
@@ -75,11 +68,8 @@ export const useSponsorAdminDrawer = ({
       contractStartDate: '',
       contractEndDate: '',
     });
-    setLogoLightPreview(null);
-    setFileLightToUpload(null);
-    setLogoDarkPreview(null);
-    setFileDarkToUpload(null);
-    setCropTarget(null);
+    setLogoPreview(null);
+    setFileToUpload(null);
     setImageToCrop(null);
     setIsCropOpen(false);
   }, [form]);
@@ -104,13 +94,12 @@ export const useSponsorAdminDrawer = ({
                 ? Boolean((sponsor as any).active)
                 : true;
 
-          const lightUrl = sponsor.logoUrl || '';
-          const darkUrl = sponsor.logoDarkUrl || '';
+          const logo = sponsor.logoUrl || sponsor.logoDarkUrl || '';
 
           form.reset({
             name: sponsor.name || '',
-            logoUrl: lightUrl,
-            logoDarkUrl: darkUrl,
+            logoUrl: logo,
+            logoDarkUrl: logo,
             websiteUrl: sponsor.websiteUrl || '',
             isFeatured,
             isActive,
@@ -118,8 +107,8 @@ export const useSponsorAdminDrawer = ({
             contractStartDate: sponsor.contractStartDate ? sponsor.contractStartDate.slice(0, 10) : '',
             contractEndDate: sponsor.contractEndDate ? sponsor.contractEndDate.slice(0, 10) : '',
           });
-          setLogoLightPreview(lightUrl || null);
-          setLogoDarkPreview(darkUrl || null);
+
+          setLogoPreview(logo || null);
         })
         .catch((err) => {
           console.error('Erro ao buscar dados do patrocinador:', err);
@@ -134,57 +123,42 @@ export const useSponsorAdminDrawer = ({
     }
   }, [isOpen, sponsorId, form, resetAll, onClose]);
 
-  // Disparo dos seletores de arquivo
-  const triggerFileInput = (target: LogoTarget) => {
-    if (target === 'light') {
-      fileInputLightRef.current?.click();
-    } else {
-      fileInputDarkRef.current?.click();
-    }
+  // Disparo do seletor de arquivo
+  const triggerFileInput = () => {
+    fileInputRef.current?.click();
   };
 
-  const handleFileChange = (target: LogoTarget, e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setCropTarget(target);
     const objectUrl = URL.createObjectURL(file);
     setImageToCrop(objectUrl);
     setIsCropOpen(true);
 
-    if (target === 'light' && fileInputLightRef.current) {
-      fileInputLightRef.current.value = '';
-    } else if (target === 'dark' && fileInputDarkRef.current) {
-      fileInputDarkRef.current.value = '';
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
   };
 
   const handleCropComplete = (croppedBlob: Blob) => {
-    const prefix = cropTarget === 'dark' ? 'sponsor-logo-dark' : 'sponsor-logo-light';
-    const croppedFile = new File([croppedBlob], `${prefix}-${Date.now()}.png`, {
+    const croppedFile = new File([croppedBlob], `sponsor-logo-${Date.now()}.png`, {
       type: 'image/png',
     });
     const previewUrl = URL.createObjectURL(croppedBlob);
 
-    if (cropTarget === 'dark') {
-      setFileDarkToUpload(croppedFile);
-      setLogoDarkPreview(previewUrl);
-      form.setValue('logoDarkUrl', previewUrl, { shouldValidate: true });
-    } else {
-      setFileLightToUpload(croppedFile);
-      setLogoLightPreview(previewUrl);
-      form.setValue('logoUrl', previewUrl, { shouldValidate: true });
-    }
+    setFileToUpload(croppedFile);
+    setLogoPreview(previewUrl);
+    form.setValue('logoUrl', previewUrl, { shouldValidate: true });
+    form.setValue('logoDarkUrl', previewUrl, { shouldValidate: true });
 
     setIsCropOpen(false);
     setImageToCrop(null);
-    setCropTarget(null);
   };
 
   const handleCropCancel = () => {
     setIsCropOpen(false);
     setImageToCrop(null);
-    setCropTarget(null);
   };
 
   const handleUseOriginal = useCallback(() => {
@@ -197,63 +171,45 @@ export const useSponsorAdminDrawer = ({
       });
   }, [imageToCrop, handleCropComplete]);
 
-  const handleRemoveLogo = (target: LogoTarget) => {
-    if (target === 'dark') {
-      setFileDarkToUpload(null);
-      setLogoDarkPreview(null);
-      form.setValue('logoDarkUrl', '', { shouldValidate: true });
-    } else {
-      setFileLightToUpload(null);
-      setLogoLightPreview(null);
-      form.setValue('logoUrl', '', { shouldValidate: true });
-    }
+  const handleRemoveLogo = () => {
+    setFileToUpload(null);
+    setLogoPreview(null);
+    form.setValue('logoUrl', '', { shouldValidate: true });
+    form.setValue('logoDarkUrl', '', { shouldValidate: true });
   };
 
   // Submissão com Pipeline Transacional Media-First
   const onSubmit = form.handleSubmit((data: SponsorFormData) => {
-    const hasAnyLogo = Boolean(
-      fileLightToUpload ||
-        (data.logoUrl && !data.logoUrl.startsWith('blob:')) ||
-        fileDarkToUpload ||
-        (data.logoDarkUrl && !data.logoDarkUrl.startsWith('blob:')),
+    const hasLogo = Boolean(
+      fileToUpload || (data.logoUrl && !data.logoUrl.startsWith('blob:'))
     );
 
-    if (!hasAnyLogo) {
-      toast.error(ADMIN_SPONSORS_TEXTS.TOAST.ERROR_LOGO_REQUIRED);
+    if (!hasLogo) {
+      toast.error('O logotipo oficial da marca é obrigatório.');
       return;
     }
 
     runTransactionalSave({
-      hasPendingMedia: Boolean(fileLightToUpload || fileDarkToUpload),
+      hasPendingMedia: Boolean(fileToUpload),
       uploadMedia: async () => {
-        let uploadedLightUrl: string | undefined;
-        let uploadedDarkUrl: string | undefined;
+        let uploadedUrl: string | undefined;
 
-        if (fileLightToUpload) {
-          const resLight = await adminSponsorsService.uploadLogo(fileLightToUpload);
-          uploadedLightUrl = verifyUploadedUrl(resLight);
+        if (fileToUpload) {
+          const res = await adminSponsorsService.uploadLogo(fileToUpload);
+          uploadedUrl = verifyUploadedUrl(res);
         }
 
-        if (fileDarkToUpload) {
-          const resDark = await adminSponsorsService.uploadLogo(fileDarkToUpload);
-          uploadedDarkUrl = verifyUploadedUrl(resDark);
-        }
-
-        return { uploadedLightUrl, uploadedDarkUrl };
+        return { uploadedUrl };
       },
       saveToDb: async (uploadResult) => {
-        const finalLightUrl = uploadResult?.uploadedLightUrl
-          ? uploadResult.uploadedLightUrl
+        const finalUrl = uploadResult?.uploadedUrl
+          ? uploadResult.uploadedUrl
           : stripBlobUrl(data.logoUrl || '', '');
-
-        const finalDarkUrl = uploadResult?.uploadedDarkUrl
-          ? uploadResult.uploadedDarkUrl
-          : stripBlobUrl(data.logoDarkUrl || '', '');
 
         const payload: CreateSponsorPayload = {
           name: data.name.trim(),
-          logoUrl: finalLightUrl || finalDarkUrl, // fallback canônico no backend
-          logoDarkUrl: finalDarkUrl || null,
+          logoUrl: finalUrl,
+          logoDarkUrl: finalUrl,
           websiteUrl: data.websiteUrl ? data.websiteUrl.trim() : null,
           isFeatured: Boolean(data.isFeatured),
           featured: Boolean(data.isFeatured),
@@ -286,18 +242,11 @@ export const useSponsorAdminDrawer = ({
     });
   });
 
-  // Previews dinâmicos com regra de fallback mútuo para a UI
-  const effectiveLightPreview = logoLightPreview || logoDarkPreview || null;
-  const effectiveDarkPreview = logoDarkPreview || logoLightPreview || null;
-
   return {
     form,
-    fileInputLightRef,
-    fileInputDarkRef,
-    logoLightPreview,
-    logoDarkPreview,
-    effectiveLightPreview,
-    effectiveDarkPreview,
+    fileInputRef,
+    logoPreview,
+    effectivePreview: logoPreview,
     isCropOpen,
     imageToCrop,
     isLoadingDetails,

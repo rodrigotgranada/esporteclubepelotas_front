@@ -51,20 +51,12 @@ export const ThemeMobileCard = ({
             <Text className="text-base font-bold text-text-primary">
               {theme.name}
             </Text>
-            {theme.isCampaign && (
-              <Badge variant="primary" size="sm">
-                {SETTINGS_TEXTS.THEMES.BADGE_CAMPAIGN}
-              </Badge>
-            )}
+            <Badge variant="primary" size="sm">
+              {SETTINGS_TEXTS.THEMES.BADGE_CAMPAIGN}
+            </Badge>
           </LayoutContainer>
 
-          {theme.isDefault && (
-            <Text className="text-xs text-text-secondary">
-              {SETTINGS_TEXTS.THEMES.BADGE_DEFAULT}
-            </Text>
-          )}
-
-          {theme.isCampaign && (theme.startDate || theme.endDate) && (
+          {(theme.startDate || theme.endDate) && (
             <Text className="text-xs text-text-secondary mt-0.5">
               📅 {formatDate(theme.startDate)} {theme.endDate ? `até ${formatDate(theme.endDate)}` : ''}
             </Text>
@@ -109,7 +101,7 @@ export const ThemeMobileCard = ({
             {SETTINGS_TEXTS.THEMES.BTN_ACTIVATE}
           </Button>
         ) : (
-          theme.isCampaign && handleDeactivate && (
+          handleDeactivate && (
             <Button
               type="button"
               variant="outline"
@@ -120,7 +112,7 @@ export const ThemeMobileCard = ({
                 handleDeactivate(rowKey);
               }}
             >
-              Desativar
+              {SETTINGS_TEXTS.THEMES.BTN_DEACTIVATE}
             </Button>
           )
         )}

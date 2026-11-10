@@ -24,13 +24,9 @@ export const sponsorSchema = z
     contractEndDate: z.string().optional().nullable(),
   })
   .refine(
-    (data) =>
-      Boolean(
-        (data.logoUrl && data.logoUrl.trim().length > 0) ||
-          (data.logoDarkUrl && data.logoDarkUrl.trim().length > 0),
-      ),
+    (data) => Boolean(data.logoUrl && data.logoUrl.trim().length > 0),
     {
-      message: 'Cadastre ao menos um logotipo da marca (tema claro ou tema escuro)',
+      message: 'O logotipo oficial da marca é obrigatório',
       path: ['logoUrl'],
     },
   )

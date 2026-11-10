@@ -18,9 +18,19 @@ export const useThemesSettingsTab = () => {
         setIsLoading(true);
       }
       const data = await themeService.getThemes();
-      setThemes(data);
-      if (data.length > 0) {
-        setPreviewTheme((prev) => prev || data.find((t: any) => t.isActive) || data[0]);
+      // Filtrar para exibir estritamente as Campanhas Sazonais (oculta o tema padrão inalterável do clube)
+      const campaignThemes = data.filter((t: any) => !t.isDefault);
+      setThemes(campaignThemes);
+
+      if (campaignThemes.length > 0) {
+        setPreviewTheme((prev) => {
+          if (prev && campaignThemes.some((c: any) => c._id === prev._id)) {
+            return prev;
+          }
+          return campaignThemes.find((t: any) => t.isActive) || campaignThemes[0];
+        });
+      } else {
+        setPreviewTheme(undefined);
       }
     } catch {
       if (!options?.silent) {
@@ -85,16 +95,6 @@ export const useThemesSettingsTab = () => {
   };
 
   const getThemeStatus = (theme: ThemeDocument) => {
-    if (!theme.isCampaign) {
-      return {
-        label: theme.isActive
-          ? SETTINGS_TEXTS.THEMES.BADGE_ACTIVE
-          : SETTINGS_TEXTS.THEMES.BADGE_INACTIVE,
-        variant: theme.isActive ? ('success' as const) : ('default' as const),
-        isCampaignActive: false,
-      };
-    }
-
     if (!theme.isActive) {
       return {
         label: SETTINGS_TEXTS.THEMES.BADGE_INACTIVE,

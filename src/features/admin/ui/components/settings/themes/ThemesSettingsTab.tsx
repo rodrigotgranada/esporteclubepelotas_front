@@ -46,8 +46,8 @@ export const ThemesSettingsTab = () => {
 
   return (
     <LayoutContainer>
-      <LayoutContainer className="flex justify-between items-center mb-6">
-        <Text className="text-gray-300">{SETTINGS_TEXTS.THEMES.LIST_DESC}</Text>
+      <LayoutContainer className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <Text className="text-gray-300 max-w-2xl">{SETTINGS_TEXTS.THEMES.LIST_DESC}</Text>
         <Button variant="primary" size="sm" onClick={() => handleOpenDrawer()}>
           {SETTINGS_TEXTS.THEMES.NEW_THEME_BUTTON}
         </Button>
@@ -120,20 +120,12 @@ export const ThemesSettingsTab = () => {
                             <Text className="font-semibold text-text-primary">
                               {theme.name}
                             </Text>
-                            {theme.isCampaign && (
-                              <Badge variant="primary" size="sm">
-                                {SETTINGS_TEXTS.THEMES.BADGE_CAMPAIGN}
-                              </Badge>
-                            )}
+                            <Badge variant="primary" size="sm">
+                              {SETTINGS_TEXTS.THEMES.BADGE_CAMPAIGN}
+                            </Badge>
                           </LayoutContainer>
 
-                          {theme.isDefault && (
-                            <Text className="text-xs text-text-secondary">
-                              {SETTINGS_TEXTS.THEMES.BADGE_DEFAULT}
-                            </Text>
-                          )}
-
-                          {theme.isCampaign && (theme.startDate || theme.endDate) && (
+                          {(theme.startDate || theme.endDate) && (
                             <Text className="text-xs text-text-secondary mt-0.5">
                               📅 {formatDate(theme.startDate)}{' '}
                               {theme.endDate ? `até ${formatDate(theme.endDate)}` : ''}
@@ -192,24 +184,22 @@ export const ThemesSettingsTab = () => {
                                 {SETTINGS_TEXTS.THEMES.BTN_ACTIVATE}
                               </Button>
                             ) : (
-                              theme.isCampaign && (
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  size="sm"
-                                  className="text-amber-500 hover:border-amber-500"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleDeactivate(
-                                      typeof theme._id === 'string'
-                                        ? theme._id
-                                        : (theme._id as any).$oid
-                                    );
-                                  }}
-                                >
-                                  {SETTINGS_TEXTS.THEMES.BTN_DEACTIVATE}
-                                </Button>
-                              )
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                className="text-amber-500 hover:border-amber-500"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeactivate(
+                                    typeof theme._id === 'string'
+                                      ? theme._id
+                                      : (theme._id as any).$oid
+                                  );
+                                }}
+                              >
+                                {SETTINGS_TEXTS.THEMES.BTN_DEACTIVATE}
+                              </Button>
                             )}
                             <Button
                               type="button"

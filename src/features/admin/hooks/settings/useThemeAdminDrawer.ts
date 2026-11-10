@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useForm, UseFormReturn } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { themeService, ThemeDocument, ThemePalette } from '@/services/theme.service';
 import { generateCampaignPalettes } from '@/shared/utils/colorPaletteGenerator';
@@ -27,24 +27,6 @@ export const CAMPAIGN_PRESETS: CampaignPreset[] = [
   { name: 'Dezembro Laranja', color: '#ea580c', month: 12, icon: '🎗️' },
 ];
 
-const defaultPalette: ThemePalette = {
-  primary: '#fbbf24',
-  secondary: '#1e3a8a',
-  buttonSecondary: '#1e3a8a',
-  background: '#fefdf0',
-  surface: '#ffffff',
-  header: '#1e3a8a',
-  card: '#ffffff',
-  drawer: '#ffffff',
-  table: '#ffffff',
-  textPrimary: '#0f172a',
-  textSecondary: '#475569',
-  border: '#fef08a',
-  success: '#22c55e',
-  error: '#ea580c',
-  warning: '#f59e0b',
-};
-
 const defaultDarkPalette: ThemePalette = {
   primary: '#fbbf24',
   secondary: '#1e3a8a',
@@ -65,11 +47,11 @@ const defaultDarkPalette: ThemePalette = {
 
 const defaultThemeValues: ThemeAdminFormData = {
   name: '',
-  isCampaign: false,
+  isCampaign: true,
   campaignColor: '#ec4899',
   startDate: '',
   endDate: '',
-  light: defaultPalette,
+  light: defaultDarkPalette,
   dark: defaultDarkPalette,
 };
 
@@ -100,7 +82,7 @@ export const useThemeAdminDrawer = (
   useEffect(() => {
     if (theme) {
       const isCamp = Boolean(theme.isCampaign);
-      const campColor = theme.campaignColor || theme.light?.primary || '#ec4899';
+      const campColor = theme.campaignColor || theme.dark?.primary || theme.light?.primary || '#ec4899';
 
       let start = '';
       if (theme.startDate) {
@@ -120,21 +102,26 @@ export const useThemeAdminDrawer = (
         campaignColor: campColor,
         startDate: start,
         endDate: end,
-        light: theme.light || defaultPalette,
+        light: theme.dark || theme.light || defaultDarkPalette,
         dark: theme.dark || defaultDarkPalette,
       });
 
-      setShowAdvanced(!isCamp);
+      setShowAdvanced(false);
     } else {
-      form.reset(defaultThemeValues);
-      setShowAdvanced(true);
+      const { dark } = generateCampaignPalettes('#ec4899');
+      form.reset({
+        ...defaultThemeValues,
+        light: dark,
+        dark,
+      });
+      setShowAdvanced(false);
     }
   }, [theme, form]);
 
   const handleCampaignColorChange = (newColor: string) => {
     form.setValue('campaignColor', newColor);
-    const { light, dark } = generateCampaignPalettes(newColor);
-    form.setValue('light', light);
+    const { dark } = generateCampaignPalettes(newColor);
+    form.setValue('light', dark);
     form.setValue('dark', dark);
   };
 
@@ -148,12 +135,9 @@ export const useThemeAdminDrawer = (
     form.setValue('startDate', `${currentYear}-${monthPadded}-01`);
     form.setValue('endDate', `${currentYear}-${monthPadded}-${lastDay}`);
 
-    const { light, dark } = generateCampaignPalettes(preset.color);
-    const currentName = form.getValues('name');
-    if (!currentName) {
-      form.setValue('name', preset.name);
-    }
-    form.setValue('light', light);
+    const { dark } = generateCampaignPalettes(preset.color);
+    form.setValue('name', preset.name);
+    form.setValue('light', dark);
     form.setValue('dark', dark);
   };
 
@@ -161,19 +145,11 @@ export const useThemeAdminDrawer = (
     form.setValue('isCampaign', campaignMode);
     if (campaignMode) {
       const color = form.getValues('campaignColor') || '#ec4899';
-      const { light, dark } = generateCampaignPalettes(color);
-      form.setValue('light', light);
+      const { dark } = generateCampaignPalettes(color);
+      form.setValue('light', dark);
       form.setValue('dark', dark);
     } else {
       setShowAdvanced(true);
-    }
-  };
-
-  const handleChange = (field: string, value: any, mode?: 'light' | 'dark') => {
-    if (mode) {
-      form.setValue(`${mode}.${field}` as any, value);
-    } else {
-      form.setValue(field as any, value);
     }
   };
 
@@ -181,14 +157,14 @@ export const useThemeAdminDrawer = (
     const themeId = resolveThemeId(theme);
     const payload: Partial<ThemeDocument> = {
       name: data.name.trim(),
-      isCampaign: data.isCampaign,
-      campaignColor: data.isCampaign ? data.campaignColor : undefined,
+      isCampaign: true,
+      campaignColor: data.campaignColor,
       startDate:
-        data.isCampaign && data.startDate
+        data.startDate
           ? new Date(`${data.startDate}T00:00:00.000Z`)
           : undefined,
       endDate:
-        data.isCampaign && data.endDate
+        data.endDate
           ? new Date(`${data.endDate}T23:59:59.999Z`)
           : undefined,
       light: data.dark,
@@ -199,31 +175,33 @@ export const useThemeAdminDrawer = (
       hasPendingMedia: false,
       saveToDb: async () => {
         if (themeId) {
-          return themeService.updateTheme(themeId, payload);
+          return await themeService.updateTheme(themeId, payload);
+        } else {
+          return await themeService.createTheme(payload);
         }
-        return themeService.createTheme(payload);
       },
       onConfirmed: () => {
         toast.success(SETTINGS_TEXTS.THEMES.SUCCESS_SAVE);
         if (onSuccess) onSuccess();
       },
-      onError: (error: any) => {
-        toast.error(error?.response?.data?.message || SETTINGS_TEXTS.THEMES.ERROR_SAVE);
+      onError: () => {
+        toast.error(SETTINGS_TEXTS.THEMES.ERROR_SAVE);
       },
     });
   });
 
   const handleDelete = async () => {
     const themeId = resolveThemeId(theme);
-    if (!themeId || isLoading) return;
+    if (!themeId) return;
+
     try {
       setIsDeleting(true);
       await themeService.deleteTheme(themeId);
       toast.success(SETTINGS_TEXTS.THEMES.SUCCESS_DELETE);
       setIsDeleteModalOpen(false);
       if (onSuccess) onSuccess();
-    } catch (error: any) {
-      toast.error(error?.response?.data?.message || SETTINGS_TEXTS.THEMES.ERROR_DELETE);
+    } catch {
+      toast.error(SETTINGS_TEXTS.THEMES.ERROR_DELETE);
     } finally {
       setIsDeleting(false);
     }
@@ -236,7 +214,6 @@ export const useThemeAdminDrawer = (
     setShowAdvanced,
     isDeleteModalOpen,
     setIsDeleteModalOpen,
-    handleChange,
     handleCampaignColorChange,
     handleSelectPreset,
     handleToggleMode,

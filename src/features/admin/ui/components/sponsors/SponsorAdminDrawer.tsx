@@ -26,8 +26,6 @@ import {
   Hash,
   Sparkles,
   Eye,
-  Sun,
-  Moon,
   Trash2,
   CheckCircle2,
 } from 'lucide-react';
@@ -51,12 +49,9 @@ export const SponsorAdminDrawer: React.FC<SponsorAdminDrawerProps> = ({
 
   const {
     form,
-    fileInputLightRef,
-    fileInputDarkRef,
-    logoLightPreview,
-    logoDarkPreview,
-    effectiveLightPreview,
-    effectiveDarkPreview,
+    fileInputRef,
+    logoPreview,
+    effectivePreview,
     isCropOpen,
     imageToCrop,
     isLoadingDetails,
@@ -162,7 +157,7 @@ export const SponsorAdminDrawer: React.FC<SponsorAdminDrawerProps> = ({
               </FormField>
             </LayoutContainer>
 
-            {/* Seção 2: Uploads Duplos de Logotipo */}
+            {/* Seção 2: Upload Único do Logotipo Oficial */}
             <LayoutContainer className="flex flex-col gap-4">
               <LayoutContainer className="flex items-center gap-2 border-b border-border pb-2">
                 <Upload size={18} className="text-primary" />
@@ -175,163 +170,86 @@ export const SponsorAdminDrawer: React.FC<SponsorAdminDrawerProps> = ({
                 {texts.LOGOS_HELP}
               </Text>
 
-              {/* Inputs Ocultos de Arquivo */}
+              {/* Input Oculto de Arquivo */}
               <LayoutContainer className="hidden">
                 <input
-                  ref={fileInputLightRef}
+                  ref={fileInputRef}
                   type="file"
-                  onChange={(e) => handleFileChange('light', e)}
-                  accept="image/png,image/jpeg,image/webp,image/svg+xml"
-                />
-                <input
-                  ref={fileInputDarkRef}
-                  type="file"
-                  onChange={(e) => handleFileChange('dark', e)}
+                  onChange={handleFileChange}
                   accept="image/png,image/jpeg,image/webp,image/svg+xml"
                 />
               </LayoutContainer>
 
-              <LayoutContainer className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Card Upload: Modo Claro */}
-                <LayoutContainer className="flex flex-col justify-between p-4 rounded-xl bg-amber-50/20 dark:bg-amber-950/10 border border-amber-500/20 shadow-xs">
-                  <LayoutContainer className="flex flex-col gap-2">
-                    <LayoutContainer className="flex items-center justify-between">
-                      <LayoutContainer className="flex items-center gap-2">
-                        <Sun className="w-4 h-4 text-amber-500" />
-                        <Text as="span" className="font-bold text-xs uppercase tracking-wider text-text-primary">
-                          {texts.SECTION_LOGO_LIGHT}
-                        </Text>
-                      </LayoutContainer>
-                      {logoLightPreview && (
-                        <Badge variant="default" size="sm" className="font-semibold text-[10px]">
-                          Definido
-                        </Badge>
-                      )}
+              {/* Card de Upload do Logotipo */}
+              <LayoutContainer className="flex flex-col justify-between p-5 rounded-xl bg-blue-950/20 border border-blue-900/40 shadow-xs">
+                <LayoutContainer className="flex flex-col gap-3">
+                  <LayoutContainer className="flex items-center justify-between">
+                    <LayoutContainer className="flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-primary" />
+                      <Text as="span" className="font-bold text-xs uppercase tracking-wider text-text-primary">
+                        {texts.SECTION_LOGO}
+                      </Text>
                     </LayoutContainer>
-
-                    <Text as="p" className="text-xs text-text-secondary leading-snug">
-                      {texts.DESC_LOGO_LIGHT}
-                    </Text>
-
-                    {/* Área de Visualização Fundo Claro */}
-                    <LayoutContainer className="relative w-full h-24 rounded-lg bg-white border border-neutral-200 p-2 flex items-center justify-center overflow-hidden my-2">
-                      {logoLightPreview ? (
-                        <SafeImage
-                          src={logoLightPreview}
-                          alt="Logo Claro"
-                          fill
-                          className="object-contain"
-                          fallbackSrc="/images/pelotas-logo.png"
-                        />
-                      ) : (
-                        <LayoutContainer className="flex flex-col items-center gap-1 text-neutral-400">
-                          <Building2 size={24} className="opacity-40" />
-                          <Text as="span" className="text-[11px] font-medium">
-                            Nenhum logo claro
-                          </Text>
-                        </LayoutContainer>
-                      )}
-                    </LayoutContainer>
+                    {logoPreview ? (
+                      <Badge variant="primary" size="sm" className="font-semibold text-[10px]">
+                        Definido
+                      </Badge>
+                    ) : (
+                      <Badge variant="default" size="sm" className="font-normal text-[10px]">
+                        Obrigatório
+                      </Badge>
+                    )}
                   </LayoutContainer>
 
-                  <LayoutContainer className="flex items-center gap-2 pt-2 border-t border-border/40">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => triggerFileInput('light')}
-                      leftIcon={<Upload size={13} />}
-                      className="font-bold text-xs flex-1"
-                    >
-                      {logoLightPreview ? texts.BUTTON_CHANGE_LIGHT : texts.BUTTON_SELECT_LIGHT}
-                    </Button>
+                  <Text as="p" className="text-xs text-text-secondary leading-snug">
+                    {texts.DESC_LOGO}
+                  </Text>
 
-                    {logoLightPreview && (
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleRemoveLogo('light')}
-                        className="px-2 text-text-secondary hover:text-[#ea580c]"
-                        title="Remover logotipo claro"
-                      >
-                        <Trash2 size={14} />
-                      </Button>
+                  {/* Área de Visualização Fundo Escuro Oficial */}
+                  <LayoutContainer className="relative w-full h-32 rounded-xl bg-[#0b1329] border border-blue-900/50 p-4 flex items-center justify-center overflow-hidden my-2">
+                    {logoPreview ? (
+                      <SafeImage
+                        src={logoPreview}
+                        alt="Logotipo da Marca"
+                        fill
+                        className="object-contain p-2"
+                        fallbackSrc="/images/pelotas-logo.png"
+                      />
+                    ) : (
+                      <LayoutContainer className="flex flex-col items-center gap-2 text-slate-500">
+                        <Building2 size={28} className="opacity-40" />
+                        <Text as="span" className="text-xs font-medium text-slate-400">
+                          Nenhum logotipo selecionado
+                        </Text>
+                      </LayoutContainer>
                     )}
                   </LayoutContainer>
                 </LayoutContainer>
 
-                {/* Card Upload: Modo Escuro */}
-                <LayoutContainer className="flex flex-col justify-between p-4 rounded-xl bg-blue-50/20 dark:bg-blue-950/10 border border-blue-500/20 shadow-xs">
-                  <LayoutContainer className="flex flex-col gap-2">
-                    <LayoutContainer className="flex items-center justify-between">
-                      <LayoutContainer className="flex items-center gap-2">
-                        <Moon className="w-4 h-4 text-blue-400" />
-                        <Text as="span" className="font-bold text-xs uppercase tracking-wider text-text-primary">
-                          {texts.SECTION_LOGO_DARK}
-                        </Text>
-                      </LayoutContainer>
-                      {logoDarkPreview ? (
-                        <Badge variant="primary" size="sm" className="font-semibold text-[10px]">
-                          Definido
-                        </Badge>
-                      ) : (
-                        <Badge variant="default" size="sm" className="font-normal text-[10px]">
-                          Opcional
-                        </Badge>
-                      )}
-                    </LayoutContainer>
+                <LayoutContainer className="flex items-center gap-2 pt-3 border-t border-border/40 mt-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={triggerFileInput}
+                    leftIcon={<Upload size={14} />}
+                    className="font-bold text-xs flex-1"
+                  >
+                    {logoPreview ? texts.BUTTON_CHANGE_LOGO : texts.BUTTON_SELECT_LOGO}
+                  </Button>
 
-                    <Text as="p" className="text-xs text-text-secondary leading-snug">
-                      {texts.DESC_LOGO_DARK}
-                    </Text>
-
-                    {/* Área de Visualização Fundo Escuro */}
-                    <LayoutContainer className="relative w-full h-24 rounded-lg bg-[#0b1329] border border-blue-900/40 p-2 flex items-center justify-center overflow-hidden my-2">
-                      {logoDarkPreview ? (
-                        <SafeImage
-                          src={logoDarkPreview}
-                          alt="Logo Escuro"
-                          fill
-                          className="object-contain"
-                          fallbackSrc="/images/pelotas-logo.png"
-                        />
-                      ) : (
-                        <LayoutContainer className="flex flex-col items-center gap-1 text-slate-500">
-                          <Building2 size={24} className="opacity-40" />
-                          <Text as="span" className="text-[11px] font-medium text-slate-400">
-                            Usará o logo claro como fallback
-                          </Text>
-                        </LayoutContainer>
-                      )}
-                    </LayoutContainer>
-                  </LayoutContainer>
-
-                  <LayoutContainer className="flex items-center gap-2 pt-2 border-t border-border/40">
+                  {logoPreview && (
                     <Button
                       type="button"
-                      variant="outline"
+                      variant="ghost"
                       size="sm"
-                      onClick={() => triggerFileInput('dark')}
-                      leftIcon={<Upload size={13} />}
-                      className="font-bold text-xs flex-1"
+                      onClick={handleRemoveLogo}
+                      className="px-3 text-text-secondary hover:text-[#ea580c]"
+                      title="Remover logotipo"
                     >
-                      {logoDarkPreview ? texts.BUTTON_CHANGE_DARK : texts.BUTTON_SELECT_DARK}
+                      <Trash2 size={16} />
                     </Button>
-
-                    {logoDarkPreview && (
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleRemoveLogo('dark')}
-                        className="px-2 text-text-secondary hover:text-[#ea580c]"
-                        title="Remover logotipo escuro"
-                      >
-                        <Trash2 size={14} />
-                      </Button>
-                    )}
-                  </LayoutContainer>
+                  )}
                 </LayoutContainer>
               </LayoutContainer>
 
@@ -342,7 +260,7 @@ export const SponsorAdminDrawer: React.FC<SponsorAdminDrawerProps> = ({
               )}
             </LayoutContainer>
 
-            {/* Seção 3: Pré-visualização em Tempo Real (Live Previews) */}
+            {/* Seção 3: Pré-visualização em Tempo Real */}
             <LayoutContainer className="flex flex-col gap-4 p-4 rounded-xl bg-surface/70 border border-border shadow-xs">
               <LayoutContainer className="flex items-center gap-2 border-b border-border pb-2">
                 <CheckCircle2 size={16} className="text-primary" />
@@ -355,59 +273,26 @@ export const SponsorAdminDrawer: React.FC<SponsorAdminDrawerProps> = ({
                 {texts.DESC_PREVIEWS}
               </Text>
 
-              {!effectiveLightPreview && !effectiveDarkPreview ? (
+              {!effectivePreview ? (
                 <LayoutContainer className="p-6 text-center rounded-lg border border-dashed border-border text-text-secondary text-xs">
                   {texts.PREVIEW_EMPTY}
                 </LayoutContainer>
               ) : (
-                <LayoutContainer className="flex flex-col gap-5">
+                <LayoutContainer className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Prévia 1: Carrossel Superior (Ticker) */}
                   <LayoutContainer className="flex flex-col gap-2">
                     <Text as="span" className="text-xs font-bold uppercase tracking-wider text-text-secondary">
                       {texts.PREVIEW_TICKER_TITLE}
                     </Text>
-
-                    <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      {/* Ticker em Tema Claro */}
-                      <LayoutContainer className="flex flex-col gap-1 p-2.5 rounded-lg bg-neutral-100 border border-neutral-300">
-                        <LayoutContainer className="flex items-center gap-1.5 text-[11px] font-bold text-neutral-700">
-                          <Sun size={12} className="text-amber-600" />
-                          <span>{texts.PREVIEW_LIGHT_LABEL}</span>
-                        </LayoutContainer>
-                        <LayoutContainer className="h-12 rounded bg-white/90 border border-neutral-200 flex items-center justify-center p-1.5 overflow-hidden">
-                          {effectiveLightPreview ? (
-                            <LayoutContainer className="relative w-28 h-8">
-                              <SafeImage
-                                src={effectiveLightPreview}
-                                alt="Preview Ticker Claro"
-                                fill
-                                className="object-contain"
-                                fallbackSrc="/images/pelotas-logo.png"
-                              />
-                            </LayoutContainer>
-                          ) : null}
-                        </LayoutContainer>
-                      </LayoutContainer>
-
-                      {/* Ticker em Tema Escuro */}
-                      <LayoutContainer className="flex flex-col gap-1 p-2.5 rounded-lg bg-[#060a14] border border-blue-900/60">
-                        <LayoutContainer className="flex items-center gap-1.5 text-[11px] font-bold text-blue-300">
-                          <Moon size={12} className="text-blue-400" />
-                          <span>{texts.PREVIEW_DARK_LABEL}</span>
-                        </LayoutContainer>
-                        <LayoutContainer className="h-12 rounded bg-[#0b1329] border border-blue-900/40 flex items-center justify-center p-1.5 overflow-hidden">
-                          {effectiveDarkPreview ? (
-                            <LayoutContainer className="relative w-28 h-8">
-                              <SafeImage
-                                src={effectiveDarkPreview}
-                                alt="Preview Ticker Escuro"
-                                fill
-                                className="object-contain"
-                                fallbackSrc="/images/pelotas-logo.png"
-                              />
-                            </LayoutContainer>
-                          ) : null}
-                        </LayoutContainer>
+                    <LayoutContainer className="h-16 rounded-xl bg-[#060a14] border border-blue-900/60 flex items-center justify-center p-2 overflow-hidden shadow-inner">
+                      <LayoutContainer className="relative w-32 h-10">
+                        <SafeImage
+                          src={effectivePreview}
+                          alt="Preview Ticker"
+                          fill
+                          className="object-contain"
+                          fallbackSrc="/images/pelotas-logo.png"
+                        />
                       </LayoutContainer>
                     </LayoutContainer>
                   </LayoutContainer>
@@ -417,55 +302,19 @@ export const SponsorAdminDrawer: React.FC<SponsorAdminDrawerProps> = ({
                     <Text as="span" className="text-xs font-bold uppercase tracking-wider text-text-secondary">
                       {texts.PREVIEW_CARD_TITLE}
                     </Text>
-
-                    <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      {/* Card em Tema Claro */}
-                      <LayoutContainer className="flex flex-col gap-1 p-2.5 rounded-lg bg-neutral-100 border border-neutral-300">
-                        <LayoutContainer className="flex items-center gap-1.5 text-[11px] font-bold text-neutral-700">
-                          <Sun size={12} className="text-amber-600" />
-                          <span>{texts.PREVIEW_LIGHT_LABEL}</span>
-                        </LayoutContainer>
-                        <LayoutContainer className="h-28 rounded-xl bg-white border border-neutral-200 p-3 flex flex-col items-center justify-center gap-2 shadow-xs">
-                          <LayoutContainer className="relative w-24 h-12">
-                            {effectiveLightPreview && (
-                              <SafeImage
-                                src={effectiveLightPreview}
-                                alt="Preview Card Claro"
-                                fill
-                                className="object-contain"
-                                fallbackSrc="/images/pelotas-logo.png"
-                              />
-                            )}
-                          </LayoutContainer>
-                          <Text as="span" className="text-xs font-bold text-neutral-800 line-clamp-1">
-                            {watchedName}
-                          </Text>
-                        </LayoutContainer>
+                    <LayoutContainer className="h-28 rounded-xl bg-[#0e1832] border border-blue-900/50 p-3 flex flex-col items-center justify-center gap-2 shadow-xs">
+                      <LayoutContainer className="relative w-28 h-12">
+                        <SafeImage
+                          src={effectivePreview}
+                          alt="Preview Card"
+                          fill
+                          className="object-contain"
+                          fallbackSrc="/images/pelotas-logo.png"
+                        />
                       </LayoutContainer>
-
-                      {/* Card em Tema Escuro */}
-                      <LayoutContainer className="flex flex-col gap-1 p-2.5 rounded-lg bg-[#060a14] border border-blue-900/60">
-                        <LayoutContainer className="flex items-center gap-1.5 text-[11px] font-bold text-blue-300">
-                          <Moon size={12} className="text-blue-400" />
-                          <span>{texts.PREVIEW_DARK_LABEL}</span>
-                        </LayoutContainer>
-                        <LayoutContainer className="h-28 rounded-xl bg-[#0e1832] border border-blue-900/50 p-3 flex flex-col items-center justify-center gap-2 shadow-xs">
-                          <LayoutContainer className="relative w-24 h-12">
-                            {effectiveDarkPreview && (
-                              <SafeImage
-                                src={effectiveDarkPreview}
-                                alt="Preview Card Escuro"
-                                fill
-                                className="object-contain"
-                                fallbackSrc="/images/pelotas-logo.png"
-                              />
-                            )}
-                          </LayoutContainer>
-                          <Text as="span" className="text-xs font-bold text-white line-clamp-1">
-                            {watchedName}
-                          </Text>
-                        </LayoutContainer>
-                      </LayoutContainer>
+                      <Text as="span" className="text-xs font-bold text-white line-clamp-1">
+                        {watchedName}
+                      </Text>
                     </LayoutContainer>
                   </LayoutContainer>
                 </LayoutContainer>

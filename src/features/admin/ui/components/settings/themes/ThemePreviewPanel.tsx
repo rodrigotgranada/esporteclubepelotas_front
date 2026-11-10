@@ -1,7 +1,6 @@
 import React from 'react';
 import { LayoutContainer, Text, Badge } from '@/shared/ui/components';
 import { ThemeDocument } from '@/services/theme.service';
-import { Moon } from 'lucide-react';
 import { SETTINGS_TEXTS } from '../../../../constants/settings.constants';
 
 interface ThemePreviewPanelProps {
@@ -11,7 +10,7 @@ interface ThemePreviewPanelProps {
 export const ThemePreviewPanel = ({ previewTheme }: ThemePreviewPanelProps) => {
   if (!previewTheme) {
     return (
-      <LayoutContainer className="h-full flex flex-col items-center justify-center bg-surface border border-border rounded-2xl p-8 text-center text-text-secondary">
+      <LayoutContainer className="h-full min-h-[380px] flex flex-col items-center justify-center bg-surface border border-border rounded-2xl p-8 text-center text-text-secondary">
         <Text>{SETTINGS_TEXTS.THEMES.PREVIEW_EMPTY_STATE}</Text>
       </LayoutContainer>
     );
@@ -32,11 +31,6 @@ export const ThemePreviewPanel = ({ previewTheme }: ThemePreviewPanelProps) => {
               {SETTINGS_TEXTS.THEMES.BADGE_CAMPAIGN}
             </Badge>
           )}
-        </LayoutContainer>
-
-        <LayoutContainer className="flex items-center gap-1.5 px-3 py-1 bg-background rounded-lg border border-border text-xs text-text-secondary">
-          <Moon size={14} className="text-secondary" />
-          <span>Modo Escuro</span>
         </LayoutContainer>
       </LayoutContainer>
 
