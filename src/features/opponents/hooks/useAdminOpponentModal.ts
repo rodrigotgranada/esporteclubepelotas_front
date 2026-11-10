@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'react-hot-toast';
 import { OpponentClub, OpponentClubFormData } from '../types/opponents.types';
-import { OPPONENTS_CONSTANTS } from '../constants/opponents.constants';
+import { OPPONENTS_CONSTANTS, DEFAULT_CLUB_BADGE } from '../constants/opponents.constants';
 import { opponentClubSchema, OpponentClubSchemaType } from '../schemas/opponents.schema';
 import { opponentsService } from '../services/opponents.service';
 
@@ -145,6 +145,10 @@ export const useAdminOpponentModal = ({
         } finally {
           setIsUploadingBadge(false);
         }
+      }
+
+      if (!finalBadgeUrl || !finalBadgeUrl.trim() || finalBadgeUrl === '/images/pelotas-logo.png') {
+        finalBadgeUrl = DEFAULT_CLUB_BADGE;
       }
 
       const payload: OpponentClubFormData = {

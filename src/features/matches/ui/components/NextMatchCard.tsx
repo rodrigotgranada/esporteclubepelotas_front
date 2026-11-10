@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { LayoutContainer, Text, Badge } from '@/shared/ui/components/atoms';
 import { SafeImage } from '@/shared/ui/components/molecules/SafeImage';
 import { Match } from '../../types/matches.types';
-import { MATCHES_CONSTANTS } from '../../constants/matches.constants';
+import { MATCHES_CONSTANTS, DEFAULT_OPPONENT_BADGE } from '../../constants/matches.constants';
 
 export interface NextMatchCardProps {
   match: Match | null;
@@ -40,7 +40,7 @@ export const NextMatchCard: React.FC<NextMatchCardProps> = ({
   });
 
   const pelotasLogo = '/images/pelotas-logo.png';
-  const opponentLogo = match.opponentLogoUrl || '/images/pelotas-logo.png';
+  const opponentLogo = match.opponentLogoUrl || DEFAULT_OPPONENT_BADGE;
 
   const homeTeam = {
     name: isPelotasHome ? NEXT_MATCH.PELOTAS_NAME : match.opponentName,

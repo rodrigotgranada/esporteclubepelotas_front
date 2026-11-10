@@ -1,3 +1,5 @@
+export const DEFAULT_CLUB_BADGE = '/images/default-club-badge.svg';
+
 export const OPPONENTS_CONSTANTS = {
   PAGE_TITLE: 'Clubes Adversários',
   PAGE_SUBTITLE: 'Gerencie o catálogo oficial de adversários com distintivos, cidades e estádios sede.',

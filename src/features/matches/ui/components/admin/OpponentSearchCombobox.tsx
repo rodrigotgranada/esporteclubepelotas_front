@@ -10,6 +10,7 @@ import {
 import { Search, X, ChevronDown, PlusCircle, Building2 } from 'lucide-react';
 import { SafeImage } from '@/shared/ui/components/molecules/SafeImage';
 import { OpponentClub } from '@/features/opponents/types/opponents.types';
+import { DEFAULT_OPPONENT_BADGE } from '../../../constants/matches.constants';
 
 export interface OpponentSearchComboboxProps {
   opponents: OpponentClub[];
@@ -170,7 +171,7 @@ export const OpponentSearchCombobox: React.FC<OpponentSearchComboboxProps> = ({
                       {/* Mini Escudo */}
                       <LayoutContainer className="w-8 h-8 rounded-lg bg-surface border border-border/60 flex items-center justify-center p-1 overflow-hidden shrink-0 shadow-2xs">
                         <SafeImage
-                          src={club.badgeUrl || '/images/pelotas-logo.png'}
+                          src={club.badgeUrl || DEFAULT_OPPONENT_BADGE}
                           alt={club.name}
                           width={24}
                           height={24}

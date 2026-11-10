@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" fill="none">
+  <defs>
+    <!-- Gradiente de preenchimento do escudo genérico -->
+    <linearGradient id="shieldGrad" x1="60" y1="10" x2="60" y2="110" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#334155" />
+      <stop offset="50%" stop-color="#1e293b" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+
+    <!-- Gradiente da borda dourada suave -->
+    <linearGradient id="borderGrad" x1="15" y1="10" x2="105" y2="110" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#fbbf24" stop-opacity="0.8" />
+      <stop offset="50%" stop-color="#ca8a04" stop-opacity="0.6" />
+      <stop offset="100%" stop-color="#a16207" stop-opacity="0.4" />
+    </linearGradient>
+
+    <!-- Sombra projetada do escudo -->
+    <filter id="shieldShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#000000" flood-opacity="0.45" />
+    </filter>
+
+    <!-- Padrão interno de listras sutis (marca d'água neutra) -->
+    <clipPath id="shieldClip">
+      <path d="M 60 12 C 86 12 105 16 105 32 C 105 74 76 98 60 108 C 44 98 15 74 15 32 C 15 16 34 12 60 12 Z" />
+    </clipPath>
+  </defs>
+
+  <!-- Corpo do Escudo -->
+  <g filter="url(#shieldShadow)">
+    <path
+      d="M 60 12 C 86 12 105 16 105 32 C 105 74 76 98 60 108 C 44 98 15 74 15 32 C 15 16 34 12 60 12 Z"
+      fill="url(#shieldGrad)"
+      stroke="url(#borderGrad)"
+      stroke-width="2.5"
+    />
+  </g>
+
+  <!-- Conteúdo interno com clip no escudo -->
+  <g clip-path="url(#shieldClip)">
+    <!-- Divisão vertical sutil de meia-sombra heraldica -->
+    <path d="M 60 12 L 105 32 C 105 74 76 98 60 108 Z" fill="#ffffff" fill-opacity="0.04" />
+
+    <!-- Linhas heráldicas neutras em marca d'água -->
+    <path
+      d="M 60 22 C 80 22 95 25 95 38 C 95 70 72 89 60 97 C 48 89 25 70 25 38 C 25 25 40 22 60 22 Z"
+      fill="none"
+      stroke="#ffffff"
+      stroke-opacity="0.08"
+      stroke-width="1.5"
+      stroke-dasharray="3 3"
+    />
+
+    <!-- Ícone de Escudo / Silhueta interna estlizada -->
+    <path
+      d="M 60 36 C 72 36 82 39 82 48 C 82 68 67 80 60 85 C 53 80 38 68 38 48 C 38 39 48 36 60 36 Z"
+      fill="#475569"
+      fill-opacity="0.3"
+      stroke="#94a3b8"
+      stroke-opacity="0.3"
+      stroke-width="1.2"
+    />
+
+    <!-- Pequena estrela / centelha heráldica no topo interno -->
+    <polygon
+      points="60,42 62,47 67,47 63,50 64.5,55 60,52 55.5,55 57,50 53,47 58,47"
+      fill="#fbbf24"
+      fill-opacity="0.45"
+    />
+  </g>
+</svg>

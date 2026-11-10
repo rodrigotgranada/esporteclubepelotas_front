@@ -14,7 +14,7 @@ import {
 import { CropModal } from '@/shared/ui/components/molecules/CropModal';
 import { SafeImage } from '@/shared/ui/components/molecules/SafeImage';
 import { Championship, Match } from '../../../types/matches.types';
-import { MATCHES_CONSTANTS, MATCH_STATUS_LABELS } from '../../../constants/matches.constants';
+import { MATCHES_CONSTANTS, MATCH_STATUS_LABELS, DEFAULT_OPPONENT_BADGE } from '../../../constants/matches.constants';
 import { useAdminMatchModal } from '../../../hooks/useAdminMatchModal';
 import { AdminOpponentModal } from '@/features/opponents/ui/components/AdminOpponentModal';
 import { OpponentSearchCombobox } from './OpponentSearchCombobox';
@@ -187,7 +187,7 @@ export const AdminMatchModal: React.FC<AdminMatchModalProps> = ({
                     <LayoutContainer className="flex items-center gap-3 p-2 rounded-xl bg-surface-card border border-border/60">
                       <LayoutContainer className="w-12 h-12 rounded-lg bg-surface flex items-center justify-center p-1 overflow-hidden shrink-0">
                         <SafeImage
-                          src={logoPreviewUrl || '/images/pelotas-logo.png'}
+                          src={logoPreviewUrl || DEFAULT_OPPONENT_BADGE}
                           alt={selectedOpponentName || 'Escudo'}
                           width={40}
                           height={40}

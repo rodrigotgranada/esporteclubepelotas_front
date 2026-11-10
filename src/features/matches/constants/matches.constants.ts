@@ -1,5 +1,7 @@
 import { ChampionshipCategory, HomeAway, MatchStatus } from '../types/matches.types';
 
+export const DEFAULT_OPPONENT_BADGE = '/images/default-club-badge.svg';
+
 export const CHAMPIONSHIP_CATEGORY_LABELS: Record<ChampionshipCategory, string> = {
   PROFESSIONAL_MEN: 'Profissional Masculino',
   PROFESSIONAL_WOMEN: 'Profissional Feminino',

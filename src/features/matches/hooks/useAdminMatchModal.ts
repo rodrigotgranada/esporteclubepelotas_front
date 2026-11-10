@@ -7,7 +7,7 @@ import toast from 'react-hot-toast';
 import { Championship, Match, MatchFormData, MatchStatus, HomeAway } from '../types/matches.types';
 import { matchesService } from '../services/matches.service';
 import { matchSchema, MatchSchemaType } from '../schemas/matches.schema';
-import { MATCHES_CONSTANTS } from '../constants/matches.constants';
+import { MATCHES_CONSTANTS, DEFAULT_OPPONENT_BADGE } from '../constants/matches.constants';
 import { OpponentClub } from '@/features/opponents/types/opponents.types';
 import { opponentsService } from '@/features/opponents/services/opponents.service';
 
@@ -160,11 +160,10 @@ export const useAdminMatchModal = ({
   // Selecionar um clube adversário do catálogo
   const handleSelectOpponentClub = (club: OpponentClub) => {
     setValue('opponentName', club.name, { shouldValidate: true });
-    if (club.badgeUrl) {
-      setValue('opponentLogoUrl', club.badgeUrl);
-      setLogoPreviewUrl(club.badgeUrl);
-      setPendingLogoFile(null);
-    }
+    const badge = club.badgeUrl || DEFAULT_OPPONENT_BADGE;
+    setValue('opponentLogoUrl', badge);
+    setLogoPreviewUrl(badge);
+    setPendingLogoFile(null);
 
     // Se o mando for fora (visitante), preenche automaticamente com o estádio e cidade do adversário
     if (currentHomeAway === 'AWAY') {
@@ -184,7 +183,7 @@ export const useAdminMatchModal = ({
       // Tentar encontrar o clube selecionado para preencher estádio/cidade
       const found = opponents.find(
         (c) => c.name.toLowerCase() === currentOpponentName.toLowerCase() ||
-               (c.shortName && c.shortName.toLowerCase() === currentOpponentName.toLowerCase())
+          (c.shortName && c.shortName.toLowerCase() === currentOpponentName.toLowerCase())
       );
       if (found) {
         if (found.stadiumName) setValue('stadiumName', found.stadiumName);
@@ -252,6 +251,10 @@ export const useAdminMatchModal = ({
 
       if (pendingLogoFile) {
         finalLogoUrl = await matchesService.adminUploadMatchImage(pendingLogoFile);
+      }
+
+      if (!finalLogoUrl || !finalLogoUrl.trim() || finalLogoUrl === '/images/pelotas-logo.png') {
+        finalLogoUrl = DEFAULT_OPPONENT_BADGE;
       }
 
       const dateUtc = new Date(values.matchDate).toISOString();

@@ -18,7 +18,7 @@ import {
 } from '@/shared/ui/components/atoms';
 import { SafeImage } from '@/shared/ui/components/molecules/SafeImage';
 import { Championship, Match } from '../../../types/matches.types';
-import { MATCHES_CONSTANTS } from '../../../constants/matches.constants';
+import { MATCHES_CONSTANTS, DEFAULT_OPPONENT_BADGE } from '../../../constants/matches.constants';
 
 export interface AdminMatchesTableProps {
   matches: Match[];
@@ -157,7 +157,7 @@ export const AdminMatchesTable: React.FC<AdminMatchesTableProps> = ({
                     <LayoutContainer className="flex items-center space-x-3">
                       <LayoutContainer className="w-8 h-8 rounded-lg bg-surface-hover border border-border/50 flex items-center justify-center p-1">
                         <SafeImage
-                          src={match.opponentLogoUrl || '/images/pelotas-logo.png'}
+                          src={match.opponentLogoUrl || DEFAULT_OPPONENT_BADGE}
                           alt={match.opponentName}
                           width={24}
                           height={24}

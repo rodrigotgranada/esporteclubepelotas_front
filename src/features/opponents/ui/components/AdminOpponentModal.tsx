@@ -12,7 +12,7 @@ import {
 import { CropModal } from '@/shared/ui/components/molecules/CropModal';
 import { SafeImage } from '@/shared/ui/components/molecules/SafeImage';
 import { OpponentClub } from '../../types/opponents.types';
-import { OPPONENTS_CONSTANTS } from '../../constants/opponents.constants';
+import { OPPONENTS_CONSTANTS, DEFAULT_CLUB_BADGE } from '../../constants/opponents.constants';
 import { useAdminOpponentModal } from '../../hooks/useAdminOpponentModal';
 
 export interface AdminOpponentModalProps {
@@ -166,7 +166,7 @@ export const AdminOpponentModal: React.FC<AdminOpponentModalProps> = ({
               <LayoutContainer className="flex items-center gap-4">
                 <LayoutContainer className="w-16 h-16 rounded-xl bg-surface-hover border border-border flex items-center justify-center p-1 overflow-hidden shadow-inner">
                   <SafeImage
-                    src={previewBadgeUrl || '/images/pelotas-logo.png'}
+                    src={previewBadgeUrl || DEFAULT_CLUB_BADGE}
                     alt="Escudo do Clube"
                     width={56}
                     height={56}

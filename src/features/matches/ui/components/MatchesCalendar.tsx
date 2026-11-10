@@ -4,7 +4,7 @@ import React from 'react';
 import { LayoutContainer, Title, Text, Badge, Button } from '@/shared/ui/components/atoms';
 import { SafeImage } from '@/shared/ui/components/molecules/SafeImage';
 import { Championship, Match } from '../../types/matches.types';
-import { MATCHES_CONSTANTS } from '../../constants/matches.constants';
+import { MATCHES_CONSTANTS, DEFAULT_OPPONENT_BADGE } from '../../constants/matches.constants';
 
 export interface MatchesCalendarProps {
   championships: Championship[];
@@ -99,7 +99,7 @@ export const MatchesCalendar: React.FC<MatchesCalendarProps> = ({
           <LayoutContainer className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {upcomingMatches.map((match) => {
               const isPelotasHome = match.homeAway === 'HOME';
-              const opponentLogo = match.opponentLogoUrl || pelotasLogo;
+              const opponentLogo = match.opponentLogoUrl || DEFAULT_OPPONENT_BADGE;
 
               return (
                 <LayoutContainer
@@ -200,7 +200,7 @@ export const MatchesCalendar: React.FC<MatchesCalendarProps> = ({
           <LayoutContainer className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {pastMatches.map((match) => {
               const isPelotasHome = match.homeAway === 'HOME';
-              const opponentLogo = match.opponentLogoUrl || pelotasLogo;
+              const opponentLogo = match.opponentLogoUrl || DEFAULT_OPPONENT_BADGE;
               const homeScore = isPelotasHome ? match.pelotasScore : match.opponentScore;
               const awayScore = isPelotasHome ? match.opponentScore : match.pelotasScore;
 

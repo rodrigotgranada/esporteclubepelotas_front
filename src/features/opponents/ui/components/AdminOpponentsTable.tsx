@@ -19,7 +19,7 @@ import {
 import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { SafeImage } from '@/shared/ui/components/molecules/SafeImage';
 import { OpponentClub } from '../../types/opponents.types';
-import { OPPONENTS_CONSTANTS } from '../../constants/opponents.constants';
+import { OPPONENTS_CONSTANTS, DEFAULT_CLUB_BADGE } from '../../constants/opponents.constants';
 import { OpponentSortField, SortDirection, OpponentStatusFilter } from '../../hooks/useAdminOpponents';
 
 export interface AdminOpponentsTableProps {
@@ -179,7 +179,7 @@ export const AdminOpponentsTable: React.FC<AdminOpponentsTableProps> = ({
                   <TableCell>
                     <LayoutContainer className="w-10 h-10 rounded-xl bg-surface-hover border border-border/60 flex items-center justify-center p-1 overflow-hidden shadow-xs">
                       <SafeImage
-                        src={club.badgeUrl || '/images/pelotas-logo.png'}
+                        src={club.badgeUrl || DEFAULT_CLUB_BADGE}
                         alt={club.name}
                         width={32}
                         height={32}
