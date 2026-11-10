@@ -75,3 +75,4 @@ export const AdminDeleteOpponentModal: React.FC<AdminDeleteOpponentModalProps> =
     </Modal>
   );
 };
+

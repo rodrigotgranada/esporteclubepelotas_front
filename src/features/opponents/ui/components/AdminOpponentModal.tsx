@@ -187,8 +187,8 @@ export const AdminOpponentModal: React.FC<AdminOpponentModalProps> = ({
               </LayoutContainer>
             </LayoutContainer>
 
-            {/* Linha 4: Ativo e Ordem */}
-            <LayoutContainer className="flex items-center justify-between pt-2">
+            {/* Linha 4: Status Ativo */}
+            <LayoutContainer className="pt-2">
               <label className="flex items-center space-x-2.5 cursor-pointer select-none">
                 <input
                   type="checkbox"
@@ -200,15 +200,6 @@ export const AdminOpponentModal: React.FC<AdminOpponentModalProps> = ({
                   {MODAL.ACTIVE_LABEL}
                 </Text>
               </label>
-
-              <LayoutContainer className="flex items-center space-x-2">
-                <Text className="text-xs text-text-muted">{MODAL.ORDER_LABEL}:</Text>
-                <Input
-                  type="number"
-                  {...register('displayOrder')}
-                  className="w-20 text-center text-xs py-1"
-                />
-              </LayoutContainer>
             </LayoutContainer>
 
             {/* Rodapé com Ações */}
@@ -249,3 +240,4 @@ export const AdminOpponentModal: React.FC<AdminOpponentModalProps> = ({
     </>
   );
 };
+

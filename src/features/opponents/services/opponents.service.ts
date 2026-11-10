@@ -63,3 +63,4 @@ export const opponentsService = {
     return res.url;
   },
 };
+

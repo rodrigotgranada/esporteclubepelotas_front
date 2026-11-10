@@ -11,3 +11,4 @@ export const opponentClubSchema = z.object({
 });
 
 export type OpponentClubSchemaType = z.infer<typeof opponentClubSchema>;
+

@@ -20,3 +20,4 @@ export interface OpponentClubFormData {
   isActive: boolean;
   displayOrder: number;
 }
+

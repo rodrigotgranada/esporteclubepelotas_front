@@ -13,15 +13,26 @@ import {
   Badge,
   Button,
   Input,
+  Select,
+  Option,
 } from '@/shared/ui/components/atoms';
+import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { SafeImage } from '@/shared/ui/components/molecules/SafeImage';
 import { OpponentClub } from '../../types/opponents.types';
 import { OPPONENTS_CONSTANTS } from '../../constants/opponents.constants';
+import { OpponentSortField, SortDirection, OpponentStatusFilter } from '../../hooks/useAdminOpponents';
 
 export interface AdminOpponentsTableProps {
   opponents: OpponentClub[];
+  totalCount: number;
+  filteredCount: number;
   search: string;
   onSearchChange: (value: string) => void;
+  statusFilter: OpponentStatusFilter;
+  onStatusFilterChange: (status: OpponentStatusFilter) => void;
+  sortField: OpponentSortField;
+  sortDirection: SortDirection;
+  onSort: (field: OpponentSortField) => void;
   onOpenCreate: () => void;
   onEdit: (club: OpponentClub) => void;
   onDelete: (club: OpponentClub) => void;
@@ -29,24 +40,62 @@ export interface AdminOpponentsTableProps {
 
 export const AdminOpponentsTable: React.FC<AdminOpponentsTableProps> = ({
   opponents,
+  totalCount,
+  filteredCount,
   search,
   onSearchChange,
+  statusFilter,
+  onStatusFilterChange,
+  sortField,
+  sortDirection,
+  onSort,
   onOpenCreate,
   onEdit,
   onDelete,
 }) => {
   const { TABLE } = OPPONENTS_CONSTANTS;
 
+  const renderSortIndicator = (field: OpponentSortField) => {
+    if (sortField === field) {
+      return sortDirection === 'asc' ? (
+        <ArrowUp className="w-3.5 h-3.5 text-secondary inline ml-1.5" />
+      ) : (
+        <ArrowDown className="w-3.5 h-3.5 text-secondary inline ml-1.5" />
+      );
+    }
+    return (
+      <ArrowUpDown className="w-3.5 h-3.5 text-text-muted/40 group-hover:text-text-muted inline ml-1.5 transition-colors" />
+    );
+  };
+
   return (
     <LayoutContainer className="space-y-4">
-      {/* Barra de Filtro e Ação */}
-      <LayoutContainer className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
-        <Input
-          placeholder={TABLE.SEARCH_PLACEHOLDER}
-          value={search}
-          onChange={(e) => onSearchChange(e.target.value)}
-          className="w-full sm:w-96"
-        />
+      {/* Barra de Filtro, Seleção de Status e Ação */}
+      <LayoutContainer className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+        <LayoutContainer className="flex flex-wrap items-center gap-3 flex-1">
+          <Input
+            placeholder={TABLE.SEARCH_PLACEHOLDER}
+            value={search}
+            onChange={(e) => onSearchChange(e.target.value)}
+            className="w-full sm:w-80"
+          />
+
+          <Select
+            value={statusFilter}
+            onChange={(e) => onStatusFilterChange(e.target.value as OpponentStatusFilter)}
+            className="w-full sm:w-44"
+          >
+            <Option value="ALL">{TABLE.STATUS_FILTER_ALL}</Option>
+            <Option value="ACTIVE">{TABLE.STATUS_FILTER_ACTIVE}</Option>
+            <Option value="INACTIVE">{TABLE.STATUS_FILTER_INACTIVE}</Option>
+          </Select>
+
+          {totalCount > 0 && (
+            <Text className="text-xs text-text-muted hidden lg:inline">
+              {TABLE.COUNTER_LABEL(filteredCount, totalCount)}
+            </Text>
+          )}
+        </LayoutContainer>
 
         <Button
           onClick={onOpenCreate}
@@ -57,17 +106,63 @@ export const AdminOpponentsTable: React.FC<AdminOpponentsTableProps> = ({
         </Button>
       </LayoutContainer>
 
-      {/* Tabela de Clubes */}
+      {/* Tabela de Clubes com Cabeçalhos Ordenáveis */}
       <LayoutContainer className="rounded-2xl border border-border/60 bg-surface-card overflow-hidden shadow-sm">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>{TABLE.BADGE}</TableHead>
-              <TableHead>{TABLE.NAME}</TableHead>
-              <TableHead>{TABLE.SHORT_NAME}</TableHead>
-              <TableHead>{TABLE.CITY}</TableHead>
-              <TableHead>{TABLE.STADIUM}</TableHead>
-              <TableHead>{TABLE.STATUS}</TableHead>
+              <TableHead className="w-16">{TABLE.BADGE}</TableHead>
+
+              <TableHead
+                onClick={() => onSort('name')}
+                className="cursor-pointer group select-none hover:text-secondary transition-colors"
+              >
+                <LayoutContainer className="flex items-center">
+                  <span>{TABLE.NAME}</span>
+                  {renderSortIndicator('name')}
+                </LayoutContainer>
+              </TableHead>
+
+              <TableHead
+                onClick={() => onSort('shortName')}
+                className="cursor-pointer group select-none hover:text-secondary transition-colors"
+              >
+                <LayoutContainer className="flex items-center">
+                  <span>{TABLE.SHORT_NAME}</span>
+                  {renderSortIndicator('shortName')}
+                </LayoutContainer>
+              </TableHead>
+
+              <TableHead
+                onClick={() => onSort('city')}
+                className="cursor-pointer group select-none hover:text-secondary transition-colors"
+              >
+                <LayoutContainer className="flex items-center">
+                  <span>{TABLE.CITY}</span>
+                  {renderSortIndicator('city')}
+                </LayoutContainer>
+              </TableHead>
+
+              <TableHead
+                onClick={() => onSort('stadiumName')}
+                className="cursor-pointer group select-none hover:text-secondary transition-colors"
+              >
+                <LayoutContainer className="flex items-center">
+                  <span>{TABLE.STADIUM}</span>
+                  {renderSortIndicator('stadiumName')}
+                </LayoutContainer>
+              </TableHead>
+
+              <TableHead
+                onClick={() => onSort('isActive')}
+                className="cursor-pointer group select-none hover:text-secondary transition-colors"
+              >
+                <LayoutContainer className="flex items-center">
+                  <span>{TABLE.STATUS}</span>
+                  {renderSortIndicator('isActive')}
+                </LayoutContainer>
+              </TableHead>
+
               <TableHead className="text-right">{TABLE.ACTIONS}</TableHead>
             </TableRow>
           </TableHeader>

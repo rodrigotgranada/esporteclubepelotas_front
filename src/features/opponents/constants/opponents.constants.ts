@@ -3,6 +3,10 @@ export const OPPONENTS_CONSTANTS = {
   PAGE_SUBTITLE: 'Gerencie o catálogo oficial de adversários com distintivos, cidades e estádios sede.',
   TABLE: {
     SEARCH_PLACEHOLDER: 'Buscar por nome, apelido, cidade ou estádio...',
+    STATUS_FILTER_ALL: 'Todos os Status',
+    STATUS_FILTER_ACTIVE: 'Apenas Ativos',
+    STATUS_FILTER_INACTIVE: 'Apenas Inativos',
+    COUNTER_LABEL: (filtered: number, total: number) => `Exibindo ${filtered} de ${total} clubes`,
     BADGE: 'Distintivo',
     NAME: 'Nome do Clube',
     SHORT_NAME: 'Apelido / Sigla',
@@ -45,3 +49,4 @@ export const OPPONENTS_CONSTANTS = {
     SAVE_ERROR: 'Erro ao salvar clube. Tente novamente.',
   },
 };
+

@@ -17,8 +17,15 @@ import {
 export const AdminOpponentsFeature: React.FC = () => {
   const {
     opponents,
+    totalCount,
+    filteredCount,
     search,
     setSearch,
+    statusFilter,
+    setStatusFilter,
+    sortField,
+    sortDirection,
+    handleSort,
     isLoading,
     isModalOpen,
     selectedOpponent,
@@ -56,8 +63,15 @@ export const AdminOpponentsFeature: React.FC = () => {
       ) : (
         <AdminOpponentsTable
           opponents={opponents}
+          totalCount={totalCount}
+          filteredCount={filteredCount}
           search={search}
           onSearchChange={setSearch}
+          statusFilter={statusFilter}
+          onStatusFilterChange={setStatusFilter}
+          sortField={sortField}
+          sortDirection={sortDirection}
+          onSort={handleSort}
           onOpenCreate={handleOpenCreate}
           onEdit={handleOpenEdit}
           onDelete={handleOpenDelete}
