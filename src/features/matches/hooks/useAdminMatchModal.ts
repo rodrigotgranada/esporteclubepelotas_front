@@ -34,6 +34,7 @@ export const useAdminMatchModal = ({
   const [opponents, setOpponents] = useState<OpponentClub[]>([]);
   const [isLoadingOpponents, setIsLoadingOpponents] = useState(false);
   const [isQuickClubModalOpen, setIsQuickClubModalOpen] = useState(false);
+  const [quickClubInitialName, setQuickClubInitialName] = useState<string>('');
 
   // Recorte manual de Escudo (caso queira subir arquivo direto)
   const [pendingLogoFile, setPendingLogoFile] = useState<File | null>(null);
@@ -189,10 +190,17 @@ export const useAdminMatchModal = ({
     }
   };
 
+  // Abrir Modal de Cadastro Rápido de Clube
+  const handleOpenQuickClub = (initialName?: string) => {
+    setQuickClubInitialName(initialName?.trim() || '');
+    setIsQuickClubModalOpen(true);
+  };
+
   // Callback de sucesso ao cadastrar novo clube in-place
   const handleQuickClubSuccess = (newClub?: OpponentClub) => {
     loadOpponents();
     setIsQuickClubModalOpen(false);
+    setQuickClubInitialName('');
 
     if (newClub) {
       handleSelectOpponentClub(newClub);
@@ -306,6 +314,8 @@ export const useAdminMatchModal = ({
     isLoadingOpponents,
     isQuickClubModalOpen,
     setIsQuickClubModalOpen,
+    quickClubInitialName,
+    handleOpenQuickClub,
     handleSelectOpponentClub,
     handleQuickClubSuccess,
     handleHomeAwayChange,

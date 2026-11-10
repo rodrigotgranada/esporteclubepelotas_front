@@ -16,8 +16,8 @@ import { SafeImage } from '@/shared/ui/components/molecules/SafeImage';
 import { Championship, Match } from '../../../types/matches.types';
 import { MATCHES_CONSTANTS, MATCH_STATUS_LABELS } from '../../../constants/matches.constants';
 import { useAdminMatchModal } from '../../../hooks/useAdminMatchModal';
-import { OpponentClub } from '@/features/opponents/types/opponents.types';
 import { AdminOpponentModal } from '@/features/opponents/ui/components/AdminOpponentModal';
+import { OpponentSearchCombobox } from './OpponentSearchCombobox';
 
 export interface AdminMatchModalProps {
   isOpen: boolean;
@@ -50,6 +50,8 @@ export const AdminMatchModal: React.FC<AdminMatchModalProps> = ({
     opponents,
     isQuickClubModalOpen,
     setIsQuickClubModalOpen,
+    quickClubInitialName,
+    handleOpenQuickClub,
     handleSelectOpponentClub,
     handleQuickClubSuccess,
     handleHomeAwayChange,
@@ -145,7 +147,7 @@ export const AdminMatchModal: React.FC<AdminMatchModalProps> = ({
                 {/* Linha 1: Campeonato */}
                 <LayoutContainer className="space-y-1">
                   <Text className="text-xs font-semibold text-text-secondary">
-                    {MATCH_DRAWER.CHAMPIONSHIP_LABEL} *
+                    {MATCH_DRAWER.CHAMPIONSHIP_LABEL}
                   </Text>
                   <Select
                     {...register('championshipId')}
@@ -164,7 +166,7 @@ export const AdminMatchModal: React.FC<AdminMatchModalProps> = ({
                   )}
                 </LayoutContainer>
 
-                {/* Linha 2: Seleção do Clube Adversário */}
+                {/* Linha 2: Seleção do Clube Adversário (Combobox com Search Dropdown) */}
                 <LayoutContainer className="p-4 rounded-xl border border-border/60 bg-surface/30 space-y-3">
                   <LayoutContainer className="flex items-center justify-between">
                     <Text className="text-xs font-semibold text-text-secondary">
@@ -174,7 +176,7 @@ export const AdminMatchModal: React.FC<AdminMatchModalProps> = ({
                       type="button"
                       variant="outline"
                       size="sm"
-                      onClick={() => setIsQuickClubModalOpen(true)}
+                      onClick={() => handleOpenQuickClub(selectedOpponentName)}
                       className="text-xs font-bold border-secondary/40 text-secondary hover:bg-secondary/10 cursor-pointer"
                     >
                       + Cadastrar Novo Clube
@@ -182,36 +184,16 @@ export const AdminMatchModal: React.FC<AdminMatchModalProps> = ({
                   </LayoutContainer>
 
                   <LayoutContainer className="grid grid-cols-1 md:grid-cols-3 gap-3 items-center">
-                    {/* Seletor Rápido de Clubes Cadastrados */}
-                    <LayoutContainer className="md:col-span-2 space-y-1">
-                      <Select
-                        value={
-                          opponents.find((c: OpponentClub) => c.name === selectedOpponentName)?.id || ''
-                        }
-                        onChange={(e) => {
-                          const chosen = opponents.find((c: OpponentClub) => c.id === e.target.value);
-                          if (chosen) handleSelectOpponentClub(chosen);
-                        }}
-                        className="w-full"
-                      >
-                        <Option value="">Selecione um clube do catálogo...</Option>
-                        {opponents.map((club: OpponentClub) => (
-                          <Option key={club.id} value={club.id}>
-                            {club.name} ({club.city || 'Sem cidade'})
-                          </Option>
-                        ))}
-                      </Select>
-
-                      <Input
-                        placeholder="Ou digite o nome do adversário caso avulso"
-                        {...register('opponentName')}
-                        className="mt-2 text-xs"
+                    {/* Input com Dropdown Filtrável */}
+                    <LayoutContainer className="md:col-span-2">
+                      <OpponentSearchCombobox
+                        opponents={opponents}
+                        value={selectedOpponentName || ''}
+                        onChange={(val) => setValue('opponentName', val, { shouldValidate: true })}
+                        onSelectClub={handleSelectOpponentClub}
+                        onOpenQuickCreate={handleOpenQuickClub}
+                        error={errors.opponentName?.message}
                       />
-                      {errors.opponentName && (
-                        <Text className="text-xs text-orange-500 font-medium">
-                          {errors.opponentName.message}
-                        </Text>
-                      )}
                     </LayoutContainer>
 
                     {/* Escudo do Adversário */}
@@ -249,7 +231,7 @@ export const AdminMatchModal: React.FC<AdminMatchModalProps> = ({
                 {/* Linha 3: Mando de Campo */}
                 <LayoutContainer className="space-y-1">
                   <Text className="text-xs font-semibold text-text-secondary">
-                    {MATCH_DRAWER.HOME_AWAY_LABEL} *
+                    {MATCH_DRAWER.HOME_AWAY_LABEL}
                   </Text>
                   <LayoutContainer className="grid grid-cols-2 gap-3">
                     <Button
@@ -292,7 +274,7 @@ export const AdminMatchModal: React.FC<AdminMatchModalProps> = ({
                 <LayoutContainer className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <LayoutContainer className="space-y-1">
                     <Text className="text-xs font-semibold text-text-secondary">
-                      {MATCH_DRAWER.STADIUM_LABEL} *
+                      {MATCH_DRAWER.STADIUM_LABEL}
                     </Text>
                     <Input
                       placeholder={MATCH_DRAWER.STADIUM_PLACEHOLDER}
@@ -320,7 +302,7 @@ export const AdminMatchModal: React.FC<AdminMatchModalProps> = ({
                 <LayoutContainer className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <LayoutContainer className="space-y-1">
                     <Text className="text-xs font-semibold text-text-secondary">
-                      {MATCH_DRAWER.DATE_LABEL} *
+                      {MATCH_DRAWER.DATE_LABEL}
                     </Text>
                     <Input
                       type="datetime-local"
@@ -335,7 +317,7 @@ export const AdminMatchModal: React.FC<AdminMatchModalProps> = ({
 
                   <LayoutContainer className="space-y-1">
                     <Text className="text-xs font-semibold text-text-secondary">
-                      {MATCH_DRAWER.ROUND_LABEL} *
+                      {MATCH_DRAWER.ROUND_LABEL}
                     </Text>
                     <Input
                       placeholder={MATCH_DRAWER.ROUND_PLACEHOLDER}
@@ -350,7 +332,7 @@ export const AdminMatchModal: React.FC<AdminMatchModalProps> = ({
 
                   <LayoutContainer className="space-y-1">
                     <Text className="text-xs font-semibold text-text-secondary">
-                      {MATCH_DRAWER.STATUS_LABEL} *
+                      {MATCH_DRAWER.STATUS_LABEL}
                     </Text>
                     <Select
                       {...register('status')}
@@ -526,6 +508,7 @@ export const AdminMatchModal: React.FC<AdminMatchModalProps> = ({
         <AdminOpponentModal
           isOpen={isQuickClubModalOpen}
           onClose={() => setIsQuickClubModalOpen(false)}
+          initialName={quickClubInitialName}
           onSuccess={handleQuickClubSuccess}
           isQuickMode={true}
         />

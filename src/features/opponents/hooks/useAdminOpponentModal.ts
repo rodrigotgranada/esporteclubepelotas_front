@@ -13,6 +13,7 @@ export interface UseAdminOpponentModalProps {
   isOpen: boolean;
   onClose: () => void;
   opponent?: OpponentClub | null;
+  initialName?: string;
   onSuccess?: (savedClub?: OpponentClub) => void;
 }
 
@@ -20,6 +21,7 @@ export const useAdminOpponentModal = ({
   isOpen,
   onClose,
   opponent,
+  initialName,
   onSuccess,
 }: UseAdminOpponentModalProps) => {
   const [isSaving, setIsSaving] = useState(false);
@@ -71,7 +73,7 @@ export const useAdminOpponentModal = ({
         setPreviewBadgeUrl(opponent.badgeUrl || null);
       } else {
         reset({
-          name: '',
+          name: initialName?.trim() || '',
           shortName: '',
           city: '',
           stadiumName: '',
@@ -85,7 +87,7 @@ export const useAdminOpponentModal = ({
       setCropSourceImage(null);
       setIsCropModalOpen(false);
     }
-  }, [isOpen, opponent, reset]);
+  }, [isOpen, opponent, initialName, reset]);
 
   // Disparar seleção de arquivo
   const handleSelectBadgeClick = () => {

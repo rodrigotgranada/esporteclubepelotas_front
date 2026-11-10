@@ -19,6 +19,7 @@ export interface AdminOpponentModalProps {
   isOpen: boolean;
   onClose: () => void;
   opponent?: OpponentClub | null;
+  initialName?: string;
   onSuccess?: (savedClub?: OpponentClub) => void;
   isQuickMode?: boolean;
 }
@@ -27,6 +28,7 @@ export const AdminOpponentModal: React.FC<AdminOpponentModalProps> = ({
   isOpen,
   onClose,
   opponent,
+  initialName,
   onSuccess,
   isQuickMode = false,
 }) => {
@@ -53,6 +55,7 @@ export const AdminOpponentModal: React.FC<AdminOpponentModalProps> = ({
     isOpen,
     onClose,
     opponent,
+    initialName,
     onSuccess,
   });
 
