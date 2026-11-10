@@ -53,7 +53,10 @@ export const PUBLIC_FOOTER_TEXTS = {
   DEFAULT_NAV_LINKS: [
     { label: 'Início', url: '/', isVisible: true, isExternal: false },
     { label: 'Notícias do Lobo', url: '/noticias', isVisible: true, isExternal: false },
+    { label: 'Jogos & Campeonatos', url: '/jogos', isVisible: true, isExternal: false },
     { label: 'Elencos', url: '/elenco', isVisible: true, isExternal: false },
+    { label: 'Loja Oficial Lobo Mania', url: '/loja', isVisible: true, isExternal: false },
+    { label: 'Mantos & Uniformes', url: '/uniformes', isVisible: true, isExternal: false },
     { label: 'Memorial & Ídolos', url: '/idolos', isVisible: true, isExternal: false },
     { label: 'História & Linha do Tempo', url: '/historia', isVisible: true, isExternal: false },
     { label: 'Hino Oficial', url: '/hino', isVisible: true, isExternal: false },

@@ -33,6 +33,7 @@ export const PUBLIC_DRAWER_TEXTS = {
   LINK_ANTHEM: 'Hino Oficial',
   LINK_SYMBOLS: 'Símbolos & Mascote',
   LINK_KITS: 'Mantos & Uniformes',
+  LINK_STORE: 'Loja Oficial',
 
   THEME_TITLE: 'Aparência',
   THEME_LIGHT: 'Modo Claro',

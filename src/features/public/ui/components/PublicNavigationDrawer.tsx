@@ -11,7 +11,8 @@ import {
   Title,
   Badge,
   Button,
-  ShieldPlaceholder, isUnoptimizedImageUrl,
+  ShieldPlaceholder,
+  isUnoptimizedImageUrl,
 } from '@/shared/ui/components';
 import {
   X,
@@ -22,15 +23,10 @@ import {
   Users,
   History,
   Sparkles,
-  User as UserIcon,
-  Settings as SettingsIcon,
-  LogOut,
-  LogIn,
-  Sun,
-  Moon,
   Music,
   Shirt,
   CalendarDays,
+  ShoppingBag,
 } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useSettingsStore } from '@/store/useSettingsStore';
@@ -38,6 +34,7 @@ import { useThemeStore } from '@/store/useThemeStore';
 import { useSystemModulesStore } from '@/store/useSystemModulesStore';
 import { useMembershipLink } from '@/features/membership/hooks/useMembershipLink';
 import { PUBLIC_DRAWER_TEXTS } from './PublicNavigationDrawer.constants';
+import { PublicDrawerFooter } from './PublicDrawerFooter';
 
 export interface PublicNavigationDrawerProps {
   isOpen: boolean;
@@ -64,7 +61,6 @@ export const PublicNavigationDrawer: React.FC<PublicNavigationDrawerProps> = ({
     setMounted(true);
   }, []);
 
-  // Sync dark state for simple binary switch
   useEffect(() => {
     if (typeof window !== 'undefined') {
       if (mode === 'dark') {
@@ -83,7 +79,6 @@ export const PublicNavigationDrawer: React.FC<PublicNavigationDrawerProps> = ({
     setIsDark(!isDark);
   };
 
-  // Close drawer on escape key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
@@ -94,7 +89,6 @@ export const PublicNavigationDrawer: React.FC<PublicNavigationDrawerProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
-  // Lock body scroll when open
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -144,56 +138,51 @@ export const PublicNavigationDrawer: React.FC<PublicNavigationDrawerProps> = ({
                   alt={clubName}
                   width={42}
                   height={42}
-                  className="object-contain drop-shadow-sm group-hover:scale-105 transition-transform" unoptimized={isUnoptimizedImageUrl(settings.clubLogoUrl)}
+                  className="object-contain drop-shadow-sm group-hover:scale-105 transition-transform"
+                  unoptimized={isUnoptimizedImageUrl(settings.clubLogoUrl)}
                 />
               ) : (
                 <ShieldPlaceholder size={42} />
               )}
               <LayoutContainer className="flex flex-col">
-                <Title
-                  level="h3"
-                  className="text-base font-black text-text-primary tracking-tight leading-tight group-hover:text-primary transition-colors"
-                >
-                  {clubName}
+                <Title level="h2" className="text-sm font-black tracking-tight text-text-primary group-hover:text-primary transition-colors uppercase">
+                  {PUBLIC_DRAWER_TEXTS.TITLE}
                 </Title>
-                <Text className="text-[10px] font-extrabold text-primary uppercase tracking-widest">
-                  {PUBLIC_DRAWER_TEXTS.BADGE_OFFICIAL}
+                <Text className="text-[11px] text-text-secondary leading-tight line-clamp-1">
+                  {PUBLIC_DRAWER_TEXTS.SUBTITLE}
                 </Text>
               </LayoutContainer>
             </Link>
 
-            {/* Circular Close Button */}
             <button
+              type="button"
               onClick={onClose}
-              className="w-9 h-9 rounded-full bg-surface border border-border/80 flex items-center justify-center text-text-secondary hover:text-text-primary hover:bg-background hover:rotate-90 transition-all duration-200 focus:outline-none cursor-pointer"
-              title={PUBLIC_DRAWER_TEXTS.CLOSE}
+              className="w-9 h-9 rounded-xl border border-border flex items-center justify-center text-text-secondary hover:text-text-primary hover:bg-surface transition-all focus:outline-none"
               aria-label={PUBLIC_DRAWER_TEXTS.CLOSE}
             >
-              <X className="w-4 h-4" />
+              <X className="w-5 h-5" />
             </button>
           </LayoutContainer>
 
-          {/* Drawer Scrollable Content */}
-          <LayoutContainer className="flex-1 p-5 sm:p-6 flex flex-col gap-6">
-            {/* 1. Membership Highlight Card */}
-            <LayoutContainer className="rounded-2xl p-5 bg-gradient-to-br from-secondary/15 via-surface to-primary/10 border border-primary/40 shadow-xs flex flex-col gap-3 relative overflow-hidden group">
-              <LayoutContainer className="flex items-center justify-between">
-                <Badge variant="primary" size="sm" className="font-extrabold uppercase text-[10px] tracking-wider px-2 py-0.5 shadow-xs">
-                  <Sparkles className="w-3 h-3 mr-1" />
+          {/* Drawer Body Links & Sections */}
+          <LayoutContainer className="p-5 sm:p-6 flex flex-col gap-6 flex-1">
+            {/* 1. Highlight Membership Banner */}
+            <LayoutContainer className="rounded-2xl bg-gradient-to-br from-primary/15 via-surface to-surface border border-primary/30 p-4.5 flex flex-col gap-3 relative overflow-hidden shadow-xs">
+              <LayoutContainer className="flex items-center justify-between gap-2">
+                <Badge variant="primary" size="sm" className="font-extrabold text-[10px] tracking-wider uppercase">
                   {PUBLIC_DRAWER_TEXTS.MEMBERSHIP_BADGE}
                 </Badge>
-                <Text className="text-[10px] font-bold text-text-secondary/80 uppercase tracking-widest">
-                  1908
-                </Text>
+                <Sparkles className="w-4 h-4 text-primary animate-pulse" />
               </LayoutContainer>
 
-              <Title level="h4" className="text-base font-black text-text-primary leading-tight">
-                {PUBLIC_DRAWER_TEXTS.MEMBERSHIP_CARD_TITLE}
-              </Title>
-
-              <Text className="text-xs text-text-secondary leading-relaxed">
-                {PUBLIC_DRAWER_TEXTS.MEMBERSHIP_CARD_DESC}
-              </Text>
+              <LayoutContainer className="flex flex-col gap-1">
+                <Title level="h3" className="text-base font-black text-text-primary">
+                  {PUBLIC_DRAWER_TEXTS.MEMBERSHIP_CARD_TITLE}
+                </Title>
+                <Text className="text-xs text-text-secondary leading-relaxed">
+                  {PUBLIC_DRAWER_TEXTS.MEMBERSHIP_CARD_DESC}
+                </Text>
+              </LayoutContainer>
 
               <Link
                 href={membershipLink.url}
@@ -353,7 +342,7 @@ export const PublicNavigationDrawer: React.FC<PublicNavigationDrawerProps> = ({
               </LayoutContainer>
             </LayoutContainer>
 
-            {/* 4. Navigation Section: O Clube & Memória */}
+            {/* 5. Navigation Section: O Clube & Memória */}
             <LayoutContainer className="flex flex-col gap-2">
               <Text className="text-[11px] font-extrabold text-text-secondary uppercase tracking-wider px-1">
                 {PUBLIC_DRAWER_TEXTS.SECTION_CLUB}
@@ -387,7 +376,7 @@ export const PublicNavigationDrawer: React.FC<PublicNavigationDrawerProps> = ({
                   <ChevronRight className="w-4 h-4 text-text-secondary/60 group-hover:text-primary group-hover:translate-x-1 transition-all" />
                 </Link>
 
-                {/* Ídolos e Linha do Tempo Grid */}
+                {/* Ídolos, Linha do Tempo, Hino, Símbolos, Mantos e Loja Grid */}
                 <LayoutContainer className="grid grid-cols-2 gap-2">
                   {idolsActive ? (
                     <Link
@@ -472,134 +461,33 @@ export const PublicNavigationDrawer: React.FC<PublicNavigationDrawerProps> = ({
                     </LayoutContainer>
                     <ChevronRight className="w-3.5 h-3.5 text-text-secondary/60 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
                   </Link>
+
+                  <Link
+                    href="/loja"
+                    onClick={onClose}
+                    className="p-3 rounded-xl bg-surface/70 hover:bg-surface border border-border/80 hover:border-primary/50 flex items-center justify-between transition-all group"
+                  >
+                    <LayoutContainer className="flex items-center gap-2">
+                      <ShoppingBag className="w-3.5 h-3.5 text-primary group-hover:scale-110 transition-transform" />
+                      <span className="text-xs font-bold text-text-primary group-hover:text-primary transition-colors">
+                        {PUBLIC_DRAWER_TEXTS.LINK_STORE}
+                      </span>
+                    </LayoutContainer>
+                    <ChevronRight className="w-3.5 h-3.5 text-text-secondary/60 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
+                  </Link>
                 </LayoutContainer>
               </LayoutContainer>
             </LayoutContainer>
           </LayoutContainer>
 
           {/* Bottom Footer of Drawer (User Session / Auth + Clean Light/Dark Switch) */}
-          <LayoutContainer className="p-5 sm:p-6 border-t border-border/80 bg-surface/40 flex flex-col gap-4 mt-auto shrink-0 pb-8">
-            {user ? (
-              <LayoutContainer className="flex flex-col gap-3">
-                <LayoutContainer className="flex items-center gap-3">
-                  <LayoutContainer className="w-10 h-10 rounded-full bg-background border-2 border-primary overflow-hidden relative shrink-0 shadow-xs">
-                    {user.avatarUrl ? (
-                      <Image
-                        src={user.avatarUrl}
-                        alt="Avatar"
-                        fill
-                        sizes="40px" unoptimized={isUnoptimizedImageUrl(user.avatarUrl)}
-                        className="object-cover"
-                      />
-                    ) : (
-                      <LayoutContainer className="w-full h-full flex items-center justify-center text-primary font-bold">
-                        {user.firstName[0]}
-                      </LayoutContainer>
-                    )}
-                  </LayoutContainer>
-                  <LayoutContainer className="flex flex-col overflow-hidden">
-                    <Text className="font-bold text-text-primary text-sm truncate">
-                      {user.firstName} {user.lastName}
-                    </Text>
-                    <Text className="text-text-secondary text-xs truncate">{user.email}</Text>
-                  </LayoutContainer>
-                </LayoutContainer>
-
-                <LayoutContainer className="grid grid-cols-2 gap-2 pt-1">
-                  <Link href="/profile" onClick={onClose}>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full text-xs font-bold justify-center"
-                      leftIcon={<UserIcon className="w-3.5 h-3.5" />}
-                    >
-                      {PUBLIC_DRAWER_TEXTS.BTN_PROFILE}
-                    </Button>
-                  </Link>
-                  {((user.role?.name || user.role) === 'ADMIN' ||
-                    (user.role?.name || user.role) === 'OWNER') && (
-                    <Link href="/gestao" onClick={onClose}>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="w-full text-xs font-bold justify-center"
-                        leftIcon={<SettingsIcon className="w-3.5 h-3.5" />}
-                      >
-                        {PUBLIC_DRAWER_TEXTS.BTN_ADMIN}
-                      </Button>
-                    </Link>
-                  )}
-                </LayoutContainer>
-
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleLogout}
-                  className="text-error hover:bg-error/10 w-full justify-center text-xs font-bold"
-                  leftIcon={<LogOut className="w-3.5 h-3.5" />}
-                >
-                  {PUBLIC_DRAWER_TEXTS.BTN_LOGOUT}
-                </Button>
-              </LayoutContainer>
-            ) : (
-              <LayoutContainer className="flex flex-col gap-2">
-                <Link href="/login" onClick={onClose}>
-                  <Button
-                    variant="primary"
-                    size="md"
-                    className="w-full font-extrabold uppercase tracking-wide text-xs sm:text-sm py-2.5 shadow-md hover:shadow-lg justify-center"
-                    leftIcon={<LogIn className="w-4 h-4" />}
-                  >
-                    {PUBLIC_DRAWER_TEXTS.BTN_LOGIN}
-                  </Button>
-                </Link>
-                <LayoutContainer className="flex items-center justify-center gap-1.5 text-xs text-text-secondary">
-                  <span>{PUBLIC_DRAWER_TEXTS.NO_ACCOUNT_PROMPT}</span>
-                  <Link
-                    href="/register"
-                    onClick={onClose}
-                    className="font-bold text-primary hover:underline"
-                  >
-                    {PUBLIC_DRAWER_TEXTS.REGISTER_LINK}
-                  </Link>
-                </LayoutContainer>
-              </LayoutContainer>
-            )}
-
-            {/* Simple Binary Light / Dark Switch */}
-            <LayoutContainer className="pt-2 border-t border-border flex items-center justify-between p-2.5 rounded-xl bg-surface/70 border border-border/80">
-              <LayoutContainer className="flex items-center gap-2.5">
-                <LayoutContainer className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-                  {isDark ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
-                </LayoutContainer>
-                <Text className="text-xs font-bold text-text-primary">
-                  {isDark ? PUBLIC_DRAWER_TEXTS.THEME_DARK : PUBLIC_DRAWER_TEXTS.THEME_LIGHT}
-                </Text>
-              </LayoutContainer>
-
-              {/* Toggle Switch */}
-              <button
-                type="button"
-                role="switch"
-                aria-checked={isDark}
-                aria-label={PUBLIC_DRAWER_TEXTS.THEME_SWITCH_ARIA}
-                onClick={toggleTheme}
-                className="relative inline-flex h-7 w-13 shrink-0 cursor-pointer rounded-full border border-border bg-background transition-colors duration-200 focus:outline-none"
-              >
-                <span
-                  className={`pointer-events-none flex h-5 w-5 transform items-center justify-center rounded-full bg-primary text-black font-bold shadow-sm transition-transform duration-200 ease-in-out mt-0.5 ml-0.5 ${
-                    isDark ? 'translate-x-6' : 'translate-x-0'
-                  }`}
-                >
-                  {isDark ? <Moon className="w-3 h-3" /> : <Sun className="w-3 h-3" />}
-                </span>
-              </button>
-            </LayoutContainer>
-
-            <Text className="text-[10px] text-text-secondary text-center">
-              {PUBLIC_DRAWER_TEXTS.COPYRIGHT}
-            </Text>
-          </LayoutContainer>
+          <PublicDrawerFooter
+            user={user}
+            onClose={onClose}
+            onLogout={handleLogout}
+            isDark={isDark}
+            onToggleTheme={toggleTheme}
+          />
         </LayoutContainer>
       </LayoutContainer>
     </LayoutContainer>,

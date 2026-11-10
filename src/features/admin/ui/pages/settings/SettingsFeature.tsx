@@ -7,6 +7,7 @@ import { ThemesSettingsTab } from '../../components/settings/themes/ThemesSettin
 import { GeneralSettingsTab } from '../../components/settings/general/GeneralSettingsTab';
 import { SocialSettingsTab } from '../../components/settings/social/SocialSettingsTab';
 import { ContactsSettingsTab } from '../../components/settings/contacts/ContactsSettingsTab';
+import { StoreSettingsTab } from '../../components/settings/store/StoreSettingsTab';
 
 export const SettingsFeature = () => {
   const [defaultTab, setDefaultTab] = useState<string>('LOGO');
@@ -65,6 +66,15 @@ export const SettingsFeature = () => {
       content: (
         <LayoutContainer>
           <ContactsSettingsTab />
+        </LayoutContainer>
+      ),
+    },
+    {
+      id: 'STORE',
+      label: SETTINGS_TEXTS.TAB_STORE,
+      content: (
+        <LayoutContainer>
+          <StoreSettingsTab />
         </LayoutContainer>
       ),
     },

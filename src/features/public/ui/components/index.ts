@@ -2,6 +2,7 @@ export * from './PublicHeader';
 export * from './HeaderReadingProgressBar';
 export * from './PublicFooter';
 export * from './PublicNavigationDrawer';
+export * from './PublicDrawerFooter';
 export * from './PelotasWatermarkBackground';
 export * from './PublicHeader.constants';
 export * from './PublicFooter.constants';

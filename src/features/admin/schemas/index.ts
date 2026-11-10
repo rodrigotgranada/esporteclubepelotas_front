@@ -12,4 +12,5 @@ export * from './users/user-admin.schema';
 export * from './settings/general-settings.schema';
 export * from './settings/social-settings.schema';
 export * from './settings/contacts-settings.schema';
+export * from './settings/store-settings.schema';
 export * from './settings/theme.schema';

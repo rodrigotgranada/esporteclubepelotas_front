@@ -52,6 +52,17 @@ export interface Settings {
   copyrightText?: string;
   membershipSystemProvider?: 'ELEVENTICKETS' | 'NATIVE';
   membershipExternalUrl?: string;
+  storeName?: string;
+  storeDescription?: string;
+  storeExternalUrl?: string;
+  storeIsOnlineActive?: boolean;
+  storeInstagramUrl?: string;
+  storeWhatsappNumber?: string;
+  storeWhatsappMessage?: string;
+  storeOpeningHours?: string;
+  storeAddress?: string;
+  storeHasMemberDiscount?: boolean;
+  storeMemberDiscountText?: string;
 }
 
 interface SettingsState {
