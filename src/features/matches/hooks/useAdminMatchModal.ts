@@ -33,6 +33,9 @@ export const useAdminMatchModal = ({
   const [isQuickClubModalOpen, setIsQuickClubModalOpen] = useState(false);
   const [quickClubInitialName, setQuickClubInitialName] = useState<string>('');
 
+  // Modal Dedicado de Placar & Pênaltis
+  const [isScoreModalOpen, setIsScoreModalOpen] = useState(false);
+
   const isEditing = Boolean(match);
 
   const form = useForm<MatchSchemaType>({
@@ -196,6 +199,41 @@ export const useAdminMatchModal = ({
     }
   };
 
+  // Alteração de Status com acionamento do Modal de Placar
+  const handleStatusChange = (newStatus: MatchStatus) => {
+    setValue('status', newStatus, { shouldValidate: true, shouldDirty: true });
+
+    if (newStatus === 'FINISHED') {
+      setIsScoreModalOpen(true);
+    } else {
+      setValue('pelotasScore', null, { shouldValidate: true, shouldDirty: true });
+      setValue('opponentScore', null, { shouldValidate: true, shouldDirty: true });
+      setValue('penaltyPelotasScore', null, { shouldValidate: true, shouldDirty: true });
+      setValue('penaltyOpponentScore', null, { shouldValidate: true, shouldDirty: true });
+    }
+  };
+
+  const handleOpenScoreModal = () => {
+    setIsScoreModalOpen(true);
+  };
+
+  const handleCloseScoreModal = () => {
+    setIsScoreModalOpen(false);
+  };
+
+  const handleSaveScore = (scores: {
+    pelotasScore: number;
+    opponentScore: number;
+    penaltyPelotasScore: number | null;
+    penaltyOpponentScore: number | null;
+  }) => {
+    setValue('pelotasScore', scores.pelotasScore, { shouldValidate: true, shouldDirty: true });
+    setValue('opponentScore', scores.opponentScore, { shouldValidate: true, shouldDirty: true });
+    setValue('penaltyPelotasScore', scores.penaltyPelotasScore, { shouldValidate: true, shouldDirty: true });
+    setValue('penaltyOpponentScore', scores.penaltyOpponentScore, { shouldValidate: true, shouldDirty: true });
+    setIsScoreModalOpen(false);
+  };
+
   // Submissão do formulário
   const onSubmit = async (values: MatchSchemaType) => {
     if (inFlightRef.current) return;
@@ -281,6 +319,13 @@ export const useAdminMatchModal = ({
     handleSelectOpponentClub,
     handleQuickClubSuccess,
     handleHomeAwayChange,
+    // Modal de Placar Dedicado
+    isScoreModalOpen,
+    setIsScoreModalOpen,
+    handleOpenScoreModal,
+    handleCloseScoreModal,
+    handleSaveScore,
+    handleStatusChange,
     onSubmit: form.handleSubmit(onSubmit),
   };
 };

@@ -12,12 +12,13 @@ import {
   Button,
   Badge,
 } from '@/shared/ui/components/atoms';
-import { Radio, Trophy } from 'lucide-react';
+import { Radio, Trophy, Edit3 } from 'lucide-react';
 import { Championship, Match, MatchStatus } from '../../../types/matches.types';
 import { MATCHES_CONSTANTS, MATCH_STATUS_LABELS } from '../../../constants/matches.constants';
 import { useAdminMatchModal } from '../../../hooks/useAdminMatchModal';
 import { AdminOpponentModal } from '@/features/opponents/ui/components/AdminOpponentModal';
 import { OpponentSearchCombobox } from './OpponentSearchCombobox';
+import { AdminMatchScoreModal } from './AdminMatchScoreModal';
 
 export interface AdminMatchModalProps {
   isOpen: boolean;
@@ -53,6 +54,11 @@ export const AdminMatchModal: React.FC<AdminMatchModalProps> = ({
     handleSelectOpponentClub,
     handleQuickClubSuccess,
     handleHomeAwayChange,
+    isScoreModalOpen,
+    handleOpenScoreModal,
+    handleCloseScoreModal,
+    handleSaveScore,
+    handleStatusChange,
     onSubmit,
   } = useAdminMatchModal({
     match,
@@ -62,10 +68,15 @@ export const AdminMatchModal: React.FC<AdminMatchModalProps> = ({
   });
 
   const selectedOpponentName = watch('opponentName');
+  const opponentLogoUrl = watch('opponentLogoUrl');
   const currentHomeAway = watch('homeAway');
   const currentStatus = watch('status');
   const currentChampionshipId = watch('championshipId');
   const hasLiveCoverage = watch('hasLiveCoverage');
+  const pelotasScore = watch('pelotasScore');
+  const opponentScore = watch('opponentScore');
+  const penaltyPelotas = watch('penaltyPelotasScore');
+  const penaltyOpponent = watch('penaltyOpponentScore');
 
   return (
     <>
@@ -308,16 +319,7 @@ export const AdminMatchModal: React.FC<AdminMatchModalProps> = ({
                   </Text>
                   <Select
                     value={currentStatus}
-                    onChange={(e) => {
-                      const nextStatus = e.target.value as MatchStatus;
-                      setValue('status', nextStatus, { shouldValidate: true, shouldDirty: true });
-                      if (nextStatus !== 'FINISHED') {
-                        setValue('pelotasScore', null);
-                        setValue('opponentScore', null);
-                        setValue('penaltyPelotasScore', null);
-                        setValue('penaltyOpponentScore', null);
-                      }
-                    }}
+                    onChange={(e) => handleStatusChange(e.target.value as MatchStatus)}
                     className="w-full"
                   >
                     <Option value="SCHEDULED">{MATCH_STATUS_LABELS.SCHEDULED}</Option>
@@ -329,81 +331,60 @@ export const AdminMatchModal: React.FC<AdminMatchModalProps> = ({
                 </LayoutContainer>
               </LayoutContainer>
 
-              {/* ================= SEÇÃO CONDICIONAL: PLACAR & RESULTADO (Apenas quando Status for Encerrado) ================= */}
+              {/* ================= RESUMO DO PLACAR OFICIAL (Apenas quando Status for Encerrado) ================= */}
               {currentStatus === 'FINISHED' && (
-                <LayoutContainer className="p-4 rounded-xl border border-secondary/50 bg-secondary/10 space-y-4 animate-in fade-in slide-in-from-top-2 duration-200 shadow-sm">
-                  <LayoutContainer className="border-b border-secondary/30 pb-2.5 flex items-center justify-between">
-                    <LayoutContainer className="flex items-center gap-2">
-                      <Trophy size={16} className="text-secondary" />
-                      <Text className="text-xs font-black text-text-primary uppercase tracking-wider">
-                        Placar Oficial & Resultado do Confronto
-                      </Text>
+                <LayoutContainer className="p-4 rounded-xl border border-secondary/50 bg-secondary/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-in fade-in slide-in-from-top-2 duration-200 shadow-xs">
+                  <LayoutContainer className="flex items-center gap-3">
+                    <LayoutContainer className="w-10 h-10 rounded-xl bg-secondary/20 flex items-center justify-center text-secondary shrink-0 border border-secondary/30">
+                      <Trophy size={20} />
                     </LayoutContainer>
-                    <Badge
-                      variant="default"
-                      className="text-[10px] font-black uppercase text-primary bg-secondary px-2.5 py-0.5 rounded-full shadow-xs border-0"
-                    >
-                      Partida Encerrada
-                    </Badge>
-                  </LayoutContainer>
-
-                  <LayoutContainer className="grid grid-cols-2 gap-4">
-                    <LayoutContainer className="space-y-1">
-                      <Text className="text-xs font-bold text-text-primary">
-                        {MATCH_DRAWER.SCORE_PELOTAS_LABEL}
-                      </Text>
-                      <Input
-                        type="number"
-                        min={0}
-                        placeholder="0"
-                        {...register('pelotasScore')}
-                      />
-                    </LayoutContainer>
-
-                    <LayoutContainer className="space-y-1">
-                      <Text className="text-xs font-bold text-text-primary">
-                        {MATCH_DRAWER.SCORE_OPPONENT_LABEL}
-                      </Text>
-                      <Input
-                        type="number"
-                        min={0}
-                        placeholder="0"
-                        {...register('opponentScore')}
-                      />
-                    </LayoutContainer>
-                  </LayoutContainer>
-
-                  {/* Disputa de Pênaltis Opcionais */}
-                  <LayoutContainer className="border-t border-secondary/20 pt-3 space-y-2">
-                    <Text className="text-xs font-semibold text-text-secondary block">
-                      Disputa de Pênaltis (Caso tenha havido empate/mata-mata)
-                    </Text>
-                    <LayoutContainer className="grid grid-cols-2 gap-4">
-                      <LayoutContainer className="space-y-1">
-                        <Text className="text-xs font-semibold text-text-secondary">
-                          {MATCH_DRAWER.PENALTIES_PELOTAS_LABEL}
+                    <LayoutContainer>
+                      <LayoutContainer className="flex items-center gap-2">
+                        <Text className="text-xs font-black text-text-primary uppercase tracking-wider">
+                          {MATCHES_CONSTANTS.ADMIN.SCORE_MODAL.SUMMARY_TITLE}
                         </Text>
-                        <Input
-                          type="number"
-                          min={0}
-                          placeholder="0"
-                          {...register('penaltyPelotasScore')}
-                        />
+                        <Badge
+                          variant="default"
+                          className="text-[9px] font-black uppercase text-primary bg-secondary px-2 py-0.5 rounded-full border-0 shadow-2xs"
+                        >
+                          Partida Encerrada
+                        </Badge>
                       </LayoutContainer>
 
-                      <LayoutContainer className="space-y-1">
-                        <Text className="text-xs font-semibold text-text-secondary">
-                          {MATCH_DRAWER.PENALTIES_OPPONENT_LABEL}
+                      {pelotasScore !== null && opponentScore !== null ? (
+                        <LayoutContainer className="flex items-center gap-2 mt-0.5 flex-wrap">
+                          <Text className="text-sm font-black text-secondary">
+                            Pelotas {pelotasScore} x {opponentScore} {selectedOpponentName || 'Adversário'}
+                          </Text>
+                          {penaltyPelotas !== null && penaltyOpponent !== null && (
+                            <Badge
+                              variant="default"
+                              className="text-[10px] font-bold border-secondary/40 text-secondary bg-secondary/15 px-2 py-0"
+                            >
+                              (Pên: {penaltyPelotas} x {penaltyOpponent})
+                            </Badge>
+                          )}
+                        </LayoutContainer>
+                      ) : (
+                        <Text className="text-xs text-orange-500 font-semibold mt-0.5">
+                          {MATCHES_CONSTANTS.ADMIN.SCORE_MODAL.SUMMARY_EMPTY}
                         </Text>
-                        <Input
-                          type="number"
-                          min={0}
-                          placeholder="0"
-                          {...register('penaltyOpponentScore')}
-                        />
-                      </LayoutContainer>
+                      )}
                     </LayoutContainer>
                   </LayoutContainer>
+
+                  <Button
+                    type="button"
+                    variant="custom"
+                    size="none"
+                    onClick={handleOpenScoreModal}
+                    className="px-3.5 py-2 rounded-xl bg-secondary text-primary hover:bg-secondary-hover font-bold text-xs flex items-center gap-1.5 shadow-xs cursor-pointer shrink-0 transition-transform active:scale-95"
+                  >
+                    <Edit3 size={14} />
+                    {pelotasScore !== null && opponentScore !== null
+                      ? MATCHES_CONSTANTS.ADMIN.SCORE_MODAL.SUMMARY_EDIT_BUTTON
+                      : MATCHES_CONSTANTS.ADMIN.SCORE_MODAL.SUMMARY_DEFINE_BUTTON}
+                  </Button>
                 </LayoutContainer>
               )}
 
@@ -455,6 +436,21 @@ export const AdminMatchModal: React.FC<AdminMatchModalProps> = ({
           initialName={quickClubInitialName}
           onSuccess={handleQuickClubSuccess}
           isQuickMode={true}
+        />
+      )}
+
+      {/* Modal Dedicado para Lançar Placar Oficial & Pênaltis */}
+      {isScoreModalOpen && (
+        <AdminMatchScoreModal
+          isOpen={isScoreModalOpen}
+          opponentName={selectedOpponentName}
+          opponentLogoUrl={opponentLogoUrl}
+          initialPelotasScore={pelotasScore}
+          initialOpponentScore={opponentScore}
+          initialPenaltyPelotasScore={penaltyPelotas}
+          initialPenaltyOpponentScore={penaltyOpponent}
+          onConfirm={handleSaveScore}
+          onClose={handleCloseScoreModal}
         />
       )}
     </>
