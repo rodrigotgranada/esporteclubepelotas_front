@@ -6,6 +6,7 @@ import {
   Text,
   Badge,
   Button,
+  Input,
 } from '@/shared/ui/components/atoms';
 import { Search, X, ChevronDown, PlusCircle, Building2 } from 'lucide-react';
 import { SafeImage } from '@/shared/ui/components/molecules/SafeImage';
@@ -107,20 +108,24 @@ export const OpponentSearchCombobox: React.FC<OpponentSearchComboboxProps> = ({
           }`}
         />
 
-        <LayoutContainer className="absolute right-2.5 flex items-center gap-1">
+        <LayoutContainer className="absolute right-2.5 flex items-center gap-1 z-10">
           {value && (
-            <button
+            <Button
               type="button"
+              variant="custom"
+              size="none"
               onClick={handleClear}
               className="p-1 rounded-lg text-text-muted hover:text-text-primary hover:bg-surface-hover transition-colors cursor-pointer"
               title="Limpar seleção"
             >
               <X size={15} />
-            </button>
+            </Button>
           )}
 
-          <button
+          <Button
             type="button"
+            variant="custom"
+            size="none"
             onClick={() => setIsOpen((prev) => !prev)}
             className="p-1 rounded-lg text-text-muted hover:text-text-primary hover:bg-surface-hover transition-colors cursor-pointer"
             title="Abrir catálogo de clubes"
@@ -129,7 +134,7 @@ export const OpponentSearchCombobox: React.FC<OpponentSearchComboboxProps> = ({
               size={16}
               className={`transition-transform duration-200 ${isOpen ? 'rotate-180 text-secondary' : ''}`}
             />
-          </button>
+          </Button>
         </LayoutContainer>
       </LayoutContainer>
 
@@ -157,9 +162,11 @@ export const OpponentSearchCombobox: React.FC<OpponentSearchComboboxProps> = ({
                   (club.shortName && club.shortName.toLowerCase() === value.toLowerCase());
 
                 return (
-                  <button
+                  <Button
                     key={club.id}
                     type="button"
+                    variant="custom"
+                    size="none"
                     onClick={() => handleSelect(club)}
                     className={`w-full text-left px-3.5 py-2.5 flex items-center justify-between gap-3 transition-colors cursor-pointer ${
                       isSelected
@@ -218,7 +225,7 @@ export const OpponentSearchCombobox: React.FC<OpponentSearchComboboxProps> = ({
                         Selecionado
                       </Badge>
                     )}
-                  </button>
+                  </Button>
                 );
               })
             ) : (

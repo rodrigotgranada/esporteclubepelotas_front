@@ -11,8 +11,6 @@ import { MATCHES_CONSTANTS, DEFAULT_OPPONENT_BADGE } from '../constants/matches.
 import { OpponentClub } from '@/features/opponents/types/opponents.types';
 import { opponentsService } from '@/features/opponents/services/opponents.service';
 
-export type MatchModalTab = 'match' | 'score';
-
 export interface UseAdminMatchModalProps {
   match: Match | null;
   championships: Championship[];
@@ -27,7 +25,6 @@ export const useAdminMatchModal = ({
   onSuccess,
 }: UseAdminMatchModalProps) => {
   const inFlightRef = useRef(false);
-  const [activeTab, setActiveTab] = useState<MatchModalTab>('match');
   const [isSaving, setIsSaving] = useState(false);
 
   // Catálogo de Clubes Adversários
@@ -87,8 +84,6 @@ export const useAdminMatchModal = ({
 
   // Resetar formulário ao abrir/mudar match
   useEffect(() => {
-    setActiveTab('match');
-
     if (match) {
       let formattedDate = '';
       try {
@@ -162,11 +157,11 @@ export const useAdminMatchModal = ({
 
   // Alterar Mando de Campo com automação de local
   const handleHomeAwayChange = (mando: HomeAway) => {
-    setValue('homeAway', mando);
+    setValue('homeAway', mando, { shouldValidate: true, shouldDirty: true });
 
     if (mando === 'HOME') {
-      setValue('stadiumName', 'Estádio Boca do Lobo');
-      setValue('city', 'Pelotas - RS');
+      setValue('stadiumName', 'Estádio Boca do Lobo', { shouldValidate: true, shouldDirty: true });
+      setValue('city', 'Pelotas - RS', { shouldValidate: true, shouldDirty: true });
     } else {
       // Tentar encontrar o clube selecionado para preencher estádio/cidade
       const found = opponents.find(
@@ -174,11 +169,11 @@ export const useAdminMatchModal = ({
           (c.shortName && c.shortName.toLowerCase() === currentOpponentName.toLowerCase())
       );
       if (found) {
-        if (found.stadiumName) setValue('stadiumName', found.stadiumName);
-        if (found.city) setValue('city', found.city);
+        if (found.stadiumName) setValue('stadiumName', found.stadiumName, { shouldValidate: true, shouldDirty: true });
+        if (found.city) setValue('city', found.city, { shouldValidate: true, shouldDirty: true });
       } else {
-        setValue('stadiumName', '');
-        setValue('city', '');
+        setValue('stadiumName', '', { shouldValidate: true });
+        setValue('city', '', { shouldValidate: true });
       }
     }
   };
@@ -216,17 +211,18 @@ export const useAdminMatchModal = ({
 
       const dateUtc = new Date(values.matchDate).toISOString();
 
-      // No cadastro novo, placar é estritamente null conforme exigência
-      const pelotasScore = isEditing && values.pelotasScore !== null && values.pelotasScore !== undefined
+      // Placar só é gravado quando o status for FINISHED (Encerrado), tanto na criação quanto na edição!
+      const isFinished = values.status === 'FINISHED';
+      const pelotasScore = isFinished && values.pelotasScore !== null && values.pelotasScore !== undefined && !Number.isNaN(Number(values.pelotasScore))
         ? Number(values.pelotasScore)
         : null;
-      const opponentScore = isEditing && values.opponentScore !== null && values.opponentScore !== undefined
+      const opponentScore = isFinished && values.opponentScore !== null && values.opponentScore !== undefined && !Number.isNaN(Number(values.opponentScore))
         ? Number(values.opponentScore)
         : null;
-      const penaltyPelotas = isEditing && values.penaltyPelotasScore !== null && values.penaltyPelotasScore !== undefined
+      const penaltyPelotas = isFinished && values.penaltyPelotasScore !== null && values.penaltyPelotasScore !== undefined && !Number.isNaN(Number(values.penaltyPelotasScore))
         ? Number(values.penaltyPelotasScore)
         : null;
-      const penaltyOpponent = isEditing && values.penaltyOpponentScore !== null && values.penaltyOpponentScore !== undefined
+      const penaltyOpponent = isFinished && values.penaltyOpponentScore !== null && values.penaltyOpponentScore !== undefined && !Number.isNaN(Number(values.penaltyOpponentScore))
         ? Number(values.penaltyOpponentScore)
         : null;
 
@@ -274,8 +270,6 @@ export const useAdminMatchModal = ({
   return {
     form,
     isEditing,
-    activeTab,
-    setActiveTab,
     isSaving,
     // Catálogo de Oponentes
     opponents,
