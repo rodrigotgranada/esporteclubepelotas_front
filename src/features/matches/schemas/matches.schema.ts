@@ -36,6 +36,7 @@ export const homeAwaySchema = z.enum(['HOME', 'AWAY'], {
 
 export const matchSchema = z.object({
   championshipId: z.string().min(1, 'Selecione o campeonato oficial'),
+  opponentClubId: z.string().trim().optional(),
   opponentName: z.string().trim().min(2, 'Nome do adversário deve ter pelo menos 2 caracteres'),
   opponentLogoUrl: z.string().trim().optional(),
   homeAway: homeAwaySchema,

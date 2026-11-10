@@ -180,3 +180,4 @@ export const useAdminMatchNarrator = ({ matchId }: UseAdminMatchNarratorProps) =
     loadLiveDetails,
   };
 };
+

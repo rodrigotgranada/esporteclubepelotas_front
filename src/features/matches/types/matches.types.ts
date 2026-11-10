@@ -38,7 +38,9 @@ export interface Match {
   championshipId: string;
   championshipName?: string;
   seasonYear?: number;
+  opponentClubId?: string | null;
   opponentName: string;
+  opponentShortName?: string | null;
   opponentLogoUrl?: string | null;
   homeAway: HomeAway;
   stadiumName: string;
@@ -145,6 +147,7 @@ export interface ChampionshipFormData {
 
 export interface MatchFormData {
   championshipId: string;
+  opponentClubId?: string;
   opponentName: string;
   opponentLogoUrl?: string;
   homeAway: HomeAway;

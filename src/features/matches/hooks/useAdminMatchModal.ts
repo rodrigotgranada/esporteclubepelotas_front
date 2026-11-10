@@ -42,6 +42,7 @@ export const useAdminMatchModal = ({
     resolver: zodResolver(matchSchema),
     defaultValues: {
       championshipId: championships[0]?.id || '',
+      opponentClubId: '',
       opponentName: '',
       opponentLogoUrl: '',
       homeAway: 'HOME',
@@ -97,10 +98,22 @@ export const useAdminMatchModal = ({
         formattedDate = new Date().toISOString().slice(0, 16);
       }
 
+      const matchedClub = opponents.find(
+        (c) =>
+          (match.opponentClubId && c.id === match.opponentClubId) ||
+          c.name.toLowerCase() === match.opponentName.toLowerCase() ||
+          (c.shortName && c.shortName.toLowerCase() === match.opponentName.toLowerCase())
+      );
+      const resolvedLogo =
+        match.opponentLogoUrl && match.opponentLogoUrl !== DEFAULT_OPPONENT_BADGE && match.opponentLogoUrl !== '/images/pelotas-logo.png'
+          ? match.opponentLogoUrl
+          : (matchedClub?.badgeUrl || DEFAULT_OPPONENT_BADGE);
+
       form.reset({
         championshipId: match.championshipId,
+        opponentClubId: match.opponentClubId || matchedClub?.id || '',
         opponentName: match.opponentName,
-        opponentLogoUrl: match.opponentLogoUrl || '',
+        opponentLogoUrl: resolvedLogo,
         homeAway: match.homeAway,
         stadiumName: match.stadiumName,
         city: match.city || '',
@@ -122,6 +135,7 @@ export const useAdminMatchModal = ({
     } else {
       form.reset({
         championshipId: championships[0]?.id || '',
+        opponentClubId: '',
         opponentName: '',
         opponentLogoUrl: '',
         homeAway: 'HOME',
@@ -147,14 +161,19 @@ export const useAdminMatchModal = ({
 
   // Selecionar um clube adversário do catálogo
   const handleSelectOpponentClub = (club: OpponentClub) => {
-    setValue('opponentName', club.name, { shouldValidate: true });
-    const badge = club.badgeUrl || DEFAULT_OPPONENT_BADGE;
-    setValue('opponentLogoUrl', badge);
+    setValue('opponentClubId', club.id, { shouldDirty: true });
+    // Usar shortName (ex: "Caxias") se cadastrado, ou nome completo
+    const displayName = club.shortName?.trim() || club.name;
+    setValue('opponentName', displayName, { shouldValidate: true, shouldDirty: true });
+    const badge = (club.badgeUrl && club.badgeUrl.trim() !== '' && club.badgeUrl !== DEFAULT_OPPONENT_BADGE && club.badgeUrl !== '/images/pelotas-logo.png')
+      ? club.badgeUrl
+      : DEFAULT_OPPONENT_BADGE;
+    setValue('opponentLogoUrl', badge, { shouldDirty: true });
 
     // Se o mando for fora (visitante), preenche automaticamente com o estádio e cidade do adversário
     if (currentHomeAway === 'AWAY') {
-      if (club.stadiumName) setValue('stadiumName', club.stadiumName);
-      if (club.city) setValue('city', club.city);
+      if (club.stadiumName) setValue('stadiumName', club.stadiumName, { shouldValidate: true, shouldDirty: true });
+      if (club.city) setValue('city', club.city, { shouldValidate: true, shouldDirty: true });
     }
   };
 
@@ -243,8 +262,18 @@ export const useAdminMatchModal = ({
     try {
       let finalLogoUrl = values.opponentLogoUrl || '';
 
-      if (!finalLogoUrl || !finalLogoUrl.trim() || finalLogoUrl === '/images/pelotas-logo.png') {
-        finalLogoUrl = DEFAULT_OPPONENT_BADGE;
+      if (!finalLogoUrl || !finalLogoUrl.trim() || finalLogoUrl === '/images/pelotas-logo.png' || finalLogoUrl === DEFAULT_OPPONENT_BADGE) {
+        const matched = opponents.find(
+          (c) =>
+            (values.opponentClubId && c.id === values.opponentClubId) ||
+            c.name.toLowerCase() === values.opponentName.trim().toLowerCase() ||
+            (c.shortName && c.shortName.toLowerCase() === values.opponentName.trim().toLowerCase())
+        );
+        if (matched?.badgeUrl && matched.badgeUrl.trim() !== '' && matched.badgeUrl !== DEFAULT_OPPONENT_BADGE && matched.badgeUrl !== '/images/pelotas-logo.png') {
+          finalLogoUrl = matched.badgeUrl;
+        } else {
+          finalLogoUrl = DEFAULT_OPPONENT_BADGE;
+        }
       }
 
       const dateUtc = new Date(values.matchDate).toISOString();
@@ -266,6 +295,7 @@ export const useAdminMatchModal = ({
 
       const payload: MatchFormData = {
         championshipId: values.championshipId,
+        opponentClubId: values.opponentClubId || undefined,
         opponentName: values.opponentName.trim(),
         opponentLogoUrl: finalLogoUrl.trim() || undefined,
         homeAway: values.homeAway as HomeAway,

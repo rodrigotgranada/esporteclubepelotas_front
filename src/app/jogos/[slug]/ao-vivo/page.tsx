@@ -16,3 +16,4 @@ export default async function MatchLivePage({ params }: Props) {
   const { slug } = await params;
   return <PublicMatchLiveFeature slugOrId={slug} />;
 }
+

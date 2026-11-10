@@ -84,3 +84,4 @@ export const usePublicMatchLive = ({ slugOrId }: UsePublicMatchLiveProps) => {
     reload: loadLiveDetails,
   };
 };
+

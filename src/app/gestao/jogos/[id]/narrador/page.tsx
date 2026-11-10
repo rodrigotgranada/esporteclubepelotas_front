@@ -16,3 +16,4 @@ export default async function AdminMatchNarratorPage({ params }: Props) {
   const { id } = await params;
   return <AdminMatchNarratorFeature matchId={id} />;
 }
+

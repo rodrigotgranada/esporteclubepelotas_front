@@ -302,3 +302,4 @@ export const AdminMatchEventModal: React.FC<AdminMatchEventModalProps> = ({
     </Modal>
   );
 };
+
