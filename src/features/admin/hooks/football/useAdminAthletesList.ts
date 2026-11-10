@@ -7,7 +7,7 @@ import { AthleteData, AthleteType } from '@/features/football/services/football.
 import { ADMIN_FOOTBALL_CONSTANTS } from '../../constants/admin-football.constants';
 
 export interface UseAdminAthletesListOptions {
-  scope?: 'PROFESSIONAL' | 'YOUTH';
+  scope?: 'PROFESSIONAL' | 'YOUTH' | 'FEMALE';
   defaultAthleteType?: '' | AthleteType;
 }
 

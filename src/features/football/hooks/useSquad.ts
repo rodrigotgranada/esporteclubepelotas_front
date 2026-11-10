@@ -8,7 +8,7 @@ import {
   SquadData,
 } from '../services/football.service';
 
-const SENIOR_CATEGORIES: SquadCategory[] = ['PROFESSIONAL', 'FEMININE'];
+const SENIOR_CATEGORIES: SquadCategory[] = ['PROFESSIONAL'];
 
 export const useSquad = (initialCategory: SquadCategory = 'PROFESSIONAL') => {
   const searchParams = useSearchParams();

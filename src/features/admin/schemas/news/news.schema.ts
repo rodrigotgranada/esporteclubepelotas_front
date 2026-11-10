@@ -23,6 +23,7 @@ export const newsArticleSchema = z.object({
   featuredSlot: z.enum(['MAIN', 'SECONDARY', 'NONE'] as const),
   isPinned: z.boolean(),
   isYouth: z.boolean(),
+  isFemale: z.boolean().optional(),
   showOnHomepage: z.boolean(),
   reporterName: z.string().trim().optional(),
   photographerName: z.string().trim().optional(),
@@ -33,4 +34,3 @@ export const newsArticleSchema = z.object({
 });
 
 export type NewsArticleFormData = z.infer<typeof newsArticleSchema>;
-

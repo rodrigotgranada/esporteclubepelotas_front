@@ -10,8 +10,9 @@ import {
 } from '../../services/admin-news.service';
 import { ADMIN_NEWS_TEXTS } from '../../constants/admin-news.constants';
 
-export const useAdminNewsList = (options?: { fixedIsYouth?: boolean }) => {
+export const useAdminNewsList = (options?: { fixedIsYouth?: boolean; fixedIsFemale?: boolean }) => {
   const fixedIsYouth = options?.fixedIsYouth;
+  const fixedIsFemale = options?.fixedIsFemale;
   const [news, setNews] = useState<NewsArticleData[]>([]);
   const [categories, setCategories] = useState<NewsCategoryData[]>([]);
   const [total, setTotal] = useState(0);
@@ -61,6 +62,7 @@ export const useAdminNewsList = (options?: { fixedIsYouth?: boolean }) => {
         if (featuredFilter === 'YES') params.isFeatured = true;
         if (featuredFilter === 'NO') params.isFeatured = false;
         if (typeof fixedIsYouth === 'boolean') params.isYouth = fixedIsYouth;
+        if (typeof fixedIsFemale === 'boolean') params.isFemale = fixedIsFemale;
 
         const res = await adminNewsService.getNews(params);
         setNews(res.data);
@@ -77,7 +79,7 @@ export const useAdminNewsList = (options?: { fixedIsYouth?: boolean }) => {
         }
       }
     },
-    [page, limit, search, categoryFilter, statusFilter, featuredFilter, fixedIsYouth],
+    [page, limit, search, categoryFilter, statusFilter, featuredFilter, fixedIsYouth, fixedIsFemale],
   );
 
   useEffect(() => {

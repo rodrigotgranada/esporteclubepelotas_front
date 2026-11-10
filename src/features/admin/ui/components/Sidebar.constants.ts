@@ -10,6 +10,7 @@ export const SIDEBAR_TEXTS = {
     OPPONENTS: 'Clubes Adversários',
     FOOTBALL: 'Futebol & Elenco',
     YOUTH: 'Categorias de Base',
+    FEMALE: 'Futebol Feminino',
     IDOLS: 'Ídolos & Memorial',
     TIMELINE: 'História & Linha do Tempo',
     ANTHEM: 'Hino Oficial',

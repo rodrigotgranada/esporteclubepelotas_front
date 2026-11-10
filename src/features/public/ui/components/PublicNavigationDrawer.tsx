@@ -19,6 +19,7 @@ import {
   ChevronRight,
   Newspaper,
   Shield,
+  Crown,
   Trophy,
   Users,
   History,
@@ -321,7 +322,44 @@ export const PublicNavigationDrawer: React.FC<PublicNavigationDrawerProps> = ({
               </LayoutContainer>
             </LayoutContainer>
 
-            {/* 5. Navigation Section: O Clube & Memória */}
+            {/* 5. Navigation Section: Futebol Feminino (As Lobas) */}
+            <LayoutContainer className="flex flex-col gap-2">
+              <Text className="text-[11px] font-extrabold text-text-secondary uppercase tracking-wider px-1">
+                {PUBLIC_DRAWER_TEXTS.SECTION_FEMALE}
+              </Text>
+
+              <LayoutContainer className="grid grid-cols-2 gap-2">
+                <Link
+                  href="/feminino"
+                  onClick={onClose}
+                  className="p-3.5 rounded-xl bg-surface/70 hover:bg-surface border border-border/80 hover:border-primary/50 flex flex-col gap-2 transition-all group"
+                >
+                  <LayoutContainer className="flex items-center justify-between">
+                    <Crown className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
+                    <ChevronRight className="w-3.5 h-3.5 text-text-secondary/60 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
+                  </LayoutContainer>
+                  <Text as="span" className="text-xs font-bold text-text-primary group-hover:text-primary transition-colors">
+                    {PUBLIC_DRAWER_TEXTS.LINK_FEMALE}
+                  </Text>
+                </Link>
+
+                <Link
+                  href="/feminino/elencos"
+                  onClick={onClose}
+                  className="p-3.5 rounded-xl bg-surface/70 hover:bg-surface border border-border/80 hover:border-primary/50 flex flex-col gap-2 transition-all group"
+                >
+                  <LayoutContainer className="flex items-center justify-between">
+                    <Users className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
+                    <ChevronRight className="w-3.5 h-3.5 text-text-secondary/60 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
+                  </LayoutContainer>
+                  <Text as="span" className="text-xs font-bold text-text-primary group-hover:text-primary transition-colors">
+                    {PUBLIC_DRAWER_TEXTS.LINK_FEMALE_SQUADS}
+                  </Text>
+                </Link>
+              </LayoutContainer>
+            </LayoutContainer>
+
+            {/* 6. Navigation Section: O Clube & Memória */}
             <LayoutContainer className="flex flex-col gap-2">
               <Text className="text-[11px] font-extrabold text-text-secondary uppercase tracking-wider px-1">
                 {PUBLIC_DRAWER_TEXTS.SECTION_CLUB}

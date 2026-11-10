@@ -16,6 +16,7 @@ import { athleteSchema, AthleteFormData } from '../../schemas/football/athlete.s
 export const useAdminAthleteDrawer = (
   onSuccess: () => void,
   defaultAthleteType: AthleteType = 'PROFESSIONAL',
+  defaultGender: 'MALE' | 'FEMALE' = 'MALE',
 ) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [editingAthleteId, setEditingAthleteId] = useState<string | null>(null);
@@ -28,7 +29,7 @@ export const useAdminAthleteDrawer = (
   const form = useForm<AthleteFormData>({
     resolver: zodResolver(athleteSchema),
     defaultValues: {
-      gender: 'MALE',
+      gender: defaultGender,
       athleteType: defaultAthleteType,
       youthCategory: defaultAthleteType === 'YOUTH' ? 'SUB_20' : '',
       entryYear: defaultAthleteType === 'YOUTH' ? String(new Date().getFullYear()) : '',
@@ -53,12 +54,12 @@ export const useAdminAthleteDrawer = (
   const [photoUrl, setPhotoUrl] = useState<string>('');
   const [pendingPhotoFile, setPendingPhotoFile] = useState<File | null>(null);
 
-  const resetForm = (targetType: AthleteType = defaultAthleteType) => {
+  const resetForm = (targetType: AthleteType = defaultAthleteType, targetGender: 'MALE' | 'FEMALE' = defaultGender) => {
     setEditingAthleteId(null);
     setPhotoUrl('');
     setPendingPhotoFile(null);
     form.reset({
-      gender: 'MALE',
+      gender: targetGender,
       athleteType: targetType,
       youthCategory: targetType === 'YOUTH' ? 'SUB_20' : '',
       entryYear: targetType === 'YOUTH' ? String(new Date().getFullYear()) : '',
@@ -80,7 +81,7 @@ export const useAdminAthleteDrawer = (
   };
 
   const openCreate = () => {
-    resetForm(defaultAthleteType);
+    resetForm(defaultAthleteType, defaultGender);
     setIsOpen(true);
   };
 

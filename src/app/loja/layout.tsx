@@ -8,3 +8,4 @@ export default function LojaLayout({
 }) {
   return <PublicLayout>{children}</PublicLayout>;
 }
+

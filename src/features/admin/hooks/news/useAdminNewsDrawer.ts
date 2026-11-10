@@ -37,6 +37,7 @@ const defaultNewsValues: NewsArticleFormData = {
   featuredSlot: 'NONE',
   isPinned: false,
   isYouth: false,
+  isFemale: false,
   showOnHomepage: true,
   reporterName: '',
   photographerName: '',
@@ -51,6 +52,7 @@ export const useAdminNewsDrawer = (
   isOpen: boolean,
   onSuccess: () => void,
   defaultIsYouth: boolean = false,
+  defaultIsFemale: boolean = false,
 ) => {
   const [isLoading, setIsLoading] = useState(false);
   const [categories, setCategories] = useState<NewsCategoryData[]>([]);
@@ -65,7 +67,8 @@ export const useAdminNewsDrawer = (
     defaultValues: {
       ...defaultNewsValues,
       isYouth: defaultIsYouth,
-      showOnHomepage: !defaultIsYouth,
+      isFemale: defaultIsFemale,
+      showOnHomepage: !(defaultIsYouth || defaultIsFemale),
     },
   });
 
@@ -171,7 +174,8 @@ export const useAdminNewsDrawer = (
     form.reset({
       ...defaultNewsValues,
       isYouth: defaultIsYouth,
-      showOnHomepage: !defaultIsYouth,
+      isFemale: defaultIsFemale,
+      showOnHomepage: !(defaultIsYouth || defaultIsFemale),
       categoryId: categories[0]?._id || '',
     });
     setCoverFile(null);
@@ -179,7 +183,7 @@ export const useAdminNewsDrawer = (
     setGalleryPreviews([]);
     setGalleryCropItem(null);
     setTagInput('');
-  }, [form, defaultIsYouth, categories]);
+  }, [form, defaultIsYouth, defaultIsFemale, categories]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -210,6 +214,7 @@ export const useAdminNewsDrawer = (
           featuredSlot: art.featuredSlot || (art.isFeatured ? 'MAIN' : 'NONE'),
           isPinned: Boolean(art.isPinned),
           isYouth: Boolean(art.isYouth),
+          isFemale: Boolean(art.isFemale),
           showOnHomepage: art.showOnHomepage ?? true,
           reporterName: art.reporterName || '',
           photographerName: art.photographerName || '',
@@ -229,7 +234,7 @@ export const useAdminNewsDrawer = (
       .finally(() => {
         setIsLoading(false);
       });
-  }, [isOpen, articleId, defaultIsYouth, form, loadCategories, resetForm]);
+  }, [isOpen, articleId, defaultIsYouth, defaultIsFemale, form, loadCategories, resetForm]);
 
   const handleAddTag = () => {
     const trimmed = tagInput.trim().replace(/^#/, '');
@@ -442,7 +447,8 @@ export const useAdminNewsDrawer = (
             featuredSlot: data.featuredSlot,
             isPinned: data.isPinned,
             isYouth: data.isYouth,
-            showOnHomepage: data.isYouth ? data.showOnHomepage : true,
+            isFemale: data.isFemale,
+            showOnHomepage: (data.isYouth || data.isFemale) ? data.showOnHomepage : true,
             reporterName: data.reporterName?.trim() || undefined,
             photographerName: data.photographerName?.trim() || undefined,
             allowReactions: data.allowReactions,

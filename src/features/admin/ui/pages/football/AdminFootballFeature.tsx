@@ -34,7 +34,7 @@ export const AdminFootballFeature: React.FC = () => {
   const squadsList = useAdminSquadsList({ scope: 'PROFESSIONAL' });
 
   // Hooks de Drawers
-  const athleteDrawer = useAdminAthleteDrawer(() => athletesList.reload(), 'PROFESSIONAL');
+  const athleteDrawer = useAdminAthleteDrawer(() => athletesList.reload(), 'PROFESSIONAL', 'MALE');
   const squadDrawer = useAdminSquadDrawer(() => squadsList.reload(), 'PROFESSIONAL');
   const squadMembersDrawer = useAdminSquadMembersDrawer(() => squadsList.reload());
 
@@ -164,7 +164,6 @@ export const AdminFootballFeature: React.FC = () => {
                 >
                   <Option value="">{texts.SQUADS_TAB.ALL_CATEGORIES}</Option>
                   <Option value="PROFESSIONAL">{FOOTBALL_CONSTANTS.CATEGORIES.PROFESSIONAL}</Option>
-                  <Option value="FEMININE">{FOOTBALL_CONSTANTS.CATEGORIES.FEMININE}</Option>
                 </Select>
               </LayoutContainer>
             </LayoutContainer>
@@ -242,7 +241,7 @@ export const AdminFootballFeature: React.FC = () => {
         onAddStaff={squadDrawer.handleAddStaff}
         onRemoveStaff={squadDrawer.handleRemoveStaff}
         existingCompetitions={existingCompetitions}
-        allowedCategories={['PROFESSIONAL', 'FEMININE']}
+        allowedCategories={['PROFESSIONAL']}
         championships={squadDrawer.championships}
         coaches={squadDrawer.coaches}
         onChampionshipChange={squadDrawer.handleChampionshipChange}

@@ -47,6 +47,7 @@ export interface NewsEditorDrawerProps {
   articleId: string | null;
   onSaveSuccess: () => void;
   defaultIsYouth?: boolean;
+  defaultIsFemale?: boolean;
 }
 
 export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
@@ -55,6 +56,7 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
   articleId,
   onSaveSuccess,
   defaultIsYouth = false,
+  defaultIsFemale = false,
 }) => {
   const { DRAWER: texts, STATUS_MAP, MODAL_REPLACE_MAIN: replaceMainTexts } = ADMIN_NEWS_TEXTS;
 
@@ -89,7 +91,7 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
     discardDraft,
     handleCategoryCreated,
     handleSave,
-  } = useAdminNewsDrawer(articleId, isOpen, onSaveSuccess, defaultIsYouth);
+  } = useAdminNewsDrawer(articleId, isOpen, onSaveSuccess, defaultIsYouth, defaultIsFemale);
 
   const {
     register,
@@ -121,6 +123,7 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
   const featuredSlot = watch('featuredSlot');
   const isPinned = watch('isPinned');
   const isYouth = watch('isYouth');
+  const isFemale = watch('isFemale');
   const showOnHomepage = watch('showOnHomepage');
   const reporterName = watch('reporterName') || '';
   const photographerName = watch('photographerName') || '';
@@ -214,7 +217,12 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
                   render={({ field }) => (
                     <Switch
                       checked={field.value}
-                      onChange={field.onChange}
+                      onChange={(checked) => {
+                        field.onChange(checked);
+                        if (checked) {
+                          setValue('isFemale', false);
+                        }
+                      }}
                       aria-label={texts.SWITCH_IS_YOUTH_LABEL}
                     />
                   )}
@@ -223,6 +231,45 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
 
               <Text as="p" className="text-xs text-text-muted leading-relaxed">
                 {texts.SWITCH_IS_YOUTH_DESC}
+              </Text>
+            </LayoutContainer>
+
+            {/* Classificação: Matéria do Futebol Feminino (As Lobas) */}
+            <LayoutContainer
+              className={`p-4 rounded-2xl border transition-all duration-300 flex flex-col gap-2 ${
+                isFemale ? 'bg-primary/10 border-primary/40 shadow-xs' : 'bg-surface border-border'
+              }`}
+            >
+              <LayoutContainer className="flex items-center justify-between">
+                <LayoutContainer className="flex items-center gap-2">
+                  <Text as="span" className="text-sm font-bold text-text-primary">
+                    {texts.SWITCH_IS_FEMALE_LABEL}
+                  </Text>
+                  <Badge variant={isFemale ? 'primary' : 'default'} size="sm" className="font-extrabold text-[10px] uppercase">
+                    {isFemale ? `👑 ${texts.BADGE_FEMALE_ACTIVE}` : texts.BADGE_PRO_ACTIVE}
+                  </Badge>
+                </LayoutContainer>
+
+                <Controller
+                  control={control}
+                  name="isFemale"
+                  render={({ field }) => (
+                    <Switch
+                      checked={Boolean(field.value)}
+                      onChange={(checked) => {
+                        field.onChange(checked);
+                        if (checked) {
+                          setValue('isYouth', false);
+                        }
+                      }}
+                      aria-label={texts.SWITCH_IS_FEMALE_LABEL}
+                    />
+                  )}
+                />
+              </LayoutContainer>
+
+              <Text as="p" className="text-xs text-text-muted leading-relaxed">
+                {texts.SWITCH_IS_FEMALE_DESC}
               </Text>
             </LayoutContainer>
 
@@ -412,8 +459,8 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
               setIsPinned={(val) => setValue('isPinned', val)}
             />
 
-            {/* Distribuição & Exibição da Matéria (Categoria de Base) */}
-            {isYouth && (
+            {/* Distribuição & Exibição da Matéria (Categoria de Base ou Futebol Feminino) */}
+            {(isYouth || isFemale) && (
               <LayoutContainer className="p-4 rounded-2xl bg-surface border border-border flex flex-col gap-3 animate-in fade-in duration-200">
                 <Text as="span" className="text-xs font-semibold text-text-primary uppercase tracking-wider flex items-center gap-1.5">
                   <Globe className="w-4 h-4 text-primary" />
@@ -434,7 +481,7 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
                 />
 
                 <LayoutContainer className="p-2.5 rounded-xl bg-primary/10 border border-primary/20 text-xs text-text-secondary mt-1">
-                  {texts.YOUTH_CATEGORY_NOTICE}
+                  {isYouth ? texts.YOUTH_CATEGORY_NOTICE : texts.FEMALE_CATEGORY_NOTICE}
                 </LayoutContainer>
               </LayoutContainer>
             )}

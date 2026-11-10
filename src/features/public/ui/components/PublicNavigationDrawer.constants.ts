@@ -21,6 +21,10 @@ export const PUBLIC_DRAWER_TEXTS = {
   LINK_YOUTH: 'Categorias de Base',
   LINK_YOUTH_SQUADS: 'Elencos',
 
+  SECTION_FEMALE: 'Futebol Feminino',
+  LINK_FEMALE: 'As Lobas',
+  LINK_FEMALE_SQUADS: 'Elencos',
+
   LINK_MATCHES: 'Jogos & Campeonatos',
   BADGE_COMING_SOON: 'Em breve',
 

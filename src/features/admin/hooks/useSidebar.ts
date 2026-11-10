@@ -4,7 +4,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useSystemModulesStore } from '@/store/useSystemModulesStore';
 import { startTransition, useEffect } from 'react';
-import { Home, Users, Settings, Layers, Shield, Newspaper, Trophy, Shirt, Sprout, History, Landmark, Handshake, UserCheck, Music, Sparkles, CalendarDays } from 'lucide-react';
+import { Home, Users, Settings, Layers, Shield, Newspaper, Trophy, Shirt, Sprout, Crown, History, Landmark, Handshake, UserCheck, Music, Sparkles, CalendarDays } from 'lucide-react';
 import { SIDEBAR_TEXTS } from '../ui/components/Sidebar.constants';
 
 export const useSidebar = () => {
@@ -38,6 +38,7 @@ export const useSidebar = () => {
     { label: SIDEBAR_TEXTS.NAV.OPPONENTS, href: '/gestao/clubes', icon: Shield, show: true },
     { label: SIDEBAR_TEXTS.NAV.FOOTBALL, href: '/gestao/football', icon: Shirt, show: true },
     { label: SIDEBAR_TEXTS.NAV.YOUTH, href: '/gestao/base', icon: Sprout, show: true },
+    { label: SIDEBAR_TEXTS.NAV.FEMALE, href: '/gestao/feminino', icon: Crown, show: true },
     { label: SIDEBAR_TEXTS.NAV.IDOLS, href: '/gestao/idols', icon: Trophy, show: true },
     { label: SIDEBAR_TEXTS.NAV.TIMELINE, href: '/gestao/timeline', icon: History, show: true },
     { label: SIDEBAR_TEXTS.NAV.ANTHEM, href: '/gestao/hino', icon: Music, show: true },

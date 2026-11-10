@@ -7,7 +7,7 @@ import { SquadData } from '@/features/football/services/football.service';
 import { ADMIN_FOOTBALL_CONSTANTS } from '../../constants/admin-football.constants';
 
 export interface UseAdminSquadsListOptions {
-  scope?: 'PROFESSIONAL' | 'YOUTH';
+  scope?: 'PROFESSIONAL' | 'YOUTH' | 'FEMALE';
 }
 
 export const useAdminSquadsList = (options?: UseAdminSquadsListOptions) => {
