@@ -18,6 +18,10 @@ export const useAdminOpponents = () => {
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   const [isLoading, setIsLoading] = useState(true);
 
+  // Paginação
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = OPPONENTS_CONSTANTS.TABLE.PAGINATION.ITEMS_PER_PAGE;
+
   // Modais de Criação/Edição e Exclusão
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedOpponent, setSelectedOpponent] = useState<OpponentClub | null>(null);
@@ -49,6 +53,16 @@ export const useAdminOpponents = () => {
       setSortField(field);
       setSortDirection('asc');
     }
+  };
+
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    setCurrentPage(1);
+  };
+
+  const handleStatusFilterChange = (status: OpponentStatusFilter) => {
+    setStatusFilter(status);
+    setCurrentPage(1);
   };
 
   // Filtragem e Ordenação Reativa
@@ -104,6 +118,33 @@ export const useAdminOpponents = () => {
     return result;
   }, [opponents, search, statusFilter, sortField, sortDirection]);
 
+  // Total de Páginas e Fatiamento da Página Atual
+  const totalPages = Math.max(1, Math.ceil(filteredAndSortedOpponents.length / itemsPerPage));
+  const safeCurrentPage = Math.min(currentPage, totalPages);
+
+  const paginatedOpponents = useMemo(() => {
+    const start = (safeCurrentPage - 1) * itemsPerPage;
+    return filteredAndSortedOpponents.slice(start, start + itemsPerPage);
+  }, [filteredAndSortedOpponents, safeCurrentPage, itemsPerPage]);
+
+  const goToPage = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
+  const nextPage = () => {
+    if (safeCurrentPage < totalPages) {
+      setCurrentPage(safeCurrentPage + 1);
+    }
+  };
+
+  const prevPage = () => {
+    if (safeCurrentPage > 1) {
+      setCurrentPage(safeCurrentPage - 1);
+    }
+  };
+
   const handleOpenCreate = () => {
     setSelectedOpponent(null);
     setIsModalOpen(true);
@@ -151,7 +192,7 @@ export const useAdminOpponents = () => {
   };
 
   return {
-    opponents: filteredAndSortedOpponents,
+    opponents: paginatedOpponents,
     totalCount: opponents.length,
     filteredCount: filteredAndSortedOpponents.length,
     search,
@@ -162,6 +203,14 @@ export const useAdminOpponents = () => {
     sortDirection,
     handleSort,
     isLoading,
+    currentPage: safeCurrentPage,
+    totalPages,
+    itemsPerPage,
+    goToPage,
+    nextPage,
+    prevPage,
+    onSearchChange: handleSearchChange,
+    onStatusFilterChange: handleStatusFilterChange,
     isModalOpen,
     selectedOpponent,
     isDeleteModalOpen,

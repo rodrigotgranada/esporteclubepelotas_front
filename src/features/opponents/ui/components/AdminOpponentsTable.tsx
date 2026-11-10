@@ -33,6 +33,12 @@ export interface AdminOpponentsTableProps {
   sortField: OpponentSortField;
   sortDirection: SortDirection;
   onSort: (field: OpponentSortField) => void;
+  currentPage: number;
+  totalPages: number;
+  itemsPerPage: number;
+  onNextPage: () => void;
+  onPrevPage: () => void;
+  onGoToPage: (page: number) => void;
   onOpenCreate: () => void;
   onEdit: (club: OpponentClub) => void;
   onDelete: (club: OpponentClub) => void;
@@ -49,6 +55,12 @@ export const AdminOpponentsTable: React.FC<AdminOpponentsTableProps> = ({
   sortField,
   sortDirection,
   onSort,
+  currentPage,
+  totalPages,
+  itemsPerPage,
+  onNextPage,
+  onPrevPage,
+  onGoToPage,
   onOpenCreate,
   onEdit,
   onDelete,
@@ -118,7 +130,9 @@ export const AdminOpponentsTable: React.FC<AdminOpponentsTableProps> = ({
                 className="cursor-pointer group select-none hover:text-secondary transition-colors"
               >
                 <LayoutContainer className="flex items-center">
-                  <span>{TABLE.NAME}</span>
+                  <Text className="font-semibold text-xs tracking-wider uppercase">
+                    {TABLE.NAME}
+                  </Text>
                   {renderSortIndicator('name')}
                 </LayoutContainer>
               </TableHead>
@@ -128,7 +142,9 @@ export const AdminOpponentsTable: React.FC<AdminOpponentsTableProps> = ({
                 className="cursor-pointer group select-none hover:text-secondary transition-colors"
               >
                 <LayoutContainer className="flex items-center">
-                  <span>{TABLE.SHORT_NAME}</span>
+                  <Text className="font-semibold text-xs tracking-wider uppercase">
+                    {TABLE.SHORT_NAME}
+                  </Text>
                   {renderSortIndicator('shortName')}
                 </LayoutContainer>
               </TableHead>
@@ -138,7 +154,9 @@ export const AdminOpponentsTable: React.FC<AdminOpponentsTableProps> = ({
                 className="cursor-pointer group select-none hover:text-secondary transition-colors"
               >
                 <LayoutContainer className="flex items-center">
-                  <span>{TABLE.CITY}</span>
+                  <Text className="font-semibold text-xs tracking-wider uppercase">
+                    {TABLE.CITY}
+                  </Text>
                   {renderSortIndicator('city')}
                 </LayoutContainer>
               </TableHead>
@@ -148,42 +166,57 @@ export const AdminOpponentsTable: React.FC<AdminOpponentsTableProps> = ({
                 className="cursor-pointer group select-none hover:text-secondary transition-colors"
               >
                 <LayoutContainer className="flex items-center">
-                  <span>{TABLE.STADIUM}</span>
+                  <Text className="font-semibold text-xs tracking-wider uppercase">
+                    {TABLE.STADIUM}
+                  </Text>
                   {renderSortIndicator('stadiumName')}
                 </LayoutContainer>
               </TableHead>
 
               <TableHead
                 onClick={() => onSort('isActive')}
-                className="cursor-pointer group select-none hover:text-secondary transition-colors"
+                className="cursor-pointer group select-none hover:text-secondary transition-colors w-24"
               >
                 <LayoutContainer className="flex items-center">
-                  <span>{TABLE.STATUS}</span>
+                  <Text className="font-semibold text-xs tracking-wider uppercase">
+                    {TABLE.STATUS}
+                  </Text>
                   {renderSortIndicator('isActive')}
                 </LayoutContainer>
               </TableHead>
 
-              <TableHead className="text-right">{TABLE.ACTIONS}</TableHead>
+              <TableHead className="text-right w-28">
+                <Text className="font-semibold text-xs tracking-wider uppercase">
+                  {TABLE.ACTIONS}
+                </Text>
+              </TableHead>
             </TableRow>
           </TableHeader>
+
           <TableBody>
             {opponents.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-10 text-text-muted text-sm">
-                  {TABLE.EMPTY_STATE}
+                <TableCell colSpan={7} className="text-center py-12">
+                  <Text className="text-sm text-text-muted">
+                    {TABLE.EMPTY_STATE}
+                  </Text>
                 </TableCell>
               </TableRow>
             ) : (
               opponents.map((club) => (
-                <TableRow key={club.id} className="hover:bg-surface-hover/50">
+                <TableRow
+                  key={club.id}
+                  className="hover:bg-surface-hover/40 transition-colors border-b border-border/40"
+                >
                   <TableCell>
-                    <LayoutContainer className="w-10 h-10 rounded-xl bg-surface-hover border border-border/60 flex items-center justify-center p-1 overflow-hidden shadow-xs">
+                    <LayoutContainer className="w-9 h-9 rounded-full bg-surface-card border border-border/80 flex items-center justify-center p-1 overflow-hidden shrink-0">
                       <SafeImage
                         src={club.badgeUrl || DEFAULT_CLUB_BADGE}
                         alt={club.name}
                         width={32}
                         height={32}
-                        className="object-contain max-h-8"
+                        className="object-contain w-full h-full"
+                        fallbackSrc={DEFAULT_CLUB_BADGE}
                       />
                     </LayoutContainer>
                   </TableCell>
@@ -250,6 +283,61 @@ export const AdminOpponentsTable: React.FC<AdminOpponentsTableProps> = ({
           </TableBody>
         </Table>
       </LayoutContainer>
+
+      {/* Controles de Paginação */}
+      {filteredCount > 0 && (
+        <LayoutContainer className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 px-1">
+          <Text className="text-xs text-text-muted">
+            {TABLE.PAGINATION.INFO(
+              (currentPage - 1) * itemsPerPage + 1,
+              Math.min(currentPage * itemsPerPage, filteredCount),
+              filteredCount
+            )}
+          </Text>
+
+          {totalPages > 1 && (
+            <LayoutContainer className="flex items-center space-x-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onPrevPage}
+                disabled={currentPage === 1}
+                className="text-xs border border-border/60 hover:bg-surface-hover disabled:opacity-40 cursor-pointer disabled:cursor-not-allowed px-3 py-1.5 rounded-lg"
+              >
+                {TABLE.PAGINATION.PREVIOUS}
+              </Button>
+
+              <LayoutContainer className="flex items-center space-x-1">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <Button
+                    key={page}
+                    variant={page === currentPage ? 'primary' : 'ghost'}
+                    size="sm"
+                    onClick={() => onGoToPage(page)}
+                    className={`text-xs px-2.5 py-1 rounded-lg cursor-pointer ${
+                      page === currentPage
+                        ? 'bg-secondary text-primary font-bold shadow-sm'
+                        : 'text-text-muted hover:text-text-primary hover:bg-surface-hover'
+                    }`}
+                  >
+                    {page}
+                  </Button>
+                ))}
+              </LayoutContainer>
+
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onNextPage}
+                disabled={currentPage === totalPages}
+                className="text-xs border border-border/60 hover:bg-surface-hover disabled:opacity-40 cursor-pointer disabled:cursor-not-allowed px-3 py-1.5 rounded-lg"
+              >
+                {TABLE.PAGINATION.NEXT}
+              </Button>
+            </LayoutContainer>
+          )}
+        </LayoutContainer>
+      )}
     </LayoutContainer>
   );
 };

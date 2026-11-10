@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import Link from 'next/link';
 import {
   LayoutContainer,
@@ -14,11 +14,10 @@ import {
   Badge,
   Button,
   Input,
-  Select,
-  Option,
 } from '@/shared/ui/components/atoms';
 import { Radio } from 'lucide-react';
 import { SafeImage } from '@/shared/ui/components/molecules/SafeImage';
+import { SearchableSelect, SearchableSelectOption } from '@/shared/ui/components/molecules';
 import { Championship, Match } from '../../../types/matches.types';
 import { MATCHES_CONSTANTS, DEFAULT_OPPONENT_BADGE } from '../../../constants/matches.constants';
 
@@ -83,49 +82,59 @@ export const AdminMatchesTable: React.FC<AdminMatchesTableProps> = ({
     }
   };
 
+  // Opções para o Combobox de Status
+  const statusOptions: SearchableSelectOption[] = useMemo(() => [
+    { value: 'ALL', label: MATCHES_TABLE.STATUS_FILTER_ALL },
+    { value: 'SCHEDULED', label: 'Agendado' },
+    { value: 'IN_PROGRESS', label: 'Ao Vivo' },
+    { value: 'FINISHED', label: 'Encerrado' },
+    { value: 'POSTPONED', label: 'Adiado' },
+    { value: 'CANCELLED', label: 'Cancelado' },
+  ], [MATCHES_TABLE.STATUS_FILTER_ALL]);
+
+  // Opções para o Combobox de Campeonato
+  const championshipOptions: SearchableSelectOption[] = useMemo(() => {
+    const list = championships.map((c) => ({
+      value: c.id,
+      label: `${c.name} ${c.seasonYear}`,
+      badge: String(c.seasonYear),
+    }));
+    return [{ value: 'ALL', label: 'Todos os Campeonatos' }, ...list];
+  }, [championships]);
+
   return (
     <LayoutContainer className="space-y-4">
-      {/* Barra de Filtros e Ação */}
-      <LayoutContainer className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
-        <LayoutContainer className="flex flex-wrap items-center gap-3 flex-1">
+      {/* Barra de Filtros e Ação - Alinhamento Horizontal Lado a Lado */}
+      <LayoutContainer className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
+        <LayoutContainer className="grid grid-cols-1 sm:grid-cols-3 gap-3 flex-1 items-center">
           <Input
             placeholder={MATCHES_TABLE.SEARCH_PLACEHOLDER}
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full sm:w-64"
+            className="w-full"
           />
 
-          <Select
+          <SearchableSelect
+            options={statusOptions}
             value={statusFilter}
-            onChange={(e) => onStatusFilterChange(e.target.value)}
-            className="w-full sm:w-44"
-          >
-            <Option value="ALL">{MATCHES_TABLE.STATUS_FILTER_ALL}</Option>
-            <Option value="SCHEDULED">Agendado</Option>
-            <Option value="IN_PROGRESS">Ao Vivo</Option>
-            <Option value="FINISHED">Encerrado</Option>
-            <Option value="POSTPONED">Adiado</Option>
-            <Option value="CANCELLED">Cancelado</Option>
-          </Select>
+            onChange={onStatusFilterChange}
+            placeholder={MATCHES_TABLE.STATUS_FILTER_ALL}
+            searchPlaceholder="Filtrar por status..."
+          />
 
-          <Select
+          <SearchableSelect
+            options={championshipOptions}
             value={championshipFilter}
-            onChange={(e) => onChampionshipFilterChange(e.target.value)}
-            className="w-full sm:w-52"
-          >
-            <Option value="ALL">Todos os Campeonatos</Option>
-            {championships.map((c) => (
-              <Option key={c.id} value={c.id}>
-                {c.name} {c.seasonYear}
-              </Option>
-            ))}
-          </Select>
+            onChange={onChampionshipFilterChange}
+            placeholder="Todos os Campeonatos"
+            searchPlaceholder="Buscar campeonato..."
+          />
         </LayoutContainer>
 
         <Button
           onClick={onOpenCreate}
           variant="primary"
-          className="bg-secondary text-primary hover:bg-secondary-hover font-bold px-5 py-2 rounded-xl shadow-md shrink-0"
+          className="bg-secondary text-primary hover:bg-secondary-hover font-bold px-5 py-2.5 rounded-xl shadow-md shrink-0 cursor-pointer h-full"
         >
           + {MATCHES_TABLE.ADD_MATCH_BUTTON}
         </Button>
@@ -228,14 +237,14 @@ export const AdminMatchesTable: React.FC<AdminMatchesTableProps> = ({
                       <Button
                         variant="ghost"
                         onClick={() => onEdit(match)}
-                        className="text-xs text-secondary hover:text-secondary-hover px-2 py-1 h-auto"
+                        className="text-xs text-secondary hover:text-secondary-hover px-2 py-1 h-auto cursor-pointer"
                       >
                         Editar
                       </Button>
                       <Button
                         variant="ghost"
                         onClick={() => onDelete(match)}
-                        className="text-xs text-orange-500 hover:text-orange-400 px-2 py-1 h-auto"
+                        className="text-xs text-orange-500 hover:text-orange-400 px-2 py-1 h-auto cursor-pointer"
                       >
                         Excluir
                       </Button>

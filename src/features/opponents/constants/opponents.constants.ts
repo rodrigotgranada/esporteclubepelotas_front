@@ -18,6 +18,13 @@ export const OPPONENTS_CONSTANTS = {
     ACTIONS: 'Ações',
     EMPTY_STATE: 'Nenhum clube adversário encontrado.',
     ADD_BUTTON: 'Novo Clube Adversário',
+    PAGINATION: {
+      ITEMS_PER_PAGE: 10,
+      PAGE_INDICATOR: (current: number, total: number) => `Página ${current} de ${total}`,
+      INFO: (start: number, end: number, total: number) => `Mostrando ${start} a ${end} de ${total} clubes`,
+      PREVIOUS: 'Anterior',
+      NEXT: 'Próxima',
+    },
   },
   MODAL: {
     CREATE_TITLE: 'Cadastrar Novo Clube Adversário',
@@ -51,4 +58,3 @@ export const OPPONENTS_CONSTANTS = {
     SAVE_ERROR: 'Erro ao salvar clube. Tente novamente.',
   },
 };
-

@@ -23,3 +23,5 @@ export * from './MembershipCtaCard';
 export * from './MembershipCtaCard.constants';
 export * from './FormField';
 export * from './ScrollReadingProgressBar';
+
+export * from './SearchableSelect';

@@ -20,13 +20,19 @@ export const AdminOpponentsFeature: React.FC = () => {
     totalCount,
     filteredCount,
     search,
-    setSearch,
     statusFilter,
-    setStatusFilter,
     sortField,
     sortDirection,
     handleSort,
     isLoading,
+    currentPage,
+    totalPages,
+    itemsPerPage,
+    goToPage,
+    nextPage,
+    prevPage,
+    onSearchChange,
+    onStatusFilterChange,
     isModalOpen,
     selectedOpponent,
     isDeleteModalOpen,
@@ -54,7 +60,7 @@ export const AdminOpponentsFeature: React.FC = () => {
       </LayoutContainer>
 
       {/* Conteúdo Principal */}
-      {isLoading && opponents.length === 0 ? (
+      {isLoading && totalCount === 0 ? (
         <LayoutContainer className="flex items-center justify-center p-16 border border-border/50 rounded-2xl bg-surface-card shadow-sm">
           <Text className="text-sm text-text-muted animate-pulse">
             Carregando catálogo de clubes adversários...
@@ -66,12 +72,18 @@ export const AdminOpponentsFeature: React.FC = () => {
           totalCount={totalCount}
           filteredCount={filteredCount}
           search={search}
-          onSearchChange={setSearch}
+          onSearchChange={onSearchChange}
           statusFilter={statusFilter}
-          onStatusFilterChange={setStatusFilter}
+          onStatusFilterChange={onStatusFilterChange}
           sortField={sortField}
           sortDirection={sortDirection}
           onSort={handleSort}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          itemsPerPage={itemsPerPage}
+          onNextPage={nextPage}
+          onPrevPage={prevPage}
+          onGoToPage={goToPage}
           onOpenCreate={handleOpenCreate}
           onEdit={handleOpenEdit}
           onDelete={handleOpenDelete}
