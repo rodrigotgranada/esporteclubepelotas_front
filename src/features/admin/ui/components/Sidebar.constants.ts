@@ -6,6 +6,7 @@ export const SIDEBAR_TEXTS = {
     DASHBOARD: 'Dashboard',
     USERS: 'Usuários',
     NEWS: 'Matérias',
+    MATCHES: 'Campeonatos & Jogos',
     FOOTBALL: 'Futebol & Elenco',
     YOUTH: 'Categorias de Base',
     IDOLS: 'Ídolos & Memorial',

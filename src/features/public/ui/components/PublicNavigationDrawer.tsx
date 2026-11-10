@@ -30,6 +30,7 @@ import {
   Moon,
   Music,
   Shirt,
+  CalendarDays,
 } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useSettingsStore } from '@/store/useSettingsStore';
@@ -242,33 +243,49 @@ export const PublicNavigationDrawer: React.FC<PublicNavigationDrawerProps> = ({
                 {PUBLIC_DRAWER_TEXTS.SECTION_FOOTBALL}
               </Text>
 
-              {footballActive ? (
+              <LayoutContainer className="grid grid-cols-2 gap-2">
+                {footballActive ? (
+                  <Link
+                    href="/elenco"
+                    onClick={onClose}
+                    className="p-3.5 rounded-xl bg-surface/70 hover:bg-surface border border-border/80 hover:border-primary/50 flex flex-col gap-2 transition-all group"
+                  >
+                    <LayoutContainer className="flex items-center justify-between">
+                      <Trophy className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
+                      <ChevronRight className="w-3.5 h-3.5 text-text-secondary/60 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
+                    </LayoutContainer>
+                    <Text as="span" className="text-xs font-bold text-text-primary group-hover:text-primary transition-colors">
+                      {PUBLIC_DRAWER_TEXTS.LINK_SQUAD}
+                    </Text>
+                  </Link>
+                ) : (
+                  <LayoutContainer className="p-3.5 rounded-xl bg-surface/50 border border-border/70 flex flex-col gap-2 opacity-85 hover:opacity-100 transition-opacity">
+                    <LayoutContainer className="flex items-center justify-between">
+                      <Trophy className="w-4 h-4 text-primary" />
+                      <Badge variant="default" size="sm" className="text-[9px] py-0 px-1.5 font-medium">
+                        {PUBLIC_DRAWER_TEXTS.BADGE_COMING_SOON}
+                      </Badge>
+                    </LayoutContainer>
+                    <Text as="span" className="text-xs font-bold text-text-primary">
+                      {PUBLIC_DRAWER_TEXTS.LINK_SQUAD}
+                    </Text>
+                  </LayoutContainer>
+                )}
+
                 <Link
-                  href="/elenco"
+                  href="/jogos"
                   onClick={onClose}
                   className="p-3.5 rounded-xl bg-surface/70 hover:bg-surface border border-border/80 hover:border-primary/50 flex flex-col gap-2 transition-all group"
                 >
                   <LayoutContainer className="flex items-center justify-between">
-                    <Trophy className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
+                    <CalendarDays className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
                     <ChevronRight className="w-3.5 h-3.5 text-text-secondary/60 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
                   </LayoutContainer>
                   <Text as="span" className="text-xs font-bold text-text-primary group-hover:text-primary transition-colors">
-                    {PUBLIC_DRAWER_TEXTS.LINK_SQUAD}
+                    {PUBLIC_DRAWER_TEXTS.LINK_MATCHES}
                   </Text>
                 </Link>
-              ) : (
-                <LayoutContainer className="p-3.5 rounded-xl bg-surface/50 border border-border/70 flex flex-col gap-2 opacity-85 hover:opacity-100 transition-opacity">
-                  <LayoutContainer className="flex items-center justify-between">
-                    <Trophy className="w-4 h-4 text-primary" />
-                    <Badge variant="default" size="sm" className="text-[9px] py-0 px-1.5 font-medium">
-                      {PUBLIC_DRAWER_TEXTS.BADGE_COMING_SOON}
-                    </Badge>
-                  </LayoutContainer>
-                  <Text as="span" className="text-xs font-bold text-text-primary">
-                    {PUBLIC_DRAWER_TEXTS.LINK_SQUAD}
-                  </Text>
-                </LayoutContainer>
-              )}
+              </LayoutContainer>
             </LayoutContainer>
 
             {/* 4. Navigation Section: Base */}

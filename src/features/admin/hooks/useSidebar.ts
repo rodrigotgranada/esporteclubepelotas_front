@@ -4,7 +4,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useSystemModulesStore } from '@/store/useSystemModulesStore';
 import { startTransition, useEffect } from 'react';
-import { Home, Users, Settings, Layers, Shield, Newspaper, Trophy, Shirt, Sprout, History, Landmark, Handshake, UserCheck, Music, Sparkles } from 'lucide-react';
+import { Home, Users, Settings, Layers, Shield, Newspaper, Trophy, Shirt, Sprout, History, Landmark, Handshake, UserCheck, Music, Sparkles, CalendarDays } from 'lucide-react';
 import { SIDEBAR_TEXTS } from '../ui/components/Sidebar.constants';
 
 export const useSidebar = () => {
@@ -34,6 +34,7 @@ export const useSidebar = () => {
   const navItems = [
     { label: SIDEBAR_TEXTS.NAV.DASHBOARD, href: '/gestao', icon: Home, show: true },
     { label: SIDEBAR_TEXTS.NAV.NEWS, href: '/gestao/news', icon: Newspaper, show: true },
+    { label: SIDEBAR_TEXTS.NAV.MATCHES, href: '/gestao/jogos', icon: CalendarDays, show: true },
     { label: SIDEBAR_TEXTS.NAV.FOOTBALL, href: '/gestao/football', icon: Shirt, show: true },
     { label: SIDEBAR_TEXTS.NAV.YOUTH, href: '/gestao/base', icon: Sprout, show: true },
     { label: SIDEBAR_TEXTS.NAV.IDOLS, href: '/gestao/idols', icon: Trophy, show: true },

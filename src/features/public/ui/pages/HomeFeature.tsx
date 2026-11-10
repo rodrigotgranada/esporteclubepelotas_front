@@ -21,6 +21,8 @@ import { NewsBentoHero } from '@/features/news/ui/components/NewsBentoHero';
 import { NewsCard } from '@/features/news/ui/components/NewsCard';
 import { HomeSponsorsTicker, HomeSponsorsSection } from '@/features/sponsors';
 import { useRealtimeEvents } from '@/shared/hooks/useRealtimeEvents';
+import { Match, matchesService } from '@/features/matches';
+import { NextMatchCard } from '@/features/matches/ui/components/NextMatchCard';
 
 export const HomeFeature = () => {
   const { settings } = useSettingsStore();
@@ -28,13 +30,19 @@ export const HomeFeature = () => {
   const membershipLink = useMembershipLink();
   const [featuredNews, setFeaturedNews] = useState<NewsArticleData[]>([]);
   const [latestNews, setLatestNews] = useState<NewsArticleData[]>([]);
+  const [nextMatch, setNextMatch] = useState<Match | null>(null);
 
   const loadHomeData = useCallback(async () => {
     try {
-      const [featuredResult, feedResult] = await Promise.allSettled([
+      const [featuredResult, feedResult, nextMatchData] = await Promise.allSettled([
         newsService.getFeaturedNews(3),
         newsService.getNews({ limit: 6 }),
+        matchesService.publicGetNextMatch(),
       ]);
+
+      if (nextMatchData.status === 'fulfilled') {
+        setNextMatch(nextMatchData.value);
+      }
 
       const featuredArticles =
         featuredResult.status === 'fulfilled' && Array.isArray(featuredResult.value)
@@ -67,6 +75,10 @@ export const HomeFeature = () => {
   }, [loadHomeData]);
 
   useRealtimeEvents('news', () => {
+    loadHomeData();
+  });
+
+  useRealtimeEvents('matches', () => {
     loadHomeData();
   });
 
@@ -179,23 +191,12 @@ export const HomeFeature = () => {
         </LayoutContainer>
       </LayoutContainer>
 
-      {/* 3. Terceira Seção: Outras Seções Institucionais (Próximo Jogo & Loja) */}
-      <LayoutContainer className="max-w-7xl mx-auto px-4 py-12 sm:py-16 w-full bg-transparent">
-        <LayoutContainer className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
-          <LayoutContainer className="bg-surface/85 backdrop-blur-xs border border-border rounded-2xl p-6 sm:p-8 hover:border-primary/30 transition-colors shadow-xs">
-            <Title level="h3" className="text-xl sm:text-2xl font-bold text-text-primary mb-3 sm:mb-4">
-              {HOME_FEATURE_TEXTS.SECTION_MATCH_TITLE}
-            </Title>
-            <Text className="text-text-secondary text-sm sm:text-base">{HOME_FEATURE_TEXTS.SECTION_MATCH_DESC}</Text>
-          </LayoutContainer>
-          <LayoutContainer className="bg-surface/85 backdrop-blur-xs border border-border rounded-2xl p-6 sm:p-8 hover:border-primary/30 transition-colors shadow-xs">
-            <Title level="h3" className="text-xl sm:text-2xl font-bold text-text-primary mb-3 sm:mb-4">
-              {HOME_FEATURE_TEXTS.SECTION_STORE_TITLE}
-            </Title>
-            <Text className="text-text-secondary text-sm sm:text-base">{HOME_FEATURE_TEXTS.SECTION_STORE_DESC}</Text>
-          </LayoutContainer>
+      {/* 3. Terceira Seção: Próximo Jogo Oficial (Aparece SOMENTE se houver campeonato ativo com partida futura ou ao vivo) */}
+      {nextMatch && (
+        <LayoutContainer className="max-w-7xl mx-auto px-4 py-8 sm:py-12 w-full bg-transparent">
+          <NextMatchCard match={nextMatch} isHomeWidget={true} />
         </LayoutContainer>
-      </LayoutContainer>
+      )}
 
       {/* 4. Quarta Seção: Patrocinadores e Parceiros Oficiais (Pré-Rodapé em 5 colunas) */}
       <HomeSponsorsSection />
