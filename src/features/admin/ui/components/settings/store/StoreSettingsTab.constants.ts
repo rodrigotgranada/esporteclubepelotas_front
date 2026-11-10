@@ -1,35 +1,51 @@
 export const STORE_SETTINGS_TEXTS = {
-  TITLE: 'Loja Oficial Lobo Mania',
+  TITLE: 'Loja Oficial Alcateia',
   DESCRIPTION:
     'Gerencie os canais de contato, redes sociais, link da loja virtual parceira, horários de atendimento físico e benefícios para sócios.',
-  
+
   // Section 1: General Info
   SECTION_GENERAL_TITLE: 'Informações Básicas da Loja',
-  SECTION_GENERAL_DESC: 'Nome de exibição e descrição oficial da boutique / loja do clube.',
+  SECTION_GENERAL_DESC: 'Nome de exibição, foto de fachada do Hero e descrição oficial da boutique do clube.',
   FIELD_STORE_NAME_LABEL: 'Nome da Loja',
-  FIELD_STORE_NAME_PLACEHOLDER: 'Ex: Loja Oficial Lobo Mania',
+  FIELD_STORE_NAME_PLACEHOLDER: 'Ex: Alcateia',
   FIELD_STORE_DESC_LABEL: 'Descrição / Apresentação',
   FIELD_STORE_DESC_PLACEHOLDER: 'Ex: Vista o manto áureo-cerúleo e apoie o Esporte Clube Pelotas...',
 
+  // Fachada da Loja
+  SECTION_FACADE_TITLE: 'Foto da Fachada da Loja (Fundo do Hero)',
+  SECTION_FACADE_DESC:
+    'Faça upload de uma foto da fachada ou interior da boutique física. Se informada, ela será exibida no fundo do Hero da página pública com elegante filtro noturno.',
+  BUTTON_SELECT_FACADE: 'Selecionar Foto da Fachada',
+  BUTTON_CHANGE_FACADE: 'Trocar Foto da Fachada',
+  BUTTON_REMOVE_FACADE: 'Remover Foto',
+  FACADE_HELP: 'Formatos aceitos: JPG, PNG ou WebP. Proporção recomendada: 16:9 ou paisagem.',
+  FACADE_EMPTY: 'Nenhuma foto de fachada cadastrada (usará o fundo gráfico padrão do portal).',
+
   // Section 2: Online Store (E-commerce)
   SECTION_ONLINE_TITLE: 'Loja Virtual & E-commerce',
-  SECTION_ONLINE_DESC: 'Configuração da plataforma de vendas online terceirizada.',
+  SECTION_ONLINE_DESC:
+    'Configure o link da plataforma de vendas online. Caso o link seja deixado em branco, o card de loja virtual não será exibido na página pública.',
   SWITCH_ONLINE_ACTIVE_LABEL: 'Loja Virtual em Operação',
-  SWITCH_ONLINE_ACTIVE_DESC: 'Se desmarcado, a página pública exibirá o selo "Em Breve" orientando compras via WhatsApp.',
+  SWITCH_ONLINE_ACTIVE_DESC: 'Ativa ou pausa a exibição do link da loja virtual para os torcedores.',
   FIELD_EXTERNAL_URL_LABEL: 'Link da Loja Virtual Parceira',
-  FIELD_EXTERNAL_URL_PLACEHOLDER: 'https://lojadolobo.com.br ou https://shopee.com.br/...',
-  ONLINE_STATUS_ACTIVE_BADGE: 'Loja Virtual Online',
-  ONLINE_STATUS_SOON_BADGE: 'Status: Em Breve',
+  FIELD_EXTERNAL_URL_PLACEHOLDER: 'https://shopee.com.br/... ou https://loja.com.br',
+  ONLINE_STATUS_ACTIVE_BADGE: 'Loja Virtual Configurada',
+  ONLINE_STATUS_SOON_BADGE: 'Sem Loja Virtual',
 
   // Section 3: Social & Direct Channels
   SECTION_CHANNELS_TITLE: 'Canais Oficiais de Atendimento',
-  SECTION_CHANNELS_DESC: 'WhatsApp para atendimento direto de pedidos e Instagram oficial da loja.',
-  FIELD_WHATSAPP_NUMBER_LABEL: 'WhatsApp da Loja (com DDI e DDD)',
-  FIELD_WHATSAPP_NUMBER_PLACEHOLDER: 'Ex: 5553999999999',
-  FIELD_WHATSAPP_MESSAGE_LABEL: 'Mensagem Inicial do WhatsApp',
-  FIELD_WHATSAPP_MESSAGE_PLACEHOLDER: 'Ex: Olá! Gostaria de informações sobre mantos e produtos oficiais do Pelotas.',
-  FIELD_INSTAGRAM_URL_LABEL: 'Instagram Oficial da Loja',
-  FIELD_INSTAGRAM_URL_PLACEHOLDER: 'https://www.instagram.com/lojadolobo/',
+  SECTION_CHANNELS_DESC:
+    'Configure o WhatsApp e o Instagram da loja. Os cards só serão exibidos na página se estiverem preenchidos.',
+  FIELD_WHATSAPP_NUMBER_LABEL: 'WhatsApp da Loja',
+  FIELD_WHATSAPP_NUMBER_HELP: 'O código do país (+55) é fixo. Digite o DDD e o número celular.',
+  FIELD_WHATSAPP_DESC_LABEL: 'Mensagem do Card de WhatsApp',
+  FIELD_WHATSAPP_DESC_PLACEHOLDER: 'Ex: Consulte tamanhos disponíveis, envie seu comprovante e garanta seu manto com atendimento personalizado.',
+  FIELD_WHATSAPP_MESSAGE_LABEL: 'Mensagem Inicial Pré-preenchida (Link do WhatsApp)',
+  FIELD_WHATSAPP_MESSAGE_PLACEHOLDER: 'Ex: Olá! Gostaria de informações sobre mantos e produtos oficiais do E.C. Pelotas.',
+  FIELD_INSTAGRAM_URL_LABEL: 'Link do Instagram Oficial da Loja',
+  FIELD_INSTAGRAM_URL_PLACEHOLDER: 'https://www.instagram.com/alcateia.ecpelotas/',
+  FIELD_INSTAGRAM_DESC_LABEL: 'Mensagem do Card de Instagram',
+  FIELD_INSTAGRAM_DESC_PLACEHOLDER: 'Ex: Acompanhe lançamentos de uniformes, bastidores da boutique, reposições e novidades diárias em primeira mão.',
 
   // Section 4: Physical Store & Opening Hours
   SECTION_PHYSICAL_TITLE: 'Loja Física na Boca do Lobo',
@@ -50,7 +66,7 @@ export const STORE_SETTINGS_TEXTS = {
   // Actions
   BUTTON_SAVE: 'Salvar Configurações da Loja',
   SAVING_BUTTON: 'Salvando configurações...',
+  UPLOADING_BUTTON: 'Enviando foto da fachada...',
   SAVE_SUCCESS: 'Configurações da Loja Oficial atualizadas com sucesso!',
   SAVE_ERROR: 'Erro ao salvar configurações da loja. Tente novamente.',
 };
-

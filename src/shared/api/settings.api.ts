@@ -17,12 +17,23 @@ export const settingsApi = {
     return res.url;
   },
 
+  uploadFacadeMedia: async (file: File): Promise<string> => {
+    const res = await uploadMedia(file, {
+      endpoint: '/settings/upload-facade',
+      folder: 'settings',
+      legacyFieldName: 'facade',
+    });
+    return res.url;
+  },
+
   updateSettings: async (data: any, file?: File): Promise<Settings> => {
+    if (!file) {
+      const response = await api.put('/settings', data);
+      return response.data;
+    }
     const formData = new FormData();
     formData.append('data', JSON.stringify(data));
-    if (file) {
-      formData.append('logo', file);
-    }
+    formData.append('logo', file);
     const response = await api.put('/settings', formData);
     return response.data;
   },

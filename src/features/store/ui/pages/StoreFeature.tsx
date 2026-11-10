@@ -13,12 +13,19 @@ export const StoreFeature = () => {
   const {
     storeName,
     storeDescription,
+    storeFacadeUrl,
     isOnlineActive,
     externalUrl,
+    hasOnlineStore,
     instagramUrl,
+    instagramHandle,
+    instagramDescription,
+    hasInstagram,
     whatsappNumber,
+    whatsappDescription,
     whatsappLink,
     formattedWhatsapp,
+    hasWhatsapp,
     openingHours,
     address,
     hasMemberDiscount,
@@ -28,28 +35,38 @@ export const StoreFeature = () => {
 
   return (
     <LayoutContainer className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 flex flex-col gap-8 sm:gap-10">
-      {/* 1. Hero Section */}
-      <StoreHero storeName={storeName} storeDescription={storeDescription} />
+      {/* 1. Hero Section (com suporte a imagem de fachada) */}
+      <StoreHero
+        storeName={storeName}
+        storeDescription={storeDescription}
+        facadeImageUrl={storeFacadeUrl}
+      />
 
-      {/* 2. Member Discount Card (Conditionally shown if hasMemberDiscount is true) */}
+      {/* 2. Member Discount Card (Exibido apenas quando tem benefício de sócio ativo) */}
       <StoreMemberDiscountCard
         hasMemberDiscount={hasMemberDiscount}
         memberDiscountText={memberDiscountText}
       />
 
-      {/* 3. Online Store Card */}
-      <StoreOnlineCard
-        isOnlineActive={isOnlineActive}
-        externalUrl={externalUrl}
-        whatsappLink={whatsappLink}
-      />
+      {/* 3. Online Store Card (Exibido apenas quando HOUVER link de loja virtual cadastrado no admin) */}
+      {hasOnlineStore && (
+        <StoreOnlineCard
+          externalUrl={externalUrl}
+          isOnlineActive={isOnlineActive}
+        />
+      )}
 
-      {/* 4. Official Channels (WhatsApp & Instagram) */}
+      {/* 4. Official Channels (Exibido apenas se WhatsApp ou Instagram estiver cadastrado) */}
       <StoreChannelsGrid
         whatsappNumber={whatsappNumber}
         whatsappLink={whatsappLink}
         formattedWhatsapp={formattedWhatsapp}
+        whatsappDescription={whatsappDescription}
+        hasWhatsapp={hasWhatsapp}
         instagramUrl={instagramUrl}
+        instagramHandle={instagramHandle}
+        instagramDescription={instagramDescription}
+        hasInstagram={hasInstagram}
       />
 
       {/* 5. Physical Store & Hours */}
@@ -61,4 +78,3 @@ export const StoreFeature = () => {
     </LayoutContainer>
   );
 };
-

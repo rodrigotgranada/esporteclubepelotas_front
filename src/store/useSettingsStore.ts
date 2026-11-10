@@ -54,10 +54,13 @@ export interface Settings {
   membershipExternalUrl?: string;
   storeName?: string;
   storeDescription?: string;
+  storeFacadeUrl?: string | null;
   storeExternalUrl?: string;
   storeIsOnlineActive?: boolean;
   storeInstagramUrl?: string;
+  storeInstagramDescription?: string;
   storeWhatsappNumber?: string;
+  storeWhatsappDescription?: string;
   storeWhatsappMessage?: string;
   storeOpeningHours?: string;
   storeAddress?: string;

@@ -1,18 +1,49 @@
 'use client';
 
 import React from 'react';
-import { LayoutContainer, Text, Title, Badge } from '@/shared/ui/components';
+import { LayoutContainer, Text, Title, Badge, SafeImage } from '@/shared/ui/components';
 import { ShoppingBag, Sparkles } from 'lucide-react';
 import { STORE_TEXTS } from '../../constants/store.constants';
 
 interface StoreHeroProps {
   storeName: string;
   storeDescription: string;
+  facadeImageUrl?: string | null;
 }
 
-export const StoreHero: React.FC<StoreHeroProps> = ({ storeName, storeDescription }) => {
+export const StoreHero: React.FC<StoreHeroProps> = ({
+  storeName,
+  storeDescription,
+  facadeImageUrl,
+}) => {
   return (
-    <LayoutContainer className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/15 via-surface-elevated/70 to-surface border border-border p-8 sm:p-12 shadow-xl">
+    <LayoutContainer className="relative overflow-hidden rounded-3xl bg-surface border border-border p-8 sm:p-12 shadow-xl min-h-[260px] sm:min-h-[300px] flex items-center">
+      {/* Imagem de Fundo da Fachada (se cadastrada) */}
+      {facadeImageUrl && (
+        <>
+          <SafeImage
+            src={facadeImageUrl}
+            alt={storeName}
+            fill
+            className="object-cover object-center"
+            fallbackSrc="/images/stadium-default.jpg"
+          />
+          {/* Overlay com gradiente escuro garantindo contraste total */}
+          <LayoutContainer className="absolute inset-0 bg-gradient-to-r from-[#060a14]/95 via-[#0b1329]/90 to-[#0b1329]/75" />
+        </>
+      )}
+
+      {/* Fundo Decorativo Padrão (caso não haja foto da fachada) */}
+      {!facadeImageUrl && (
+        <>
+          <LayoutContainer className="absolute inset-0 bg-gradient-to-br from-primary/15 via-surface-elevated/70 to-surface" />
+          <LayoutContainer className="absolute -right-8 -bottom-8 pointer-events-none opacity-5 text-primary">
+            <ShoppingBag className="w-72 h-72" />
+          </LayoutContainer>
+        </>
+      )}
+
+      {/* Conteúdo do Hero */}
       <LayoutContainer className="relative z-10 max-w-3xl flex flex-col gap-4">
         <LayoutContainer className="inline-flex items-center gap-2 self-start">
           <Badge variant="primary" className="px-3.5 py-1 text-xs uppercase tracking-wider font-semibold">
@@ -29,12 +60,6 @@ export const StoreHero: React.FC<StoreHeroProps> = ({ storeName, storeDescriptio
           {storeDescription || STORE_TEXTS.HERO_SUBTITLE}
         </Text>
       </LayoutContainer>
-
-      {/* Decorative background watermark */}
-      <LayoutContainer className="absolute -right-8 -bottom-8 pointer-events-none opacity-5 text-primary">
-        <ShoppingBag className="w-72 h-72" />
-      </LayoutContainer>
     </LayoutContainer>
   );
 };
-
