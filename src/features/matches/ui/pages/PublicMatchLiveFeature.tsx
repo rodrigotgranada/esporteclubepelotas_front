@@ -382,9 +382,20 @@ export const PublicMatchLiveFeature: React.FC<PublicMatchLiveFeatureProps> = ({ 
                     )}
 
                     {event.playerName && (
-                      <Text className="text-[11px] text-text-muted">
-                        Atleta: <span className="font-semibold text-text-secondary">{event.playerName}</span>
-                      </Text>
+                      <LayoutContainer className="flex items-center gap-1.5 pt-0.5">
+                        {event.playerPhotoUrl && (
+                          <SafeImage
+                            src={event.playerPhotoUrl}
+                            alt={event.playerName}
+                            width={20}
+                            height={20}
+                            className="w-5 h-5 rounded-full object-cover border border-secondary/30"
+                          />
+                        )}
+                        <Text className="text-[11px] text-text-muted">
+                          Atleta: <span className="font-semibold text-text-secondary">{event.playerName}</span>
+                        </Text>
+                      </LayoutContainer>
                     )}
                   </LayoutContainer>
                 </LayoutContainer>

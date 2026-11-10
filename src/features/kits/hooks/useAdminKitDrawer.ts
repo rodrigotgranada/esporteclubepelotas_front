@@ -6,6 +6,8 @@ import { ClubKit, ClubKitFormData, KitType } from '../types/kits.types';
 import { kitsService } from '../services/kits.service';
 import { kitFormSchema, KitFormSchema } from '../schemas/kit.schema';
 import { getKitTypeLabel } from '../utils/kits.utils';
+import { matchesService } from '@/features/matches/services';
+import { Championship } from '@/features/matches/types/matches.types';
 
 export interface UseAdminKitDrawerProps {
   kit: ClubKit | null;
@@ -20,6 +22,13 @@ export const useAdminKitDrawer = ({
 }: UseAdminKitDrawerProps) => {
   const inFlightRef = useRef(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [championships, setChampionships] = useState<Championship[]>([]);
+
+  useEffect(() => {
+    matchesService.publicGetChampionships()
+      .then((data) => setChampionships(data || []))
+      .catch((err) => console.error('Erro ao buscar campeonatos para mantos:', err));
+  }, []);
 
   // Upload e Recorte com CropModal
   const [pendingImageFile, setPendingImageFile] = useState<File | null>(null);
@@ -35,6 +44,7 @@ export const useAdminKitDrawer = ({
   const form = useForm<KitFormSchema>({
     resolver: zodResolver(kitFormSchema),
     defaultValues: {
+      championshipId: null,
       name: '',
       kitType: 'HOME',
       competition: '',
@@ -53,6 +63,7 @@ export const useAdminKitDrawer = ({
   useEffect(() => {
     if (kit) {
       form.reset({
+        championshipId: kit.championshipId || null,
         name: kit.name,
         kitType: kit.kitType,
         competition: kit.competition,
@@ -71,6 +82,7 @@ export const useAdminKitDrawer = ({
       setGalleryUrls(kit.galleryUrls || []);
     } else {
       form.reset({
+        championshipId: null,
         name: '',
         kitType: 'HOME',
         competition: '',
@@ -184,6 +196,7 @@ export const useAdminKitDrawer = ({
           : getKitTypeLabel(values.kitType as KitType);
 
       const payload: ClubKitFormData = {
+        championshipId: values.championshipId || undefined,
         name: resolvedName,
         kitType: values.kitType as KitType,
         competition: values.competition.trim(),
@@ -217,9 +230,22 @@ export const useAdminKitDrawer = ({
     }
   };
 
+  const handleChampionshipChange = (champId: string) => {
+    form.setValue('championshipId', champId || null);
+    if (champId) {
+      const selected = championships.find((c) => c.id === champId);
+      if (selected) {
+        form.setValue('competition', selected.name);
+        form.setValue('seasonYear', selected.seasonYear);
+      }
+    }
+  };
+
   return {
     form,
     isSaving,
+    championships,
+    handleChampionshipChange,
     imagePreviewUrl,
     isCropModalOpen,
     cropSourceImage,

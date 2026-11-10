@@ -35,6 +35,8 @@ export const AdminKitDrawer: React.FC<AdminKitDrawerProps> = ({
   const {
     form,
     isSaving,
+    championships,
+    handleChampionshipChange,
     imagePreviewUrl,
     isCropModalOpen,
     cropSourceImage,
@@ -121,6 +123,36 @@ export const AdminKitDrawer: React.FC<AdminKitDrawerProps> = ({
                 )}
               </LayoutContainer>
             </LayoutContainer>
+
+            {/* Campeonato Oficial Vinculado (Fonte Única da Verdade) */}
+            {championships.length > 0 && (
+              <LayoutContainer className="flex flex-col gap-1.5 p-3.5 rounded-xl border border-primary/20 bg-primary/5">
+                <LayoutContainer className="flex items-center gap-1.5">
+                  <Trophy className="w-3.5 h-3.5 text-primary" />
+                  <Text as="span" className="text-xs font-bold text-primary">
+                    Vincular a Campeonato Oficial (Preenchimento Automático)
+                  </Text>
+                </LayoutContainer>
+                <Controller
+                  name="championshipId"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      value={field.value || ''}
+                      onChange={(e) => handleChampionshipChange(e.target.value)}
+                      className="w-full text-sm font-semibold"
+                    >
+                      <Option value="">Nenhum (Digitação Livre / Avulso)</Option>
+                      {championships.map((c) => (
+                        <Option key={c.id} value={c.id}>
+                          {c.name} ({c.seasonYear})
+                        </Option>
+                      ))}
+                    </Select>
+                  )}
+                />
+              </LayoutContainer>
+            )}
 
             {/* 2. Campeonato Obrigatório e Ano da Temporada */}
             <LayoutContainer className="grid grid-cols-1 sm:grid-cols-12 gap-4">

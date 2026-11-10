@@ -287,6 +287,10 @@ export const AdminYouthFeature: React.FC = () => {
         onRemoveStaff={squadDrawer.handleRemoveStaff}
         existingCompetitions={existingYouthCompetitions}
         allowedCategories={['SUB_20', 'SUB_17', 'SUB_15']}
+        championships={squadDrawer.championships}
+        coaches={squadDrawer.coaches}
+        onChampionshipChange={squadDrawer.handleChampionshipChange}
+        onCoachChange={squadDrawer.handleCoachChange}
       />
 
       <SquadMembersDrawer

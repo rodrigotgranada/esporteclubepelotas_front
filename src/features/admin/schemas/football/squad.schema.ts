@@ -6,6 +6,8 @@ export const squadStaffItemSchema = z.object({
 });
 
 export const squadSchema = z.object({
+  championshipId: z.string().optional().nullable(),
+  coachId: z.string().optional().nullable(),
   year: z.coerce.number().min(1908, 'Ano deve ser igual ou superior a 1908.'),
   category: z.enum(['PROFESSIONAL', 'FEMININE', 'SUB_20', 'SUB_17', 'SUB_15']),
   seasonName: z.string().min(2, 'O nome da temporada/competição é obrigatório.'),

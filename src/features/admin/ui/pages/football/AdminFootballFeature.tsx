@@ -243,6 +243,10 @@ export const AdminFootballFeature: React.FC = () => {
         onRemoveStaff={squadDrawer.handleRemoveStaff}
         existingCompetitions={existingCompetitions}
         allowedCategories={['PROFESSIONAL', 'FEMININE']}
+        championships={squadDrawer.championships}
+        coaches={squadDrawer.coaches}
+        onChampionshipChange={squadDrawer.handleChampionshipChange}
+        onCoachChange={squadDrawer.handleCoachChange}
       />
 
       <SquadMembersDrawer

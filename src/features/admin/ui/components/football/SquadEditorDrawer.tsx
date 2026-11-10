@@ -18,7 +18,8 @@ import {
 } from '@/shared/ui/components';
 import { ADMIN_FOOTBALL_CONSTANTS } from '../../../constants/admin-football.constants';
 import { FOOTBALL_CONSTANTS } from '@/features/football/constants/football.constants';
-import { SquadCategory } from '@/features/football/services/football.service';
+import { SquadCategory, AthleteData } from '@/features/football/services/football.service';
+import { Championship } from '@/features/matches/types/matches.types';
 import { SquadFormData } from '../../../schemas/football/squad.schema';
 
 export interface SquadEditorDrawerProps {
@@ -36,6 +37,10 @@ export interface SquadEditorDrawerProps {
   onRemoveStaff: (index: number) => void;
   existingCompetitions?: string[];
   allowedCategories?: SquadCategory[];
+  championships?: Championship[];
+  coaches?: AthleteData[];
+  onChampionshipChange?: (champId: string) => void;
+  onCoachChange?: (coachId: string) => void;
 }
 
 export const SquadEditorDrawer: React.FC<SquadEditorDrawerProps> = ({
@@ -53,6 +58,10 @@ export const SquadEditorDrawer: React.FC<SquadEditorDrawerProps> = ({
   onRemoveStaff,
   existingCompetitions = [],
   allowedCategories,
+  championships,
+  coaches,
+  onChampionshipChange,
+  onCoachChange,
 }) => {
   const texts = ADMIN_FOOTBALL_CONSTANTS.DRAWER_SQUAD;
   const categoriesTexts = FOOTBALL_CONSTANTS.CATEGORIES;
@@ -70,6 +79,37 @@ export const SquadEditorDrawer: React.FC<SquadEditorDrawerProps> = ({
       size="md"
     >
       <LayoutContainer className="flex flex-col gap-6 p-6">
+        {/* Campeonato Oficial Vinculado */}
+        {championships && championships.length > 0 && (
+          <LayoutContainer className="p-3.5 rounded-xl border border-primary/20 bg-primary/5 flex flex-col gap-1.5">
+            <Text as="span" className="text-xs font-bold text-primary">
+              Campeonato Oficial Vinculado (Preenchimento Automático)
+            </Text>
+            <Controller
+              control={control}
+              name="championshipId"
+              render={({ field }) => (
+                <Select
+                  value={field.value || ''}
+                  onChange={(e) =>
+                    onChampionshipChange
+                      ? onChampionshipChange(e.target.value)
+                      : field.onChange(e.target.value)
+                  }
+                  className="w-full text-sm font-semibold"
+                >
+                  <Option value="">Nenhum (Digitação Livre / Avulso)</Option>
+                  {championships.map((c) => (
+                    <Option key={c.id} value={c.id}>
+                      {c.name} ({c.seasonYear})
+                    </Option>
+                  ))}
+                </Select>
+              )}
+            />
+          </LayoutContainer>
+        )}
+
         {/* Ano & Categoria */}
         <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <FormField label={`${texts.FIELD_YEAR} *`} error={errors.year?.message}>
@@ -145,12 +185,44 @@ export const SquadEditorDrawer: React.FC<SquadEditorDrawerProps> = ({
         </LayoutContainer>
 
         {/* Treinador Principal */}
-        <FormField label={texts.FIELD_COACH} error={errors.coachName?.message}>
-          <Input
-            {...register('coachName')}
-            placeholder={texts.FIELD_COACH_PLACEHOLDER}
-          />
-        </FormField>
+        <LayoutContainer className="flex flex-col gap-2">
+          {coaches && coaches.length > 0 && (
+            <LayoutContainer className="flex flex-col gap-1.5">
+              <Text as="span" className="text-xs font-bold text-text-secondary">
+                Selecionar Treinador da Comissão Técnica (STAFF)
+              </Text>
+              <Controller
+                control={control}
+                name="coachId"
+                render={({ field }) => (
+                  <Select
+                    value={field.value || ''}
+                    onChange={(e) =>
+                      onCoachChange
+                        ? onCoachChange(e.target.value)
+                        : field.onChange(e.target.value)
+                    }
+                    className="w-full text-sm font-semibold"
+                  >
+                    <Option value="">Outro / Digitação Manual</Option>
+                    {coaches.map((c) => (
+                      <Option key={c.id || c._id} value={c.id || c._id}>
+                        {c.name} {c.staffRole ? `(${c.staffRole})` : ''}
+                      </Option>
+                    ))}
+                  </Select>
+                )}
+              />
+            </LayoutContainer>
+          )}
+
+          <FormField label={texts.FIELD_COACH} error={errors.coachName?.message}>
+            <Input
+              {...register('coachName')}
+              placeholder={texts.FIELD_COACH_PLACEHOLDER}
+            />
+          </FormField>
+        </LayoutContainer>
 
         {/* Marcar como Elenco Atual Checkbox */}
         <LayoutContainer className="p-4 rounded-2xl bg-surface border border-border">

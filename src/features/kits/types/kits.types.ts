@@ -2,6 +2,7 @@ export type KitType = 'HOME' | 'AWAY' | 'THIRD' | 'GOALKEEPER' | 'SPECIAL';
 
 export interface ClubKit {
   id: string;
+  championshipId?: string | null;
   name: string;
   kitType: KitType;
   competition: string;
@@ -25,6 +26,7 @@ export interface ClubKitCompetitionItem {
 }
 
 export interface ClubKitFormData {
+  championshipId?: string | null;
   name: string;
   kitType: KitType;
   competition: string;

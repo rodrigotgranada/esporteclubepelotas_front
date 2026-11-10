@@ -104,6 +104,11 @@ export interface MatchEvent {
   period: MatchPeriod;
   eventType: MatchEventType;
   team: MatchEventTeam;
+  playerAthleteId?: string | null;
+  playerNickname?: string | null;
+  playerPhotoUrl?: string | null;
+  playerOutAthleteId?: string | null;
+  playerOutNickname?: string | null;
   playerName?: string | null;
   playerOutName?: string | null;
   title: string;
@@ -128,6 +133,8 @@ export interface MatchEventFormData {
   period?: MatchPeriod;
   eventType: MatchEventType;
   team?: MatchEventTeam;
+  playerAthleteId?: string;
+  playerOutAthleteId?: string;
   playerName?: string;
   playerOutName?: string;
   title?: string;

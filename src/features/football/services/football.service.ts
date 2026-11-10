@@ -82,6 +82,9 @@ export interface SquadStaffData {
 export interface SquadData {
   _id: string;
   id: string;
+  championshipId?: string | null;
+  coachId?: string | null;
+  coachPhotoUrl?: string | null;
   year: number;
   category: SquadCategory;
   seasonName: string;
