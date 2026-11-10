@@ -57,8 +57,79 @@ export interface Match {
   transmissionUrl?: string | null;
   notes?: string | null;
   displayOrder: number;
+  currentPeriod?: string;
+  currentMinute?: string;
+  timerStartedAt?: string | null;
   createdAt?: string;
   updatedAt?: string;
+}
+
+export type MatchEventType =
+  | 'GOAL_PELOTAS'
+  | 'GOAL_OPPONENT'
+  | 'YELLOW_CARD'
+  | 'RED_CARD'
+  | 'SUBSTITUTION'
+  | 'DANGEROUS_ATTACK'
+  | 'PENALTY'
+  | 'VAR'
+  | 'GENERAL_TEXT'
+  | 'START_FIRST_HALF'
+  | 'END_FIRST_HALF'
+  | 'START_SECOND_HALF'
+  | 'END_SECOND_HALF'
+  | 'START_EXTRA_TIME'
+  | 'END_MATCH';
+
+export type MatchPeriod =
+  | 'PRE_MATCH'
+  | 'FIRST_HALF'
+  | 'HALF_TIME'
+  | 'SECOND_HALF'
+  | 'EXTRA_TIME_1'
+  | 'EXTRA_TIME_2'
+  | 'PENALTIES'
+  | 'FINISHED';
+
+export type MatchEventTeam = 'PELOTAS' | 'OPPONENT' | 'NEUTRAL';
+
+export interface MatchEvent {
+  id: string;
+  matchId: string;
+  minute: number;
+  minuteExtra?: number | null;
+  formattedMinute: string;
+  period: MatchPeriod;
+  eventType: MatchEventType;
+  team: MatchEventTeam;
+  playerName?: string | null;
+  playerOutName?: string | null;
+  title: string;
+  description?: string | null;
+  scorePelotasMoment?: number | null;
+  scoreOpponentMoment?: number | null;
+  createdAt: string;
+}
+
+export interface MatchLiveDetails {
+  match: Match;
+  events: MatchEvent[];
+  currentPeriod: string;
+  currentMinute: string;
+  timerStartedAt?: string | null;
+  isTimerRunning: boolean;
+}
+
+export interface MatchEventFormData {
+  minute: number;
+  minuteExtra?: number;
+  period?: MatchPeriod;
+  eventType: MatchEventType;
+  team?: MatchEventTeam;
+  playerName?: string;
+  playerOutName?: string;
+  title?: string;
+  description?: string;
 }
 
 export interface ChampionshipFormData {

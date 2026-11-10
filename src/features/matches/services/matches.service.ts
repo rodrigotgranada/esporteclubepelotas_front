@@ -5,6 +5,9 @@ import {
   ChampionshipFormData,
   Match,
   MatchFormData,
+  MatchLiveDetails,
+  MatchEvent,
+  MatchEventFormData,
 } from '../types/matches.types';
 
 export const matchesService = {
@@ -113,5 +116,55 @@ export const matchesService = {
 
   async adminDeleteChampionship(id: string): Promise<void> {
     await api.delete(`/championships/admin/${id}`);
+  },
+
+  // ==========================================
+  // MINUTO A MINUTO (AO VIVO)
+  // ==========================================
+
+  /**
+   * Obtém os detalhes completos do lance a lance (público)
+   */
+  async publicGetLiveDetails(matchIdOrSlug: string): Promise<MatchLiveDetails> {
+    const response = await api.get<MatchLiveDetails>(`/matches/public/${matchIdOrSlug}/live`);
+    return response.data;
+  },
+
+  /**
+   * Obtém os detalhes completos do lance a lance para o Painel do Narrador (admin)
+   */
+  async adminGetLiveDetails(matchId: string): Promise<MatchLiveDetails> {
+    const response = await api.get<MatchLiveDetails>(`/matches/admin/${matchId}/live`);
+    return response.data;
+  },
+
+  /**
+   * Registra um novo lance na partida
+   */
+  async adminAddMatchEvent(matchId: string, data: MatchEventFormData): Promise<MatchEvent> {
+    const response = await api.post<MatchEvent>(`/matches/admin/${matchId}/events`, data);
+    return response.data;
+  },
+
+  /**
+   * Exclui um lance da partida
+   */
+  async adminDeleteMatchEvent(eventId: string): Promise<void> {
+    await api.delete(`/matches/admin/events/${eventId}`);
+  },
+
+  /**
+   * Executa uma ação de ciclo de partida (iniciar 1T, intervalo, iniciar 2T, encerrar, atualizar tempo)
+   */
+  async adminExecuteLiveAction(
+    matchId: string,
+    action: string,
+    data?: { minute?: number; period?: string; notes?: string }
+  ): Promise<MatchLiveDetails> {
+    const response = await api.post<MatchLiveDetails>(`/matches/admin/${matchId}/live/status`, {
+      action,
+      ...data,
+    });
+    return response.data;
   },
 };

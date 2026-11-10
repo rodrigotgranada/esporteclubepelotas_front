@@ -276,3 +276,4 @@ export const AdminMatchScoreModal: React.FC<AdminMatchScoreModalProps> = ({
     </Modal>
   );
 };
+

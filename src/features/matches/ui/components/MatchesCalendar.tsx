@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { LayoutContainer, Title, Text, Badge, Button } from '@/shared/ui/components/atoms';
 import { SafeImage } from '@/shared/ui/components/molecules/SafeImage';
 import { Championship, Match } from '../../types/matches.types';
@@ -153,27 +154,25 @@ export const MatchesCalendar: React.FC<MatchesCalendarProps> = ({
                     </LayoutContainer>
                   </LayoutContainer>
 
-                  {/* Ações / Transmissão */}
-                  {(match.ticketUrl || match.transmissionUrl) && (
+                  {/* Ações / Transmissão & Minuto a Minuto */}
+                  {(match.hasLiveCoverage || match.transmissionUrl) && (
                     <LayoutContainer className="flex items-center justify-end gap-2 pt-2 border-t border-border/40">
+                      {match.hasLiveCoverage && (
+                        <Link
+                          href={`/jogos/${match.slug || match.id}/ao-vivo`}
+                          className="inline-flex items-center text-xs bg-secondary/15 border border-secondary/40 text-secondary hover:bg-secondary/25 py-1 px-3 rounded-lg font-bold transition-colors"
+                        >
+                          🔴 Lance a Lance
+                        </Link>
+                      )}
                       {match.transmissionUrl && (
                         <a
                           href={match.transmissionUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center text-xs text-secondary hover:text-secondary-hover py-1 px-2.5 font-semibold transition-colors"
+                          className="inline-flex items-center text-xs text-text-secondary hover:text-text-primary py-1 px-2.5 font-semibold transition-colors"
                         >
                           Transmissão ↗
-                        </a>
-                      )}
-                      {match.ticketUrl && (
-                        <a
-                          href={match.ticketUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center text-xs border border-secondary/40 text-secondary hover:bg-secondary/10 py-1 px-3 rounded-lg font-semibold transition-colors"
-                        >
-                          Ingressos ↗
                         </a>
                       )}
                     </LayoutContainer>

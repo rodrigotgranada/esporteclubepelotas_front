@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import {
   LayoutContainer,
   Table,
@@ -16,6 +17,7 @@ import {
   Select,
   Option,
 } from '@/shared/ui/components/atoms';
+import { Radio } from 'lucide-react';
 import { SafeImage } from '@/shared/ui/components/molecules/SafeImage';
 import { Championship, Match } from '../../../types/matches.types';
 import { MATCHES_CONSTANTS, DEFAULT_OPPONENT_BADGE } from '../../../constants/matches.constants';
@@ -209,6 +211,20 @@ export const AdminMatchesTable: React.FC<AdminMatchesTableProps> = ({
 
                   <TableCell className="text-right">
                     <LayoutContainer className="flex items-center justify-end space-x-2">
+                      {match.hasLiveCoverage && (
+                        <Link href={`/gestao/jogos/${match.id}/narrador`}>
+                          <Button
+                            type="button"
+                            variant="custom"
+                            size="none"
+                            className="text-xs font-bold bg-secondary/15 text-secondary hover:bg-secondary/25 border border-secondary/40 px-2.5 py-1 rounded-lg cursor-pointer flex items-center gap-1 shadow-2xs"
+                            title="Abrir Painel do Narrador (Minuto a Minuto Ao Vivo)"
+                          >
+                            <Radio size={12} className={match.status === 'IN_PROGRESS' ? 'animate-pulse text-secondary' : ''} />
+                            Narrador
+                          </Button>
+                        </Link>
+                      )}
                       <Button
                         variant="ghost"
                         onClick={() => onEdit(match)}
