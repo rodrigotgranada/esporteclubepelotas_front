@@ -35,6 +35,7 @@ export const useSidebar = () => {
     { label: SIDEBAR_TEXTS.NAV.DASHBOARD, href: '/gestao', icon: Home, show: true },
     { label: SIDEBAR_TEXTS.NAV.NEWS, href: '/gestao/news', icon: Newspaper, show: true },
     { label: SIDEBAR_TEXTS.NAV.MATCHES, href: '/gestao/jogos', icon: CalendarDays, show: true },
+    { label: SIDEBAR_TEXTS.NAV.OPPONENTS, href: '/gestao/clubes', icon: Shield, show: true },
     { label: SIDEBAR_TEXTS.NAV.FOOTBALL, href: '/gestao/football', icon: Shirt, show: true },
     { label: SIDEBAR_TEXTS.NAV.YOUTH, href: '/gestao/base', icon: Sprout, show: true },
     { label: SIDEBAR_TEXTS.NAV.IDOLS, href: '/gestao/idols', icon: Trophy, show: true },

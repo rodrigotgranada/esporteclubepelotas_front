@@ -18,7 +18,7 @@ import {
 } from '@/shared/ui/components/atoms';
 import { SafeImage } from '@/shared/ui/components/molecules/SafeImage';
 import { Championship, Match } from '../../../types/matches.types';
-import { MATCHES_CONSTANTS, MATCH_STATUS_LABELS } from '../../../constants/matches.constants';
+import { MATCHES_CONSTANTS } from '../../../constants/matches.constants';
 
 export interface AdminMatchesTableProps {
   matches: Match[];
@@ -132,17 +132,17 @@ export const AdminMatchesTable: React.FC<AdminMatchesTableProps> = ({
       {/* Tabela de Dados */}
       <LayoutContainer className="rounded-2xl border border-border/60 bg-surface-card overflow-hidden shadow-sm">
         <Table>
-          <TableHead>
+          <TableHeader>
             <TableRow>
-              <TableHeader>{MATCHES_TABLE.OPPONENT}</TableHeader>
-              <TableHeader>{MATCHES_TABLE.CHAMPIONSHIP}</TableHeader>
-              <TableHeader>{MATCHES_TABLE.DATE_TIME}</TableHeader>
-              <TableHeader>{MATCHES_TABLE.STADIUM}</TableHeader>
-              <TableHeader>{MATCHES_TABLE.STATUS}</TableHeader>
-              <TableHeader>{MATCHES_TABLE.SCORE}</TableHeader>
-              <TableHeader className="text-right">{MATCHES_TABLE.ACTIONS}</TableHeader>
+              <TableHead>{MATCHES_TABLE.OPPONENT}</TableHead>
+              <TableHead>{MATCHES_TABLE.CHAMPIONSHIP}</TableHead>
+              <TableHead>{MATCHES_TABLE.DATE_TIME}</TableHead>
+              <TableHead>{MATCHES_TABLE.STADIUM}</TableHead>
+              <TableHead>{MATCHES_TABLE.STATUS}</TableHead>
+              <TableHead>{MATCHES_TABLE.SCORE}</TableHead>
+              <TableHead className="text-right">{MATCHES_TABLE.ACTIONS}</TableHead>
             </TableRow>
-          </TableHead>
+          </TableHeader>
           <TableBody>
             {matches.length === 0 ? (
               <TableRow>

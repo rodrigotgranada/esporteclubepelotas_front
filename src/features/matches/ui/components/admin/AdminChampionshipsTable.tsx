@@ -63,17 +63,17 @@ export const AdminChampionshipsTable: React.FC<AdminChampionshipsTableProps> = (
       {/* Tabela de Dados */}
       <LayoutContainer className="rounded-2xl border border-border/60 bg-surface-card overflow-hidden shadow-sm">
         <Table>
-          <TableHead>
+          <TableHeader>
             <TableRow>
-              <TableHeader>{CHAMPIONSHIPS_TABLE.NAME}</TableHeader>
-              <TableHeader>{CHAMPIONSHIPS_TABLE.SEASON}</TableHeader>
-              <TableHeader>{CHAMPIONSHIPS_TABLE.CATEGORY}</TableHeader>
-              <TableHeader>Tabela FGF/CBF</TableHeader>
-              <TableHeader>Regulamentos</TableHeader>
-              <TableHeader>{CHAMPIONSHIPS_TABLE.STATUS}</TableHeader>
-              <TableHeader className="text-right">{CHAMPIONSHIPS_TABLE.ACTIONS}</TableHeader>
+              <TableHead>{CHAMPIONSHIPS_TABLE.NAME}</TableHead>
+              <TableHead>{CHAMPIONSHIPS_TABLE.SEASON}</TableHead>
+              <TableHead>{CHAMPIONSHIPS_TABLE.CATEGORY}</TableHead>
+              <TableHead>Tabela FGF/CBF</TableHead>
+              <TableHead>Regulamentos</TableHead>
+              <TableHead>{CHAMPIONSHIPS_TABLE.STATUS}</TableHead>
+              <TableHead className="text-right">{CHAMPIONSHIPS_TABLE.ACTIONS}</TableHead>
             </TableRow>
-          </TableHead>
+          </TableHeader>
           <TableBody>
             {championships.length === 0 ? (
               <TableRow>

@@ -5,7 +5,7 @@ import { LayoutContainer, Title, Text, Button, Spinner } from '@/shared/ui/compo
 import { useAdminMatches } from '../../../hooks/useAdminMatches';
 import { AdminMatchesTable } from '../../components/admin/AdminMatchesTable';
 import { AdminChampionshipsTable } from '../../components/admin/AdminChampionshipsTable';
-import { AdminMatchDrawer } from '../../components/admin/AdminMatchDrawer';
+import { AdminMatchModal } from '../../components/admin/AdminMatchModal';
 import { AdminChampionshipDrawer } from '../../components/admin/AdminChampionshipDrawer';
 import { AdminDeleteMatchModal } from '../../components/admin/AdminDeleteMatchModal';
 import { MATCHES_CONSTANTS } from '../../../constants/matches.constants';
@@ -127,7 +127,7 @@ export const AdminMatchesFeature: React.FC = () => {
 
       {/* Drawers e Modais */}
       {isMatchDrawerOpen && (
-        <AdminMatchDrawer
+        <AdminMatchModal
           isOpen={isMatchDrawerOpen}
           match={selectedMatch}
           championships={championships}

@@ -8,3 +8,4 @@ export default function JogosLayout({
 }) {
   return <PublicLayout>{children}</PublicLayout>;
 }
+

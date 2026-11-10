@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import toast from 'react-hot-toast';
-import { Championship, Match, MatchStatus } from '../types/matches.types';
+import { Championship, Match } from '../types/matches.types';
 import { matchesService } from '../services/matches.service';
 import { MATCHES_CONSTANTS } from '../constants/matches.constants';
 import { useRealtimeEvents } from '@/shared/hooks/useRealtimeEvents';
