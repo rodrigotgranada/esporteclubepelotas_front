@@ -43,6 +43,8 @@ export const matchSchema = z.object({
   city: z.string().trim().optional(),
   matchDate: z.string().min(1, 'Data e hora da partida são obrigatórias'),
   roundName: z.string().trim().min(1, 'Informe a rodada ou fase'),
+  slug: z.string().trim().optional(),
+  hasLiveCoverage: z.boolean(),
   status: matchStatusSchema,
   pelotasScore: z.coerce.number().int().nullable().optional(),
   opponentScore: z.coerce.number().int().nullable().optional(),

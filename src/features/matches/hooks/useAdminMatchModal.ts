@@ -11,7 +11,7 @@ import { MATCHES_CONSTANTS } from '../constants/matches.constants';
 import { OpponentClub } from '@/features/opponents/types/opponents.types';
 import { opponentsService } from '@/features/opponents/services/opponents.service';
 
-export type MatchModalTab = 'match' | 'broadcast' | 'score';
+export type MatchModalTab = 'match' | 'score';
 
 export interface UseAdminMatchModalProps {
   match: Match | null;
@@ -55,6 +55,8 @@ export const useAdminMatchModal = ({
       city: 'Pelotas - RS',
       matchDate: new Date().toISOString().slice(0, 16),
       roundName: '',
+      slug: '',
+      hasLiveCoverage: false,
       status: 'SCHEDULED',
       pelotasScore: null,
       opponentScore: null,
@@ -112,6 +114,8 @@ export const useAdminMatchModal = ({
         city: match.city || '',
         matchDate: formattedDate,
         roundName: match.roundName,
+        slug: match.slug || '',
+        hasLiveCoverage: match.hasLiveCoverage ?? false,
         status: match.status,
         pelotasScore: match.pelotasScore ?? null,
         opponentScore: match.opponentScore ?? null,
@@ -135,6 +139,8 @@ export const useAdminMatchModal = ({
         city: 'Pelotas - RS',
         matchDate: new Date().toISOString().slice(0, 16),
         roundName: '',
+        slug: '',
+        hasLiveCoverage: false,
         status: 'SCHEDULED',
         pelotasScore: null,
         opponentScore: null,
@@ -273,12 +279,14 @@ export const useAdminMatchModal = ({
         city: values.city?.trim() || undefined,
         matchDate: dateUtc,
         roundName: values.roundName.trim(),
+        slug: values.slug?.trim() || undefined,
+        hasLiveCoverage: Boolean(values.hasLiveCoverage),
         status: values.status as MatchStatus,
         pelotasScore,
         opponentScore,
         penaltyPelotasScore: penaltyPelotas,
         penaltyOpponentScore: penaltyOpponent,
-        ticketUrl: values.ticketUrl?.trim() || undefined,
+        ticketUrl: undefined,
         broadcastChannel: values.broadcastChannel?.trim() || undefined,
         transmissionUrl: values.transmissionUrl?.trim() || undefined,
         notes: values.notes?.trim() || undefined,

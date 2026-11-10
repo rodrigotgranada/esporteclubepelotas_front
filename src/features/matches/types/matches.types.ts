@@ -45,6 +45,8 @@ export interface Match {
   city?: string | null;
   matchDate: string; // ISO string UTC
   roundName: string;
+  slug?: string;
+  hasLiveCoverage?: boolean;
   status: MatchStatus;
   pelotasScore?: number | null;
   opponentScore?: number | null;
@@ -79,6 +81,8 @@ export interface MatchFormData {
   city?: string;
   matchDate: string;
   roundName: string;
+  slug?: string;
+  hasLiveCoverage?: boolean;
   status: MatchStatus;
   pelotasScore?: number | null;
   opponentScore?: number | null;

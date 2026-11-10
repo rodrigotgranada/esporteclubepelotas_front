@@ -4,7 +4,6 @@ export * from './MatchesCalendar';
 export * from './MatchesOfficialLinks';
 export * from './admin/AdminMatchesTable';
 export * from './admin/AdminChampionshipsTable';
-export * from './admin/AdminMatchDrawer';
 export * from './admin/AdminMatchModal';
 export * from './admin/OpponentSearchCombobox';
 export * from './admin/AdminChampionshipDrawer';

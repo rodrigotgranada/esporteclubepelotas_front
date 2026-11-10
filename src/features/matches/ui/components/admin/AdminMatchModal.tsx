@@ -72,6 +72,8 @@ export const AdminMatchModal: React.FC<AdminMatchModalProps> = ({
   const selectedOpponentName = watch('opponentName');
   const currentHomeAway = watch('homeAway');
   const currentStatus = watch('status');
+  const hasLiveCoverage = watch('hasLiveCoverage');
+  const currentSlug = watch('slug');
 
   return (
     <>
@@ -91,38 +93,23 @@ export const AdminMatchModal: React.FC<AdminMatchModalProps> = ({
             </LayoutContainer>
           </LayoutContainer>
 
-          {/* Abas de Navegação */}
-          <LayoutContainer className="flex items-center space-x-2 border-b border-border/60 pb-1">
-            <Button
-              type="button"
-              variant="custom"
-              size="none"
-              onClick={() => setActiveTab('match')}
-              className={`px-4 py-2 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
-                activeTab === 'match'
-                  ? 'bg-secondary text-primary shadow-xs'
-                  : 'text-text-secondary hover:text-text-primary hover:bg-surface'
-              }`}
-            >
-              1. Confronto & Local
-            </Button>
+          {/* Abas de Navegação (Exclusivas para modo de Edição) */}
+          {isEditing && (
+            <LayoutContainer className="flex items-center space-x-2 border-b border-border/60 pb-1">
+              <Button
+                type="button"
+                variant="custom"
+                size="none"
+                onClick={() => setActiveTab('match')}
+                className={`px-4 py-2 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
+                  activeTab === 'match'
+                    ? 'bg-secondary text-primary shadow-xs'
+                    : 'text-text-secondary hover:text-text-primary hover:bg-surface'
+                }`}
+              >
+                1. Dados da Partida
+              </Button>
 
-            <Button
-              type="button"
-              variant="custom"
-              size="none"
-              onClick={() => setActiveTab('broadcast')}
-              className={`px-4 py-2 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
-                activeTab === 'broadcast'
-                  ? 'bg-secondary text-primary shadow-xs'
-                  : 'text-text-secondary hover:text-text-primary hover:bg-surface'
-              }`}
-            >
-              2. Transmissão & Ingressos
-            </Button>
-
-            {/* Aba de Placar exclusiva para edição de partida existente */}
-            {isEditing && (
               <Button
                 type="button"
                 variant="custom"
@@ -134,15 +121,15 @@ export const AdminMatchModal: React.FC<AdminMatchModalProps> = ({
                     : 'text-text-secondary hover:text-text-primary hover:bg-surface'
                 }`}
               >
-                3. Placar & Resultado
+                2. Placar & Resultado
               </Button>
-            )}
-          </LayoutContainer>
+            </LayoutContainer>
+          )}
 
           {/* Formulário Principal */}
           <form onSubmit={onSubmit} className="space-y-5">
-            {/* ================= ABA 1: CONFRONTO & LOCAL ================= */}
-            {activeTab === 'match' && (
+            {/* ================= DADOS DA PARTIDA ================= */}
+            {(activeTab === 'match' || !isEditing) && (
               <LayoutContainer className="space-y-4 animate-in fade-in duration-150">
                 {/* Linha 1: Campeonato */}
                 <LayoutContainer className="space-y-1">
@@ -346,60 +333,88 @@ export const AdminMatchModal: React.FC<AdminMatchModalProps> = ({
                     </Select>
                   </LayoutContainer>
                 </LayoutContainer>
-              </LayoutContainer>
-            )}
 
-            {/* ================= ABA 2: TRANSMISSÃO & INGRESSOS ================= */}
-            {activeTab === 'broadcast' && (
-              <LayoutContainer className="space-y-4 animate-in fade-in duration-150">
-                <LayoutContainer className="space-y-1">
-                  <Text className="text-xs font-semibold text-text-secondary">
-                    {MATCH_DRAWER.TRANSMISSION_URL_LABEL}
-                  </Text>
-                  <Input
-                    placeholder={MATCH_DRAWER.TRANSMISSION_URL_PLACEHOLDER}
-                    {...register('transmissionUrl')}
-                  />
-                  <Text className="text-[11px] text-text-muted">
-                    Cole o link do YouTube, Federação ou streaming ao vivo.
-                  </Text>
-                </LayoutContainer>
+                {/* Linha 6: Minuto a Minuto Ao Vivo & Transmissão (Abaixo de tudo) */}
+                <LayoutContainer className="p-4 rounded-xl border border-border/60 bg-surface/30 space-y-4 pt-4 mt-2">
+                  {/* Switch para Habilitar Cobertura Minuto a Minuto */}
+                  <LayoutContainer className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-xl bg-surface-card border border-border/50">
+                    <LayoutContainer className="space-y-0.5">
+                      <Text className="text-xs font-bold text-text-primary block">
+                        {MATCH_DRAWER.LIVE_COVERAGE_LABEL}
+                      </Text>
+                      <Text className="text-[11px] text-text-muted block">
+                        {MATCH_DRAWER.LIVE_COVERAGE_DESC}
+                      </Text>
+                    </LayoutContainer>
 
-                <LayoutContainer className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                      <input
+                        type="checkbox"
+                        checked={hasLiveCoverage}
+                        onChange={(e) => setValue('hasLiveCoverage', e.target.checked)}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-surface-hover peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-border after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
+                    </label>
+                  </LayoutContainer>
+
+                  {/* Slug da Partida (URL do Minuto a Minuto) */}
                   <LayoutContainer className="space-y-1">
-                    <Text className="text-xs font-semibold text-text-secondary">
-                      {MATCH_DRAWER.BROADCAST_CHANNEL_LABEL}
-                    </Text>
+                    <LayoutContainer className="flex items-center justify-between">
+                      <Text className="text-xs font-semibold text-text-secondary">
+                        {MATCH_DRAWER.SLUG_LABEL}
+                      </Text>
+                      <Text className="text-[10px] text-text-muted">
+                        URL: /jogos/{currentSlug || 'slug-automatico'}/ao-vivo
+                      </Text>
+                    </LayoutContainer>
                     <Input
-                      placeholder={MATCH_DRAWER.BROADCAST_CHANNEL_PLACEHOLDER}
-                      {...register('broadcastChannel')}
+                      placeholder={MATCH_DRAWER.SLUG_PLACEHOLDER}
+                      {...register('slug')}
                     />
                   </LayoutContainer>
 
+                  {/* Link da Transmissão Oficial Ao Vivo */}
                   <LayoutContainer className="space-y-1">
                     <Text className="text-xs font-semibold text-text-secondary">
-                      {MATCH_DRAWER.TICKET_URL_LABEL}
+                      {MATCH_DRAWER.TRANSMISSION_URL_LABEL}
                     </Text>
                     <Input
-                      placeholder={MATCH_DRAWER.TICKET_URL_PLACEHOLDER}
-                      {...register('ticketUrl')}
+                      placeholder={MATCH_DRAWER.TRANSMISSION_URL_PLACEHOLDER}
+                      {...register('transmissionUrl')}
                     />
+                    <Text className="text-[10px] text-text-muted block">
+                      Cole o link direto do YouTube, Federação ou streaming ao vivo.
+                    </Text>
                   </LayoutContainer>
-                </LayoutContainer>
 
-                <LayoutContainer className="space-y-1">
-                  <Text className="text-xs font-semibold text-text-secondary">
-                    {MATCH_DRAWER.NOTES_LABEL}
-                  </Text>
-                  <Input
-                    placeholder={MATCH_DRAWER.NOTES_PLACEHOLDER}
-                    {...register('notes')}
-                  />
+                  {/* Canal de TV / Rádio e Observações */}
+                  <LayoutContainer className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <LayoutContainer className="space-y-1">
+                      <Text className="text-xs font-semibold text-text-secondary">
+                        {MATCH_DRAWER.BROADCAST_CHANNEL_LABEL}
+                      </Text>
+                      <Input
+                        placeholder={MATCH_DRAWER.BROADCAST_CHANNEL_PLACEHOLDER}
+                        {...register('broadcastChannel')}
+                      />
+                    </LayoutContainer>
+
+                    <LayoutContainer className="space-y-1">
+                      <Text className="text-xs font-semibold text-text-secondary">
+                        {MATCH_DRAWER.NOTES_LABEL}
+                      </Text>
+                      <Input
+                        placeholder={MATCH_DRAWER.NOTES_PLACEHOLDER}
+                        {...register('notes')}
+                      />
+                    </LayoutContainer>
+                  </LayoutContainer>
                 </LayoutContainer>
               </LayoutContainer>
             )}
 
-            {/* ================= ABA 3: PLACAR & RESULTADO (Apenas Edição) ================= */}
+            {/* ================= ABA 2: PLACAR & RESULTADO (Apenas Edição) ================= */}
             {isEditing && activeTab === 'score' && (
               <LayoutContainer className="space-y-4 animate-in fade-in duration-150 p-4 rounded-xl border border-border/60 bg-surface/30">
                 <LayoutContainer className="border-b border-border/50 pb-2 flex items-center justify-between">
