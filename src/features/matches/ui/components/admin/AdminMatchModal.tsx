@@ -12,7 +12,7 @@ import {
   Button,
 } from '@/shared/ui/components/atoms';
 import { Radio } from 'lucide-react';
-import { Championship, Match } from '../../../types/matches.types';
+import { Championship, Match, MatchStatus } from '../../../types/matches.types';
 import { MATCHES_CONSTANTS, MATCH_STATUS_LABELS } from '../../../constants/matches.constants';
 import { useAdminMatchModal } from '../../../hooks/useAdminMatchModal';
 import { AdminOpponentModal } from '@/features/opponents/ui/components/AdminOpponentModal';
@@ -65,6 +65,7 @@ export const AdminMatchModal: React.FC<AdminMatchModalProps> = ({
   const selectedOpponentName = watch('opponentName');
   const currentHomeAway = watch('homeAway');
   const currentStatus = watch('status');
+  const currentChampionshipId = watch('championshipId');
   const hasLiveCoverage = watch('hasLiveCoverage');
 
   return (
@@ -93,11 +94,10 @@ export const AdminMatchModal: React.FC<AdminMatchModalProps> = ({
                 variant="custom"
                 size="none"
                 onClick={() => setActiveTab('match')}
-                className={`px-4 py-2 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
-                  activeTab === 'match'
+                className={`px-4 py-2 text-xs font-bold rounded-lg transition-colors cursor-pointer ${activeTab === 'match'
                     ? 'bg-secondary text-primary shadow-xs'
                     : 'text-text-secondary hover:text-text-primary hover:bg-surface'
-                }`}
+                  }`}
               >
                 1. Dados da Partida
               </Button>
@@ -107,11 +107,10 @@ export const AdminMatchModal: React.FC<AdminMatchModalProps> = ({
                 variant="custom"
                 size="none"
                 onClick={() => setActiveTab('score')}
-                className={`px-4 py-2 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
-                  activeTab === 'score'
+                className={`px-4 py-2 text-xs font-bold rounded-lg transition-colors cursor-pointer ${activeTab === 'score'
                     ? 'bg-secondary text-primary shadow-xs'
                     : 'text-text-secondary hover:text-text-primary hover:bg-surface'
-                }`}
+                  }`}
               >
                 2. Placar & Resultado
               </Button>
@@ -131,7 +130,8 @@ export const AdminMatchModal: React.FC<AdminMatchModalProps> = ({
                       {MATCH_DRAWER.CHAMPIONSHIP_LABEL}
                     </Text>
                     <Select
-                      {...register('championshipId')}
+                      value={currentChampionshipId}
+                      onChange={(e) => setValue('championshipId', e.target.value, { shouldValidate: true, shouldDirty: true })}
                       className="w-full"
                     >
                       {championships.map((champ) => (
@@ -230,14 +230,19 @@ export const AdminMatchModal: React.FC<AdminMatchModalProps> = ({
                       variant="custom"
                       size="none"
                       onClick={() => handleHomeAwayChange('HOME')}
-                      className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer ${
+                      className={`p-3 rounded-xl border text-center transition-all cursor-pointer ${
                         currentHomeAway === 'HOME'
-                          ? 'border-secondary bg-secondary/10 text-secondary font-bold shadow-xs'
-                          : 'border-border/60 bg-surface/50 text-text-secondary hover:bg-surface'
+                          ? 'border-secondary bg-secondary text-primary font-black shadow-lg ring-2 ring-secondary/50'
+                          : 'border-border/60 bg-surface/40 text-text-muted hover:bg-surface/80 hover:text-text-secondary'
                       }`}
                     >
-                      <Text className="text-xs font-bold block">Mandante (Casa)</Text>
-                      <Text className="text-[10px] text-text-muted block mt-0.5">
+                      <LayoutContainer className="flex items-center justify-center gap-1.5">
+                        {currentHomeAway === 'HOME' && <span className="text-primary font-black">✓</span>}
+                        <Text className={`text-xs font-black block ${currentHomeAway === 'HOME' ? 'text-primary' : 'text-text-primary'}`}>
+                          Mandante (Casa)
+                        </Text>
+                      </LayoutContainer>
+                      <Text className={`text-[10px] block mt-0.5 ${currentHomeAway === 'HOME' ? 'text-primary/90 font-semibold' : 'text-text-muted'}`}>
                         Estádio Boca do Lobo (Pelotas - RS)
                       </Text>
                     </Button>
@@ -247,14 +252,19 @@ export const AdminMatchModal: React.FC<AdminMatchModalProps> = ({
                       variant="custom"
                       size="none"
                       onClick={() => handleHomeAwayChange('AWAY')}
-                      className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer ${
+                      className={`p-3 rounded-xl border text-center transition-all cursor-pointer ${
                         currentHomeAway === 'AWAY'
-                          ? 'border-secondary bg-secondary/10 text-secondary font-bold shadow-xs'
-                          : 'border-border/60 bg-surface/50 text-text-secondary hover:bg-surface'
+                          ? 'border-secondary bg-secondary text-primary font-black shadow-lg ring-2 ring-secondary/50'
+                          : 'border-border/60 bg-surface/40 text-text-muted hover:bg-surface/80 hover:text-text-secondary'
                       }`}
                     >
-                      <Text className="text-xs font-bold block">Visitante (Fora)</Text>
-                      <Text className="text-[10px] text-text-muted block mt-0.5">
+                      <LayoutContainer className="flex items-center justify-center gap-1.5">
+                        {currentHomeAway === 'AWAY' && <span className="text-primary font-black">✓</span>}
+                        <Text className={`text-xs font-black block ${currentHomeAway === 'AWAY' ? 'text-primary' : 'text-text-primary'}`}>
+                          Visitante (Fora)
+                        </Text>
+                      </LayoutContainer>
+                      <Text className={`text-[10px] block mt-0.5 ${currentHomeAway === 'AWAY' ? 'text-primary/90 font-semibold' : 'text-text-muted'}`}>
                         Estádio Sede do Adversário
                       </Text>
                     </Button>
@@ -326,7 +336,8 @@ export const AdminMatchModal: React.FC<AdminMatchModalProps> = ({
                       {MATCH_DRAWER.STATUS_LABEL}
                     </Text>
                     <Select
-                      {...register('status')}
+                      value={currentStatus}
+                      onChange={(e) => setValue('status', e.target.value as MatchStatus, { shouldValidate: true, shouldDirty: true })}
                       className="w-full"
                     >
                       <Option value="SCHEDULED">{MATCH_STATUS_LABELS.SCHEDULED}</Option>
