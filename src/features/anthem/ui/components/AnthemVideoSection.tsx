@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Video } from 'lucide-react';
 import {
   LayoutContainer,
@@ -6,34 +6,14 @@ import {
   Text,
 } from '@/shared/ui/components';
 import { ANTHEM_TEXTS } from '../../constants/anthem.constants';
+import { getYouTubeEmbedUrl } from '@/shared/utils';
 
 export interface AnthemVideoSectionProps {
   videoUrl?: string | null;
 }
 
 export const AnthemVideoSection: React.FC<AnthemVideoSectionProps> = ({ videoUrl }) => {
-  const embedUrl = useMemo(() => {
-    if (!videoUrl) return null;
-    try {
-      const trimmed = videoUrl.trim();
-      let videoId = '';
-
-      if (trimmed.includes('youtu.be/')) {
-        videoId = trimmed.split('youtu.be/')[1]?.split('?')[0] || '';
-      } else if (trimmed.includes('watch?v=')) {
-        videoId = trimmed.split('watch?v=')[1]?.split('&')[0] || '';
-      } else if (trimmed.includes('/embed/')) {
-        videoId = trimmed.split('/embed/')[1]?.split('?')[0] || '';
-      }
-
-      if (videoId) {
-        return `https://www.youtube-nocookie.com/embed/${videoId}`;
-      }
-      return null;
-    } catch {
-      return null;
-    }
-  }, [videoUrl]);
+  const embedUrl = getYouTubeEmbedUrl(videoUrl);
 
   if (!embedUrl) {
     return null;

@@ -398,7 +398,7 @@ export const AdminMatchModal: React.FC<AdminMatchModalProps> = ({
                   {...register('transmissionUrl')}
                 />
                 <Text className="text-[10px] text-text-muted block">
-                  Link opcional para canal oficial do YouTube, Federação ou streaming ao vivo.
+                  {MATCH_DRAWER.TRANSMISSION_URL_HELPER}
                 </Text>
               </LayoutContainer>
             </LayoutContainer>

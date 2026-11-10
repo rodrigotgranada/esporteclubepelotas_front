@@ -87,3 +87,4 @@ export const StoreOnlineCard: React.FC<StoreOnlineCardProps> = ({
     </LayoutContainer>
   );
 };
+

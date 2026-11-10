@@ -61,3 +61,4 @@ export const StoreMemberDiscountCard: React.FC<StoreMemberDiscountCardProps> = (
     </LayoutContainer>
   );
 };
+

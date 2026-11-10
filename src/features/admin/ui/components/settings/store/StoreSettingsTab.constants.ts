@@ -53,3 +53,4 @@ export const STORE_SETTINGS_TEXTS = {
   SAVE_SUCCESS: 'Configurações da Loja Oficial atualizadas com sucesso!',
   SAVE_ERROR: 'Erro ao salvar configurações da loja. Tente novamente.',
 };
+

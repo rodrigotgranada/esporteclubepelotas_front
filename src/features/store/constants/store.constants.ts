@@ -60,3 +60,4 @@ export const STORE_TEXTS = {
   FALLBACK_MEMBER_DISCOUNT:
     'Sócios do Pelotas em dia têm desconto exclusivo em produtos e mantos oficiais mediante apresentação da carteirinha física ou digital.',
 };
+

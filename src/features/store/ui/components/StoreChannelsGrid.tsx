@@ -130,3 +130,4 @@ export const StoreChannelsGrid: React.FC<StoreChannelsGridProps> = ({
     </LayoutContainer>
   );
 };
+

@@ -24,6 +24,7 @@ import { SafeImage } from '@/shared/ui/components/molecules/SafeImage';
 import { MATCHES_CONSTANTS, DEFAULT_OPPONENT_BADGE } from '../../constants/matches.constants';
 import { usePublicMatchLive } from '../../hooks/usePublicMatchLive';
 import { MatchEventType, MatchEvent } from '../../types/matches.types';
+import { getYouTubeEmbedUrl } from '@/shared/utils';
 
 export interface PublicMatchLiveFeatureProps {
   slugOrId: string;
@@ -134,28 +135,6 @@ export const PublicMatchLiveFeature: React.FC<PublicMatchLiveFeatureProps> = ({ 
         return <AlertCircle size={18} className="text-orange-400" />;
       default:
         return <MessageSquare size={18} className="text-text-muted" />;
-    }
-  };
-
-  // Helper para extrair embed do YouTube se aplicável
-  const getYouTubeEmbedUrl = (url?: string | null) => {
-    if (!url) return null;
-    try {
-      if (url.includes('youtube.com/watch?v=')) {
-        const id = url.split('v=')[1]?.split('&')[0];
-        return id ? `https://www.youtube.com/embed/${id}` : null;
-      }
-      if (url.includes('youtu.be/')) {
-        const id = url.split('youtu.be/')[1]?.split('?')[0];
-        return id ? `https://www.youtube.com/embed/${id}` : null;
-      }
-      if (url.includes('youtube.com/live/')) {
-        const id = url.split('youtube.com/live/')[1]?.split('?')[0];
-        return id ? `https://www.youtube.com/embed/${id}` : null;
-      }
-      return null;
-    } catch {
-      return null;
     }
   };
 
@@ -278,7 +257,7 @@ export const PublicMatchLiveFeature: React.FC<PublicMatchLiveFeatureProps> = ({ 
               rel="noopener noreferrer"
               className="text-xs text-secondary hover:text-secondary-hover font-bold"
             >
-              Abrir no YouTube ↗
+              {PUBLIC_LIVE.TRANSMISSION_OPEN_YOUTUBE}
             </a>
           </LayoutContainer>
 
@@ -286,7 +265,7 @@ export const PublicMatchLiveFeature: React.FC<PublicMatchLiveFeatureProps> = ({ 
             <LayoutContainer className="relative w-full aspect-video rounded-2xl overflow-hidden border border-border shadow-lg">
               <iframe
                 src={youtubeEmbedUrl}
-                title="Transmissão Ao Vivo"
+                title={PUBLIC_LIVE.TRANSMISSION_IFRAME_TITLE}
                 className="w-full h-full border-0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
@@ -295,15 +274,15 @@ export const PublicMatchLiveFeature: React.FC<PublicMatchLiveFeatureProps> = ({ 
           ) : (
             <LayoutContainer className="p-4 rounded-xl bg-surface border border-border flex items-center justify-between">
               <Text className="text-sm text-text-secondary">
-                Acompanhe a transmissão oficial ao vivo pelo canal oficial.
+                {PUBLIC_LIVE.TRANSMISSION_EXTERNAL_DESC}
               </Text>
               <a
                 href={match.transmissionUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 bg-secondary text-primary font-bold px-4 py-2 rounded-xl text-xs"
+                className="inline-flex items-center gap-1.5 bg-secondary text-primary font-bold px-4 py-2 rounded-xl text-xs hover:bg-secondary-hover transition-colors"
               >
-                Assistir Transmissão ↗
+                {PUBLIC_LIVE.TRANSMISSION_WATCH_BTN}
               </a>
             </LayoutContainer>
           )}

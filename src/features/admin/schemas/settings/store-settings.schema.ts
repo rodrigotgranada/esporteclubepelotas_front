@@ -25,3 +25,4 @@ export const storeSettingsSchema = z.object({
 });
 
 export type StoreSettingsFormData = z.infer<typeof storeSettingsSchema>;
+

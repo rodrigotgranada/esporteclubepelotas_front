@@ -37,3 +37,4 @@ export const StoreHero: React.FC<StoreHeroProps> = ({ storeName, storeDescriptio
     </LayoutContainer>
   );
 };
+

@@ -159,3 +159,4 @@ export const PublicDrawerFooter: React.FC<PublicDrawerFooterProps> = ({
     </LayoutContainer>
   );
 };
+
