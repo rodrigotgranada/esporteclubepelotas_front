@@ -10,6 +10,9 @@ export interface Sponsor {
   featured?: boolean;
   isActive: boolean;
   active?: boolean;
+  showOnMain: boolean;
+  showOnYouth: boolean;
+  showOnFemale: boolean;
   displayOrder: number;
   contractStartDate?: string | null;
   contractEndDate?: string | null;
@@ -28,6 +31,9 @@ export interface CreateSponsorPayload {
   featured?: boolean;
   isActive?: boolean;
   active?: boolean;
+  showOnMain?: boolean;
+  showOnYouth?: boolean;
+  showOnFemale?: boolean;
   displayOrder?: number;
   contractStartDate?: string | null;
   contractEndDate?: string | null;
@@ -42,6 +48,9 @@ export interface UpdateSponsorPayload {
   featured?: boolean;
   isActive?: boolean;
   active?: boolean;
+  showOnMain?: boolean;
+  showOnYouth?: boolean;
+  showOnFemale?: boolean;
   displayOrder?: number;
   contractStartDate?: string | null;
   contractEndDate?: string | null;
@@ -53,6 +62,7 @@ export interface GetSponsorsParams {
   search?: string;
   status?: string;
   isFeatured?: boolean;
+  scope?: 'ALL' | 'MAIN' | 'YOUTH' | 'FEMALE';
 }
 
 export interface GetSponsorsResponse {

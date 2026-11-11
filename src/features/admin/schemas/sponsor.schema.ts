@@ -19,6 +19,9 @@ export const sponsorSchema = z
       ),
     isFeatured: z.boolean(),
     isActive: z.boolean(),
+    showOnMain: z.boolean(),
+    showOnYouth: z.boolean(),
+    showOnFemale: z.boolean(),
     displayOrder: z.coerce.number().int().min(0, 'A ordem não pode ser negativa'),
     contractStartDate: z.string().optional().nullable(),
     contractEndDate: z.string().optional().nullable(),
@@ -28,6 +31,13 @@ export const sponsorSchema = z
     {
       message: 'O logotipo oficial da marca é obrigatório',
       path: ['logoUrl'],
+    },
+  )
+  .refine(
+    (data) => Boolean(data.showOnMain || data.showOnYouth || data.showOnFemale),
+    {
+      message: 'Selecione ao menos um local de exibição (Principal, Base ou Feminino)',
+      path: ['showOnMain'],
     },
   )
   .refine(

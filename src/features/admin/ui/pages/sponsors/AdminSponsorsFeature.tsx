@@ -25,6 +25,8 @@ export const AdminSponsorsFeature = () => {
     setStatusFilter,
     featuredFilter,
     setFeaturedFilter,
+    scopeFilter,
+    setScopeFilter,
     drawerOpen,
     selectedSponsorId,
     openCreateDrawer,
@@ -62,6 +64,8 @@ export const AdminSponsorsFeature = () => {
         onStatusFilterChange={setStatusFilter}
         featuredFilter={featuredFilter}
         onFeaturedFilterChange={setFeaturedFilter}
+        scopeFilter={scopeFilter}
+        onScopeFilterChange={setScopeFilter}
         onNewSponsor={openCreateDrawer}
         onExportReport={handleExportReport}
         isExporting={isExporting}

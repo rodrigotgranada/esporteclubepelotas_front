@@ -136,3 +136,4 @@ export const FemaleNewsSection: React.FC<FemaleNewsSectionProps> = ({
     </LayoutContainer>
   );
 };
+

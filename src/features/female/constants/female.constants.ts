@@ -112,4 +112,12 @@ export const FEMALE_CONSTANTS = {
     CONTACT_PHONE_LABEL: 'Telefone / WhatsApp:',
     CONTACT_EMAIL_LABEL: 'E-mail de Contato:',
   },
+
+  SPONSORS: {
+    BADGE: 'Parceiros das Lobas',
+    TITLE_PREFIX: 'Patrocinadores & Apoiadores do',
+    TITLE_HIGHLIGHT: 'Futebol Feminino',
+    SUBTITLE:
+      'Marcas parceiras e empresas que investem e fortalecem o futebol feminino do Esporte Clube Pelotas.',
+  },
 };

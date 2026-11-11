@@ -34,9 +34,15 @@ export const FemaleHubFeature: React.FC = () => {
         />
       </LayoutContainer>
 
-      {/* Patrocinadores Oficiais */}
+      {/* Patrocinadores Oficiais do Futebol Feminino */}
       <LayoutContainer className="my-10">
-        <HomeSponsorsSection />
+        <HomeSponsorsSection
+          scope="FEMALE"
+          badge={FEMALE_CONSTANTS.SPONSORS.BADGE}
+          titlePrefix={FEMALE_CONSTANTS.SPONSORS.TITLE_PREFIX}
+          titleHighlight={FEMALE_CONSTANTS.SPONSORS.TITLE_HIGHLIGHT}
+          subtitle={FEMALE_CONSTANTS.SPONSORS.SUBTITLE}
+        />
       </LayoutContainer>
     </LayoutContainer>
   );

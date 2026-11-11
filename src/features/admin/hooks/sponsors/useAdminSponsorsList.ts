@@ -21,6 +21,7 @@ export const useAdminSponsorsList = () => {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [featuredFilter, setFeaturedFilter] = useState<string>('');
+  const [scopeFilter, setScopeFilter] = useState<string>('');
 
   // Modal de Exclusão
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -42,6 +43,7 @@ export const useAdminSponsorsList = () => {
       if (statusFilter) params.status = statusFilter;
       if (featuredFilter === 'true') params.isFeatured = true;
       if (featuredFilter === 'false') params.isFeatured = false;
+      if (scopeFilter) params.scope = scopeFilter;
 
       const res = await adminSponsorsService.getSponsors(params);
       setSponsors(res.data || []);
@@ -53,7 +55,7 @@ export const useAdminSponsorsList = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [page, limit, search, statusFilter, featuredFilter]);
+  }, [page, limit, search, statusFilter, featuredFilter, scopeFilter]);
 
   useEffect(() => {
     loadSponsors();
@@ -246,6 +248,8 @@ export const useAdminSponsorsList = () => {
     setStatusFilter,
     featuredFilter,
     setFeaturedFilter,
+    scopeFilter,
+    setScopeFilter,
     drawerOpen,
     selectedSponsorId,
     openCreateDrawer,

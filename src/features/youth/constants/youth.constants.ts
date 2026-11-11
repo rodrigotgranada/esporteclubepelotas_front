@@ -128,4 +128,12 @@ export const YOUTH_CONSTANTS = {
     CONTACT_PHONE_LABEL: 'Telefone / WhatsApp:',
     LOADING: 'Carregando informações de captação...',
   },
+
+  SPONSORS: {
+    BADGE: 'Parceiros da Base',
+    TITLE_PREFIX: 'Patrocinadores & Apoiadores das',
+    TITLE_HIGHLIGHT: 'Crias da Boca',
+    SUBTITLE:
+      'Empresas parceiras e marcas que acreditam no futuro do Esporte Clube Pelotas e investem na formação de novos atletas.',
+  },
 };

@@ -84,3 +84,4 @@ export const useFemaleHub = () => {
     reloadSquad: () => loadCurrentSquad({ silent: false }),
   };
 };
+

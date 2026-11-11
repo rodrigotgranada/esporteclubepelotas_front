@@ -78,3 +78,4 @@ export const FemaleHero: React.FC = () => {
     </LayoutContainer>
   );
 };
+

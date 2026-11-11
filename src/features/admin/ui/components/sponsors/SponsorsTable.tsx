@@ -146,6 +146,9 @@ export const SponsorsTable: React.FC<SponsorsTableProps> = ({
               <TableHead className="py-3 px-4 font-bold text-xs uppercase text-text-secondary">
                 {texts.COL_NAME}
               </TableHead>
+              <TableHead className="py-3 px-4 font-bold text-xs uppercase text-text-secondary text-center">
+                {texts.COL_SCOPES}
+              </TableHead>
               <TableHead className="py-3 px-4 font-bold text-xs uppercase text-text-secondary">
                 {texts.COL_CONTRACT}
               </TableHead>
@@ -203,6 +206,27 @@ export const SponsorsTable: React.FC<SponsorsTableProps> = ({
                         </Text>
                         <ExternalLink size={10} className="shrink-0" />
                       </Link>
+                    )}
+                  </LayoutContainer>
+                </TableCell>
+
+                {/* Onde Apoia / Modalidades */}
+                <TableCell className="py-3 px-4 text-center">
+                  <LayoutContainer className="flex flex-wrap items-center justify-center gap-1 max-w-[170px] mx-auto">
+                    {sponsor.showOnMain && (
+                      <Badge variant="primary" size="sm" className="text-[10px] font-bold py-0.5 px-1.5">
+                        {texts.SCOPE_MAIN_BADGE}
+                      </Badge>
+                    )}
+                    {sponsor.showOnYouth && (
+                      <Badge variant="success" size="sm" className="text-[10px] font-bold py-0.5 px-1.5">
+                        {texts.SCOPE_YOUTH_BADGE}
+                      </Badge>
+                    )}
+                    {sponsor.showOnFemale && (
+                      <Badge variant="default" size="sm" className="text-[10px] font-bold py-0.5 px-1.5 border-primary/40 text-primary">
+                        {texts.SCOPE_FEMALE_BADGE}
+                      </Badge>
                     )}
                   </LayoutContainer>
                 </TableCell>

@@ -5,21 +5,26 @@ import { Sponsor } from '../types/sponsors.types';
 import { sponsorsService } from '../services/sponsors.service';
 import { useRealtimeEvents } from '@/shared/hooks/useRealtimeEvents';
 
-export const useHomeSponsorsSection = () => {
+export interface UseHomeSponsorsSectionProps {
+  scope?: 'MAIN' | 'YOUTH' | 'FEMALE';
+}
+
+export const useHomeSponsorsSection = (props?: UseHomeSponsorsSectionProps) => {
+  const scope = props?.scope || 'MAIN';
   const [sponsors, setSponsors] = useState<Sponsor[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const loadSponsors = useCallback(async () => {
     try {
-      const data = await sponsorsService.getActiveSponsors();
+      const data = await sponsorsService.getActiveSponsors(scope);
       setSponsors(Array.isArray(data) ? data : []);
     } catch (err) {
-      console.warn('Erro ao carregar patrocinadores para a Home:', err);
+      console.warn(`Erro ao carregar patrocinadores para o escopo ${scope}:`, err);
       setSponsors([]);
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [scope]);
 
   useEffect(() => {
     loadSponsors();

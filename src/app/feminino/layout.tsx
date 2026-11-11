@@ -8,3 +8,4 @@ export default function FemininoLayout({
 }) {
   return <PublicLayout>{children}</PublicLayout>;
 }
+

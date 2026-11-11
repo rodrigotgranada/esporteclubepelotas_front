@@ -7,8 +7,22 @@ import { useHomeSponsorsSection } from '../../hooks';
 import { HOME_SPONSORS_SECTION_TEXTS } from '../../constants';
 import { HomeSponsorCard } from './HomeSponsorCard';
 
-export const HomeSponsorsSection = () => {
-  const { sponsors, isLoading, handleSponsorClick } = useHomeSponsorsSection();
+export interface HomeSponsorsSectionProps {
+  scope?: 'MAIN' | 'YOUTH' | 'FEMALE';
+  badge?: string;
+  titlePrefix?: string;
+  titleHighlight?: string;
+  subtitle?: string;
+}
+
+export const HomeSponsorsSection: React.FC<HomeSponsorsSectionProps> = ({
+  scope = 'MAIN',
+  badge = HOME_SPONSORS_SECTION_TEXTS.BADGE,
+  titlePrefix = HOME_SPONSORS_SECTION_TEXTS.TITLE_PREFIX,
+  titleHighlight = HOME_SPONSORS_SECTION_TEXTS.TITLE_HIGHLIGHT,
+  subtitle = HOME_SPONSORS_SECTION_TEXTS.SUBTITLE,
+}) => {
+  const { sponsors, isLoading, handleSponsorClick } = useHomeSponsorsSection({ scope });
 
   if (isLoading && sponsors.length === 0) {
     return null;
@@ -27,21 +41,21 @@ export const HomeSponsorsSection = () => {
       <LayoutContainer className="flex flex-col items-center text-center max-w-2xl mx-auto gap-2">
         <LayoutContainer className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary font-bold text-xs uppercase tracking-wider">
           <Sparkles size={13} className="text-primary" />
-          <Text as="span">{HOME_SPONSORS_SECTION_TEXTS.BADGE}</Text>
+          <Text as="span">{badge}</Text>
         </LayoutContainer>
 
         <Title
           level="h2"
           className="text-2xl sm:text-3xl md:text-4xl font-black text-text-primary tracking-tight"
         >
-          {HOME_SPONSORS_SECTION_TEXTS.TITLE_PREFIX}{' '}
+          {titlePrefix}{' '}
           <Text as="span" className="text-primary">
-            {HOME_SPONSORS_SECTION_TEXTS.TITLE_HIGHLIGHT}
+            {titleHighlight}
           </Text>
         </Title>
 
         <Text as="p" className="text-text-secondary text-sm sm:text-base">
-          {HOME_SPONSORS_SECTION_TEXTS.SUBTITLE}
+          {subtitle}
         </Text>
       </LayoutContainer>
 

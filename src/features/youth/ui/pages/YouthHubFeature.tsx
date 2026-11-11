@@ -9,6 +9,7 @@ import { YouthNewsSection } from '../components/YouthNewsSection';
 import { YouthSquadsCtaCard } from '../components/YouthSquadsCtaCard';
 import { YouthMethodologySection } from '../components/YouthMethodologySection';
 import { YouthPeneirasSection } from '../components/YouthPeneirasSection';
+import { HomeSponsorsSection } from '@/features/sponsors/ui/components/HomeSponsorsSection';
 
 export const YouthHubFeature: React.FC = () => {
   const { news, isLoadingNews, youthConfig, isLoadingConfig } = useYouthHub();
@@ -44,6 +45,17 @@ export const YouthHubFeature: React.FC = () => {
         buttonText={ctaTexts.BTN}
         className="mt-14"
       />
+
+      {/* 7. Patrocinadores & Apoiadores Oficiais da Base */}
+      <LayoutContainer className="my-10">
+        <HomeSponsorsSection
+          scope="YOUTH"
+          badge={YOUTH_CONSTANTS.SPONSORS.BADGE}
+          titlePrefix={YOUTH_CONSTANTS.SPONSORS.TITLE_PREFIX}
+          titleHighlight={YOUTH_CONSTANTS.SPONSORS.TITLE_HIGHLIGHT}
+          subtitle={YOUTH_CONSTANTS.SPONSORS.SUBTITLE}
+        />
+      </LayoutContainer>
     </LayoutContainer>
   );
 };

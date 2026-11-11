@@ -86,3 +86,4 @@ export const FemaleSquadSection: React.FC<FemaleSquadSectionProps> = ({
     </LayoutContainer>
   );
 };
+

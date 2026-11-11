@@ -12,6 +12,8 @@ export interface SponsorsFilterBarProps {
   onStatusFilterChange: (value: string) => void;
   featuredFilter: string;
   onFeaturedFilterChange: (value: string) => void;
+  scopeFilter?: string;
+  onScopeFilterChange?: (value: string) => void;
   onNewSponsor: () => void;
   onExportReport?: () => void;
   isExporting?: boolean;
@@ -24,6 +26,8 @@ export const SponsorsFilterBar: React.FC<SponsorsFilterBarProps> = ({
   onStatusFilterChange,
   featuredFilter,
   onFeaturedFilterChange,
+  scopeFilter = '',
+  onScopeFilterChange,
   onNewSponsor,
   onExportReport,
   isExporting = false,
@@ -57,7 +61,7 @@ export const SponsorsFilterBar: React.FC<SponsorsFilterBarProps> = ({
         </LayoutContainer>
 
         {/* Filtro por Destaque no Ticker */}
-        <LayoutContainer className="w-full sm:w-48 shrink-0">
+        <LayoutContainer className="w-full sm:w-44 shrink-0">
           <Select
             value={featuredFilter}
             onChange={(e) => onFeaturedFilterChange(e.target.value)}
@@ -67,6 +71,21 @@ export const SponsorsFilterBar: React.FC<SponsorsFilterBarProps> = ({
             <Option value="false">{ADMIN_SPONSORS_TEXTS.FILTERS.STANDARD_ONLY}</Option>
           </Select>
         </LayoutContainer>
+
+        {/* Filtro por Modalidade / Onde Apoia */}
+        {onScopeFilterChange && (
+          <LayoutContainer className="w-full sm:w-48 shrink-0">
+            <Select
+              value={scopeFilter}
+              onChange={(e) => onScopeFilterChange(e.target.value)}
+            >
+              <Option value="">{ADMIN_SPONSORS_TEXTS.FILTERS.SCOPE_ALL}</Option>
+              <Option value="MAIN">{ADMIN_SPONSORS_TEXTS.FILTERS.SCOPE_MAIN}</Option>
+              <Option value="YOUTH">{ADMIN_SPONSORS_TEXTS.FILTERS.SCOPE_YOUTH}</Option>
+              <Option value="FEMALE">{ADMIN_SPONSORS_TEXTS.FILTERS.SCOPE_FEMALE}</Option>
+            </Select>
+          </LayoutContainer>
+        )}
       </LayoutContainer>
 
       {/* Ações: Exportar Relatório e Novo Patrocinador */}

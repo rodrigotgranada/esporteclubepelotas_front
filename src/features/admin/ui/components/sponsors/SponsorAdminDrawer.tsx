@@ -31,6 +31,7 @@ import {
 } from 'lucide-react';
 import { ADMIN_SPONSORS_TEXTS } from '../../../constants/admin-sponsors.constants';
 import { useSponsorAdminDrawer } from '../../../hooks/sponsors/useSponsorAdminDrawer';
+import { SponsorScopesFormSection } from './SponsorScopesFormSection';
 
 export interface SponsorAdminDrawerProps {
   isOpen: boolean;
@@ -437,6 +438,9 @@ export const SponsorAdminDrawer: React.FC<SponsorAdminDrawerProps> = ({
                 />
               </LayoutContainer>
             </LayoutContainer>
+
+            {/* Seção 6: Onde Este Patrocinador Apoia? (Segmentação de Modalidades) */}
+            <SponsorScopesFormSection control={control} errors={errors} />
 
             {/* Rodapé de Ações */}
             <LayoutContainer className="flex items-center justify-end gap-3 pt-4 border-t border-border mt-4">
