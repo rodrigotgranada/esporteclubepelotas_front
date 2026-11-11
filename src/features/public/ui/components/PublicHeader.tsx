@@ -66,19 +66,15 @@ export const PublicHeader = () => {
               className="relative w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 max-w-[40px] sm:max-w-[44px] md:max-w-[48px] max-h-[40px] sm:max-h-[44px] md:max-h-[48px] flex items-center justify-center shrink-0 group focus:outline-none overflow-hidden"
               aria-label={settings?.clubName || PUBLIC_HEADER_TEXTS.LOGO_FULL}
             >
-              {settings?.clubLogoUrl ? (
-                <Image
-                  src={settings.clubLogoUrl}
-                  alt={settings?.clubName || PUBLIC_HEADER_TEXTS.LOGO_FULL}
-                  fill
-                  sizes="(max-width: 640px) 40px, 48px"
-                  priority
-                  className="object-contain drop-shadow-sm group-hover:scale-105 transition-transform"
-                  unoptimized={isUnoptimizedImageUrl(settings.clubLogoUrl)}
-                />
-              ) : (
-                <ShieldPlaceholder size={40} />
-              )}
+              <Image
+                src={settings?.clubLogoUrl || '/images/pelotas-logo.png'}
+                alt={settings?.clubName || PUBLIC_HEADER_TEXTS.LOGO_FULL}
+                fill
+                sizes="(max-width: 640px) 40px, 48px"
+                priority
+                className="object-contain drop-shadow-sm group-hover:scale-105 transition-transform"
+                unoptimized={isUnoptimizedImageUrl(settings?.clubLogoUrl || '/images/pelotas-logo.png')}
+              />
             </Link>
           </LayoutContainer>
 

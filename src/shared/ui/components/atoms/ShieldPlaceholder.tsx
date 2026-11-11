@@ -1,16 +1,34 @@
 import React from 'react';
+import Image from 'next/image';
 
-export const ShieldPlaceholder = ({ size = 32, className = '' }: { size?: number, className?: string }) => {
+export interface ShieldPlaceholderProps {
+  size?: number;
+  className?: string;
+  alt?: string;
+}
+
+/**
+ * ShieldPlaceholder
+ * Distintivo oficial centenário do Esporte Clube Pelotas (Áureo-Cerúleo).
+ * Atua como o escudo padrão institucional do portal caso nenhum logo customizado tenha sido configurado.
+ */
+export const ShieldPlaceholder: React.FC<ShieldPlaceholderProps> = ({
+  size = 32,
+  className = '',
+  alt = 'Distintivo Oficial E.C. Pelotas',
+}) => {
   return (
-    <svg 
-      width={size} 
-      height={size} 
-      viewBox="0 0 24 24" 
-      fill="currentColor" 
-      className={`text-primary ${className}`}
-      xmlns="http://www.w3.org/2000/svg"
+    <span
+      style={{ width: size, height: size }}
+      className={`relative shrink-0 inline-flex items-center justify-center select-none ${className}`}
     >
-      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-    </svg>
+      <Image
+        src="/images/pelotas-logo.png"
+        alt={alt}
+        width={size}
+        height={size}
+        className="w-full h-full object-contain drop-shadow-sm pointer-events-none"
+      />
+    </span>
   );
 };

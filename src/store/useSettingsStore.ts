@@ -31,6 +31,9 @@ export interface OpeningHourItem {
   schedule: string;
 }
 
+export const DEFAULT_CLUB_LOGO = '/images/pelotas-logo.png';
+export const DEFAULT_CLUB_NAME = 'Esporte Clube Pelotas';
+
 export interface Settings {
   clubLogoUrl: string | null;
   clubLogoGallery?: string[];
@@ -76,15 +79,39 @@ interface SettingsState {
 }
 
 export const useSettingsStore = create<SettingsState>((set) => ({
-  settings: null,
-  setSettings: (settings) => set({ settings }),
+  settings: {
+    clubLogoUrl: DEFAULT_CLUB_LOGO,
+    clubName: DEFAULT_CLUB_NAME,
+    clubLogoGallery: [],
+    newsletterIsActive: true,
+  },
+  setSettings: (newSettings) =>
+    set((state) => ({
+      settings: {
+        ...state.settings,
+        ...newSettings,
+        clubLogoUrl: newSettings.clubLogoUrl || DEFAULT_CLUB_LOGO,
+        clubName: newSettings.clubName || DEFAULT_CLUB_NAME,
+      },
+    })),
   updateSettings: (partial) =>
     set((state) => ({
       settings: state.settings
-        ? { ...state.settings, ...partial }
+        ? {
+            ...state.settings,
+            ...partial,
+            clubLogoUrl:
+              partial.clubLogoUrl !== undefined
+                ? partial.clubLogoUrl || DEFAULT_CLUB_LOGO
+                : state.settings.clubLogoUrl || DEFAULT_CLUB_LOGO,
+            clubName:
+              partial.clubName !== undefined
+                ? partial.clubName || DEFAULT_CLUB_NAME
+                : state.settings.clubName || DEFAULT_CLUB_NAME,
+          }
         : {
-            clubLogoUrl: null,
-            clubName: 'Esporte Clube Pelotas',
+            clubLogoUrl: partial.clubLogoUrl || DEFAULT_CLUB_LOGO,
+            clubName: partial.clubName || DEFAULT_CLUB_NAME,
             ...partial,
           },
     })),

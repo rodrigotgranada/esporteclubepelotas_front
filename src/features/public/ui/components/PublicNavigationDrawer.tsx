@@ -129,18 +129,14 @@ export const PublicNavigationDrawer: React.FC<PublicNavigationDrawerProps> = ({
               onClick={onClose}
               className="flex items-center gap-3 group focus:outline-none"
             >
-              {settings?.clubLogoUrl ? (
-                <Image
-                  src={settings.clubLogoUrl}
-                  alt={clubName}
-                  width={42}
-                  height={42}
-                  className="object-contain drop-shadow-sm group-hover:scale-105 transition-transform"
-                  unoptimized={isUnoptimizedImageUrl(settings.clubLogoUrl)}
-                />
-              ) : (
-                <ShieldPlaceholder size={42} />
-              )}
+              <Image
+                src={settings?.clubLogoUrl || '/images/pelotas-logo.png'}
+                alt={clubName}
+                width={42}
+                height={42}
+                className="object-contain drop-shadow-sm group-hover:scale-105 transition-transform"
+                unoptimized={isUnoptimizedImageUrl(settings?.clubLogoUrl || '/images/pelotas-logo.png')}
+              />
               <LayoutContainer className="flex flex-col">
                 <Title level="h2" className="text-sm font-black tracking-tight text-text-primary group-hover:text-primary transition-colors uppercase">
                   {PUBLIC_DRAWER_TEXTS.TITLE}

@@ -134,18 +134,15 @@ export const HomeFeature = () => {
 
         <LayoutContainer className="relative z-10 max-w-4xl mx-auto px-4 text-center animate-in fade-in slide-in-from-bottom-6 duration-700 flex flex-col items-center">
           <LayoutContainer className="mb-4 sm:mb-6 animate-in zoom-in duration-700 delay-150">
-            {settings?.clubLogoUrl ? (
-              <Image
-                src={settings.clubLogoUrl}
-                alt={settings.clubName || 'Esporte Clube Pelotas'}
-                width={110}
-                height={110}
-                className="object-contain drop-shadow-2xl w-24 h-24 sm:w-28 sm:h-28"
-                unoptimized={isUnoptimizedImageUrl(settings.clubLogoUrl)}
-              />
-            ) : (
-              <ShieldPlaceholder size={100} className="drop-shadow-2xl opacity-80" />
-            )}
+            <Image
+              src={settings?.clubLogoUrl || '/images/pelotas-logo.png'}
+              alt={settings?.clubName || 'Esporte Clube Pelotas'}
+              width={110}
+              height={110}
+              priority
+              className="object-contain drop-shadow-2xl w-24 h-24 sm:w-28 sm:h-28"
+              unoptimized={isUnoptimizedImageUrl(settings?.clubLogoUrl || '/images/pelotas-logo.png')}
+            />
           </LayoutContainer>
 
           <LayoutContainer className="inline-block px-3.5 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary font-bold text-xs sm:text-sm mb-3 sm:mb-4 uppercase tracking-wider">

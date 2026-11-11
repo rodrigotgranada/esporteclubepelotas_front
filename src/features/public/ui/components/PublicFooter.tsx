@@ -124,17 +124,14 @@ export const PublicFooter = () => {
           {/* Column 1: Club Identity & Heritage (lg:col-span-4) */}
           <LayoutContainer className="lg:col-span-4 flex flex-col gap-5">
             <Link href="/" className="inline-flex items-center gap-3 group">
-              {settings?.clubLogoUrl ? (
-                <Image
-                  src={settings.clubLogoUrl}
-                  alt={clubName}
-                  width={52}
-                  height={52}
-                  className="object-contain drop-shadow-xs group-hover:scale-105 transition-transform" unoptimized={isUnoptimizedImageUrl(settings.clubLogoUrl)}
-                />
-              ) : (
-                <ShieldPlaceholder size={52} />
-              )}
+              <Image
+                src={settings?.clubLogoUrl || '/images/pelotas-logo.png'}
+                alt={clubName}
+                width={52}
+                height={52}
+                className="object-contain drop-shadow-xs group-hover:scale-105 transition-transform"
+                unoptimized={isUnoptimizedImageUrl(settings?.clubLogoUrl || '/images/pelotas-logo.png')}
+              />
               <LayoutContainer className="flex flex-col">
                 <Title
                   level="h3"

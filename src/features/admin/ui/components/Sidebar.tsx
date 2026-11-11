@@ -19,19 +19,15 @@ export const Sidebar = ({ isMobileMenuOpen, setIsMobileMenuOpen }: { isMobileMen
     >
       <LayoutContainer className="h-16 flex items-center justify-between px-6 border-b border-border">
         <LayoutContainer className="flex items-center gap-2">
-          {settings?.clubLogoUrl ? (
-            <LayoutContainer className="relative w-8 h-8 shrink-0">
+          <LayoutContainer className="relative w-8 h-8 shrink-0">
               <SafeImage
-                src={settings.clubLogoUrl}
+                src={settings?.clubLogoUrl || '/images/pelotas-logo.png'}
                 alt="Logo"
                 fill
                 className="object-contain"
                 fallbackSrc="/images/pelotas-logo.png"
               />
             </LayoutContainer>
-          ) : (
-            <ShieldPlaceholder size={32} />
-          )}
           <Text as="span" className="text-xl font-black text-primary tracking-tighter truncate max-w-[120px]">
             {settings?.clubName || SIDEBAR_TEXTS.LOGO_TEXT}
           </Text>
