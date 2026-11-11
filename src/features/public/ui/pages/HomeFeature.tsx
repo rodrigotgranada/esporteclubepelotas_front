@@ -23,6 +23,8 @@ import { HomeSponsorsTicker, HomeSponsorsSection } from '@/features/sponsors';
 import { useRealtimeEvents } from '@/shared/hooks/useRealtimeEvents';
 import { Match, matchesService } from '@/features/matches';
 import { NextMatchCard } from '@/features/matches/ui/components/NextMatchCard';
+import { ClubPollWidget } from '@/features/poll';
+import { NewsletterSection } from '@/features/newsletter';
 
 export const HomeFeature = () => {
   const { settings } = useSettingsStore();
@@ -197,6 +199,16 @@ export const HomeFeature = () => {
           <NextMatchCard match={nextMatch} isHomeWidget={true} />
         </LayoutContainer>
       )}
+
+      {/* Enquete Oficial da Torcida (Somente Sócios) */}
+      <LayoutContainer className="max-w-7xl mx-auto px-4 w-full">
+        <ClubPollWidget />
+      </LayoutContainer>
+
+      {/* Newsletter Oficial (com toggle via admin) */}
+      <LayoutContainer className="max-w-7xl mx-auto px-4 w-full">
+        <NewsletterSection />
+      </LayoutContainer>
 
       {/* 4. Quarta Seção: Patrocinadores e Parceiros Oficiais (Pré-Rodapé em 5 colunas) */}
       <HomeSponsorsSection />

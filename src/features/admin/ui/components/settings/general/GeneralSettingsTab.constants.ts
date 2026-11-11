@@ -17,4 +17,6 @@ export const GENERAL_SETTINGS_TEXTS = {
   PLACEHOLDER_CLUB_NAME: 'Ex: Esporte Clube Pelotas',
   GALLERY_TITLE: 'Galeria de Escudos',
   GALLERY_REMOVE_TITLE: 'Remover da Galeria',
+  LABEL_NEWSLETTER_ACTIVE: 'Ativar Captação de Newsletter',
+  DESCRIPTION_NEWSLETTER_ACTIVE: 'Exibe a caixa de inscrição de e-mails de novidades oficiais no portal público.',
 };

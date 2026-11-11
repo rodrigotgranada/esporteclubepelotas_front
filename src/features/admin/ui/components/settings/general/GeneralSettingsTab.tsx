@@ -9,6 +9,7 @@ import {
   Spinner,
   SafeImage,
   FormField,
+  Switch,
 } from '@/shared/ui/components';
 import { Pencil, Plus, X } from 'lucide-react';
 import { CropModal } from '@/shared/ui/components/molecules/CropModal';
@@ -22,6 +23,8 @@ export const GeneralSettingsTab = () => {
     isFetching,
     previewLogo,
     gallery,
+    newsletterIsActive,
+    setNewsletterIsActive,
     isCropModalOpen,
     setIsCropModalOpen,
     cropImageSrc,
@@ -159,6 +162,22 @@ export const GeneralSettingsTab = () => {
               placeholder={GENERAL_SETTINGS_TEXTS.PLACEHOLDER_CLUB_NAME}
             />
           </FormField>
+
+          <LayoutContainer className="flex items-center justify-between p-4 rounded-xl border border-border bg-surface/50 mt-4">
+            <LayoutContainer className="flex flex-col">
+              <Text className="text-sm font-semibold text-text-primary">
+                {GENERAL_SETTINGS_TEXTS.LABEL_NEWSLETTER_ACTIVE}
+              </Text>
+              <Text className="text-xs text-text-secondary">
+                {GENERAL_SETTINGS_TEXTS.DESCRIPTION_NEWSLETTER_ACTIVE}
+              </Text>
+            </LayoutContainer>
+            <Switch
+              checked={newsletterIsActive ?? true}
+              onChange={setNewsletterIsActive}
+              disabled={isSaving}
+            />
+          </LayoutContainer>
         </LayoutContainer>
       </LayoutContainer>
 

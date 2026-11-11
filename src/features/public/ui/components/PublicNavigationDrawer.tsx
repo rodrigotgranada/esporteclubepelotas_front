@@ -28,6 +28,7 @@ import {
   Shirt,
   CalendarDays,
   ShoppingBag,
+  FileSpreadsheet,
 } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useSettingsStore } from '@/store/useSettingsStore';
@@ -69,6 +70,7 @@ export const PublicNavigationDrawer: React.FC<PublicNavigationDrawerProps> = ({
   const storeActive = isModulesLoaded ? isModuleActive('store') : true;
   const membershipActive = isModulesLoaded ? isModuleActive('membership') : true;
   const newsActive = isModulesLoaded ? isModuleActive('news') : true;
+  const transparencyActive = isModulesLoaded ? isModuleActive('transparency') : true;
 
   useEffect(() => {
     setMounted(true);
@@ -482,6 +484,22 @@ export const PublicNavigationDrawer: React.FC<PublicNavigationDrawerProps> = ({
                         <ShoppingBag className="w-3.5 h-3.5 text-primary group-hover:scale-110 transition-transform" />
                         <span className="text-xs font-bold text-text-primary group-hover:text-primary transition-colors">
                           {PUBLIC_DRAWER_TEXTS.LINK_STORE}
+                        </span>
+                      </LayoutContainer>
+                      <ChevronRight className="w-3.5 h-3.5 text-text-secondary/60 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
+                    </Link>
+                  )}
+
+                  {transparencyActive && (
+                    <Link
+                      href="/transparencia"
+                      onClick={onClose}
+                      className="p-3 rounded-xl bg-surface/70 hover:bg-surface border border-border/80 hover:border-primary/50 flex items-center justify-between transition-all group col-span-2"
+                    >
+                      <LayoutContainer className="flex items-center gap-2">
+                        <FileSpreadsheet className="w-3.5 h-3.5 text-primary group-hover:scale-110 transition-transform" />
+                        <span className="text-xs font-bold text-text-primary group-hover:text-primary transition-colors">
+                          {PUBLIC_DRAWER_TEXTS.LINK_TRANSPARENCY}
                         </span>
                       </LayoutContainer>
                       <ChevronRight className="w-3.5 h-3.5 text-text-secondary/60 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />

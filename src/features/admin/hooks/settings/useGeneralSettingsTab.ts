@@ -37,15 +37,21 @@ export const useGeneralSettingsTab = () => {
       clubName: 'Esporte Clube Pelotas',
       clubLogoUrl: null,
       clubLogoGallery: [],
+      newsletterIsActive: true,
     },
   });
 
   const previewLogo = form.watch('clubLogoUrl');
   const gallery = form.watch('clubLogoGallery') || [];
+  const newsletterIsActive = form.watch('newsletterIsActive');
 
   useEffect(() => {
     if (settings) {
       form.setValue('clubName', settings.clubName || '');
+      form.setValue(
+        'newsletterIsActive',
+        settings.newsletterIsActive !== undefined ? settings.newsletterIsActive : true,
+      );
       form.setValue(
         'clubLogoGallery',
         settings.clubLogoGallery?.length
@@ -130,6 +136,7 @@ export const useGeneralSettingsTab = () => {
           clubName: data.clubName.trim(),
           clubLogoUrl: finalUrl,
           clubLogoGallery: finalGallery,
+          newsletterIsActive: data.newsletterIsActive !== undefined ? data.newsletterIsActive : true,
         };
 
         const res = await settingsApi.updateSettings(payload);
@@ -156,6 +163,8 @@ export const useGeneralSettingsTab = () => {
     isFetching,
     previewLogo,
     gallery,
+    newsletterIsActive,
+    setNewsletterIsActive: (val: boolean) => form.setValue('newsletterIsActive', val),
     isCropModalOpen,
     setIsCropModalOpen,
     cropImageSrc,

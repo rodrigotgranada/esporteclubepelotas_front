@@ -5,6 +5,7 @@ import "./globals.css";
 import { ThemeProvider } from '@/shared/ui/providers/ThemeProvider';
 import { SettingsProvider } from '@/shared/ui/providers/SettingsProvider';
 import { EnvironmentBadge } from '@/shared/ui/components';
+import { PwaInstallPrompt } from '@/features/pwa';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,6 +34,7 @@ export async function generateMetadata(): Promise<Metadata> {
         metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://esporteclubepelotas.com.br'),
         title: data.clubName || "Esporte Clube Pelotas",
         description: "Portal Oficial do Clube",
+        manifest: "/manifest.json",
         icons,
       };
     }
@@ -44,6 +46,7 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://esporteclubepelotas.com.br'),
     title: "Esporte Clube Pelotas",
     description: "Portal Oficial do Clube",
+    manifest: "/manifest.json",
     icons: {
       icon: "/favicon.ico",
       shortcut: "/favicon.ico",
@@ -63,6 +66,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <SettingsProvider>
             {children}
             <EnvironmentBadge />
+            <PwaInstallPrompt />
             <Toaster position="top-right" />
           </SettingsProvider>
         </ThemeProvider>

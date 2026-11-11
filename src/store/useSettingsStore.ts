@@ -66,6 +66,7 @@ export interface Settings {
   storeAddress?: string;
   storeHasMemberDiscount?: boolean;
   storeMemberDiscountText?: string;
+  newsletterIsActive?: boolean;
 }
 
 interface SettingsState {

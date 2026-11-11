@@ -4,7 +4,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useSystemModulesStore } from '@/store/useSystemModulesStore';
 import { startTransition, useEffect } from 'react';
-import { Home, Users, Settings, Layers, Shield, Newspaper, Trophy, Shirt, Sprout, Crown, History, Landmark, Handshake, UserCheck, Music, Sparkles, CalendarDays, FileText } from 'lucide-react';
+import { Home, Users, Settings, Layers, Shield, Newspaper, Trophy, Shirt, Sprout, Crown, History, Landmark, Handshake, UserCheck, Music, Sparkles, CalendarDays, FileText, FileSpreadsheet, Vote, Mail } from 'lucide-react';
 import { SIDEBAR_TEXTS } from '../ui/components/Sidebar.constants';
 
 export const useSidebar = () => {
@@ -47,6 +47,9 @@ export const useSidebar = () => {
     { label: SIDEBAR_TEXTS.NAV.STADIUM, href: '/gestao/stadium', icon: Landmark, show: true },
     { label: SIDEBAR_TEXTS.NAV.SPONSORS, href: '/gestao/sponsors', icon: Handshake, show: true },
     { label: SIDEBAR_TEXTS.NAV.MEMBERSHIP, href: '/gestao/membership', icon: UserCheck, show: true },
+    { label: SIDEBAR_TEXTS.NAV.TRANSPARENCY, href: '/gestao/transparencia', icon: FileSpreadsheet, show: true },
+    { label: SIDEBAR_TEXTS.NAV.POLLS, href: '/gestao/enquetes', icon: Vote, show: true },
+    { label: SIDEBAR_TEXTS.NAV.NEWSLETTER, href: '/gestao/newsletter', icon: Mail, show: true },
     { label: SIDEBAR_TEXTS.NAV.USERS, href: '/gestao/users', icon: Users, show: isAdmin },
     { label: SIDEBAR_TEXTS.NAV.MODULES, href: '/gestao/modules', icon: Layers, show: isOwner },
     { label: SIDEBAR_TEXTS.NAV.ROLES, href: '/gestao/roles', icon: Shield, show: isOwner },

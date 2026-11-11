@@ -8,6 +8,7 @@ export const generalSettingsSchema = z.object({
     .max(100, 'O nome do clube deve ter no máximo 100 caracteres.'),
   clubLogoUrl: z.string().nullable().optional(),
   clubLogoGallery: z.array(z.string()).optional(),
+  newsletterIsActive: z.boolean().optional(),
 });
 
 export type GeneralSettingsFormData = z.infer<typeof generalSettingsSchema>;
