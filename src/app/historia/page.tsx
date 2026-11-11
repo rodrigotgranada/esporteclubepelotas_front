@@ -1,6 +1,7 @@
 import React from 'react';
 import { Metadata } from 'next';
 import { TimelineFeature } from '@/features/timeline/ui/pages/TimelineFeature';
+import { ModuleGuard } from '@/shared/ui/components';
 
 export const metadata: Metadata = {
   title: 'História & Linha do Tempo | Esporte Clube Pelotas',
@@ -15,6 +16,9 @@ export const metadata: Metadata = {
 };
 
 export default function HistoriaPage() {
-  return <TimelineFeature />;
+  return (
+    <ModuleGuard moduleSlug="history" moduleName="História & Linha do Tempo">
+      <TimelineFeature />
+    </ModuleGuard>
+  );
 }
-

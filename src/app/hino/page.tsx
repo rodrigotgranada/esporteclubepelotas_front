@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { AnthemFeature } from '@/features/anthem/ui/pages/AnthemFeature';
+import { ModuleGuard } from '@/shared/ui/components';
 
 export const metadata: Metadata = {
   title: 'Hino Oficial | Esporte Clube Pelotas',
@@ -14,6 +15,9 @@ export const metadata: Metadata = {
 };
 
 export default function HinoPage() {
-  return <AnthemFeature />;
+  return (
+    <ModuleGuard moduleSlug="anthem" moduleName="Hino Oficial">
+      <AnthemFeature />
+    </ModuleGuard>
+  );
 }
-

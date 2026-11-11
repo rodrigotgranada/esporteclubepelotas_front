@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { IdolsFeature } from '@/features/idols/ui/pages/IdolsFeature';
+import { ModuleGuard } from '@/shared/ui/components';
 
 export const metadata: Metadata = {
   title: 'Ídolos & Memorial da Boca do Lobo | E.C. Pelotas',
@@ -11,6 +12,9 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <IdolsFeature />;
+  return (
+    <ModuleGuard moduleSlug="idols" moduleName="Ídolos & Memorial">
+      <IdolsFeature />
+    </ModuleGuard>
+  );
 }
-

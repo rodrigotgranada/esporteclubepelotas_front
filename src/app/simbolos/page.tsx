@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { SymbolsFeature } from '@/features/symbols/ui/pages/SymbolsFeature';
+import { ModuleGuard } from '@/shared/ui/components';
 
 export const metadata: Metadata = {
   title: 'Símbolos Oficiais & Mascote | Esporte Clube Pelotas',
@@ -14,6 +15,9 @@ export const metadata: Metadata = {
 };
 
 export default function SimbolosPage() {
-  return <SymbolsFeature />;
+  return (
+    <ModuleGuard moduleSlug="symbols" moduleName="Símbolos & Mascote">
+      <SymbolsFeature />
+    </ModuleGuard>
+  );
 }
-

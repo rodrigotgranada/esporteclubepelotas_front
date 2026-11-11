@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { KitsFeature } from '@/features/kits/ui/pages/KitsFeature';
+import { ModuleGuard } from '@/shared/ui/components';
 
 export const metadata: Metadata = {
   title: 'Mantos Sagrados & Uniformes | Esporte Clube Pelotas',
@@ -14,6 +15,9 @@ export const metadata: Metadata = {
 };
 
 export default function UniformesPage() {
-  return <KitsFeature />;
+  return (
+    <ModuleGuard moduleSlug="kits" moduleName="Mantos & Uniformes">
+      <KitsFeature />
+    </ModuleGuard>
+  );
 }
-

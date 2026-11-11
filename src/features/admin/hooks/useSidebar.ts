@@ -4,7 +4,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useSystemModulesStore } from '@/store/useSystemModulesStore';
 import { startTransition, useEffect } from 'react';
-import { Home, Users, Settings, Layers, Shield, Newspaper, Trophy, Shirt, Sprout, Crown, History, Landmark, Handshake, UserCheck, Music, Sparkles, CalendarDays } from 'lucide-react';
+import { Home, Users, Settings, Layers, Shield, Newspaper, Trophy, Shirt, Sprout, Crown, History, Landmark, Handshake, UserCheck, Music, Sparkles, CalendarDays, FileText } from 'lucide-react';
 import { SIDEBAR_TEXTS } from '../ui/components/Sidebar.constants';
 
 export const useSidebar = () => {
@@ -50,6 +50,7 @@ export const useSidebar = () => {
     { label: SIDEBAR_TEXTS.NAV.USERS, href: '/gestao/users', icon: Users, show: isAdmin },
     { label: SIDEBAR_TEXTS.NAV.MODULES, href: '/gestao/modules', icon: Layers, show: isOwner },
     { label: SIDEBAR_TEXTS.NAV.ROLES, href: '/gestao/roles', icon: Shield, show: isOwner },
+    { label: SIDEBAR_TEXTS.NAV.AUDIT, href: '/gestao/audit', icon: FileText, show: isAdmin },
     { label: SIDEBAR_TEXTS.NAV.SETTINGS, href: '/gestao/settings', icon: Settings, show: isAdmin },
   ];
 

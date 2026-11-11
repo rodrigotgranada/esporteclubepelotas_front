@@ -37,13 +37,17 @@ export const useAdminCommentsModeration = () => {
       if (!options?.silent) {
         setIsLoading(true);
       }
-      const params: Record<string, string | number> = {
+      const params: Record<string, string | number | boolean> = {
         page,
         limit,
       };
 
       if (search.trim()) params.search = search.trim();
-      if (statusFilter) params.status = statusFilter;
+      if (statusFilter === 'REPORTED') {
+        params.reportedOnly = true;
+      } else if (statusFilter) {
+        params.status = statusFilter;
+      }
 
       const res = await adminNewsService.getComments(params);
       setComments(res.data || []);
@@ -100,6 +104,29 @@ export const useAdminCommentsModeration = () => {
     }
   };
 
+  const handleDismissReport = async (comment: AdminCommentData) => {
+    const commentId = resolveCommentId(comment);
+    if (!commentId || updatingId) return;
+    try {
+      setUpdatingId(commentId);
+      await adminNewsService.dismissCommentReport(commentId);
+      toast.success(ADMIN_NEWS_TEXTS.COMMENTS_MODERATION.TOAST_DISMISS_SUCCESS);
+      setComments((prev) =>
+        prev.map((c) =>
+          resolveCommentId(c) === commentId
+            ? { ...c, isReported: false, reportCount: 0, lastReportReason: undefined, status: 'ACTIVE' }
+            : c,
+        ),
+      );
+    } catch (err: unknown) {
+      console.error('Failed to dismiss comment report', err);
+      const apiErr = err as { response?: { data?: { message?: string } } };
+      toast.error(apiErr?.response?.data?.message || 'Erro ao desconsiderar denúncia.');
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
   const openDeleteModal = (comment: AdminCommentData) => {
     setCommentToDelete(comment);
     setDeleteModalOpen(true);
@@ -145,6 +172,7 @@ export const useAdminCommentsModeration = () => {
     setStatusFilter: handleStatusFilterChange,
     updatingId,
     handleToggleStatus,
+    handleDismissReport,
     deleteModalOpen,
     commentToDelete,
     isDeleting,

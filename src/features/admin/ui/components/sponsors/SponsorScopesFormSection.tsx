@@ -152,3 +152,4 @@ export const SponsorScopesFormSection: React.FC<SponsorScopesFormSectionProps> =
     </LayoutContainer>
   );
 };
+

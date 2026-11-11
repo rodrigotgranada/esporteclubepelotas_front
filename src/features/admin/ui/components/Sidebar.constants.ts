@@ -21,6 +21,7 @@ export const SIDEBAR_TEXTS = {
     MEMBERSHIP: 'Quadro Social (Sócios)',
     MODULES: 'Módulos do Sistema',
     ROLES: 'Cargos e Permissões',
+    AUDIT: 'Trilha de Auditoria',
     SETTINGS: 'Configurações',
   },
 };

@@ -20,6 +20,10 @@ export const useNewsComments = (slug: string) => {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [reportingComment, setReportingComment] = useState<NewsCommentData | null>(null);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [reportReason, setReportReason] = useState('');
+  const [isReporting, setIsReporting] = useState(false);
   const inFlightRef = useRef(false);
 
   const form = useForm<CommentFormData>({
@@ -140,6 +144,36 @@ export const useNewsComments = (slug: string) => {
     }
   };
 
+  const handleOpenReport = (comment: NewsCommentData) => {
+    setReportingComment(comment);
+    setReportReason('');
+    setIsReportModalOpen(true);
+  };
+
+  const handleCloseReport = () => {
+    setReportingComment(null);
+    setReportReason('');
+    setIsReportModalOpen(false);
+  };
+
+  const handleConfirmReport = async () => {
+    if (!reportingComment || isReporting) return;
+    const commentId = reportingComment._id || (reportingComment as any).id;
+    if (!commentId) return;
+
+    try {
+      setIsReporting(true);
+      await newsService.reportComment(commentId, reportReason.trim() || undefined);
+      toast.success(PUBLIC_NEWS_TEXTS.COMMENTS_REPORT_SUCCESS);
+      handleCloseReport();
+    } catch (err: unknown) {
+      const apiErr = err as { response?: { data?: { message?: string } } };
+      toast.error(apiErr?.response?.data?.message || 'Erro ao registrar denúncia.');
+    } finally {
+      setIsReporting(false);
+    }
+  };
+
   return {
     form,
     user,
@@ -154,5 +188,13 @@ export const useNewsComments = (slug: string) => {
     handleSubmit,
     handleDelete,
     handleLoadMore,
+    reportingComment,
+    isReportModalOpen,
+    reportReason,
+    setReportReason,
+    isReporting,
+    handleOpenReport,
+    handleCloseReport,
+    handleConfirmReport,
   };
 };

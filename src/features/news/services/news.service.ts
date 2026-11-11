@@ -125,4 +125,9 @@ export const newsService = {
     const response = await api.delete(`/news/comments/${commentId}`);
     return response.data;
   },
+
+  reportComment: async (commentId: string, reason?: string): Promise<NewsCommentData> => {
+    const response = await api.post(`/news/comments/${commentId}/report`, { reason });
+    return response.data;
+  },
 };

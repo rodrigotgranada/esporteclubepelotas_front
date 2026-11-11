@@ -1,7 +1,9 @@
 import { create } from 'zustand';
+import { api } from '@/services/api';
 
 export interface SystemModuleData {
-  _id: string | any;
+  id?: string;
+  _id?: string;
   name: string;
   slug: string;
   description: string;
@@ -22,23 +24,12 @@ export const useSystemModulesStore = create<SystemModulesState>((set, get) => ({
   isLoaded: false,
   fetchModules: async (force?: boolean) => {
     if ((get().isLoaded && !force) || get().isLoading) return;
-    
-    // Only attempt to fetch admin modules if user is authenticated with a token
-    try {
-      const { useAuthStore } = await import('@/store/useAuthStore');
-      const token = useAuthStore.getState().token;
-      if (!token) {
-        return;
-      }
-    } catch {
-      return;
-    }
 
     set({ isLoading: true });
     try {
-      const { adminService } = await import('@/features/admin/services/admin.service');
-      const data = await adminService.getSystemModules();
-      set({ modules: data, isLoaded: true });
+      const response = await api.get('/system-modules');
+      const list = Array.isArray(response.data) ? response.data : [];
+      set({ modules: list, isLoaded: true });
     } catch (error) {
       console.error('Failed to fetch system modules:', error);
     } finally {
@@ -46,10 +37,12 @@ export const useSystemModulesStore = create<SystemModulesState>((set, get) => ({
     }
   },
   isModuleActive: (slug: string) => {
-    const { modules } = get();
-    const mod = modules.find(m => m.slug === slug);
+    const { modules, isLoaded } = get();
+    // Se ainda não carregou, por padrão assume ativo para não quebrar primeira renderização
+    if (!isLoaded || modules.length === 0) return true;
+    const mod = modules.find((m) => m.slug === slug);
     if (!mod) return true;
-    const active = (mod as any).isActive ?? (mod as any).active;
+    const active = mod.isActive ?? (mod as any).active;
     return active !== undefined ? Boolean(active) : true;
-  }
+  },
 }));

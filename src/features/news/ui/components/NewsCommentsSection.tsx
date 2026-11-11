@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { MessageSquare, Send, Trash2, LogIn, UserPlus, MailCheck } from 'lucide-react';
+import { MessageSquare, Send, Trash2, LogIn, UserPlus, MailCheck, Flag, AlertTriangle, X } from 'lucide-react';
 import {
   LayoutContainer,
   Title,
@@ -36,6 +36,14 @@ export const NewsCommentsSection: React.FC<NewsCommentsSectionProps> = ({ slug }
     handleSubmit,
     handleDelete,
     handleLoadMore,
+    reportingComment,
+    isReportModalOpen,
+    reportReason,
+    setReportReason,
+    isReporting,
+    handleOpenReport,
+    handleCloseReport,
+    handleConfirmReport,
   } = useNewsComments(slug);
 
   const content = form.watch('content') || '';
@@ -234,6 +242,19 @@ export const NewsCommentsSection: React.FC<NewsCommentsSectionProps> = ({ slug }
                     <Text className="text-[11px] text-text-secondary">
                       {formatDate(comment.createdAt)}
                     </Text>
+                    {!isAuthor && (
+                      <Button
+                        type="button"
+                        variant="custom"
+                        size="none"
+                        onClick={() => handleOpenReport(comment)}
+                        className="p-1 rounded-lg hover:bg-surface-hover text-text-secondary hover:text-amber-400 transition-colors"
+                        aria-label={PUBLIC_NEWS_TEXTS.COMMENTS_REPORT_BTN}
+                        title={PUBLIC_NEWS_TEXTS.COMMENTS_REPORT_BTN}
+                      >
+                        <Flag className="w-3.5 h-3.5" />
+                      </Button>
+                    )}
                     {canDelete && (
                       <Button
                         type="button"
@@ -282,6 +303,79 @@ export const NewsCommentsSection: React.FC<NewsCommentsSectionProps> = ({ slug }
               </Button>
             </LayoutContainer>
           )}
+        </LayoutContainer>
+      )}
+
+      {/* Modal de Confirmação de Denúncia */}
+      {isReportModalOpen && reportingComment && (
+        <LayoutContainer className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs animate-in fade-in duration-200">
+          <LayoutContainer className="relative w-full max-w-md bg-surface border border-border rounded-2xl p-6 shadow-2xl flex flex-col gap-4">
+            <LayoutContainer className="flex items-center justify-between pb-2 border-b border-border">
+              <LayoutContainer className="flex items-center gap-2 text-accent">
+                <AlertTriangle className="w-5 h-5 text-amber-400" />
+                <Title level="h4" className="text-base font-black text-text-primary">
+                  {PUBLIC_NEWS_TEXTS.COMMENTS_REPORT_MODAL_TITLE}
+                </Title>
+              </LayoutContainer>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={handleCloseReport}
+                className="p-1 rounded-lg text-text-secondary hover:text-text-primary"
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </LayoutContainer>
+
+            <Text className="text-xs text-text-secondary leading-relaxed">
+              {PUBLIC_NEWS_TEXTS.COMMENTS_REPORT_MODAL_DESC}
+            </Text>
+
+            <LayoutContainer className="p-3 rounded-xl bg-background border border-border">
+              <Text className="text-xs italic text-text-primary/90 line-clamp-3">
+                &ldquo;{reportingComment.content}&rdquo;
+              </Text>
+            </LayoutContainer>
+
+            <LayoutContainer className="flex flex-col gap-1.5">
+              <Text as="span" className="text-xs font-bold text-text-secondary">
+                {PUBLIC_NEWS_TEXTS.COMMENTS_REPORT_REASON_LABEL}
+              </Text>
+              <Textarea
+                value={reportReason}
+                onChange={(e) => setReportReason(e.target.value)}
+                placeholder={PUBLIC_NEWS_TEXTS.COMMENTS_REPORT_REASON_PLACEHOLDER}
+                maxLength={300}
+                rows={3}
+                className="text-xs"
+              />
+            </LayoutContainer>
+
+            <LayoutContainer className="flex items-center justify-end gap-2 pt-2 border-t border-border">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={handleCloseReport}
+                disabled={isReporting}
+                className="text-xs font-semibold"
+              >
+                {PUBLIC_NEWS_TEXTS.COMMENTS_REPORT_CANCEL_BTN}
+              </Button>
+              <Button
+                type="button"
+                variant="primary"
+                size="sm"
+                onClick={handleConfirmReport}
+                isLoading={isReporting}
+                disabled={isReporting}
+                className="text-xs font-bold uppercase tracking-wider"
+              >
+                {PUBLIC_NEWS_TEXTS.COMMENTS_REPORT_CONFIRM_BTN}
+              </Button>
+            </LayoutContainer>
+          </LayoutContainer>
         </LayoutContainer>
       )}
     </LayoutContainer>

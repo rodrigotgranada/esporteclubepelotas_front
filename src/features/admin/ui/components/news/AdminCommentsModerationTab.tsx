@@ -11,7 +11,8 @@ import {
   ChevronLeft,
   ChevronRight,
   MessageSquare,
-  User,
+  ShieldCheck,
+  AlertTriangle,
 } from 'lucide-react';
 import {
   Table,
@@ -48,6 +49,7 @@ export const AdminCommentsModerationTab: React.FC = () => {
     setStatusFilter,
     updatingId,
     handleToggleStatus,
+    handleDismissReport,
     deleteModalOpen,
     commentToDelete,
     isDeleting,
@@ -104,12 +106,13 @@ export const AdminCommentsModerationTab: React.FC = () => {
           </LayoutContainer>
 
           {/* Status Filter */}
-          <LayoutContainer className="w-full sm:w-52">
+          <LayoutContainer className="w-full sm:w-56">
             <Select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
             >
               <Option value="">{texts.STATUS_FILTER_ALL}</Option>
+              <Option value="REPORTED">{texts.STATUS_FILTER_REPORTED}</Option>
               <Option value="ACTIVE">{texts.STATUS_FILTER_ACTIVE}</Option>
               <Option value="HIDDEN">{texts.STATUS_FILTER_HIDDEN}</Option>
             </Select>
@@ -156,14 +159,25 @@ export const AdminCommentsModerationTab: React.FC = () => {
             </TableHeader>
             <TableBody>
               {comments.map((comment) => {
+                const commentId = comment._id || comment.id || '';
                 const authorName = comment.author
                   ? `${comment.author.firstName || ''} ${comment.author.lastName || ''}`.trim() || 'Torcedor'
                   : 'Torcedor';
                 const isHidden = comment.status === 'HIDDEN';
-                const isUpdating = updatingId === comment._id;
+                const isUpdating = updatingId === commentId;
+                const isReported = Boolean(comment.isReported);
 
                 return (
-                  <TableRow key={comment._id} className={isHidden ? 'opacity-70 bg-background/30' : undefined}>
+                  <TableRow
+                    key={commentId}
+                    className={
+                      isReported
+                        ? 'bg-amber-500/5 hover:bg-amber-500/10 border-l-4 border-l-amber-500'
+                        : isHidden
+                          ? 'opacity-70 bg-background/30'
+                          : undefined
+                    }
+                  >
                     {/* Author */}
                     <TableCell className="min-w-[180px]">
                       <LayoutContainer className="flex items-center gap-2.5">
@@ -189,9 +203,24 @@ export const AdminCommentsModerationTab: React.FC = () => {
 
                     {/* Content */}
                     <TableCell className="max-w-[320px]">
-                      <Text as="p" className="text-xs text-text-primary leading-relaxed line-clamp-3">
-                        &ldquo;{comment.content}&rdquo;
-                      </Text>
+                      <LayoutContainer className="flex flex-col gap-1.5">
+                        <Text as="p" className="text-xs text-text-primary leading-relaxed line-clamp-3">
+                          &ldquo;{comment.content}&rdquo;
+                        </Text>
+                        {isReported && (
+                          <LayoutContainer className="p-2 rounded-lg bg-amber-500/10 border border-amber-500/30 flex flex-col gap-0.5">
+                            <LayoutContainer className="flex items-center gap-1 text-[11px] font-bold text-amber-400">
+                              <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                              <span>{texts.BADGE_REPORTED(comment.reportCount || 1)}</span>
+                            </LayoutContainer>
+                            {comment.lastReportReason && (
+                              <Text className="text-[10px] text-text-secondary italic">
+                                Motivo: &ldquo;{comment.lastReportReason}&rdquo;
+                              </Text>
+                            )}
+                          </LayoutContainer>
+                        )}
+                      </LayoutContainer>
                     </TableCell>
 
                     {/* News Article */}
@@ -246,6 +275,20 @@ export const AdminCommentsModerationTab: React.FC = () => {
                     {/* Actions */}
                     <TableCell className="text-right">
                       <LayoutContainer className="flex items-center justify-end gap-1">
+                        {/* Falso Positivo / Manter */}
+                        {isReported && (
+                          <IconButton
+                            icon={<ShieldCheck className="w-4 h-4 text-emerald-400" />}
+                            aria-label={texts.ACTION_DISMISS_REPORT}
+                            title={texts.ACTION_DISMISS_REPORT}
+                            size="sm"
+                            variant="ghost"
+                            disabled={isUpdating}
+                            onClick={() => handleDismissReport(comment)}
+                          />
+                        )}
+
+                        {/* Ocultar / Tornar Visível */}
                         <IconButton
                           icon={
                             isUpdating ? (
@@ -263,6 +306,8 @@ export const AdminCommentsModerationTab: React.FC = () => {
                           disabled={isUpdating}
                           onClick={() => handleToggleStatus(comment)}
                         />
+
+                        {/* Excluir Definitivamente */}
                         <IconButton
                           icon={<Trash2 className="w-4 h-4 text-error" />}
                           aria-label={texts.ACTION_DELETE}

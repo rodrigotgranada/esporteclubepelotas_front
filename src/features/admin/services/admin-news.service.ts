@@ -39,6 +39,10 @@ export interface AdminCommentData {
   content: string;
   status: 'ACTIVE' | 'HIDDEN';
   isActive: boolean;
+  isReported?: boolean;
+  reportCount?: number;
+  lastReportReason?: string;
+  lastReportedAt?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -243,6 +247,11 @@ export const adminNewsService = {
     status: 'ACTIVE' | 'HIDDEN',
   ): Promise<AdminCommentData> => {
     const response = await api.patch(`/news/admin/comments/${commentId}/status`, { status });
+    return response.data;
+  },
+
+  dismissCommentReport: async (commentId: string): Promise<AdminCommentData> => {
+    const response = await api.patch(`/news/admin/comments/${commentId}/dismiss-report`);
     return response.data;
   },
 

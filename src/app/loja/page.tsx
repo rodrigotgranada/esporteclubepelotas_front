@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { StoreFeature } from '@/features/store/ui/pages/StoreFeature';
 import { STORE_TEXTS } from '@/features/store/constants/store.constants';
+import { ModuleGuard } from '@/shared/ui/components';
 
 export const metadata: Metadata = {
   title: STORE_TEXTS.PAGE_TITLE,
@@ -13,6 +14,9 @@ export const metadata: Metadata = {
 };
 
 export default function LojaPage() {
-  return <StoreFeature />;
+  return (
+    <ModuleGuard moduleSlug="store" moduleName="Loja Alcateia">
+      <StoreFeature />
+    </ModuleGuard>
+  );
 }
-
