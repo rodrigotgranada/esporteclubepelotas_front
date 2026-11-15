@@ -28,7 +28,7 @@ export const PublicLayout = ({ children }: { children: React.ReactNode }) => {
       <PublicHeader />
 
       {/* Container principal transparente para que todas as páginas compartilhem a marca d'água */}
-      <LayoutContainer as="main" className="flex-1 relative z-10 bg-transparent flex flex-col">
+      <LayoutContainer as="main" className="flex-1 w-full min-w-0 relative z-10 bg-transparent flex flex-col">
         {children}
       </LayoutContainer>
 

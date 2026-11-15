@@ -9,7 +9,7 @@ export const IdolHero: React.FC = () => {
   const texts = IDOLS_CONSTANTS.HERO;
 
   return (
-    <LayoutContainer className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-surface via-surface/90 to-primary/10 border border-border p-6 sm:p-10 shadow-sm animate-in fade-in duration-300">
+    <LayoutContainer className="relative w-full min-w-0 overflow-hidden rounded-3xl bg-gradient-to-br from-surface via-surface/90 to-primary/10 border border-border p-5 sm:p-10 shadow-sm animate-in fade-in duration-300">
       {/* Decorative background glow */}
       <LayoutContainer className="absolute -top-16 -right-16 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -17,7 +17,7 @@ export const IdolHero: React.FC = () => {
         <Badge
           variant="primary"
           size="sm"
-          className="font-extrabold uppercase tracking-widest px-3 py-1 shadow-sm flex items-center gap-1.5"
+          className="max-w-full text-center font-extrabold uppercase tracking-wider sm:tracking-widest px-3 py-1 shadow-sm flex items-center gap-1.5"
         >
           <Trophy className="w-3.5 h-3.5" />
           {texts.BADGE}

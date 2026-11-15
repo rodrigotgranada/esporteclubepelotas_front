@@ -34,7 +34,7 @@ export const IdolsFeature: React.FC = () => {
   // If module is disabled in System Modules
   if (!isLoading && !isModuleActive) {
     return (
-      <LayoutContainer className="max-w-4xl mx-auto px-4 sm:px-6 py-20 flex flex-col items-center text-center gap-4 animate-in fade-in duration-300">
+      <LayoutContainer className="w-full min-w-0 max-w-4xl mx-auto px-4 sm:px-6 py-20 flex flex-col items-center text-center gap-4 animate-in fade-in duration-300">
         <LayoutContainer className="p-5 rounded-3xl bg-surface border border-border shadow-xs text-text-muted mb-2">
           <AlertCircle className="w-12 h-12 text-primary" />
         </LayoutContainer>
@@ -54,7 +54,7 @@ export const IdolsFeature: React.FC = () => {
   }
 
   return (
-    <LayoutContainer className="max-w-7xl mx-auto px-4 sm:px-6 py-8 flex flex-col gap-8 animate-in fade-in duration-200">
+    <LayoutContainer className="w-full min-w-0 max-w-7xl mx-auto px-4 sm:px-6 py-8 flex flex-col gap-8 animate-in fade-in duration-200">
       {/* Memorial Hero */}
       <IdolHero />
 
@@ -112,7 +112,7 @@ export const IdolsFeature: React.FC = () => {
 
       {/* Pagination */}
       {!isLoading && totalPages > 1 && (
-        <LayoutContainer className="flex items-center justify-between p-4 rounded-2xl bg-surface border border-border">
+        <LayoutContainer className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 rounded-2xl bg-surface border border-border w-full">
           <Text as="span" className="text-xs text-text-secondary font-medium">
             Página {page} de {totalPages} • Total de {total} ídolo(s)
           </Text>

@@ -62,7 +62,7 @@ export const IdolPrevNextNav: React.FC<IdolPrevNextNavProps> = ({ currentSlug })
   }
 
   return (
-    <LayoutContainer className="flex flex-col gap-4 pt-8 border-t border-border">
+    <LayoutContainer className="w-full min-w-0 flex flex-col gap-4 pt-8 border-t border-border">
       <LayoutContainer className="flex items-center justify-between">
         <Title level="h3" className="text-sm font-extrabold text-text-secondary uppercase tracking-wider">
           {texts.TITLE}
@@ -80,7 +80,7 @@ export const IdolPrevNextNav: React.FC<IdolPrevNextNavProps> = ({ currentSlug })
         {prevIdol ? (
           <Link
             href={`/idolos/${prevIdol.slug}`}
-            className="group p-4 rounded-2xl bg-surface border border-border hover:border-primary/50 transition-all flex items-center gap-3.5 shadow-xs"
+            className="min-w-0 group p-4 rounded-2xl bg-surface border border-border hover:border-primary/50 transition-all flex items-center gap-3.5 shadow-xs"
           >
             <LayoutContainer className="p-2 rounded-xl bg-background border border-border group-hover:border-primary/40 group-hover:bg-primary/10 transition-colors shrink-0">
               <ChevronLeft className="w-5 h-5 text-primary group-hover:-translate-x-0.5 transition-transform" />
@@ -119,7 +119,7 @@ export const IdolPrevNextNav: React.FC<IdolPrevNextNavProps> = ({ currentSlug })
         {nextIdol ? (
           <Link
             href={`/idolos/${nextIdol.slug}`}
-            className="group p-4 rounded-2xl bg-surface border border-border hover:border-primary/50 transition-all flex items-center justify-between gap-3.5 shadow-xs text-right"
+            className="min-w-0 group p-4 rounded-2xl bg-surface border border-border hover:border-primary/50 transition-all flex items-center justify-between gap-3.5 shadow-xs text-right"
           >
             <LayoutContainer className="flex flex-col min-w-0 flex-1">
               <Text as="span" className="text-[11px] font-bold text-text-muted uppercase tracking-wider">

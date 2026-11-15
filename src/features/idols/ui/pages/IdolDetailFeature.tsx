@@ -105,7 +105,7 @@ export const IdolDetailFeature: React.FC<IdolDetailFeatureProps> = ({ slug }) =>
 
   if (isLoading) {
     return (
-      <LayoutContainer className="max-w-5xl mx-auto px-4 sm:px-6 py-24 flex flex-col items-center justify-center">
+      <LayoutContainer className="w-full min-w-0 max-w-5xl mx-auto px-4 sm:px-6 py-24 flex flex-col items-center justify-center">
         <Spinner className="w-10 h-10 text-primary mb-3" />
         <Text as="p" className="text-text-secondary font-medium">
           Buscando história da lenda...
@@ -116,7 +116,7 @@ export const IdolDetailFeature: React.FC<IdolDetailFeatureProps> = ({ slug }) =>
 
   if (notFound || !idol) {
     return (
-      <LayoutContainer className="max-w-xl mx-auto px-4 sm:px-6 py-24 flex flex-col items-center text-center gap-4">
+      <LayoutContainer className="w-full min-w-0 max-w-xl mx-auto px-4 sm:px-6 py-24 flex flex-col items-center text-center gap-4">
         <LayoutContainer className="p-4 rounded-3xl bg-surface border border-border text-text-muted mb-2">
           <Trophy className="w-12 h-12 opacity-50" />
         </LayoutContainer>
@@ -136,7 +136,7 @@ export const IdolDetailFeature: React.FC<IdolDetailFeatureProps> = ({ slug }) =>
   }
 
   return (
-    <LayoutContainer className="max-w-5xl mx-auto px-4 sm:px-6 py-8 flex flex-col gap-8 animate-in fade-in duration-300">
+    <LayoutContainer className="w-full min-w-0 max-w-5xl mx-auto px-4 sm:px-6 py-8 flex flex-col gap-8 animate-in fade-in duration-300">
       {/* Back Button */}
       <LayoutContainer className="flex items-center">
         <Link href="/idolos">
@@ -153,12 +153,12 @@ export const IdolDetailFeature: React.FC<IdolDetailFeatureProps> = ({ slug }) =>
       </LayoutContainer>
 
       {/* Hero Header Card */}
-      <LayoutContainer className="flex flex-col lg:flex-row items-center lg:items-start gap-8 p-6 sm:p-10 rounded-3xl bg-surface border border-border shadow-xs relative overflow-hidden">
+      <LayoutContainer className="w-full min-w-0 flex flex-col lg:flex-row items-center lg:items-start gap-8 p-6 sm:p-10 rounded-3xl bg-surface border border-border shadow-xs relative overflow-hidden">
         {/* Glow behind photo */}
         <LayoutContainer className="absolute -top-24 -left-24 w-80 h-80 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
 
         {/* Photo Container 3:4 */}
-        <LayoutContainer className="relative w-64 sm:w-72 aspect-[3/4] rounded-2xl overflow-hidden bg-background border border-border shrink-0 shadow-lg">
+        <LayoutContainer className="relative w-full max-w-[256px] sm:w-72 aspect-[3/4] rounded-2xl overflow-hidden bg-background border border-border shrink-0 shadow-lg">
           <SafeImage
             src={idol.photoUrl}
             fallbackSrc={DEFAULT_IDOL_COVER}

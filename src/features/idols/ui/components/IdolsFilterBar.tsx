@@ -29,9 +29,9 @@ export const IdolsFilterBar: React.FC<IdolsFilterBarProps> = ({
   ];
 
   return (
-    <LayoutContainer className="flex flex-col gap-4 w-full">
+    <LayoutContainer className="flex flex-col gap-4 w-full min-w-0">
       {/* Category Tabs Scrollable */}
-      <LayoutContainer className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+      <LayoutContainer className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar w-full min-w-0">
         {filterTabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = category === tab.key;
