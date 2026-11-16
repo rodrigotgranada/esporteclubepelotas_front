@@ -134,7 +134,7 @@ export const IdolCard: React.FC<IdolCardProps> = ({ idol }) => {
             {getCategoryBadge(idol.category)}
 
             <LayoutContainer className="flex items-center gap-1.5">
-              {idol.deathDate && (
+              {(idol.isInMemoriam || idol.deathDate) && (
                 <Badge variant="default" size="sm" className="bg-background/90 backdrop-blur-sm text-[9px] font-bold border border-border text-text-muted">
                   {texts.IN_MEMORIAM}
                 </Badge>

@@ -24,11 +24,12 @@ export interface CreateAdminIdolDto {
   gallery?: string[];
   galleryItems?: IdolGalleryItem[];
   startYear: number;
-  endYear?: number;
+  endYear?: number | null;
   periods?: IdolPeriod[];
   isActiveInClub?: boolean;
-  birthDate?: string;
-  deathDate?: string;
+  birthDate?: string | null;
+  isInMemoriam?: boolean;
+  deathDate?: string | null;
   birthPlace?: string;
   quote?: string;
   biography: string;

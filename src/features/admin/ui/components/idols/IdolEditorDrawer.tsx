@@ -50,6 +50,7 @@ export const IdolEditorDrawer: React.FC<IdolEditorDrawerProps> = ({
     savingLabel,
     handleCropSave,
     handlePhotoRemove,
+    handleToggleInMemoriam,
     handleAddPeriod,
     handleUpdatePeriod,
     handleRemovePeriod,
@@ -71,6 +72,7 @@ export const IdolEditorDrawer: React.FC<IdolEditorDrawerProps> = ({
   const periods = watch('periods') || [];
   const galleryItems = watch('galleryItems') || [];
   const isActiveInClub = watch('isActiveInClub');
+  const isInMemoriam = watch('isInMemoriam');
   const isFeatured = watch('isFeatured');
 
   return (
@@ -220,7 +222,7 @@ export const IdolEditorDrawer: React.FC<IdolEditorDrawerProps> = ({
               onRemove={handleRemovePeriod}
             />
 
-            <LayoutContainer className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+            <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
               <FormField
                 label={texts.LABEL_BIRTH_DATE}
                 error={errors.birthDate?.message}
@@ -228,16 +230,6 @@ export const IdolEditorDrawer: React.FC<IdolEditorDrawerProps> = ({
                 <Input
                   type="date"
                   {...register('birthDate')}
-                />
-              </FormField>
-
-              <FormField
-                label={texts.LABEL_DEATH_DATE}
-                error={errors.deathDate?.message}
-              >
-                <Input
-                  type="date"
-                  {...register('deathDate')}
                 />
               </FormField>
 
@@ -250,6 +242,34 @@ export const IdolEditorDrawer: React.FC<IdolEditorDrawerProps> = ({
                   placeholder={texts.PLACEHOLDER_BIRTH_PLACE}
                 />
               </FormField>
+            </LayoutContainer>
+
+            <LayoutContainer className="flex flex-col gap-3 pt-1">
+              <Controller
+                control={control}
+                name="isInMemoriam"
+                render={({ field }) => (
+                  <Checkbox
+                    checked={field.value}
+                    onChange={(e) => handleToggleInMemoriam(e.target.checked)}
+                    label={texts.CHECKBOX_IN_MEMORIAM}
+                  />
+                )}
+              />
+
+              {isInMemoriam && (
+                <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <FormField
+                    label={texts.LABEL_DEATH_DATE}
+                    error={errors.deathDate?.message}
+                  >
+                    <Input
+                      type="date"
+                      {...register('deathDate')}
+                    />
+                  </FormField>
+                </LayoutContainer>
+              )}
             </LayoutContainer>
           </LayoutContainer>
 

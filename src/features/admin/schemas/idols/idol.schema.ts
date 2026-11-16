@@ -41,6 +41,7 @@ export const idolSchema = z
     galleryItems: z.array(idolGalleryItemSchema).optional(),
     isActiveInClub: z.boolean(),
     birthDate: z.string().optional(),
+    isInMemoriam: z.boolean(),
     deathDate: z.string().optional(),
     birthPlace: z.string().trim().optional(),
     quote: z.string().trim().optional(),

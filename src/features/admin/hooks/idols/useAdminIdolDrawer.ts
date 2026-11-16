@@ -32,6 +32,7 @@ const defaultFormValues: IdolFormData = {
   galleryItems: [],
   isActiveInClub: false,
   birthDate: '',
+  isInMemoriam: false,
   deathDate: '',
   birthPlace: '',
   quote: '',
@@ -109,6 +110,7 @@ export const useAdminIdolDrawer = (
               : (data.gallery || []).map((url) => ({ url, caption: '' })),
           isActiveInClub: Boolean(data.isActiveInClub),
           birthDate: data.birthDate ? data.birthDate.substring(0, 10) : '',
+          isInMemoriam: Boolean(data.isInMemoriam || data.deathDate),
           deathDate: data.deathDate ? data.deathDate.substring(0, 10) : '',
           birthPlace: data.birthPlace || '',
           quote: data.quote || '',
@@ -164,6 +166,13 @@ export const useAdminIdolDrawer = (
   const handlePhotoRemove = () => {
     setPhotoBlob(null);
     form.setValue('photoUrl', null);
+  };
+
+  const handleToggleInMemoriam = (checked: boolean) => {
+    form.setValue('isInMemoriam', checked, { shouldDirty: true });
+    if (!checked) {
+      form.setValue('deathDate', '', { shouldDirty: true });
+    }
   };
 
   const handleUpdateGalleryCaption = (index: number, caption: string) => {
@@ -306,13 +315,14 @@ export const useAdminIdolDrawer = (
           category: data.category,
           photoUrl: idolId ? finalPhotoUrl : finalPhotoUrl || undefined,
           startYear: computedStartYear,
-          endYear: computedEndYear,
+          endYear: data.isActiveInClub ? null : (computedEndYear ?? null),
           periods: finalPeriods,
           gallery: finalGalleryItems.map((item) => item.url),
           galleryItems: finalGalleryItems,
           isActiveInClub: data.isActiveInClub,
-          birthDate: data.birthDate || undefined,
-          deathDate: data.deathDate || undefined,
+          birthDate: data.birthDate || null,
+          isInMemoriam: Boolean(data.isInMemoriam),
+          deathDate: data.isInMemoriam && data.deathDate ? data.deathDate : null,
           birthPlace: data.birthPlace?.trim() || undefined,
           quote: data.quote?.trim() || undefined,
           biography: data.biography.trim(),
@@ -386,6 +396,7 @@ export const useAdminIdolDrawer = (
     savingLabel,
     handleCropSave,
     handlePhotoRemove,
+    handleToggleInMemoriam,
     handleAddPeriod,
     handleUpdatePeriod,
     handleRemovePeriod,

@@ -169,7 +169,7 @@ export const IdolDetailFeature: React.FC<IdolDetailFeatureProps> = ({ slug }) =>
             priority
           />
 
-          {idol.deathDate && (
+          {(idol.isInMemoriam || idol.deathDate) && (
             <LayoutContainer className="absolute bottom-3 left-3 right-3 text-center py-1 px-2 rounded-lg bg-background/90 backdrop-blur-md border border-border text-[11px] font-black text-text-muted">
               {texts.IN_MEMORIAM_BADGE}
             </LayoutContainer>

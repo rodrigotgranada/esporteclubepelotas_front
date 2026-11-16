@@ -28,6 +28,8 @@ export interface IdolData {
   periods?: IdolPeriod[];
   isActiveInClub?: boolean;
   birthDate?: string | null;
+  isInMemoriam?: boolean;
+
   deathDate?: string | null;
   birthPlace?: string;
   quote?: string;
