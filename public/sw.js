@@ -2,7 +2,8 @@
 const CACHE_NAME = 'ecpelotas-pwa-v2';
 const STATIC_ASSETS = [
   '/manifest.json',
-  '/images/pelotas-logo.png',
+  '/icons/icon-192x192.png',
+  '/icons/icon-512x512.png',
   '/favicon.ico',
 ];
 

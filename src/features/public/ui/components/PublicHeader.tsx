@@ -82,22 +82,51 @@ export const PublicHeader = () => {
             </Link>
           </LayoutContainer>
 
-          {/* LADO DIREITO: Lupa de Busca Global + Sessão do Usuário / Botão Entrar */}
+          {/* LADO DIREITO: Accordion Horizontal de Busca Global (Desktop) + Sessão do Usuário / Botão Entrar */}
           <LayoutContainer className="flex items-center gap-2 sm:gap-3 shrink-0">
-            <IconButton
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={headerSearch.handleToggle}
-              aria-label={PUBLIC_HEADER_TEXTS.ARIA_OPEN_SEARCH}
-              title={GLOBAL_SEARCH_TEXTS.OPEN_SEARCH_TITLE}
-              icon={<Search className="w-5 h-5" />}
-              className={`rounded-xl w-9 h-9 transition-colors ${
-                headerSearch.isOpen
+            <LayoutContainer className="hidden md:flex items-center relative">
+              <LayoutContainer
+                className={`overflow-hidden transition-all duration-300 ease-out flex items-center ${headerSearch.isOpen
+                  ? 'w-48 lg:w-72 xl:w-96 opacity-100 mr-2'
+                  : 'w-0 opacity-0 pointer-events-none mr-0'
+                  }`}
+              >
+                <GlobalSearchInputBar
+                  value={headerSearch.query}
+                  onChange={headerSearch.handleChange}
+                  onClear={headerSearch.handleClear}
+                  inputRef={headerSearch.inputRef}
+                  className="w-48 lg:w-72 xl:w-96"
+                />
+              </LayoutContainer>
+
+              <IconButton
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={headerSearch.handleToggle}
+                aria-label={PUBLIC_HEADER_TEXTS.ARIA_OPEN_SEARCH}
+                title={GLOBAL_SEARCH_TEXTS.OPEN_SEARCH_TITLE}
+                icon={<Search className="w-5 h-5" />}
+                className={`rounded-xl w-9 h-9 shrink-0 transition-colors ${headerSearch.isOpen
                   ? 'bg-primary text-black hover:bg-primary hover:text-black'
                   : 'text-header-text hover:bg-header-text/10 hover:text-primary'
-              }`}
-            />
+                  }`}
+              />
+
+              {headerSearch.isOpen && headerSearch.query.trim().length > 0 && (
+                <LayoutContainer className="absolute right-0 top-12 w-[420px] lg:w-[480px] bg-surface border border-border rounded-2xl shadow-2xl max-h-[70vh] overflow-y-auto z-50 animate-in fade-in slide-in-from-top-1 duration-200">
+                  <GlobalSearchResults
+                    query={headerSearch.query}
+                    results={headerSearch.results}
+                    isLoading={headerSearch.isLoading}
+                    error={headerSearch.error}
+                    hasSearched={headerSearch.hasSearched}
+                    onSelectResult={headerSearch.handleClose}
+                  />
+                </LayoutContainer>
+              )}
+            </LayoutContainer>
 
             {/* Sessão do Usuário ou Botão Entrar */}
             {user ? (
@@ -135,12 +164,12 @@ export const PublicHeader = () => {
                     </Link>
                     {((user.role?.name || user.role) === 'ADMIN' ||
                       (user.role?.name || user.role) === 'OWNER') && (
-                      <Link href="/gestao" onClick={() => setIsDropdownOpen(false)}>
-                        <LayoutContainer className="px-4 py-3 hover:bg-background flex items-center gap-3 text-sm text-text-secondary hover:text-primary transition-colors">
-                          <Settings size={16} /> {PUBLIC_HEADER_TEXTS.MENU_ADMIN}
-                        </LayoutContainer>
-                      </Link>
-                    )}
+                        <Link href="/gestao" onClick={() => setIsDropdownOpen(false)}>
+                          <LayoutContainer className="px-4 py-3 hover:bg-background flex items-center gap-3 text-sm text-text-secondary hover:text-primary transition-colors">
+                            <Settings size={16} /> {PUBLIC_HEADER_TEXTS.MENU_ADMIN}
+                          </LayoutContainer>
+                        </Link>
+                      )}
                     <button
                       onClick={handleLogout}
                       className="w-full text-left px-4 py-3 hover:bg-background flex items-center gap-3 text-sm text-[#ea580c] hover:bg-[#ea580c]/10 transition-colors border-t border-border cursor-pointer"
@@ -163,35 +192,6 @@ export const PublicHeader = () => {
             )}
           </LayoutContainer>
         </LayoutContainer>
-
-        {/* Campo Expansível de Busca Global no Header */}
-        {headerSearch.isOpen && (
-          <LayoutContainer className="border-t border-header-border/70 bg-header/95 backdrop-blur-md animate-in fade-in slide-in-from-top-1 duration-200">
-            <LayoutContainer className="max-w-3xl mx-auto px-4 sm:px-6 py-3 relative">
-              <GlobalSearchInputBar
-                value={headerSearch.query}
-                onChange={headerSearch.handleChange}
-                onClear={headerSearch.handleClear}
-                onClose={headerSearch.handleClose}
-                inputRef={headerSearch.inputRef}
-                showShortcutHint
-              />
-
-              {headerSearch.query.trim().length > 0 && (
-                <LayoutContainer className="mt-2 w-full bg-surface border border-border rounded-2xl shadow-2xl max-h-[70vh] overflow-y-auto z-50">
-                  <GlobalSearchResults
-                    query={headerSearch.query}
-                    results={headerSearch.results}
-                    isLoading={headerSearch.isLoading}
-                    error={headerSearch.error}
-                    hasSearched={headerSearch.hasSearched}
-                    onSelectResult={headerSearch.handleClose}
-                  />
-                </LayoutContainer>
-              )}
-            </LayoutContainer>
-          </LayoutContainer>
-        )}
 
         {/* Barra de Progresso de Leitura Áureo-Cerúlea Fixada Exatamente na Borda Inferior do Header */}
         <HeaderReadingProgressBar />

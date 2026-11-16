@@ -1,13 +1,18 @@
 'use client';
 
 import React from 'react';
-import { Download, X } from 'lucide-react';
+import { Download, Share, X } from 'lucide-react';
 import { LayoutContainer, Text, Title, Button, IconButton, SafeImage } from '@/shared/ui/components';
 import { PWA_TEXTS } from '../../constants/pwa.constants';
 import { usePwaInstall } from '../../hooks/usePwaInstall';
 
 export function PwaInstallPrompt() {
-  const { isVisible, handleInstallClick, handleDismissClick } = usePwaInstall();
+  const {
+    isVisible,
+    isIosFallback,
+    handleInstallClick,
+    handleDismissClick,
+  } = usePwaInstall();
 
   if (!isVisible) {
     return null;
@@ -15,11 +20,12 @@ export function PwaInstallPrompt() {
 
   return (
     <LayoutContainer className="fixed bottom-4 left-4 right-4 z-50 mx-auto max-w-lg animate-in fade-in slide-in-from-bottom-4 duration-300">
-      <LayoutContainer className="relative flex items-center justify-between gap-4 rounded-xl border border-amber-400/30 bg-[#0B1B3D]/95 p-4 shadow-2xl backdrop-blur-md">
-        <LayoutContainer className="flex items-center gap-3">
+      <LayoutContainer className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 rounded-xl border border-amber-400/30 bg-[#0B1B3D]/95 p-4 shadow-2xl backdrop-blur-md">
+        <LayoutContainer className="flex items-center gap-3 pr-6 sm:pr-0">
           <LayoutContainer className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-lg border border-amber-400/40 bg-[#071126] p-1.5 shadow-inner">
             <SafeImage
-              src="/pelotas-logo.png"
+              src="/icons/icon-192x192.png"
+              fallbackSrc="/images/pelotas-logo.png"
               alt="E.C. Pelotas"
               width={48}
               height={48}
@@ -31,21 +37,32 @@ export function PwaInstallPrompt() {
             <Title level="h4" className="text-sm font-bold text-amber-400">
               {PWA_TEXTS.TITLE}
             </Title>
-            <Text className="text-xs text-gray-300 line-clamp-2">
-              {PWA_TEXTS.DESCRIPTION}
+            <Text className="text-xs text-gray-300 leading-relaxed">
+              {isIosFallback ? PWA_TEXTS.IOS_DESCRIPTION : PWA_TEXTS.DESCRIPTION}
             </Text>
           </LayoutContainer>
         </LayoutContainer>
 
-        <LayoutContainer className="flex flex-shrink-0 items-center gap-2">
-          <Button
-            size="sm"
-            onClick={handleInstallClick}
-            className="flex items-center gap-1.5 bg-amber-400 font-semibold text-[#0B1B3D] hover:bg-amber-300"
-          >
-            <Download size={14} />
-            <Text as="span">{PWA_TEXTS.INSTALL_BUTTON}</Text>
-          </Button>
+        <LayoutContainer className="flex flex-shrink-0 items-center justify-end gap-2">
+          {isIosFallback ? (
+            <Button
+              size="sm"
+              onClick={handleDismissClick}
+              leftIcon={<Share size={14} />}
+              className="flex items-center gap-1.5 bg-amber-400 font-semibold text-[#0B1B3D] hover:bg-amber-300"
+            >
+              <Text as="span">{PWA_TEXTS.IOS_ACK_BUTTON}</Text>
+            </Button>
+          ) : (
+            <Button
+              size="sm"
+              onClick={handleInstallClick}
+              className="flex items-center gap-1.5 bg-amber-400 font-semibold text-[#0B1B3D] hover:bg-amber-300"
+            >
+              <Download size={14} />
+              <Text as="span">{PWA_TEXTS.INSTALL_BUTTON}</Text>
+            </Button>
+          )}
 
           <IconButton
             icon={<X size={16} />}
@@ -60,4 +77,3 @@ export function PwaInstallPrompt() {
     </LayoutContainer>
   );
 }
-

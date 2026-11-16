@@ -6,6 +6,7 @@ import { ThemeProvider } from '@/shared/ui/providers/ThemeProvider';
 import { SettingsProvider } from '@/shared/ui/providers/SettingsProvider';
 import { EnvironmentBadge } from '@/shared/ui/components';
 import { PwaInstallPrompt } from '@/features/pwa';
+import { CookieConsentBanner } from '@/features/privacy';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -66,6 +67,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <SettingsProvider>
             {children}
             <EnvironmentBadge />
+            <CookieConsentBanner />
             <PwaInstallPrompt />
             <Toaster position="top-right" />
           </SettingsProvider>
