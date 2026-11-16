@@ -7,5 +7,6 @@ export const PWA_TEXTS = {
   INSTALL_BUTTON: 'Instalar App',
   IOS_ACK_BUTTON: 'Entendi',
   DISMISS_BUTTON: 'Agora não',
+  CLOSE_ARIA: 'Fechar aviso de instalação',
   INSTALLED_MESSAGE: 'Aplicativo instalado com sucesso no seu dispositivo!',
 } as const;
