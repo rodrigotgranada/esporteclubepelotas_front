@@ -36,6 +36,7 @@ import { useSystemModulesStore } from '@/store/useSystemModulesStore';
 import { useMembershipLink } from '@/features/membership/hooks/useMembershipLink';
 import { PUBLIC_DRAWER_TEXTS } from './PublicNavigationDrawer.constants';
 import { PublicDrawerFooter } from './PublicDrawerFooter';
+import { useGlobalSearch, GlobalSearchInputBar, GlobalSearchResults, GLOBAL_SEARCH_TEXTS } from '@/features/search';
 
 export interface PublicNavigationDrawerProps {
   isOpen: boolean;
@@ -52,6 +53,14 @@ export const PublicNavigationDrawer: React.FC<PublicNavigationDrawerProps> = ({
   const membershipLink = useMembershipLink();
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
+  const drawerSearch = useGlobalSearch(5);
+  const { handleClear: clearDrawerSearch } = drawerSearch;
+
+  useEffect(() => {
+    if (!isOpen) {
+      clearDrawerSearch();
+    }
+  }, [isOpen, clearDrawerSearch]);
 
   useEffect(() => {
     fetchModules();
@@ -123,42 +132,66 @@ export const PublicNavigationDrawer: React.FC<PublicNavigationDrawerProps> = ({
       <LayoutContainer className="absolute inset-y-0 left-0 max-w-full flex">
         <LayoutContainer className="w-screen sm:w-[440px] max-w-[92vw] bg-drawer border-r border-border shadow-2xl flex flex-col justify-between h-full overflow-y-auto animate-in slide-in-from-left duration-300 border-t-2 border-t-primary">
           {/* Top Header of Drawer */}
-          <LayoutContainer className="p-5 sm:p-6 pb-4 border-b border-border/80 flex items-center justify-between sticky top-0 bg-drawer/95 backdrop-blur-md z-20">
-            <Link
-              href="/"
-              onClick={onClose}
-              className="flex items-center gap-3 group focus:outline-none"
-            >
-              <Image
-                src={settings?.clubLogoUrl || '/images/pelotas-logo.png'}
-                alt={clubName}
-                width={42}
-                height={42}
-                className="object-contain drop-shadow-sm group-hover:scale-105 transition-transform"
-                unoptimized={isUnoptimizedImageUrl(settings?.clubLogoUrl || '/images/pelotas-logo.png')}
-              />
-              <LayoutContainer className="flex flex-col">
-                <Title level="h2" className="text-sm font-black tracking-tight text-text-primary group-hover:text-primary transition-colors uppercase">
-                  {PUBLIC_DRAWER_TEXTS.TITLE}
-                </Title>
-                <Text className="text-[11px] text-text-secondary leading-tight line-clamp-1">
-                  {PUBLIC_DRAWER_TEXTS.SUBTITLE}
-                </Text>
-              </LayoutContainer>
-            </Link>
+          <LayoutContainer className="border-b border-border/80 sticky top-0 bg-drawer/95 backdrop-blur-md z-20">
+            <LayoutContainer className="p-5 sm:p-6 pb-4 flex items-center justify-between">
+              <Link
+                href="/"
+                onClick={onClose}
+                className="flex items-center gap-3 group focus:outline-none"
+              >
+                <Image
+                  src={settings?.clubLogoUrl || '/images/pelotas-logo.png'}
+                  alt={clubName}
+                  width={42}
+                  height={42}
+                  className="object-contain drop-shadow-sm group-hover:scale-105 transition-transform"
+                  unoptimized={isUnoptimizedImageUrl(settings?.clubLogoUrl || '/images/pelotas-logo.png')}
+                />
+                <LayoutContainer className="flex flex-col">
+                  <Title level="h2" className="text-sm font-black tracking-tight text-text-primary group-hover:text-primary transition-colors uppercase">
+                    {PUBLIC_DRAWER_TEXTS.TITLE}
+                  </Title>
+                  <Text className="text-[11px] text-text-secondary leading-tight line-clamp-1">
+                    {PUBLIC_DRAWER_TEXTS.SUBTITLE}
+                  </Text>
+                </LayoutContainer>
+              </Link>
 
-            <button
-              type="button"
-              onClick={onClose}
-              className="w-9 h-9 rounded-xl border border-border flex items-center justify-center text-text-secondary hover:text-text-primary hover:bg-surface transition-all focus:outline-none"
-              aria-label={PUBLIC_DRAWER_TEXTS.CLOSE}
-            >
-              <X className="w-5 h-5" />
-            </button>
+              <button
+                type="button"
+                onClick={onClose}
+                className="w-9 h-9 rounded-xl border border-border flex items-center justify-center text-text-secondary hover:text-text-primary hover:bg-surface transition-all focus:outline-none"
+                aria-label={PUBLIC_DRAWER_TEXTS.CLOSE}
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </LayoutContainer>
+
+            {/* Input de Busca Unificada no topo do Drawer Mobile */}
+            <LayoutContainer className="px-5 pb-4 md:hidden">
+              <GlobalSearchInputBar
+                value={drawerSearch.query}
+                onChange={drawerSearch.handleChange}
+                onClear={drawerSearch.handleClear}
+                placeholder={GLOBAL_SEARCH_TEXTS.PLACEHOLDER_COMPACT}
+              />
+            </LayoutContainer>
           </LayoutContainer>
 
           {/* Drawer Body Links & Sections */}
           <LayoutContainer className="p-5 sm:p-6 flex flex-col gap-6 flex-1">
+            {drawerSearch.query.trim().length > 0 && (
+              <LayoutContainer className="md:hidden rounded-2xl bg-surface/80 border border-border overflow-hidden">
+                <GlobalSearchResults
+                  query={drawerSearch.query}
+                  results={drawerSearch.results}
+                  isLoading={drawerSearch.isLoading}
+                  error={drawerSearch.error}
+                  hasSearched={drawerSearch.hasSearched}
+                  onSelectResult={onClose}
+                />
+              </LayoutContainer>
+            )}
             {/* 1. Highlight Membership Banner */}
             {membershipActive && (
               <LayoutContainer className="rounded-2xl bg-gradient-to-br from-primary/15 via-surface to-surface border border-primary/30 p-4.5 flex flex-col gap-3 relative overflow-hidden shadow-xs">

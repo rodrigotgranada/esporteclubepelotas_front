@@ -10,8 +10,14 @@ export interface SpinnerProps {
 
 export const Spinner = ({ size = 24, text, className = '' }: SpinnerProps) => {
   return (
-    <LayoutContainer className={`flex flex-col items-center justify-center gap-3 p-8 ${className}`}>
-      <Loader2 size={size} className="animate-spin text-primary" />
+    <LayoutContainer
+      className={`inline-flex flex-col items-center justify-center gap-2.5 text-primary ${text ? 'p-4' : 'p-1'} ${className}`}
+    >
+      <Loader2
+        size={size}
+        style={{ width: size, height: size }}
+        className="animate-spin text-current shrink-0"
+      />
       {text && <Text className="text-text-secondary text-sm">{text}</Text>}
     </LayoutContainer>
   );

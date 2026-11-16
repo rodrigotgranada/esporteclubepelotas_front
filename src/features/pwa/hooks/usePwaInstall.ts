@@ -13,11 +13,30 @@ export function usePwaInstall() {
   const [isInstalled, setIsInstalled] = useState(false);
 
   useEffect(() => {
-    // Registrar service worker
+    // Em localhost/desenvolvimento, remove caches e workers antigos para evitar HTML/chunks defasados
     if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js').catch((err) => {
-        console.warn('Erro ao registrar Service Worker do PWA:', err);
-      });
+      const isLocalhost =
+        window.location.hostname === 'localhost' ||
+        window.location.hostname === '127.0.0.1';
+
+      if (isLocalhost) {
+        navigator.serviceWorker.getRegistrations().then((registrations) => {
+          registrations.forEach((registration) => registration.unregister());
+        }).catch(() => undefined);
+        if ('caches' in window) {
+          caches.keys().then((keys) => {
+            keys.forEach((key) => {
+              if (key.startsWith('ecpelotas-pwa')) {
+                caches.delete(key);
+              }
+            });
+          }).catch(() => undefined);
+        }
+      } else {
+        navigator.serviceWorker.register('/sw.js').catch((err) => {
+          console.warn('Erro ao registrar Service Worker do PWA:', err);
+        });
+      }
     }
 
     // Checar se já foi dispensado recentemente

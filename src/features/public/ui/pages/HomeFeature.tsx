@@ -2,13 +2,12 @@
 
 import React, { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import {
   LayoutContainer,
   Title,
   Text,
   Button,
-  ShieldPlaceholder,
+  SafeImage,
   isUnoptimizedImageUrl,
 } from '@/shared/ui/components';
 import { HOME_FEATURE_TEXTS } from './HomeFeature.constants';
@@ -145,8 +144,9 @@ export const HomeFeature = () => {
 
         <LayoutContainer className="relative z-10 max-w-4xl mx-auto px-4 text-center animate-in fade-in slide-in-from-bottom-6 duration-700 flex flex-col items-center">
           <LayoutContainer className="mb-4 sm:mb-6 animate-in zoom-in duration-700 delay-150">
-            <Image
+            <SafeImage
               src={settings?.clubLogoUrl || '/images/pelotas-logo.png'}
+              fallbackSrc="/images/pelotas-logo.png"
               alt={settings?.clubName || 'Esporte Clube Pelotas'}
               width={110}
               height={110}

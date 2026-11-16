@@ -26,15 +26,7 @@ export function ClubPollWidget() {
     handleVote,
   } = useClubPoll();
 
-  if (isLoading) {
-    return (
-      <LayoutContainer className="rounded-2xl border border-gray-800 bg-[#071126]/40 p-6 flex items-center justify-center min-h-[220px]">
-        <Spinner size={24} className="text-amber-400" />
-      </LayoutContainer>
-    );
-  }
-
-  if (!poll) {
+  if (isLoading || !poll) {
     return null;
   }
 

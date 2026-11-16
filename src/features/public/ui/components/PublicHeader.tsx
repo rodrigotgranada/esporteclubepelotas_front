@@ -5,9 +5,10 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
-import { LayoutContainer, Button, ShieldPlaceholder, isUnoptimizedImageUrl } from '@/shared/ui/components';
-import { Menu, User, Settings, LogOut } from 'lucide-react';
+import { LayoutContainer, Button, IconButton, SafeImage, isUnoptimizedImageUrl } from '@/shared/ui/components';
+import { Menu, User, Settings, LogOut, Search } from 'lucide-react';
 import { useSettingsStore } from '@/store/useSettingsStore';
+import { useHeaderSearch, GlobalSearchInputBar, GlobalSearchResults, GLOBAL_SEARCH_TEXTS } from '@/features/search';
 import { PUBLIC_HEADER_TEXTS } from './PublicHeader.constants';
 import { PublicNavigationDrawer } from './PublicNavigationDrawer';
 import { HeaderReadingProgressBar } from './HeaderReadingProgressBar';
@@ -19,6 +20,7 @@ export const PublicHeader = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const headerSearch = useHeaderSearch();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -44,6 +46,7 @@ export const PublicHeader = () => {
     <>
       <LayoutContainer
         as="header"
+        ref={headerSearch.containerRef}
         className="sticky top-0 z-40 w-full bg-header/95 backdrop-blur-md border-b border-header-border transition-colors duration-200 relative"
       >
         <LayoutContainer className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 relative flex items-center justify-between">
@@ -66,8 +69,9 @@ export const PublicHeader = () => {
               className="relative w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 max-w-[40px] sm:max-w-[44px] md:max-w-[48px] max-h-[40px] sm:max-h-[44px] md:max-h-[48px] flex items-center justify-center shrink-0 group focus:outline-none overflow-hidden"
               aria-label={settings?.clubName || PUBLIC_HEADER_TEXTS.LOGO_FULL}
             >
-              <Image
+              <SafeImage
                 src={settings?.clubLogoUrl || '/images/pelotas-logo.png'}
+                fallbackSrc="/images/pelotas-logo.png"
                 alt={settings?.clubName || PUBLIC_HEADER_TEXTS.LOGO_FULL}
                 fill
                 sizes="(max-width: 640px) 40px, 48px"
@@ -78,8 +82,23 @@ export const PublicHeader = () => {
             </Link>
           </LayoutContainer>
 
-          {/* LADO DIREITO: Sessão do Usuário / Botão Entrar */}
+          {/* LADO DIREITO: Lupa de Busca Global + Sessão do Usuário / Botão Entrar */}
           <LayoutContainer className="flex items-center gap-2 sm:gap-3 shrink-0">
+            <IconButton
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={headerSearch.handleToggle}
+              aria-label={PUBLIC_HEADER_TEXTS.ARIA_OPEN_SEARCH}
+              title={GLOBAL_SEARCH_TEXTS.OPEN_SEARCH_TITLE}
+              icon={<Search className="w-5 h-5" />}
+              className={`rounded-xl w-9 h-9 transition-colors ${
+                headerSearch.isOpen
+                  ? 'bg-primary text-black hover:bg-primary hover:text-black'
+                  : 'text-header-text hover:bg-header-text/10 hover:text-primary'
+              }`}
+            />
+
             {/* Sessão do Usuário ou Botão Entrar */}
             {user ? (
               <LayoutContainer className="relative" ref={dropdownRef}>
@@ -144,6 +163,35 @@ export const PublicHeader = () => {
             )}
           </LayoutContainer>
         </LayoutContainer>
+
+        {/* Campo Expansível de Busca Global no Header */}
+        {headerSearch.isOpen && (
+          <LayoutContainer className="border-t border-header-border/70 bg-header/95 backdrop-blur-md animate-in fade-in slide-in-from-top-1 duration-200">
+            <LayoutContainer className="max-w-3xl mx-auto px-4 sm:px-6 py-3 relative">
+              <GlobalSearchInputBar
+                value={headerSearch.query}
+                onChange={headerSearch.handleChange}
+                onClear={headerSearch.handleClear}
+                onClose={headerSearch.handleClose}
+                inputRef={headerSearch.inputRef}
+                showShortcutHint
+              />
+
+              {headerSearch.query.trim().length > 0 && (
+                <LayoutContainer className="mt-2 w-full bg-surface border border-border rounded-2xl shadow-2xl max-h-[70vh] overflow-y-auto z-50">
+                  <GlobalSearchResults
+                    query={headerSearch.query}
+                    results={headerSearch.results}
+                    isLoading={headerSearch.isLoading}
+                    error={headerSearch.error}
+                    hasSearched={headerSearch.hasSearched}
+                    onSelectResult={headerSearch.handleClose}
+                  />
+                </LayoutContainer>
+              )}
+            </LayoutContainer>
+          </LayoutContainer>
+        )}
 
         {/* Barra de Progresso de Leitura Áureo-Cerúlea Fixada Exatamente na Borda Inferior do Header */}
         <HeaderReadingProgressBar />

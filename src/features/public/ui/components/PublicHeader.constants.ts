@@ -12,6 +12,7 @@ export const PUBLIC_HEADER_TEXTS = {
   MENU_LOGOUT: 'Sair',
   BUTTON_LOGIN: 'Entrar',
   ARIA_OPEN_MENU: 'Abrir navegação do clube',
+  ARIA_OPEN_SEARCH: 'Abrir busca no portal',
 };
 
 
