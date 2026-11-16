@@ -59,7 +59,7 @@ export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
 
       <LayoutContainer className="flex-1 lg:ml-64 flex flex-col w-full min-w-0 transition-all duration-300">
         <Topbar onMenuClick={() => setIsMobileMenuOpen(true)} />
-        <main className="flex-1 p-6 lg:p-10 w-full min-w-0 overflow-hidden">
+        <main className="flex-1 p-4 sm:p-5 lg:p-6 w-full min-w-0 overflow-hidden">
           {children}
         </main>
       </LayoutContainer>

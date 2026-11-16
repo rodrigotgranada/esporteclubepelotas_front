@@ -45,7 +45,7 @@ export const AdminSponsorsFeature = () => {
   } = useAdminSponsorsList();
 
   return (
-    <LayoutContainer className="flex flex-col gap-6 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full animate-in fade-in duration-200">
+    <LayoutContainer className="flex flex-col gap-5 max-w-[1600px] mx-auto w-full animate-in fade-in duration-200">
       {/* Cabeçalho da Página */}
       <LayoutContainer className="flex flex-col gap-1">
         <Title level="h1" className="text-2xl sm:text-3xl font-extrabold text-text-primary tracking-tight">

@@ -140,31 +140,31 @@ export const SponsorsTable: React.FC<SponsorsTableProps> = ({
         <Table className="w-full text-left border-collapse">
           <TableHeader className="border-b border-border bg-surface/50">
             <TableRow>
-              <TableHead className="py-3 px-4 font-bold text-xs uppercase text-text-secondary w-20">
+              <TableHead className="py-3 px-2.5 font-bold text-[11px] uppercase text-text-secondary w-16">
                 {texts.COL_LOGO}
               </TableHead>
-              <TableHead className="py-3 px-4 font-bold text-xs uppercase text-text-secondary">
+              <TableHead className="py-3 px-2.5 font-bold text-[11px] uppercase text-text-secondary">
                 {texts.COL_NAME}
               </TableHead>
-              <TableHead className="py-3 px-4 font-bold text-xs uppercase text-text-secondary text-center">
+              <TableHead className="py-3 px-2 font-bold text-[11px] uppercase text-text-secondary text-center">
                 {texts.COL_SCOPES}
               </TableHead>
-              <TableHead className="py-3 px-4 font-bold text-xs uppercase text-text-secondary">
+              <TableHead className="py-3 px-2.5 font-bold text-[11px] uppercase text-text-secondary">
                 {texts.COL_CONTRACT}
               </TableHead>
-              <TableHead className="py-3 px-4 font-bold text-xs uppercase text-text-secondary text-center">
+              <TableHead className="py-3 px-2 font-bold text-[11px] uppercase text-text-secondary text-center">
                 {texts.COL_CLICKS}
               </TableHead>
-              <TableHead className="py-3 px-4 font-bold text-xs uppercase text-text-secondary text-center">
+              <TableHead className="py-3 px-2 font-bold text-[11px] uppercase text-text-secondary text-center">
                 {texts.COL_ORDER}
               </TableHead>
-              <TableHead className="py-3 px-4 font-bold text-xs uppercase text-text-secondary text-center">
+              <TableHead className="py-3 px-2 font-bold text-[11px] uppercase text-text-secondary text-center">
                 {texts.COL_FEATURED}
               </TableHead>
-              <TableHead className="py-3 px-4 font-bold text-xs uppercase text-text-secondary text-center">
+              <TableHead className="py-3 px-2 font-bold text-[11px] uppercase text-text-secondary text-center">
                 {texts.COL_STATUS}
               </TableHead>
-              <TableHead className="py-3 px-4 font-bold text-xs uppercase text-text-secondary text-right">
+              <TableHead className="py-3 px-2.5 font-bold text-[11px] uppercase text-text-secondary text-right">
                 {texts.COL_ACTIONS}
               </TableHead>
             </TableRow>
@@ -176,8 +176,8 @@ export const SponsorsTable: React.FC<SponsorsTableProps> = ({
                 className="border-b border-border/50 hover:bg-background/50 transition-colors"
               >
                 {/* Logo */}
-                <TableCell className="py-3 px-4">
-                  <LayoutContainer className="relative w-12 h-10 rounded-lg bg-surface/80 border border-border/60 p-1 flex items-center justify-center overflow-hidden">
+                <TableCell className="py-3 px-2.5">
+                  <LayoutContainer className="relative w-11 h-9 rounded-lg bg-surface/80 border border-border/60 p-1 flex items-center justify-center overflow-hidden">
                     <SafeImage
                       src={sponsor.logoUrl || sponsor.logoDarkUrl || '/images/pelotas-logo.png'}
                       alt={sponsor.name}
@@ -189,9 +189,9 @@ export const SponsorsTable: React.FC<SponsorsTableProps> = ({
                 </TableCell>
 
                 {/* Nome & Website */}
-                <TableCell className="py-3 px-4">
+                <TableCell className="py-3 px-2.5">
                   <LayoutContainer className="flex flex-col">
-                    <Text as="span" className="font-bold text-sm text-text-primary">
+                    <Text as="span" className="font-bold text-sm text-text-primary leading-snug">
                       {sponsor.name}
                     </Text>
                     {sponsor.websiteUrl && (
@@ -201,7 +201,7 @@ export const SponsorsTable: React.FC<SponsorsTableProps> = ({
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-1 text-xs text-primary hover:underline mt-0.5"
                       >
-                        <Text as="span" className="line-clamp-1 max-w-[200px]">
+                        <Text as="span" className="line-clamp-1 max-w-[165px]">
                           {sponsor.websiteUrl.replace(/^https?:\/\//, '')}
                         </Text>
                         <ExternalLink size={10} className="shrink-0" />
@@ -211,8 +211,8 @@ export const SponsorsTable: React.FC<SponsorsTableProps> = ({
                 </TableCell>
 
                 {/* Onde Apoia / Modalidades */}
-                <TableCell className="py-3 px-4 text-center">
-                  <LayoutContainer className="flex flex-wrap items-center justify-center gap-1 max-w-[170px] mx-auto">
+                <TableCell className="py-3 px-2 text-center">
+                  <LayoutContainer className="flex flex-wrap items-center justify-center gap-1 max-w-[140px] mx-auto">
                     {sponsor.showOnMain && (
                       <Badge variant="primary" size="sm" className="text-[10px] font-bold py-0.5 px-1.5">
                         {texts.SCOPE_MAIN_BADGE}
@@ -232,24 +232,24 @@ export const SponsorsTable: React.FC<SponsorsTableProps> = ({
                 </TableCell>
 
                 {/* Vigência Contratual */}
-                <TableCell className="py-3 px-4">
-                  <LayoutContainer className="flex items-center gap-1.5 text-xs text-text-secondary">
+                <TableCell className="py-3 px-2.5">
+                  <LayoutContainer className="flex items-center gap-1.5 text-xs text-text-secondary max-w-[125px]">
                     <Calendar size={13} className="shrink-0 text-text-secondary/70" />
-                    <Text as="span">{getContractText(sponsor)}</Text>
+                    <Text as="span" className="leading-snug">{getContractText(sponsor)}</Text>
                   </LayoutContainer>
                 </TableCell>
 
                 {/* Contagem de Cliques */}
-                <TableCell className="py-3 px-4 text-center">
-                  <LayoutContainer className="inline-flex items-center gap-1 text-xs font-bold text-text-secondary bg-surface px-2.5 py-1 rounded-full border border-border">
+                <TableCell className="py-3 px-2 text-center">
+                  <LayoutContainer className="inline-flex items-center gap-1 text-xs font-bold text-text-secondary bg-surface px-2 py-1 rounded-full border border-border">
                     <MousePointerClick size={12} className="text-primary" />
                     <Text as="span">{sponsor.clicksCount || 0}</Text>
                   </LayoutContainer>
                 </TableCell>
 
                 {/* Ordem Manual com Botões Rápidos de Subir / Descer */}
-                <TableCell className="py-3 px-4 text-center">
-                  <LayoutContainer className="inline-flex items-center gap-1.5 justify-center">
+                <TableCell className="py-3 px-2 text-center">
+                  <LayoutContainer className="inline-flex items-center gap-1 justify-center">
                     <Text as="span" className="text-xs font-mono font-bold text-text-secondary min-w-[20px]">
                       #{sponsor.displayOrder ?? 0}
                     </Text>
@@ -281,7 +281,7 @@ export const SponsorsTable: React.FC<SponsorsTableProps> = ({
                 </TableCell>
 
                 {/* Destaque Ticker (Somente Leitura / Consulta) */}
-                <TableCell className="py-3 px-4 text-center">
+                <TableCell className="py-3 px-2 text-center">
                   {(sponsor.isFeatured ?? (sponsor as any).featured) ? (
                     <Badge variant="primary" size="sm" className="font-bold inline-flex items-center gap-1">
                       <Sparkles size={11} />
@@ -295,14 +295,14 @@ export const SponsorsTable: React.FC<SponsorsTableProps> = ({
                 </TableCell>
 
                 {/* Status Contratual (Somente Leitura / Consulta) */}
-                <TableCell className="py-3 px-4 text-center">
+                <TableCell className="py-3 px-2 text-center">
                   <LayoutContainer className="inline-flex justify-center">
                     {getStatusBadge(sponsor.status)}
                   </LayoutContainer>
                 </TableCell>
 
                 {/* Ações */}
-                <TableCell className="py-3 px-4 text-right">
+                <TableCell className="py-3 px-2.5 text-right">
                   <LayoutContainer className="flex items-center justify-end gap-1">
                     <Button
                       type="button"
