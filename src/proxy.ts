@@ -1,39 +1,41 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
+const ALLOWED_MANAGEMENT_ROLES = new Set(['ADMIN', 'OWNER', 'EDITOR']);
+
 export function proxy(request: NextRequest) {
-  // Tornar a rota /gestao e todas as suas subrotas 100% invisíveis para qualquer um não autenticado ou não autorizado
+  // Tornar a rota /gestao e todas as suas subrotas invisíveis para usuários não autenticados ou sem cargo administrativo/editorial
   if (request.nextUrl.pathname.startsWith('/gestao')) {
     const accessToken = request.cookies.get('ecp_access_token')?.value;
 
-    if (!accessToken) {
-      // Sem login -> reescreve silenciosamente como 404 (não revela que a rota existe)
+    if (!accessToken || accessToken.split('.').length !== 3) {
       request.nextUrl.pathname = '/404';
       return NextResponse.rewrite(request.nextUrl);
     }
 
     try {
-      // Extrair payload do JWT (Header.Payload.Signature)
       const payloadBase64 = accessToken.split('.')[1];
       const payloadString = atob(payloadBase64.replace(/-/g, '+').replace(/_/g, '/'));
       const payload = JSON.parse(payloadString);
 
-      // Status PENDENTE -> reescreve como 404 (ou se preferir, mantém invisível)
+      // Valida expiração básica do token JWT
+      if (typeof payload.exp === 'number' && payload.exp * 1000 <= Date.now()) {
+        request.nextUrl.pathname = '/404';
+        return NextResponse.rewrite(request.nextUrl);
+      }
+
       if (payload.status === 'PENDING') {
         request.nextUrl.pathname = '/404';
         return NextResponse.rewrite(request.nextUrl);
       }
 
-      // Checagem de Role
-      const roleName = payload.role?.name || payload.role;
-      if (roleName !== 'ADMIN' && roleName !== 'OWNER') {
-        // Não autorizado -> reescreve silenciosamente como 404
+      const rawRole = payload.role?.name || payload.role || '';
+      const roleName = typeof rawRole === 'string' ? rawRole.toUpperCase() : '';
+      if (!ALLOWED_MANAGEMENT_ROLES.has(roleName)) {
         request.nextUrl.pathname = '/404';
         return NextResponse.rewrite(request.nextUrl);
       }
-
-    } catch (e) {
-      // Token adulterado ou com formato inválido -> reescreve silenciosamente como 404
+    } catch {
       request.nextUrl.pathname = '/404';
       return NextResponse.rewrite(request.nextUrl);
     }

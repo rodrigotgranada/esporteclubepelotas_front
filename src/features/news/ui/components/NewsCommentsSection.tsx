@@ -170,7 +170,7 @@ export const NewsCommentsSection: React.FC<NewsCommentsSectionProps> = ({ slug }
             </Text>
           </LayoutContainer>
           <LayoutContainer className="flex flex-wrap items-center justify-center gap-2">
-            <Link href={`/login?redirect=/noticias/${slug}`}>
+            <Link href={`/login?returnUrl=/noticias/${slug}`}>
               <Button
                 variant="primary"
                 size="sm"
@@ -214,7 +214,7 @@ export const NewsCommentsSection: React.FC<NewsCommentsSectionProps> = ({ slug }
             const authorAvatar = author?.avatarUrl || author?.avatar;
 
             const isAuthor = Boolean(user && author?._id && (user._id === author._id));
-            const isStaff = Boolean(user && ['Owner', 'Admin', 'Editor'].includes(user.role?.name));
+            const isStaff = Boolean(user && ['OWNER', 'ADMIN', 'EDITOR'].includes((user.role?.name || '').toUpperCase()));
             const canDelete = isAuthor || isStaff;
 
             return (

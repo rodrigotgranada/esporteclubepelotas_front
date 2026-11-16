@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useAuthStore } from '@/store/useAuthStore';
 import { authRepository } from '../repositories';
 import { Toast } from '@/shared/ui/components';
+import { isSafeRelativeRedirect } from '@/shared/utils';
 import { verifyEmailSchema, VerifyEmailForm } from '../schemas/auth.schemas';
 
 export function maskEmail(email: string) {
@@ -68,8 +69,8 @@ export const useVerifyEmail = () => {
       setAuth(accessToken, authUser);
 
       Toast.success('E-mail verificado com sucesso!');
-      const returnUrl = searchParams.get('returnUrl') || '/';
-      router.push(returnUrl);
+      const rawReturnUrl = searchParams.get('returnUrl');
+      router.push(isSafeRelativeRedirect(rawReturnUrl) ? rawReturnUrl! : '/');
     } catch (error: unknown) {
       const err = error as {
         response?: { status?: number; data?: { message?: string } };

@@ -41,6 +41,7 @@ export function TransparencyPublicPage() {
               executiveBoard={executiveBoard}
               deliberativeCouncil={deliberativeCouncil}
               fiscalCouncil={fiscalCouncil}
+              isLoading={isLoading}
             />
           ) : (
             <TransparencyDocumentsGrid

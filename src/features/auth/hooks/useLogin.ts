@@ -6,6 +6,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { loginSchema, LoginForm } from '../schemas';
 import { authRepository } from '../repositories';
 import { Toast } from '@/shared/ui/components';
+import { isSafeRelativeRedirect } from '@/shared/utils';
 
 export const useLogin = () => {
   const router = useRouter();
@@ -36,8 +37,8 @@ export const useLogin = () => {
         } else if (user.mustChangePassword) {
           router.push('/change-temporary-password');
         } else {
-          const returnUrl = searchParams.get('returnUrl') || '/';
-          router.push(returnUrl);
+          // Redirect validado via isSafeRelativeRedirect
+          router.push(isSafeRelativeRedirect(searchParams.get('returnUrl')) ? searchParams.get('returnUrl')! : '/');
         }
       });
     } catch (error: unknown) {

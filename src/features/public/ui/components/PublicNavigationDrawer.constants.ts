@@ -40,11 +40,6 @@ export const PUBLIC_DRAWER_TEXTS = {
   LINK_STORE: 'Loja Oficial',
   LINK_TRANSPARENCY: 'Transparência & Governança',
 
-  THEME_TITLE: 'Aparência',
-  THEME_LIGHT: 'Modo Claro',
-  THEME_DARK: 'Modo Escuro',
-  THEME_SWITCH_ARIA: 'Alternar entre modo claro e escuro',
-
   BTN_LOGIN: 'Acessar Minha Conta',
   BTN_REGISTER: 'Cadastre-se',
   NO_ACCOUNT_PROMPT: 'Ainda não é cadastrado?',

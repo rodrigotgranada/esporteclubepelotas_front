@@ -123,6 +123,8 @@ export const useAdminMatchNarrator = ({ matchId }: UseAdminMatchNarratorProps) =
 
   // Submeter novo lance
   const handleSubmitEvent = async (data: MatchEventFormData) => {
+    if (inFlightRef.current) return;
+    inFlightRef.current = true;
     setIsSavingEvent(true);
     try {
       await matchesService.adminAddMatchEvent(matchId, data);
@@ -133,13 +135,15 @@ export const useAdminMatchNarrator = ({ matchId }: UseAdminMatchNarratorProps) =
       toast.error('Erro ao salvar lance.');
       throw err;
     } finally {
+      inFlightRef.current = false;
       setIsSavingEvent(false);
     }
   };
 
   // Excluir lance
   const handleConfirmDeleteEvent = async () => {
-    if (!eventToDelete) return;
+    if (!eventToDelete || inFlightRef.current) return;
+    inFlightRef.current = true;
     setIsDeletingEvent(true);
     try {
       await matchesService.adminDeleteMatchEvent(eventToDelete.id);
@@ -150,6 +154,7 @@ export const useAdminMatchNarrator = ({ matchId }: UseAdminMatchNarratorProps) =
       console.error('Erro ao excluir lance:', err);
       toast.error('Erro ao excluir lance.');
     } finally {
+      inFlightRef.current = false;
       setIsDeletingEvent(false);
     }
   };

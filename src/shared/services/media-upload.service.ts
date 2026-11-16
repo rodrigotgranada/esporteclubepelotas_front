@@ -48,8 +48,6 @@ function normalizeUploadFile(fileOrBlob: File | Blob, prefix = 'media'): File {
     ? 'jpg'
     : fileOrBlob.type.includes('webp')
     ? 'webp'
-    : fileOrBlob.type.includes('svg')
-    ? 'svg'
     : 'png';
 
   const fileName = `${prefix}-${Date.now()}.${ext}`;

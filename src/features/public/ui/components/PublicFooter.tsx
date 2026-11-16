@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import Link from 'next/link';
@@ -11,6 +11,7 @@ import {
   ShieldPlaceholder, isUnoptimizedImageUrl,
 } from '@/shared/ui/components';
 import { useSettingsStore, SocialPlatform } from '@/store/useSettingsStore';
+import { sanitizeSafeUrl } from '@/shared/utils';
 import {
   FaInstagram,
   FaFacebookF,
@@ -178,7 +179,7 @@ export const PublicFooter = () => {
                     return (
                       <a
                         key={idx}
-                        href={item.url}
+                        href={sanitizeSafeUrl(item.url) || '#'}
                         target="_blank"
                         rel="noopener noreferrer"
                         className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border bg-background/60 text-text-primary hover:text-primary text-xs font-semibold transition-all ${cfg.defaultBg}`}
@@ -213,7 +214,7 @@ export const PublicFooter = () => {
                   item.isExternal ? (
                     <a
                       key={idx}
-                      href={item.url}
+                      href={sanitizeSafeUrl(item.url) || '#'}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-1.5 text-text-secondary hover:text-primary transition-colors font-medium"
@@ -224,7 +225,7 @@ export const PublicFooter = () => {
                   ) : (
                     <Link
                       key={idx}
-                      href={item.url}
+                      href={sanitizeSafeUrl(item.url) || '#'}
                       prefetch={false}
                       className="inline-flex items-center gap-1.5 text-text-secondary hover:text-primary transition-colors font-medium"
                     >
@@ -333,7 +334,7 @@ export const PublicFooter = () => {
 
             {/* Google Maps Thumbnail with direct stadium link overlay */}
             <a
-              href={mapsDirectUrl}
+              href={sanitizeSafeUrl(mapsDirectUrl) || '#'}
               target="_blank"
               rel="noopener noreferrer"
               className="block w-full h-36 rounded-xl overflow-hidden border border-border bg-background shadow-xs relative mt-1 group cursor-pointer transition-all hover:border-primary/50"

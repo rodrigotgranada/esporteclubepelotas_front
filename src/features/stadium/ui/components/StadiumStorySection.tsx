@@ -2,6 +2,7 @@
 
 import React, { useMemo } from 'react';
 import Link from 'next/link';
+import DOMPurify from 'dompurify';
 import { LayoutContainer, Title, Text, Badge, Button } from '@/shared/ui/components';
 import { useMembershipLink } from '@/features/membership/hooks/useMembershipLink';
 import { STADIUM_TEXTS } from '../../constants/stadium.constants';
@@ -41,6 +42,14 @@ export const StadiumStorySection: React.FC<StadiumStorySectionProps> = ({
     }
     return null;
   }, [contentHtml]);
+
+  const sanitizedHtml = useMemo(() => {
+    if (!contentHtml || tiptapJson) return '';
+    if (typeof window !== 'undefined') {
+      return DOMPurify.sanitize(contentHtml);
+    }
+    return contentHtml.replace(/<[^>]+>/g, '');
+  }, [contentHtml, tiptapJson]);
 
   return (
     <LayoutContainer as="section" className="w-full py-12 sm:py-16 bg-background">
@@ -91,7 +100,7 @@ export const StadiumStorySection: React.FC<StadiumStorySectionProps> = ({
                   [&>figure>figcaption]:text-xs [&>figure>figcaption]:sm:text-sm [&>figure>figcaption]:text-text-secondary [&>figure>figcaption]:text-center [&>figure>figcaption]:italic [&>figure>figcaption]:mt-2.5 [&>figure>figcaption]:px-2
                   [&>img]:w-full [&>img]:max-h-[520px] [&>img]:object-cover [&>img]:rounded-2xl [&>img]:my-8 [&>img]:border [&>img]:border-border/80 [&>img]:shadow-md
                   [&>strong]:text-text-primary [&>strong]:font-bold"
-                dangerouslySetInnerHTML={{ __html: contentHtml || '' }}
+                dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
               />
             )}
           </LayoutContainer>

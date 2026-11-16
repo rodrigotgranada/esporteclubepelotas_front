@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { LayoutContainer, Title, Text, SafeImage, Badge } from '@/shared/ui/components';
+import { LayoutContainer, Title, Text, SafeImage, Badge, Spinner } from '@/shared/ui/components';
 import { User } from 'lucide-react';
 import { TransparencyBoardMember } from '../../types/transparency.types';
 import { TRANSPARENCY_TEXTS } from '../../constants/transparency.constants';
@@ -10,13 +10,23 @@ interface TransparencyBoardSectionProps {
   executiveBoard: TransparencyBoardMember[];
   deliberativeCouncil: TransparencyBoardMember[];
   fiscalCouncil: TransparencyBoardMember[];
+  isLoading?: boolean;
 }
 
 export function TransparencyBoardSection({
   executiveBoard,
   deliberativeCouncil,
   fiscalCouncil,
+  isLoading = false,
 }: TransparencyBoardSectionProps) {
+  if (isLoading) {
+    return (
+      <LayoutContainer className="flex flex-col items-center justify-center py-16 gap-3">
+        <Spinner size={32} className="text-amber-400" />
+        <Text className="text-sm text-gray-400">{TRANSPARENCY_TEXTS.LOADING_DOCUMENTS}</Text>
+      </LayoutContainer>
+    );
+  }
   const renderGroup = (title: string, members: TransparencyBoardMember[]) => {
     if (members.length === 0) return null;
 

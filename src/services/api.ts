@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosRequestConfig } from 'axios';
 import { useAuthStore } from '@/store/useAuthStore';
 
 export const api = axios.create({
@@ -6,6 +6,8 @@ export const api = axios.create({
   timeout: 60000,
   withCredentials: true,
 });
+
+let refreshPromise: Promise<string> | null = null;
 
 // Interceptor to inject Token
 api.interceptors.request.use((config) => {
@@ -26,43 +28,54 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Interceptor to handle 401 and refresh token
+// Interceptor to handle 401 with single-flight refresh lock
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const originalRequest = error.config;
+    const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
     const hasToken = typeof window !== 'undefined' ? !!useAuthStore.getState().token : false;
-    
-    // Only intercept 401s if the user actually had an active session and is not already on auth endpoints
+
     if (
-      error.response?.status === 401 && 
-      !originalRequest._retry && 
-      originalRequest.url !== '/auth/refresh' && 
+      error.response?.status === 401 &&
+      originalRequest &&
+      !originalRequest._retry &&
+      originalRequest.url !== '/auth/refresh' &&
       originalRequest.url !== '/auth/login' &&
       hasToken
     ) {
       originalRequest._retry = true;
       try {
-        const refreshResponse = await axios.post(`${api.defaults.baseURL}/auth/refresh`, {}, { withCredentials: true });
-        const newToken = refreshResponse.data.accessToken;
-        
-        // Update store with new token
-        if (typeof window !== 'undefined') {
-          const currentUser = useAuthStore.getState().user;
-          if (currentUser) {
-            useAuthStore.getState().setAuth(newToken, currentUser);
-          }
+        if (!refreshPromise) {
+          refreshPromise = axios
+            .post(`${api.defaults.baseURL}/auth/refresh`, {}, { withCredentials: true })
+            .then((refreshResponse) => {
+              const newToken = refreshResponse.data.accessToken as string;
+              if (typeof window !== 'undefined') {
+                const currentUser = useAuthStore.getState().user;
+                if (currentUser && newToken) {
+                  useAuthStore.getState().setAuth(newToken, currentUser);
+                }
+              }
+              return newToken;
+            })
+            .finally(() => {
+              refreshPromise = null;
+            });
         }
 
-        originalRequest.headers.Authorization = `Bearer ${newToken}`;
+        const newToken = await refreshPromise;
+        originalRequest.headers = {
+          ...(originalRequest.headers || {}),
+          Authorization: `Bearer ${newToken}`,
+        };
         return api(originalRequest);
       } catch (refreshError) {
         if (typeof window !== 'undefined') {
           useAuthStore.getState().logout();
           const pathname = window.location.pathname;
-          const isProtectedRoute = 
-            pathname.startsWith('/gestao') || 
-            pathname.startsWith('/profile') || 
+          const isProtectedRoute =
+            pathname.startsWith('/gestao') ||
+            pathname.startsWith('/profile') ||
             pathname.startsWith('/dashboard');
 
           if (isProtectedRoute) {
@@ -72,7 +85,7 @@ api.interceptors.response.use(
         return Promise.reject(refreshError);
       }
     }
-    
+
     return Promise.reject(error);
-  }
+  },
 );

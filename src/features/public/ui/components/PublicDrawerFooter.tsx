@@ -14,7 +14,6 @@ import {
   Settings as SettingsIcon,
   LogOut,
   LogIn,
-  Moon,
 } from 'lucide-react';
 import { PUBLIC_DRAWER_TEXTS } from './PublicNavigationDrawer.constants';
 
@@ -118,22 +117,6 @@ export const PublicDrawerFooter: React.FC<PublicDrawerFooterProps> = ({
           </LayoutContainer>
         </LayoutContainer>
       )}
-
-      {/* Indicador do Modo Noturno Oficial do Clube */}
-      <LayoutContainer className="pt-2 border-t border-border flex items-center justify-between p-2.5 rounded-xl bg-surface/70 border border-border/80">
-        <LayoutContainer className="flex items-center gap-2.5">
-          <LayoutContainer className="w-7 h-7 rounded-lg bg-secondary/10 flex items-center justify-center text-secondary">
-            <Moon className="w-4 h-4" />
-          </LayoutContainer>
-          <Text className="text-xs font-bold text-text-primary">
-            {PUBLIC_DRAWER_TEXTS.THEME_DARK}
-          </Text>
-        </LayoutContainer>
-
-        <span className="text-[10px] uppercase font-bold text-secondary bg-secondary/10 px-2 py-0.5 rounded-full border border-secondary/20">
-          Ativo
-        </span>
-      </LayoutContainer>
 
       <Text className="text-[10px] text-text-secondary text-center">
         {PUBLIC_DRAWER_TEXTS.COPYRIGHT}

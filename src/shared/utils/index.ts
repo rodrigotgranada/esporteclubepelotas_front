@@ -3,3 +3,4 @@ export * from './viacep';
 export * from './colorPaletteGenerator';
 export * from './passwordGenerator';
 export * from './youtube.utils';
+export * from './url.utils';

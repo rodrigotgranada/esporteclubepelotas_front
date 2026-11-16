@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { LayoutContainer, Title, Text, Badge, Button } from '@/shared/ui/components/atoms';
 import { SafeImage } from '@/shared/ui/components/molecules/SafeImage';
 import { SearchableSelect, SearchableSelectOption } from '@/shared/ui/components/molecules';
+import { sanitizeSafeUrl } from '@/shared/utils';
 import { Championship, Match } from '../../types/matches.types';
 import { MATCHES_CONSTANTS, DEFAULT_OPPONENT_BADGE } from '../../constants/matches.constants';
 
@@ -165,9 +166,9 @@ export const MatchesCalendar: React.FC<MatchesCalendarProps> = ({
                         </Button>
                       </Link>
                     )}
-                    {match.transmissionUrl && (
+                    {sanitizeSafeUrl(match.transmissionUrl, '') && (
                       <a
-                        href={match.transmissionUrl}
+                        href={sanitizeSafeUrl(match.transmissionUrl)}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-xs font-semibold text-text-muted hover:text-secondary flex items-center gap-1 transition-colors cursor-pointer"

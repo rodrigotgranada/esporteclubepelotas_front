@@ -20,10 +20,12 @@ export const useSecurityData = () => {
     try {
       setIsDeleting(true);
       await deleteAccount(password);
+      setIsDeleteModalOpen(false);
       logout();
       router.push('/login');
     } catch (error) {
       console.error('Failed to delete account:', error);
+      toast.error((error as any)?.response?.data?.message || PROFILE_TEXTS.TOAST_DELETE_ACCOUNT_ERROR);
     } finally {
       setIsDeleting(false);
       setIsDeleteModalOpen(false);
@@ -38,15 +40,17 @@ export const useSecurityData = () => {
     setContactDrawerState({ ...contactDrawerState, isOpen: false });
   };
 
-  const handleRequestChange = async (newValue: string, currentPassword: string) => {
+  const handleRequestChange = async (newValue: string, currentPassword: string): Promise<boolean> => {
     try {
       setIsLoading(true);
       const res = await requestProfileChange(contactDrawerState.type, newValue, currentPassword);
       toast.success(PROFILE_TEXTS.TOAST_REQUEST_CHANGE_SUCCESS);
       useAuthStore.getState().updateUser(res.user);
       closeContactDrawer();
+      return true;
     } catch (error: any) {
       toast.error(error.response?.data?.message || PROFILE_TEXTS.TOAST_REQUEST_CHANGE_ERROR);
+      return false;
     } finally {
       setIsLoading(false);
     }

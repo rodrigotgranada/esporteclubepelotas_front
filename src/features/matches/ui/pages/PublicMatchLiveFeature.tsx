@@ -21,6 +21,7 @@ import {
   Calendar,
 } from 'lucide-react';
 import { SafeImage } from '@/shared/ui/components/molecules/SafeImage';
+import { sanitizeSafeUrl } from '@/shared/utils';
 import { MATCHES_CONSTANTS, DEFAULT_OPPONENT_BADGE } from '../../constants/matches.constants';
 import { usePublicMatchLive } from '../../hooks/usePublicMatchLive';
 import { MatchEventType, MatchEvent } from '../../types/matches.types';
@@ -351,7 +352,7 @@ export const PublicMatchLiveFeature: React.FC<PublicMatchLiveFeatureProps> = ({ 
               {PUBLIC_LIVE.TRANSMISSION_TITLE}
             </Title>
             <a
-              href={match.transmissionUrl}
+              href={sanitizeSafeUrl(match.transmissionUrl) || '#'}
               target="_blank"
               rel="noopener noreferrer"
               className="text-xs text-secondary hover:text-secondary-hover font-bold cursor-pointer"
@@ -376,7 +377,7 @@ export const PublicMatchLiveFeature: React.FC<PublicMatchLiveFeatureProps> = ({ 
                 {PUBLIC_LIVE.TRANSMISSION_EXTERNAL_DESC}
               </Text>
               <a
-                href={match.transmissionUrl}
+                href={sanitizeSafeUrl(match.transmissionUrl) || '#'}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 bg-secondary text-primary font-bold px-4 py-2 rounded-xl text-xs hover:bg-secondary-hover transition-colors"

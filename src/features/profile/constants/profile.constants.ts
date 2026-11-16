@@ -161,4 +161,5 @@ export const PROFILE_TEXTS = {
   TOAST_CONFIRM_CHANGE_REQUIRED: 'Preencha o código de confirmação.',
   TOAST_UPDATE_PASSWORD_SUCCESS: 'Senha alterada com sucesso!',
   TOAST_UPDATE_PASSWORD_ERROR: 'Falha ao alterar senha.',
+  TOAST_DELETE_ACCOUNT_ERROR: 'Não foi possível excluir sua conta. Verifique sua senha.',
 };

@@ -506,7 +506,7 @@ export const PublicNavigationDrawer: React.FC<PublicNavigationDrawerProps> = ({
             </LayoutContainer>
           </LayoutContainer>
 
-          {/* Bottom Footer of Drawer (User Session / Auth + Dark Theme Indicator) */}
+          {/* Bottom Footer of Drawer (User Session / Auth) */}
           <PublicDrawerFooter
             user={user}
             onClose={onClose}

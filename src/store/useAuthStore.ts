@@ -56,7 +56,6 @@ export interface User {
   pendingChanges?: Array<{
     type: 'email' | 'phone';
     newValue: string;
-    code: string;
     expiresAt: string;
   }>;
 }
@@ -71,6 +70,16 @@ interface AuthState {
   logout: () => void;
 }
 
+function getCookieAttributes(): Cookies.CookieAttributes {
+  const isHttps = typeof window !== 'undefined' && window.location.protocol === 'https:';
+  return {
+    expires: 7,
+    path: '/',
+    sameSite: 'lax',
+    ...(isHttps ? { secure: true } : {}),
+  };
+}
+
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
@@ -78,8 +87,12 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       pendingVerificationEmail: null,
       setAuth: (token, user) => {
-        Cookies.set('ecp_access_token', token, { expires: 7, path: '/' });
-        set({ token, user, pendingVerificationEmail: null });
+        if (token) {
+          Cookies.set('ecp_access_token', token, getCookieAttributes());
+        } else {
+          Cookies.remove('ecp_access_token', { path: '/' });
+        }
+        set({ token: token || null, user, pendingVerificationEmail: null });
       },
       setPendingVerificationEmail: (email) => set({ pendingVerificationEmail: email }),
       updateUser: (updates) =>
@@ -89,18 +102,26 @@ export const useAuthStore = create<AuthState>()(
       logout: () => {
         Cookies.remove('ecp_access_token', { path: '/' });
         set({ token: null, user: null, pendingVerificationEmail: null });
+        if (typeof window !== 'undefined') {
+          const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7998';
+          fetch(`${apiUrl}/auth/logout`, {
+            method: 'POST',
+            credentials: 'include',
+            keepalive: true,
+          }).catch(() => {});
+        }
       },
     }),
     {
       name: 'auth-storage',
-    }
-  )
+    },
+  ),
 );
 
 // Sync token to cookie on initial load (rehydration) and any other changes
 useAuthStore.subscribe((state) => {
   if (state.token) {
-    Cookies.set('ecp_access_token', state.token, { expires: 7, path: '/' });
+    Cookies.set('ecp_access_token', state.token, getCookieAttributes());
   } else {
     Cookies.remove('ecp_access_token', { path: '/' });
   }

@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { LayoutContainer, Title, Text, SafeImage } from '@/shared/ui/components';
+import { sanitizeSafeUrl } from '@/shared/utils';
 
 interface TiptapMark {
   type: string;
@@ -155,7 +156,7 @@ export const NewsRenderer: React.FC<NewsRendererProps> = ({ content, className =
       }
 
       case 'image': {
-        const src = node.attrs?.src;
+        const src = sanitizeSafeUrl(node.attrs?.src);
         const alt = node.attrs?.alt || '';
         const caption = node.attrs?.caption || node.attrs?.title || alt;
         const width = node.attrs?.width || '100%';

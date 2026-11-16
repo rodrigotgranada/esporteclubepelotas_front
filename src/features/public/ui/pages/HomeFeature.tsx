@@ -33,6 +33,7 @@ export const HomeFeature = () => {
   const [featuredNews, setFeaturedNews] = useState<NewsArticleData[]>([]);
   const [latestNews, setLatestNews] = useState<NewsArticleData[]>([]);
   const [nextMatch, setNextMatch] = useState<Match | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const loadHomeData = useCallback(async () => {
     try {
@@ -69,6 +70,8 @@ export const HomeFeature = () => {
       setLatestNews(filteredLatest);
     } catch (err) {
       console.warn('Nenhuma notícia carregada para a Home:', err);
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
@@ -90,7 +93,15 @@ export const HomeFeature = () => {
       <HomeSponsorsTicker />
 
       {/* 1. Primeira Seção: Vitrine Editorial de Notícias (Destaques & Bento Grid) */}
-      {(featuredNews.length > 0 || latestNews.length > 0) && (
+      {isLoading && featuredNews.length === 0 && latestNews.length === 0 ? (
+        <LayoutContainer className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-10 pb-8 sm:pb-12 w-full grid grid-cols-1 md:grid-cols-3 gap-6">
+          <LayoutContainer className="md:col-span-2 h-72 sm:h-96 rounded-2xl bg-surface/60 border border-border/50 animate-pulse" />
+          <LayoutContainer className="flex flex-col gap-6">
+            <LayoutContainer className="h-32 sm:h-44 rounded-2xl bg-surface/60 border border-border/50 animate-pulse" />
+            <LayoutContainer className="h-32 sm:h-44 rounded-2xl bg-surface/60 border border-border/50 animate-pulse" />
+          </LayoutContainer>
+        </LayoutContainer>
+      ) : (featuredNews.length > 0 || latestNews.length > 0) && (
         <LayoutContainer className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-10 pb-8 sm:pb-12 w-full flex flex-col gap-8 sm:gap-10 bg-transparent">
           {featuredNews.length > 0 && <NewsBentoHero articles={featuredNews} />}
 

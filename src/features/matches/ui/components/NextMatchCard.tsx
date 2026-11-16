@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { LayoutContainer, Text, Badge } from '@/shared/ui/components/atoms';
 import { SafeImage } from '@/shared/ui/components/molecules/SafeImage';
+import { sanitizeSafeUrl } from '@/shared/utils';
 import { Match } from '../../types/matches.types';
 import { MATCHES_CONSTANTS, DEFAULT_OPPONENT_BADGE } from '../../constants/matches.constants';
 
@@ -165,9 +166,9 @@ export const NextMatchCard: React.FC<NextMatchCardProps> = ({
           </Link>
         )}
 
-        {match.transmissionUrl && (
+        {sanitizeSafeUrl(match.transmissionUrl, '') && (
           <a
-            href={match.transmissionUrl}
+            href={sanitizeSafeUrl(match.transmissionUrl)}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center border border-primary/40 text-text-primary hover:bg-primary/20 font-semibold px-6 py-2.5 rounded-xl transition-colors cursor-pointer text-sm"

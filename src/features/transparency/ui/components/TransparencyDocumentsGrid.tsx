@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { LayoutContainer, Title, Text, Badge, Button, Spinner } from '@/shared/ui/components';
+import { sanitizeSafeUrl } from '@/shared/utils';
 import { FileText, Download } from 'lucide-react';
 import { TransparencyDocument } from '../../types/transparency.types';
 import { TRANSPARENCY_TEXTS } from '../../constants/transparency.constants';
@@ -64,7 +65,7 @@ export function TransparencyDocumentsGrid({ documents, isLoading }: Transparency
             </Text>
 
             <a
-              href={doc.fileUrl}
+              href={sanitizeSafeUrl(doc.fileUrl) || '#'}
               target="_blank"
               rel="noopener noreferrer"
             >

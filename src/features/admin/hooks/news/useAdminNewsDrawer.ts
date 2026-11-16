@@ -183,7 +183,7 @@ export const useAdminNewsDrawer = (
     setGalleryPreviews([]);
     setGalleryCropItem(null);
     setTagInput('');
-  }, [form, defaultIsYouth, defaultIsFemale, categories]);
+  }, [form, defaultIsYouth, defaultIsFemale]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -221,7 +221,12 @@ export const useAdminNewsDrawer = (
           allowReactions: art.allowReactions ?? true,
           allowComments: art.allowComments ?? true,
           status: art.status || 'DRAFT',
-          publishedAt: art.publishedAt ? new Date(art.publishedAt).toISOString().slice(0, 16) : '',
+          publishedAt: (() => {
+            if (!art.publishedAt) return '';
+            const d = new Date(art.publishedAt);
+            const pad = (n: number) => String(n).padStart(2, '0');
+            return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+          })(),
         });
         setCoverFile(null);
         setGalleryFiles([]);
