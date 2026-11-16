@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Camera, Trash2, Edit2 } from 'lucide-react';
-import { CropModal } from '../molecules/CropModal';
+import { CropModal, CropAspectOption } from '../molecules/CropModal';
 import { LayoutContainer } from '../atoms/LayoutContainer';
 import { IMAGE_CROPPER_TEXTS } from './ImageCropper.constants';
 
@@ -12,6 +12,8 @@ export interface ImageCropperProps {
   initialImage?: string | null;
   aspect?: number;
   shape?: 'round' | 'rect';
+  aspectOptions?: CropAspectOption[];
+  allowFreeCrop?: boolean;
   placeholderLabel?: string;
   className?: string;
 }
@@ -20,8 +22,10 @@ export const ImageCropper: React.FC<ImageCropperProps> = ({
   onCropSave,
   onImageRemove,
   initialImage,
-  aspect = 1,
+  aspect,
   shape = 'round',
+  aspectOptions,
+  allowFreeCrop = true,
   placeholderLabel,
   className = '',
 }) => {
@@ -69,9 +73,12 @@ export const ImageCropper: React.FC<ImageCropperProps> = ({
     fileInputRef.current?.click();
   };
 
-  const containerClasses = shape === 'rect'
-    ? 'relative group w-full max-w-lg aspect-video rounded-xl overflow-hidden bg-surface border-2 border-dashed border-border flex items-center justify-center cursor-pointer transition-all hover:border-primary shadow-sm'
-    : 'relative group w-32 h-32 rounded-full overflow-hidden bg-surface border-2 border-dashed border-border flex items-center justify-center cursor-pointer transition-all hover:border-primary shadow-sm';
+  const resolvedAspect = aspect !== undefined ? aspect : shape === 'round' ? 1 : undefined;
+
+  const containerClasses =
+    shape === 'rect'
+      ? 'relative group w-full max-w-lg aspect-video rounded-xl overflow-hidden bg-surface border-2 border-dashed border-border flex items-center justify-center cursor-pointer transition-all hover:border-primary shadow-sm'
+      : 'relative group w-32 h-32 rounded-full overflow-hidden bg-surface border-2 border-dashed border-border flex items-center justify-center cursor-pointer transition-all hover:border-primary shadow-sm';
 
   return (
     <LayoutContainer className={`flex flex-col items-center justify-center space-y-4 ${className}`}>
@@ -93,7 +100,7 @@ export const ImageCropper: React.FC<ImageCropperProps> = ({
             <img
               src={croppedImagePreview}
               alt={IMAGE_CROPPER_TEXTS.ALT_AVATAR}
-              className="w-full h-full object-cover"
+              className={`w-full h-full ${shape === 'rect' ? 'object-contain bg-background/60' : 'object-cover'}`}
             />
             <LayoutContainer className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-4 transition-opacity">
               <LayoutContainer
@@ -126,8 +133,10 @@ export const ImageCropper: React.FC<ImageCropperProps> = ({
       <CropModal
         isOpen={isModalOpen}
         imageSrc={imageSrc || ''}
-        aspect={aspect}
+        aspect={resolvedAspect}
         fixedShape={shape}
+        aspectOptions={aspectOptions}
+        allowFreeCrop={allowFreeCrop}
         onClose={() => {
           setIsModalOpen(false);
           setImageSrc(null);

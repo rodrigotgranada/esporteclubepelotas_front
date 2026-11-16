@@ -1,8 +1,13 @@
 export const CROP_MODAL_TEXTS = {
   TITLE: 'Ajustar Foto',
   ZOOM: 'Zoom',
+  ZOOM_IN: 'Aumentar zoom',
+  ZOOM_OUT: 'Diminuir zoom',
+  ZOOM_RESET: 'Redefinir zoom para 100%',
   MODE_CIRCULAR: 'Circular (1:1)',
   MODE_FREE: 'Livre',
+  MODE_SUGGESTED: 'Padrão',
+  ASPECT_3_4: 'Retrato (3:4)',
   ASPECT_16_9: '16:9',
   ASPECT_4_3: '4:3',
   ASPECT_1_1: '1:1',
@@ -10,10 +15,9 @@ export const CROP_MODAL_TEXTS = {
   REMOVE_BACKGROUND: 'Remover Fundo',
   CANCEL: 'Cancelar',
   SAVE: 'Salvar',
+  CLOSE_ARIA: 'Fechar',
   TOAST_BG_LOADING: 'Carregando IA e processando fundo... (pode demorar alguns segundos)',
   TOAST_BG_SUCCESS: 'Fundo removido com sucesso!',
   TOAST_BG_ERROR: 'Não foi possível remover o fundo automaticamente.',
   TOAST_ERROR_ORIGINAL: 'Erro ao carregar a imagem original.',
 };
-
-

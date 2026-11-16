@@ -140,6 +140,7 @@ export const IdolEditorDrawer: React.FC<IdolEditorDrawerProps> = ({
 
               <FormField
                 label={texts.LABEL_SLUG}
+                description={texts.HELPER_SLUG}
                 error={errors.slug?.message}
               >
                 <Input
@@ -158,7 +159,13 @@ export const IdolEditorDrawer: React.FC<IdolEditorDrawerProps> = ({
               </Text>
               <ImageCropper
                 shape="rect"
-                aspect={3 / 4}
+                aspect={undefined}
+                aspectOptions={[
+                  { label: texts.CROP_ASPECT_FREE, value: undefined },
+                  { label: texts.CROP_ASPECT_PORTRAIT, value: 3 / 4 },
+                  { label: texts.CROP_ASPECT_SQUARE, value: 1 },
+                  { label: texts.CROP_ASPECT_LANDSCAPE, value: 4 / 3 },
+                ]}
                 initialImage={photoUrl}
                 onCropSave={handleCropSave}
                 onImageRemove={handlePhotoRemove}
