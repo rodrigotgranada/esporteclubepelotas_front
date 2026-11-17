@@ -90,6 +90,7 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
     recoverDraft,
     discardDraft,
     handleCategoryCreated,
+    newsletterSentAt,
     handleSave,
   } = useAdminNewsDrawer(articleId, isOpen, onSaveSuccess, defaultIsYouth, defaultIsFemale);
 
@@ -129,6 +130,7 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
   const photographerName = watch('photographerName') || '';
   const allowReactions = watch('allowReactions');
   const allowComments = watch('allowComments');
+  const sendNewsletter = watch('sendNewsletter') ?? false;
   const status = watch('status');
   const publishedAt = watch('publishedAt') || '';
 
@@ -492,6 +494,9 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
               setAllowReactions={(val) => setValue('allowReactions', val)}
               allowComments={allowComments}
               setAllowComments={(val) => setValue('allowComments', val)}
+              sendNewsletter={sendNewsletter}
+              setSendNewsletter={(val) => setValue('sendNewsletter', val)}
+              newsletterSentAt={newsletterSentAt}
             />
 
             {/* 12. Status & Agendamento */}

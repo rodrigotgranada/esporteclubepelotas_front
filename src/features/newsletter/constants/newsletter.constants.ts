@@ -8,7 +8,22 @@ export const NEWSLETTER_TEXTS = {
   SUCCESS_MESSAGE: 'Inscrição realizada com sucesso! Bem-vindo à alcateia áureo-cerúlea.',
   INVALID_EMAIL: 'Por favor, informe um endereço de e-mail válido.',
   PRIVACY_NOTE: 'Respeitamos sua privacidade. Você pode cancelar sua inscrição a qualquer momento.',
-  
+
+  UNSUBSCRIBE: {
+    PAGE_TITLE: 'Cancelar Inscrição | Newsletter E.C. Pelotas',
+    PAGE_DESCRIPTION: 'Gerencie sua preferência de recebimento da Newsletter oficial do Esporte Clube Pelotas.',
+    TITLE: 'Cancelar inscrição na Newsletter',
+    DESCRIPTION: 'Ao confirmar abaixo, você deixará de receber os e-mails automáticos de notícias e comunicados do Esporte Clube Pelotas.',
+    BUTTON_CONFIRM: 'Confirmar Cancelamento',
+    BUTTON_PROCESSING: 'Cancelando...',
+    BUTTON_HOME: 'Voltar para a Página Inicial',
+    SUCCESS_TITLE: 'Inscrição cancelada com sucesso',
+    SUCCESS_DESC: 'Seu e-mail foi desativado da lista de envios da Newsletter do Lobo. Você poderá se inscrever novamente quando quiser pelo portal.',
+    INVALID_TOKEN_TITLE: 'Link de cancelamento inválido',
+    INVALID_TOKEN_DESC: 'O link utilizado está incompleto ou não corresponde a uma inscrição ativa.',
+    ERROR_GENERIC: 'Não foi possível concluir o cancelamento agora. Tente novamente em instantes.',
+  },
+
   ADMIN: {
     PAGE_TITLE: 'Gestão de Inscritos na Newsletter',
     PAGE_SUBTITLE: 'Lista oficial de torcedores cadastrados para comunicados do clube.',
@@ -23,6 +38,5 @@ export const NEWSLETTER_TEXTS = {
     STATUS_INACTIVE: 'Inativo',
     DELETE_SUCCESS: 'Inscrito removido com sucesso!',
     EMPTY_STATE: 'Nenhum torcedor inscrito na newsletter até o momento.',
-  }
+  },
 } as const;
-

@@ -106,6 +106,8 @@ export interface NewsArticleData {
   youtubeVideoUrl?: string;
   allowReactions?: boolean;
   allowComments?: boolean;
+  sendNewsletter?: boolean;
+  newsletterSentAt?: string | null;
   reactions?: {
     wolf: number;
     fire: number;

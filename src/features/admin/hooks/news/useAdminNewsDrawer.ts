@@ -43,6 +43,7 @@ const defaultNewsValues: NewsArticleFormData = {
   photographerName: '',
   allowReactions: true,
   allowComments: true,
+  sendNewsletter: false,
   status: 'DRAFT',
   publishedAt: '',
 };
@@ -88,6 +89,7 @@ export const useAdminNewsDrawer = (
   const [existingMainTitle, setExistingMainTitle] = useState('');
   const [hasRecoverableDraft, setHasRecoverableDraft] = useState(false);
   const [quickCategoryOpen, setQuickCategoryOpen] = useState(false);
+  const [newsletterSentAt, setNewsletterSentAt] = useState<string | null>(null);
 
   const loadCategories = useCallback(async () => {
     try {
@@ -183,6 +185,7 @@ export const useAdminNewsDrawer = (
     setGalleryPreviews([]);
     setGalleryCropItem(null);
     setTagInput('');
+    setNewsletterSentAt(null);
   }, [form, defaultIsYouth, defaultIsFemale]);
 
   useEffect(() => {
@@ -220,6 +223,7 @@ export const useAdminNewsDrawer = (
           photographerName: art.photographerName || '',
           allowReactions: art.allowReactions ?? true,
           allowComments: art.allowComments ?? true,
+          sendNewsletter: Boolean(art.sendNewsletter),
           status: art.status || 'DRAFT',
           publishedAt: (() => {
             if (!art.publishedAt) return '';
@@ -228,6 +232,7 @@ export const useAdminNewsDrawer = (
             return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
           })(),
         });
+        setNewsletterSentAt(art.newsletterSentAt || null);
         setCoverFile(null);
         setGalleryFiles([]);
         setGalleryPreviews([]);
@@ -458,6 +463,7 @@ export const useAdminNewsDrawer = (
             photographerName: data.photographerName?.trim() || undefined,
             allowReactions: data.allowReactions,
             allowComments: data.allowComments,
+            sendNewsletter: Boolean(data.sendNewsletter),
             status: chosenStatus,
             publishedAt:
               chosenStatus === 'SCHEDULED' && data.publishedAt
@@ -536,6 +542,7 @@ export const useAdminNewsDrawer = (
     quickCategoryOpen,
     setQuickCategoryOpen,
     handleCategoryCreated,
+    newsletterSentAt,
     handleSave,
   };
 };

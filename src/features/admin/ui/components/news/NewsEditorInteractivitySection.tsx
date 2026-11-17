@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import { MessageSquare } from 'lucide-react';
-import { LayoutContainer, Text, Checkbox } from '@/shared/ui/components';
+import { MessageSquare, MailCheck } from 'lucide-react';
+import { LayoutContainer, Text, Checkbox, Badge } from '@/shared/ui/components';
 import { ADMIN_NEWS_TEXTS } from '../../../constants/admin-news.constants';
 
 export interface NewsEditorInteractivitySectionProps {
@@ -10,6 +10,9 @@ export interface NewsEditorInteractivitySectionProps {
   setAllowReactions: (val: boolean) => void;
   allowComments: boolean;
   setAllowComments: (val: boolean) => void;
+  sendNewsletter: boolean;
+  setSendNewsletter: (val: boolean) => void;
+  newsletterSentAt?: string | null;
 }
 
 export const NewsEditorInteractivitySection: React.FC<NewsEditorInteractivitySectionProps> = ({
@@ -17,8 +20,17 @@ export const NewsEditorInteractivitySection: React.FC<NewsEditorInteractivitySec
   setAllowReactions,
   allowComments,
   setAllowComments,
+  sendNewsletter,
+  setSendNewsletter,
+  newsletterSentAt,
 }) => {
   const { DRAWER: texts } = ADMIN_NEWS_TEXTS;
+  const formattedSentAt = newsletterSentAt
+    ? new Date(newsletterSentAt).toLocaleString('pt-BR', {
+        dateStyle: 'short',
+        timeStyle: 'short',
+      })
+    : null;
 
   return (
     <LayoutContainer className="flex flex-col gap-3 p-4 rounded-xl border border-border bg-surface shadow-xs">
@@ -48,6 +60,26 @@ export const NewsEditorInteractivitySection: React.FC<NewsEditorInteractivitySec
           checked={allowComments}
           onChange={(e) => setAllowComments(e.target.checked)}
         />
+
+        <LayoutContainer className="pt-2 mt-1 border-t border-border/60 flex flex-col gap-2">
+          <Checkbox
+            id="send-newsletter"
+            label={texts.LABEL_SEND_NEWSLETTER}
+            description={texts.SEND_NEWSLETTER_HINT}
+            checked={sendNewsletter}
+            disabled={Boolean(newsletterSentAt)}
+            onChange={(e) => setSendNewsletter(e.target.checked)}
+          />
+
+          {formattedSentAt && (
+            <LayoutContainer className="pl-7">
+              <Badge variant="success" size="sm" className="inline-flex items-center gap-1.5 font-semibold">
+                <MailCheck className="w-3.5 h-3.5" />
+                {texts.SEND_NEWSLETTER_SENT_BADGE(formattedSentAt)}
+              </Badge>
+            </LayoutContainer>
+          )}
+        </LayoutContainer>
       </LayoutContainer>
     </LayoutContainer>
   );

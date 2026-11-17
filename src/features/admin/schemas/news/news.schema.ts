@@ -29,6 +29,7 @@ export const newsArticleSchema = z.object({
   photographerName: z.string().trim().optional(),
   allowReactions: z.boolean(),
   allowComments: z.boolean(),
+  sendNewsletter: z.boolean().optional(),
   status: z.enum(['DRAFT', 'PUBLISHED', 'SCHEDULED', 'ARCHIVED'] as const),
   publishedAt: z.string().optional(),
 });

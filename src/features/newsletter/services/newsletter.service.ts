@@ -7,6 +7,11 @@ export const newsletterService = {
     return data;
   },
 
+  unsubscribe: async (token: string) => {
+    const { data } = await api.post<{ success: boolean; message: string }>('/newsletter/unsubscribe', { token });
+    return data;
+  },
+
   getAdminSubscribers: async (page = 1, limit = 20) => {
     const { data } = await api.get<{
       content: NewsletterSubscriber[];
@@ -25,4 +30,3 @@ export const newsletterService = {
     await api.delete(`/admin/newsletter/subscribers/${id}`);
   },
 };
-
