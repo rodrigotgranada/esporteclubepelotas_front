@@ -13,15 +13,20 @@ export function useNewsletterUnsubscribe() {
   const router = useRouter();
   const token = (searchParams.get('token') || '').trim();
 
+  const [selectedReason, setSelectedReason] = useState<string>('');
   const [status, setStatus] = useState<UnsubscribeStatus>('idle');
   const [errorMessage, setErrorMessage] = useState<string>('');
+
+  const handleSelectReason = useCallback((reason: string) => {
+    setSelectedReason(reason);
+  }, []);
 
   const handleConfirmUnsubscribe = useCallback(async () => {
     if (!token || status === 'loading') return;
     try {
       setStatus('loading');
       setErrorMessage('');
-      await newsletterService.unsubscribe(token);
+      await newsletterService.unsubscribe(token, selectedReason);
       setStatus('success');
       toast.success(NEWSLETTER_TEXTS.UNSUBSCRIBE.SUCCESS_TITLE);
     } catch (err: any) {
@@ -33,7 +38,7 @@ export function useNewsletterUnsubscribe() {
       setStatus('error');
       toast.error(msg);
     }
-  }, [token, status]);
+  }, [token, status, selectedReason]);
 
   const handleGoHome = useCallback(() => {
     router.push('/');
@@ -41,10 +46,11 @@ export function useNewsletterUnsubscribe() {
 
   return {
     hasToken: Boolean(token),
+    selectedReason,
+    handleSelectReason,
     status,
     errorMessage,
     handleConfirmUnsubscribe,
     handleGoHome,
   };
 }
-

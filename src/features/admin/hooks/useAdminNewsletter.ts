@@ -61,12 +61,14 @@ export function useAdminNewsletter() {
         return;
       }
 
-      const headers = ['Email', 'Nome', 'Status', 'Data de Inscrição'];
+      const headers = ['Email', 'Nome', 'Status', 'Data de Inscrição', 'Motivo de Saída', 'Data de Cancelamento'];
       const rows = all.map((s) => [
         `"${s.email}"`,
         `"${s.name || ''}"`,
         s.active ? 'Ativo' : 'Inativo',
         `"${new Date(s.createdAt).toLocaleString('pt-BR')}"`,
+        `"${(s.unsubscribeReason || '').replace(/"/g, '""')}"`,
+        `"${s.unsubscribedAt ? new Date(s.unsubscribedAt).toLocaleString('pt-BR') : ''}"`,
       ]);
 
       const csvContent = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { MailX, CheckCircle2, AlertTriangle, Home } from 'lucide-react';
-import { LayoutContainer, Title, Text, Button } from '@/shared/ui/components';
+import { LayoutContainer, Title, Text, Button, Radio } from '@/shared/ui/components';
 import { NEWSLETTER_TEXTS } from '../../constants/newsletter.constants';
 import { useNewsletterUnsubscribe } from '../../hooks/useNewsletterUnsubscribe';
 
@@ -10,6 +10,8 @@ export function NewsletterUnsubscribeFeature() {
   const texts = NEWSLETTER_TEXTS.UNSUBSCRIBE;
   const {
     hasToken,
+    selectedReason,
+    handleSelectReason,
     status,
     errorMessage,
     handleConfirmUnsubscribe,
@@ -79,6 +81,26 @@ export function NewsletterUnsubscribeFeature() {
               </Text>
             </LayoutContainer>
 
+            <LayoutContainer className="w-full flex flex-col gap-2 text-left pt-1">
+              <Text as="span" className="text-xs font-bold text-text-primary">
+                {texts.REASON_LABEL}
+              </Text>
+              <LayoutContainer className="flex flex-col gap-2">
+                {texts.REASONS.map((reason) => (
+                  <Radio
+                    key={reason}
+                    name="unsubscribe-reason"
+                    value={reason}
+                    label={reason}
+                    card
+                    checked={selectedReason === reason}
+                    disabled={status === 'loading'}
+                    onChange={() => handleSelectReason(reason)}
+                  />
+                ))}
+              </LayoutContainer>
+            </LayoutContainer>
+
             {status === 'error' && errorMessage && (
               <LayoutContainer className="w-full p-3 rounded-xl bg-error/10 border border-error/30 text-error text-xs font-semibold">
                 {errorMessage}
@@ -110,4 +132,3 @@ export function NewsletterUnsubscribeFeature() {
     </LayoutContainer>
   );
 }
-

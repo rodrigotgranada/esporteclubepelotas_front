@@ -7,8 +7,11 @@ export const newsletterService = {
     return data;
   },
 
-  unsubscribe: async (token: string) => {
-    const { data } = await api.post<{ success: boolean; message: string }>('/newsletter/unsubscribe', { token });
+  unsubscribe: async (token: string, reason?: string) => {
+    const { data } = await api.post<{ success: boolean; message: string }>('/newsletter/unsubscribe', {
+      token,
+      reason: reason?.trim() || undefined,
+    });
     return data;
   },
 

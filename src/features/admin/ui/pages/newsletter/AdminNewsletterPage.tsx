@@ -86,13 +86,14 @@ export function AdminNewsletterPage() {
                 <th className="p-4">{NEWSLETTER_TEXTS.ADMIN.TABLE_NAME}</th>
                 <th className="p-4">{NEWSLETTER_TEXTS.ADMIN.TABLE_DATE}</th>
                 <th className="p-4">{NEWSLETTER_TEXTS.ADMIN.TABLE_STATUS}</th>
+                <th className="p-4">{NEWSLETTER_TEXTS.ADMIN.TABLE_REASON}</th>
                 <th className="p-4 text-right">{NEWSLETTER_TEXTS.ADMIN.TABLE_ACTIONS}</th>
               </tr>
             </thead>
             <tbody>
               {subscribers.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="p-8 text-center text-gray-400">
+                  <td colSpan={6} className="p-8 text-center text-gray-400">
                     {NEWSLETTER_TEXTS.ADMIN.EMPTY_STATE}
                   </td>
                 </tr>
@@ -116,6 +117,20 @@ export function AdminNewsletterPage() {
                         <Badge className="bg-gray-700 text-gray-300 text-xs">
                           {NEWSLETTER_TEXTS.ADMIN.STATUS_INACTIVE}
                         </Badge>
+                      )}
+                    </td>
+                    <td className="p-4 text-xs text-gray-300">
+                      {sub.unsubscribeReason ? (
+                        <LayoutContainer className="flex flex-col gap-0.5">
+                          <Text as="span" className="text-gray-200">{sub.unsubscribeReason}</Text>
+                          {sub.unsubscribedAt && (
+                            <Text as="span" className="text-[11px] text-gray-400">
+                              {new Date(sub.unsubscribedAt).toLocaleDateString('pt-BR')}
+                            </Text>
+                          )}
+                        </LayoutContainer>
+                      ) : (
+                        NEWSLETTER_TEXTS.ADMIN.NO_REASON
                       )}
                     </td>
                     <td className="p-4 text-right">

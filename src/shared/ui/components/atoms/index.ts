@@ -7,6 +7,7 @@ export * from './Text';
 export * from './LayoutContainer';
 export * from './Form';
 export * from './Checkbox';
+export * from './Radio';
 export * from './Modal';
 export * from './DrawerOverlay';
 export * from './Badge';
