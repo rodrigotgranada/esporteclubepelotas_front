@@ -90,6 +90,16 @@ export const useAdminNewsDrawer = (
   const [hasRecoverableDraft, setHasRecoverableDraft] = useState(false);
   const [quickCategoryOpen, setQuickCategoryOpen] = useState(false);
   const [newsletterSentAt, setNewsletterSentAt] = useState<string | null>(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [isSlugUnlocked, setIsSlugUnlocked] = useState(false);
+
+  useEffect(() => {
+    setIsSlugUnlocked(false);
+  }, [isOpen, articleId]);
+
+  const toggleSlugLock = useCallback(() => {
+    setIsSlugUnlocked((prev) => !prev);
+  }, []);
 
   const loadCategories = useCallback(async () => {
     try {
@@ -543,6 +553,10 @@ export const useAdminNewsDrawer = (
     setQuickCategoryOpen,
     handleCategoryCreated,
     newsletterSentAt,
+    isPreviewOpen,
+    setIsPreviewOpen,
+    isSlugUnlocked,
+    toggleSlugLock,
     handleSave,
   };
 };

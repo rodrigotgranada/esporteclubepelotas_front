@@ -66,7 +66,7 @@ export default async function NoticiaSlugPage({ params }: Props) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
         />
       )}
-      <NewsDetailFeature slug={slug} />
+      <NewsDetailFeature slug={slug} initialArticle={article} />
     </>
   );
 }

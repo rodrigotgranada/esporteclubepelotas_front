@@ -75,8 +75,7 @@ api.interceptors.response.use(
           const pathname = window.location.pathname;
           const isProtectedRoute =
             pathname.startsWith('/gestao') ||
-            pathname.startsWith('/profile') ||
-            pathname.startsWith('/dashboard');
+            pathname.startsWith('/profile');
 
           if (isProtectedRoute) {
             window.location.href = '/login';

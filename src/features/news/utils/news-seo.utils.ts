@@ -64,7 +64,7 @@ export function buildNewsJsonLd(article: NewsArticleData, siteUrl: string) {
       url: siteUrl,
       logo: {
         '@type': 'ImageObject',
-        url: `${siteUrl}/logo.png`,
+        url: `${siteUrl}/images/pelotas-logo.png`,
       },
     },
   };

@@ -1,4 +1,4 @@
-import { uploadMedia } from '@/shared/services/media-upload.service';
+import { uploadMedia, submitMultipartWithPayload } from '@/shared/services/media-upload.service';
 import { api } from '@/services/api';
 import { TimelineEventData, TimelineCategoryData } from '@/features/timeline/services/timeline.service';
 
@@ -91,13 +91,13 @@ export const adminTimelineService = {
 
   createEvent: async (data: CreateTimelineEventInput, photoFile?: File): Promise<TimelineEventData> => {
     if (photoFile) {
-      const formData = new FormData();
-      formData.append('data', JSON.stringify(data));
-      formData.append('photo', photoFile);
-      const response = await api.post('/timeline/admin', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+      return submitMultipartWithPayload<TimelineEventData>({
+        endpoint: '/timeline/admin',
+        data,
+        file: photoFile,
+        legacyFieldName: 'photo',
+        prefix: 'timeline',
       });
-      return response.data;
     }
 
     const response = await api.post('/timeline/admin', data);
@@ -110,13 +110,14 @@ export const adminTimelineService = {
     photoFile?: File
   ): Promise<TimelineEventData> => {
     if (photoFile) {
-      const formData = new FormData();
-      formData.append('data', JSON.stringify(data));
-      formData.append('photo', photoFile);
-      const response = await api.patch(`/timeline/admin/${id}`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+      return submitMultipartWithPayload<TimelineEventData>({
+        endpoint: `/timeline/admin/${id}`,
+        method: 'patch',
+        data,
+        file: photoFile,
+        legacyFieldName: 'photo',
+        prefix: 'timeline',
       });
-      return response.data;
     }
 
     const response = await api.patch(`/timeline/admin/${id}`, data);

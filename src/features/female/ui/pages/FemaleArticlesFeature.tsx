@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Newspaper, Calendar, ArrowRight, AlertCircle, Crown, Search } from 'lucide-react';
+import { ArrowLeft, Calendar, ArrowRight, AlertCircle, Crown, Search } from 'lucide-react';
 import {
   LayoutContainer,
   Title,
@@ -14,64 +14,12 @@ import {
   Spinner,
   MembershipCtaCard,
 } from '@/shared/ui/components';
-import { newsService } from '@/features/news/services/news.service';
-import { NewsArticleData } from '@/features/admin/services/admin-news.service';
 import { FEMALE_CONSTANTS } from '../../constants/female.constants';
-import { useRealtimeEvents } from '@/shared/hooks/useRealtimeEvents';
+import { useScopedArticles } from '@/features/news/hooks/useScopedArticles';
 
 export const FemaleArticlesFeature: React.FC = () => {
-  const [articles, setArticles] = useState<NewsArticleData[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [search, setSearch] = useState<string>('');
-
+  const { displayedArticles, isLoading, search, setSearch } = useScopedArticles('female');
   const texts = FEMALE_CONSTANTS.PAGE_NEWS;
-
-  const loadArticles = useCallback(async (options?: { silent?: boolean }) => {
-    try {
-      if (!options?.silent) {
-        setIsLoading(true);
-      }
-      const res = await newsService.getNews({ isFemale: true, limit: 40 });
-      const rawList = res.data || [];
-
-      const filtered = rawList.filter((art) => {
-        const catName =
-          typeof art.category === 'object' && art.category
-            ? art.category.name?.toLowerCase() || ''
-            : '';
-        const hasFemaleCategory = catName.includes('fem') || catName.includes('loba');
-        const hasFemaleTag = (art.tags || []).some((t) => t.toLowerCase().includes('fem') || t.toLowerCase().includes('loba'));
-        return art.isFemale || hasFemaleCategory || hasFemaleTag;
-      });
-
-      setArticles(filtered.length > 0 ? filtered : rawList);
-    } catch (err) {
-      console.warn('Erro ao carregar matérias das Lobas:', err);
-      if (!options?.silent) {
-        setArticles([]);
-      }
-    } finally {
-      if (!options?.silent) {
-        setIsLoading(false);
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    loadArticles();
-  }, [loadArticles]);
-
-  useRealtimeEvents('news', () => {
-    loadArticles({ silent: true });
-  });
-
-  const displayedArticles = articles.filter((a) => {
-    if (!search.trim()) return true;
-    const term = search.toLowerCase();
-    const titleMatch = a.title?.toLowerCase().includes(term);
-    const summaryMatch = a.summary?.toLowerCase().includes(term);
-    return titleMatch || summaryMatch;
-  });
 
   return (
     <LayoutContainer className="min-h-screen py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">

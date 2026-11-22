@@ -43,7 +43,7 @@ export const EnvironmentBadge = () => {
   return (
     <LayoutContainer
       ref={containerRef}
-      className="fixed bottom-4 right-4 z-[9999] flex flex-col items-end"
+      className="fixed bottom-24 right-4 sm:bottom-4 sm:left-4 sm:right-auto z-[9999] flex flex-col items-end sm:items-start"
     >
       {isOpen && (
         <LayoutContainer className="mb-2 w-72 rounded-2xl bg-surface/95 backdrop-blur-md border border-border p-4 shadow-2xl text-xs space-y-2">

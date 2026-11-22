@@ -191,3 +191,55 @@ export async function uploadMultipartFile<T = unknown>(
 
   return response.data;
 }
+
+export interface MultipartPayloadOptions<TData = unknown> {
+  endpoint: string;
+  method?: 'post' | 'put' | 'patch';
+  data?: TData;
+  file?: File | Blob | null;
+  legacyFieldName?: string;
+  prefix?: string;
+  onProgress?: (percent: number) => void;
+}
+
+/**
+ * Envia payload JSON ('data') acompanhado opcionalmente de um arquivo binário,
+ * centralizando o uso do FormData com a chave canônica 'file' (e fallback legado).
+ */
+export async function submitMultipartWithPayload<TResponse = unknown, TData = unknown>(
+  options: MultipartPayloadOptions<TData>
+): Promise<TResponse> {
+  const formData = new FormData();
+
+  if (options.data !== undefined) {
+    formData.append('data', JSON.stringify(options.data));
+  }
+
+  if (options.file) {
+    const uploadFile = normalizeUploadFile(options.file, options.prefix || 'media');
+    formData.append('file', uploadFile);
+    if (options.legacyFieldName && options.legacyFieldName !== 'file') {
+      formData.append(options.legacyFieldName, uploadFile);
+    }
+  }
+
+  const method = options.method || 'post';
+  const config = {
+    headers: { 'Content-Type': 'multipart/form-data' },
+    onUploadProgress: (progressEvent: AxiosProgressEvent) => {
+      if (options.onProgress && progressEvent.total) {
+        const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+        options.onProgress(percent);
+      }
+    },
+  };
+
+  const response =
+    method === 'put'
+      ? await api.put<TResponse>(options.endpoint, formData, config)
+      : method === 'patch'
+      ? await api.patch<TResponse>(options.endpoint, formData, config)
+      : await api.post<TResponse>(options.endpoint, formData, config);
+
+  return response.data;
+}

@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     title: 'Estádio Boca do Lobo | O Templo Sagrado do Lobo',
     description:
       'Uma grande reportagem contando o pioneirismo, as origens, os grandes clássicos e a mística centenária da Boca do Lobo.',
-    images: ['https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1200&q=80'],
+    images: ['/images/pelotas-logo.png'],
   },
 };
 

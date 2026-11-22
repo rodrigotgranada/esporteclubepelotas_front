@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { FemaleArticlesFeature } from '@/features/female/ui/pages/FemaleArticlesFeature';
+import { ModuleGuard } from '@/shared/ui/components';
 
 export const metadata: Metadata = {
   title: 'Matérias das Lobas | Futebol Feminino E.C. Pelotas',
@@ -7,6 +8,10 @@ export const metadata: Metadata = {
 };
 
 export default function FemininoMateriasPage() {
-  return <FemaleArticlesFeature />;
+  return (
+    <ModuleGuard moduleSlug="female" moduleName="Futebol Feminino">
+      <FemaleArticlesFeature />
+    </ModuleGuard>
+  );
 }
 

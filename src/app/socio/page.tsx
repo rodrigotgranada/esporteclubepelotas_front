@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { MembershipFeature } from '@/features/membership/ui/pages/MembershipFeature';
+import { ModuleGuard } from '@/shared/ui/components';
 
 export const metadata: Metadata = {
   title: 'Quadro Social | Planos de Sócio | Esporte Clube Pelotas',
@@ -13,5 +14,9 @@ export const metadata: Metadata = {
 };
 
 export default function SocioPage() {
-  return <MembershipFeature />;
+  return (
+    <ModuleGuard moduleSlug="membership" moduleName="Quadro Social (Sócios)">
+      <MembershipFeature />
+    </ModuleGuard>
+  );
 }

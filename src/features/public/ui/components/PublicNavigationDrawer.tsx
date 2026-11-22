@@ -1,10 +1,9 @@
 'use client';
 
-import React, { useEffect, useState, startTransition } from 'react';
+import React from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import {
   LayoutContainer,
   Text,
@@ -30,13 +29,10 @@ import {
   ShoppingBag,
   FileSpreadsheet,
 } from 'lucide-react';
-import { useAuthStore } from '@/store/useAuthStore';
-import { useSettingsStore } from '@/store/useSettingsStore';
-import { useSystemModulesStore } from '@/store/useSystemModulesStore';
-import { useMembershipLink } from '@/features/membership/hooks/useMembershipLink';
 import { PUBLIC_DRAWER_TEXTS } from './PublicNavigationDrawer.constants';
 import { PublicDrawerFooter } from './PublicDrawerFooter';
-import { useGlobalSearch, GlobalSearchInputBar, GlobalSearchResults, GLOBAL_SEARCH_TEXTS } from '@/features/search';
+import { GlobalSearchInputBar, GlobalSearchResults, GLOBAL_SEARCH_TEXTS } from '@/features/search';
+import { usePublicNavigationDrawer } from '../../hooks/usePublicNavigationDrawer';
 
 export interface PublicNavigationDrawerProps {
   isOpen: boolean;
@@ -47,74 +43,29 @@ export const PublicNavigationDrawer: React.FC<PublicNavigationDrawerProps> = ({
   isOpen,
   onClose,
 }) => {
-  const { user, logout } = useAuthStore();
-  const { settings } = useSettingsStore();
-  const { isLoaded: isModulesLoaded, isModuleActive, fetchModules } = useSystemModulesStore();
-  const membershipLink = useMembershipLink();
-  const router = useRouter();
-  const [mounted, setMounted] = useState(false);
-  const drawerSearch = useGlobalSearch(5);
-  const { handleClear: clearDrawerSearch } = drawerSearch;
-
-  useEffect(() => {
-    if (!isOpen) {
-      clearDrawerSearch();
-    }
-  }, [isOpen, clearDrawerSearch]);
-
-  useEffect(() => {
-    fetchModules();
-  }, [fetchModules]);
-
-  const idolsActive = isModulesLoaded ? isModuleActive('idols') : true;
-  const footballActive = isModulesLoaded ? isModuleActive('football') : true;
-  const matchesActive = isModulesLoaded ? isModuleActive('matches') : true;
-  const youthActive = isModulesLoaded ? isModuleActive('youth') : true;
-  const femaleActive = isModulesLoaded ? isModuleActive('female') : true;
-  const stadiumActive = isModulesLoaded ? isModuleActive('stadium') : true;
-  const historyActive = isModulesLoaded ? isModuleActive('history') : true;
-  const anthemActive = isModulesLoaded ? isModuleActive('anthem') : true;
-  const symbolsActive = isModulesLoaded ? isModuleActive('symbols') : true;
-  const kitsActive = isModulesLoaded ? isModuleActive('kits') : true;
-  const storeActive = isModulesLoaded ? isModuleActive('store') : true;
-  const membershipActive = isModulesLoaded ? isModuleActive('membership') : true;
-  const newsActive = isModulesLoaded ? isModuleActive('news') : true;
-  const transparencyActive = isModulesLoaded ? isModuleActive('transparency') : true;
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) {
-        onClose();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose]);
-
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isOpen]);
-
-  const handleLogout = () => {
-    onClose();
-    startTransition(() => {
-      router.push('/');
-    });
-    setTimeout(() => {
-      logout();
-    }, 100);
-  };
+  const {
+    mounted,
+    user,
+    settings,
+    membershipLink,
+    drawerSearch,
+    modules: {
+      idols: idolsActive,
+      football: footballActive,
+      youth: youthActive,
+      female: femaleActive,
+      stadium: stadiumActive,
+      history: historyActive,
+      anthem: anthemActive,
+      symbols: symbolsActive,
+      kits: kitsActive,
+      store: storeActive,
+      membership: membershipActive,
+      news: newsActive,
+      transparency: transparencyActive,
+    },
+    handleLogout,
+  } = usePublicNavigationDrawer(isOpen, onClose);
 
   if (!isOpen || !mounted) return null;
 

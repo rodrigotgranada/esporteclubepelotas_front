@@ -1,6 +1,6 @@
 import { api } from '@/services/api';
 import { Settings } from '@/store/useSettingsStore';
-import { uploadMedia } from '@/shared/services/media-upload.service';
+import { uploadMedia, submitMultipartWithPayload } from '@/shared/services/media-upload.service';
 
 export const settingsApi = {
   getSettings: async (): Promise<Settings> => {
@@ -31,10 +31,13 @@ export const settingsApi = {
       const response = await api.put('/settings', data);
       return response.data;
     }
-    const formData = new FormData();
-    formData.append('data', JSON.stringify(data));
-    formData.append('logo', file);
-    const response = await api.put('/settings', formData);
-    return response.data;
+    return submitMultipartWithPayload<Settings>({
+      endpoint: '/settings',
+      method: 'put',
+      data,
+      file,
+      legacyFieldName: 'logo',
+      prefix: 'club-logo',
+    });
   },
 };

@@ -1,13 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { LayoutContainer, Title, Text, Select, Option } from '@/shared/ui/components';
 import { ConfirmModal } from '@/shared/ui/components/molecules/ConfirmModal';
 import { ADMIN_TEXTS } from '../../../constants/admin.constants';
 import { useUsersList } from '../../../hooks/users/useUsersList';
 import { UsersFilterBar } from '../../components/users/UsersFilterBar';
 import { UsersList } from '../../components/users/UsersList';
-import { UserAdminData } from '../../../services/admin.service';
 import { useAuthStore } from '@/store/useAuthStore';
 import { UserAdminDrawer } from '../../components/users/UserAdminDrawer';
 
@@ -29,62 +28,25 @@ export const UsersListFeature = () => {
     limit,
     totalPages,
     isLoading,
-    handleToggleStatus,
     loadUsers,
     handleExportCsv,
     selectedUserIds,
     toggleUserSelection,
     selectAllUsers,
     handleBulkUpdateStatus,
-    handleBulkUpdateRole
+    handleBulkUpdateRole,
+    availableRoles,
+    isDrawerOpen,
+    selectedUser,
+    statusModal,
+    handleAddUser,
+    handleEditUser,
+    handleDrawerClose,
+    handleSaveSuccess,
+    confirmToggleStatus,
+    closeStatusModal,
+    executeToggleStatus,
   } = useUsersList();
-
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<UserAdminData | null>(null);
-  const [availableRoles, setAvailableRoles] = useState<any[]>([]);
-
-  React.useEffect(() => {
-    import('../../../services/admin.service').then(({ adminService }) => {
-      adminService.getRoles().then(setAvailableRoles).catch(console.error);
-    });
-  }, []);
-
-  // Status Modal State
-  const [statusModal, setStatusModal] = useState<{ isOpen: boolean; user: UserAdminData | null }>({
-    isOpen: false,
-    user: null,
-  });
-
-  const handleAddUser = () => {
-    setSelectedUser(null);
-    setIsDrawerOpen(true);
-  };
-
-  const handleEditUser = (user: UserAdminData) => {
-    setSelectedUser(user);
-    setIsDrawerOpen(true);
-  };
-
-  const handleDrawerClose = () => {
-    setIsDrawerOpen(false);
-    setSelectedUser(null);
-  };
-
-  const handleSaveSuccess = () => {
-    handleDrawerClose();
-    loadUsers();
-  };
-
-  const confirmToggleStatus = (user: UserAdminData) => {
-    setStatusModal({ isOpen: true, user });
-  };
-
-  const executeToggleStatus = async () => {
-    if (statusModal.user) {
-      await handleToggleStatus(statusModal.user);
-      setStatusModal({ isOpen: false, user: null });
-    }
-  };
 
   return (
     <LayoutContainer className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -116,23 +78,23 @@ export const UsersListFeature = () => {
               onChange={(e) => {
                 if (e.target.value) {
                   handleBulkUpdateRole(e.target.value);
-                  e.target.value = ''; // reset
+                  e.target.value = '';
                 }
               }}
               defaultValue=""
             >
               <Option value="" disabled>{ADMIN_TEXTS.USERS_BULK_CHANGE_ROLE_PLACEHOLDER}</Option>
-              {availableRoles.map(r => (
-                <Option key={r._id || r.id} value={r._id || r.id}>{r.label || r.name}</Option>
+              {availableRoles.map((r) => (
+                <Option key={r._id || r.id} value={r._id || r.id || ''}>{r.label || r.name}</Option>
               ))}
             </Select>
-            
+
             <Select
               className="text-sm"
               onChange={(e) => {
                 if (e.target.value) {
                   handleBulkUpdateStatus(e.target.value);
-                  e.target.value = ''; // reset
+                  e.target.value = '';
                 }
               }}
               defaultValue=""
@@ -172,7 +134,7 @@ export const UsersListFeature = () => {
 
       <ConfirmModal
         isOpen={statusModal.isOpen}
-        onClose={() => setStatusModal({ isOpen: false, user: null })}
+        onClose={closeStatusModal}
         onConfirm={executeToggleStatus}
         title={statusModal.user?.status === 'BLOCKED' ? 'Desbloquear Usuário' : 'Bloquear Usuário'}
         description={`Tem certeza que deseja ${statusModal.user?.status === 'BLOCKED' ? 'desbloquear' : 'bloquear'} o usuário ${statusModal.user?.firstName}?`}

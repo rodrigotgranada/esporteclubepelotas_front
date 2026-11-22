@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
-import { LayoutContainer, Button, IconButton, SafeImage, isUnoptimizedImageUrl } from '@/shared/ui/components';
+import { LayoutContainer, Button, IconButton, SafeImage, ThemeToggle, isUnoptimizedImageUrl } from '@/shared/ui/components';
 import { Menu, User, Settings, LogOut, Search } from 'lucide-react';
 import { useSettingsStore } from '@/store/useSettingsStore';
 import { useHeaderSearch, GlobalSearchInputBar, GlobalSearchResults, GLOBAL_SEARCH_TEXTS } from '@/features/search';
@@ -128,6 +128,9 @@ export const PublicHeader = () => {
               )}
             </LayoutContainer>
 
+            {/* Toggle de Tema Claro / Escuro */}
+            <ThemeToggle variant="dropdown" />
+
             {/* Sessão do Usuário ou Botão Entrar */}
             {user ? (
               <LayoutContainer className="relative" ref={dropdownRef}>
@@ -162,8 +165,9 @@ export const PublicHeader = () => {
                         <User size={16} /> {PUBLIC_HEADER_TEXTS.MENU_PROFILE}
                       </LayoutContainer>
                     </Link>
-                    {((user.role?.name || user.role) === 'ADMIN' ||
-                      (user.role?.name || user.role) === 'OWNER') && (
+                    {['ADMIN', 'OWNER', 'EDITOR'].includes(
+                      typeof user.role === 'string' ? user.role : user.role?.name || '',
+                    ) && (
                         <Link href="/gestao" onClick={() => setIsDropdownOpen(false)}>
                           <LayoutContainer className="px-4 py-3 hover:bg-background flex items-center gap-3 text-sm text-text-secondary hover:text-primary transition-colors">
                             <Settings size={16} /> {PUBLIC_HEADER_TEXTS.MENU_ADMIN}

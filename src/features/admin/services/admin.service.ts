@@ -1,4 +1,5 @@
 import { api } from '@/services/api';
+import { uploadMedia, submitMultipartWithPayload } from '@/shared/services/media-upload.service';
 
 export interface UserAdminData {
   id: string;
@@ -44,13 +45,19 @@ export const adminService = {
   },
 
   createUser: async (data: any, file?: File): Promise<UserAdminData> => {
-    const formData = new FormData();
-    formData.append('data', JSON.stringify(data));
-    if (file) {
-      formData.append('avatar', file);
+    if (!file) {
+      return submitMultipartWithPayload<UserAdminData>({
+        endpoint: '/users/admin/create',
+        data,
+      });
     }
-    const response = await api.post('/users/admin/create', formData);
-    return response.data;
+    return submitMultipartWithPayload<UserAdminData>({
+      endpoint: '/users/admin/create',
+      data,
+      file,
+      legacyFieldName: 'avatar',
+      prefix: 'avatar',
+    });
   },
 
   updateUser: async (id: string, data: any): Promise<UserAdminData> => {
@@ -59,28 +66,21 @@ export const adminService = {
   },
 
   updateUserAvatar: async (id: string, file: File): Promise<{ url: string }> => {
-    const formData = new FormData();
-    formData.append('avatar', file);
-    const response = await api.post(`/users/admin/${id}/avatar`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
+    return uploadMedia(file, {
+      endpoint: `/users/admin/${id}/avatar`,
+      legacyFieldName: 'avatar',
+      prefix: 'avatar',
     });
-    return response.data;
   },
 
   uploadUserAvatarMedia: async (file: File, folderId?: string): Promise<string> => {
-    const formData = new FormData();
-    formData.append('avatar', file);
-    if (folderId) {
-      formData.append('folderId', folderId);
-    }
-    const response = await api.post('/users/admin/upload-avatar', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
+    const res = await uploadMedia(file, {
+      endpoint: '/users/admin/upload-avatar',
+      legacyFieldName: 'avatar',
+      folderId,
+      prefix: 'avatar',
     });
-    return response.data?.url || response.data;
+    return res.url;
   },
 
   softDeleteUser: async (id: string): Promise<void> => {

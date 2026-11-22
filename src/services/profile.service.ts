@@ -1,4 +1,5 @@
 import { api } from '@/services/api';
+import { uploadMedia } from '@/shared/services/media-upload.service';
 import { User } from '@/store/useAuthStore';
 
 export interface UpdateProfilePayload {
@@ -20,15 +21,11 @@ export const updateProfile = async (data: UpdateProfilePayload): Promise<User> =
 };
 
 export const updateAvatar = async (file: File): Promise<{ url: string }> => {
-  const formData = new FormData();
-  formData.append('file', file);
-
-  const response = await api.put<{ url: string }>('/users/me/avatar', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
+  return uploadMedia(file, {
+    endpoint: '/users/me/avatar',
+    legacyFieldName: 'avatar',
+    prefix: 'avatar',
   });
-  return response.data;
 };
 
 export const deleteAccount = async (password: string): Promise<void> => {

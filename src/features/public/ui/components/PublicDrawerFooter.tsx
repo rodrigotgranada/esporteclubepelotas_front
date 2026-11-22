@@ -7,6 +7,7 @@ import {
   LayoutContainer,
   Text,
   Button,
+  ThemeToggle,
   isUnoptimizedImageUrl,
 } from '@/shared/ui/components';
 import {
@@ -68,8 +69,9 @@ export const PublicDrawerFooter: React.FC<PublicDrawerFooterProps> = ({
                 {PUBLIC_DRAWER_TEXTS.BTN_PROFILE}
               </Button>
             </Link>
-            {((user.role?.name || user.role) === 'ADMIN' ||
-              (user.role?.name || user.role) === 'OWNER') && (
+            {['ADMIN', 'OWNER', 'EDITOR'].includes(
+              typeof user.role === 'string' ? user.role : user.role?.name || '',
+            ) && (
               <Link href="/gestao" onClick={onClose}>
                 <Button
                   variant="outline"
@@ -117,6 +119,8 @@ export const PublicDrawerFooter: React.FC<PublicDrawerFooterProps> = ({
           </LayoutContainer>
         </LayoutContainer>
       )}
+
+      <ThemeToggle variant="expanded" />
 
       <Text className="text-[10px] text-text-secondary text-center">
         {PUBLIC_DRAWER_TEXTS.COPYRIGHT}

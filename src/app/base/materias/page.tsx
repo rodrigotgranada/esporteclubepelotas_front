@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { Suspense } from 'react';
 import { YouthArticlesFeature } from '@/features/youth/ui/pages/YouthArticlesFeature';
-import { LayoutContainer, Spinner } from '@/shared/ui/components';
+import { LayoutContainer, Spinner, ModuleGuard } from '@/shared/ui/components';
 
 export const metadata: Metadata = {
   title: 'Notícias & Cobertura da Base | E.C. Pelotas',
@@ -16,15 +16,17 @@ export const metadata: Metadata = {
 
 export default function YouthArticlesPage() {
   return (
-    <Suspense
-      fallback={
-        <LayoutContainer className="min-h-screen py-24 flex items-center justify-center">
-          <Spinner size={32} />
-        </LayoutContainer>
-      }
-    >
-      <YouthArticlesFeature />
-    </Suspense>
+    <ModuleGuard moduleSlug="youth" moduleName="Categorias de Base">
+      <Suspense
+        fallback={
+          <LayoutContainer className="min-h-screen py-24 flex items-center justify-center">
+            <Spinner size={32} />
+          </LayoutContainer>
+        }
+      >
+        <YouthArticlesFeature />
+      </Suspense>
+    </ModuleGuard>
   );
 }
 

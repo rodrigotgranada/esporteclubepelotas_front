@@ -1,31 +1,21 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Controller } from 'react-hook-form';
+import React from 'react';
 import {
   Sparkles,
-  Calendar,
   Video,
   Send,
   Save,
   Eye,
-  Lock,
-  Unlock,
-  Globe,
 } from 'lucide-react';
 import {
   Drawer,
   LayoutContainer,
   Text,
   Input,
-  Select,
-  Option,
   Button,
-  Checkbox,
-  Badge,
   Spinner,
   ConfirmModal,
-  Switch,
   FormField,
 } from '@/shared/ui/components';
 import { ADMIN_NEWS_TEXTS } from '../../../constants/admin-news.constants';
@@ -40,6 +30,8 @@ import { NewsEditorCreditsSection } from './NewsEditorCreditsSection';
 import { NewsEditorInteractivitySection } from './NewsEditorInteractivitySection';
 import { NewsEditorCoverSection } from './NewsEditorCoverSection';
 import { NewsEditorTagsSection } from './NewsEditorTagsSection';
+import { NewsClassificationSection } from './NewsClassificationSection';
+import { NewsCategorySlugSection, NewsScheduleSection } from './NewsCategorySlugSection';
 
 export interface NewsEditorDrawerProps {
   isOpen: boolean;
@@ -58,7 +50,7 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
   defaultIsYouth = false,
   defaultIsFemale = false,
 }) => {
-  const { DRAWER: texts, STATUS_MAP, MODAL_REPLACE_MAIN: replaceMainTexts } = ADMIN_NEWS_TEXTS;
+  const { DRAWER: texts, MODAL_REPLACE_MAIN: replaceMainTexts } = ADMIN_NEWS_TEXTS;
 
   const {
     form,
@@ -91,6 +83,10 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
     discardDraft,
     handleCategoryCreated,
     newsletterSentAt,
+    isPreviewOpen,
+    setIsPreviewOpen,
+    isSlugUnlocked,
+    toggleSlugLock,
     handleSave,
   } = useAdminNewsDrawer(articleId, isOpen, onSaveSuccess, defaultIsYouth, defaultIsFemale);
 
@@ -103,36 +99,30 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
   } = form;
 
   const quickCat = useQuickCategoryModal(handleCategoryCreated);
-  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-  const [isSlugUnlocked, setIsSlugUnlocked] = useState(false);
 
-  React.useEffect(() => {
-    setIsSlugUnlocked(false);
-  }, [isOpen, articleId]);
-
-  const title = watch('title');
-  const subtitle = watch('subtitle');
-  const slug = watch('slug');
-  const summary = watch('summary');
-  const categoryId = watch('categoryId');
-  const tags = watch('tags') || [];
-  const coverImage = watch('coverImage');
-  const coverCaption = watch('coverCaption') || '';
-  const gallery = watch('gallery') || [];
-  const content = watch('content') || {};
-  const youtubeVideoUrl = watch('youtubeVideoUrl') || '';
-  const featuredSlot = watch('featuredSlot');
-  const isPinned = watch('isPinned');
-  const isYouth = watch('isYouth');
-  const isFemale = watch('isFemale');
-  const showOnHomepage = watch('showOnHomepage');
-  const reporterName = watch('reporterName') || '';
-  const photographerName = watch('photographerName') || '';
-  const allowReactions = watch('allowReactions');
-  const allowComments = watch('allowComments');
-  const sendNewsletter = watch('sendNewsletter') ?? false;
-  const status = watch('status');
-  const publishedAt = watch('publishedAt') || '';
+  const values = watch();
+  const title = values.title;
+  const subtitle = values.subtitle;
+  const slug = values.slug;
+  const summary = values.summary;
+  const categoryId = values.categoryId;
+  const tags = values.tags || [];
+  const coverImage = values.coverImage;
+  const coverCaption = values.coverCaption || '';
+  const gallery = values.gallery || [];
+  const content = values.content || {};
+  const youtubeVideoUrl = values.youtubeVideoUrl || '';
+  const featuredSlot = values.featuredSlot;
+  const isPinned = values.isPinned;
+  const isYouth = Boolean(values.isYouth);
+  const isFemale = Boolean(values.isFemale);
+  const reporterName = values.reporterName || '';
+  const photographerName = values.photographerName || '';
+  const allowReactions = values.allowReactions;
+  const allowComments = values.allowComments;
+  const sendNewsletter = values.sendNewsletter ?? false;
+  const status = values.status;
+  const publishedAt = values.publishedAt || '';
 
   const isPublishedArticle = Boolean(articleId && status === 'PUBLISHED');
   const isSlugLocked = isPublishedArticle && !isSlugUnlocked;
@@ -174,209 +164,34 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
               </LayoutContainer>
             )}
 
-            {/* 1. Titulo & Subtitulo */}
             <LayoutContainer className="flex flex-col gap-4">
-              <FormField
-                label={`${texts.LABEL_TITLE} *`}
-                error={errors.title?.message}
-              >
-                <Input
-                  {...register('title')}
-                  placeholder={texts.PLACEHOLDER_TITLE}
-                />
+              <FormField label={`${texts.LABEL_TITLE} *`} error={errors.title?.message}>
+                <Input {...register('title')} placeholder={texts.PLACEHOLDER_TITLE} />
               </FormField>
 
-              <FormField
-                label={texts.LABEL_SUBTITLE}
-                error={errors.subtitle?.message}
-              >
-                <Input
-                  {...register('subtitle')}
-                  placeholder={texts.PLACEHOLDER_SUBTITLE}
-                />
+              <FormField label={texts.LABEL_SUBTITLE} error={errors.subtitle?.message}>
+                <Input {...register('subtitle')} placeholder={texts.PLACEHOLDER_SUBTITLE} />
               </FormField>
             </LayoutContainer>
 
-            {/* Classificação: Matéria da Categoria de Base */}
-            <LayoutContainer
-              className={`p-4 rounded-2xl border transition-all duration-300 flex flex-col gap-2 ${
-                isYouth ? 'bg-primary/10 border-primary/40 shadow-xs' : 'bg-surface border-border'
-              }`}
-            >
-              <LayoutContainer className="flex items-center justify-between">
-                <LayoutContainer className="flex items-center gap-2">
-                  <Text as="span" className="text-sm font-bold text-text-primary">
-                    {texts.SWITCH_IS_YOUTH_LABEL}
-                  </Text>
-                  <Badge variant={isYouth ? 'primary' : 'default'} size="sm" className="font-extrabold text-[10px] uppercase">
-                    {isYouth ? `🌱 ${texts.BADGE_YOUTH_ACTIVE}` : texts.BADGE_PRO_ACTIVE}
-                  </Badge>
-                </LayoutContainer>
+            <NewsClassificationSection
+              control={control}
+              setValue={setValue}
+              isYouth={isYouth}
+              isFemale={isFemale}
+            />
 
-                <Controller
-                  control={control}
-                  name="isYouth"
-                  render={({ field }) => (
-                    <Switch
-                      checked={field.value}
-                      onChange={(checked) => {
-                        field.onChange(checked);
-                        if (checked) {
-                          setValue('isFemale', false);
-                        }
-                      }}
-                      aria-label={texts.SWITCH_IS_YOUTH_LABEL}
-                    />
-                  )}
-                />
-              </LayoutContainer>
+            <NewsCategorySlugSection
+              control={control}
+              register={register}
+              errors={errors}
+              categories={categories}
+              onOpenQuickCategory={quickCat.open}
+              isPublishedArticle={isPublishedArticle}
+              isSlugLocked={isSlugLocked}
+              onToggleSlugLock={toggleSlugLock}
+            />
 
-              <Text as="p" className="text-xs text-text-muted leading-relaxed">
-                {texts.SWITCH_IS_YOUTH_DESC}
-              </Text>
-            </LayoutContainer>
-
-            {/* Classificação: Matéria do Futebol Feminino (As Lobas) */}
-            <LayoutContainer
-              className={`p-4 rounded-2xl border transition-all duration-300 flex flex-col gap-2 ${
-                isFemale ? 'bg-primary/10 border-primary/40 shadow-xs' : 'bg-surface border-border'
-              }`}
-            >
-              <LayoutContainer className="flex items-center justify-between">
-                <LayoutContainer className="flex items-center gap-2">
-                  <Text as="span" className="text-sm font-bold text-text-primary">
-                    {texts.SWITCH_IS_FEMALE_LABEL}
-                  </Text>
-                  <Badge variant={isFemale ? 'primary' : 'default'} size="sm" className="font-extrabold text-[10px] uppercase">
-                    {isFemale ? `👑 ${texts.BADGE_FEMALE_ACTIVE}` : texts.BADGE_PRO_ACTIVE}
-                  </Badge>
-                </LayoutContainer>
-
-                <Controller
-                  control={control}
-                  name="isFemale"
-                  render={({ field }) => (
-                    <Switch
-                      checked={Boolean(field.value)}
-                      onChange={(checked) => {
-                        field.onChange(checked);
-                        if (checked) {
-                          setValue('isYouth', false);
-                        }
-                      }}
-                      aria-label={texts.SWITCH_IS_FEMALE_LABEL}
-                    />
-                  )}
-                />
-              </LayoutContainer>
-
-              <Text as="p" className="text-xs text-text-muted leading-relaxed">
-                {texts.SWITCH_IS_FEMALE_DESC}
-              </Text>
-            </LayoutContainer>
-
-            {/* 2. Categoria & Slug */}
-            <LayoutContainer className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <LayoutContainer className="flex flex-col">
-                <LayoutContainer className="flex items-center justify-between mb-1">
-                  <Text as="span" className="text-xs font-semibold text-text-primary uppercase tracking-wider">
-                    {texts.LABEL_CATEGORY} *
-                  </Text>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={quickCat.open}
-                    className="text-xs h-6 px-1.5 text-primary hover:text-primary/80 font-bold"
-                  >
-                    {texts.BUTTON_QUICK_CATEGORY}
-                  </Button>
-                </LayoutContainer>
-                <FormField
-                  name="categoryId"
-                  control={control}
-                  error={errors.categoryId?.message}
-                  render={({ field }) => (
-                    <Select
-                      value={field.value}
-                      onChange={(e) => field.onChange(e.target.value)}
-                      className="w-full"
-                    >
-                      {categories.map((c) => (
-                        <Option key={c._id || c.slug} value={c._id || c.slug}>
-                          {c.name}
-                        </Option>
-                      ))}
-                    </Select>
-                  )}
-                />
-              </LayoutContainer>
-
-              <LayoutContainer className="flex flex-col">
-                <LayoutContainer className="flex items-center justify-between mb-1">
-                  <LayoutContainer className="flex items-center gap-1.5">
-                    <Text as="span" className="text-xs font-semibold text-text-primary uppercase tracking-wider">
-                      {texts.LABEL_SLUG}
-                    </Text>
-                    {isPublishedArticle && (
-                      <Badge variant={isSlugLocked ? 'default' : 'warning'} size="sm">
-                        {isSlugLocked ? (
-                          <Text as="span" className="flex items-center gap-1">
-                            <Lock className="w-3 h-3" />
-                            {texts.SLUG_LOCKED_BADGE}
-                          </Text>
-                        ) : (
-                          <Text as="span" className="flex items-center gap-1">
-                            <Unlock className="w-3 h-3" />
-                            {texts.SLUG_UNLOCKED_BADGE}
-                          </Text>
-                        )}
-                      </Badge>
-                    )}
-                  </LayoutContainer>
-                  {isPublishedArticle && (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setIsSlugUnlocked(!isSlugUnlocked)}
-                      className="text-xs h-7 px-2"
-                    >
-                      {isSlugLocked ? (
-                        <>
-                          <Unlock className="w-3.5 h-3.5 mr-1 text-primary" />
-                          <Text as="span" className="text-primary">{texts.SLUG_UNLOCK_BTN}</Text>
-                        </>
-                      ) : (
-                        <>
-                          <Lock className="w-3.5 h-3.5 mr-1 text-text-secondary" />
-                          <Text as="span">{texts.SLUG_LOCK_BTN}</Text>
-                        </>
-                      )}
-                    </Button>
-                  )}
-                </LayoutContainer>
-                <FormField
-                  error={errors.slug?.message}
-                  description={
-                    isSlugLocked
-                      ? texts.SLUG_LOCKED_HINT
-                      : isPublishedArticle
-                        ? texts.SLUG_UNLOCKED_WARNING
-                        : texts.SLUG_HINT
-                  }
-                >
-                  <Input
-                    {...register('slug')}
-                    placeholder={texts.PLACEHOLDER_SLUG}
-                    disabled={isSlugLocked}
-                    className={isSlugLocked ? 'opacity-70 bg-surface-hover cursor-not-allowed' : ''}
-                  />
-                </FormField>
-              </LayoutContainer>
-            </LayoutContainer>
-
-            {/* 3. Imagem de Capa 16:9 com Crop & Legenda */}
             <NewsEditorCoverSection
               coverImage={coverImage || null}
               coverCaption={coverCaption}
@@ -385,7 +200,6 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
               onImageRemove={handleRemoveCover}
             />
 
-            {/* 4. Galeria de Fotos da Matéria */}
             <NewsEditorGallerySection
               gallery={gallery}
               galleryPreviews={galleryPreviews}
@@ -398,18 +212,10 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
               onRemoveNew={handleRemoveNewGalleryPhoto}
             />
 
-            {/* 5. Resumo / SEO Preview */}
-            <FormField
-              label={texts.LABEL_SUMMARY}
-              error={errors.summary?.message}
-            >
-              <Input
-                {...register('summary')}
-                placeholder={texts.PLACEHOLDER_SUMMARY}
-              />
+            <FormField label={texts.LABEL_SUMMARY} error={errors.summary?.message}>
+              <Input {...register('summary')} placeholder={texts.PLACEHOLDER_SUMMARY} />
             </FormField>
 
-            {/* 6. Tiptap Block Editor (Conteúdo) */}
             <LayoutContainer className="flex flex-col gap-1.5">
               <Text as="span" className="text-xs font-semibold text-text-primary uppercase tracking-wider">
                 {texts.LABEL_CONTENT} *
@@ -420,7 +226,6 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
               />
             </LayoutContainer>
 
-            {/* 7. Tags */}
             <NewsEditorTagsSection
               tags={tags}
               tagInput={tagInput}
@@ -429,7 +234,6 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
               onRemoveTag={handleRemoveTag}
             />
 
-            {/* 8. Créditos Editoriais */}
             <NewsEditorCreditsSection
               reporterName={reporterName}
               setReporterName={(val) => setValue('reporterName', val)}
@@ -437,7 +241,6 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
               setPhotographerName={(val) => setValue('photographerName', val)}
             />
 
-            {/* 9. Video do YouTube */}
             <FormField
               label={
                 <Text as="span" className="flex items-center gap-1.5">
@@ -447,13 +250,9 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
               }
               error={errors.youtubeVideoUrl?.message}
             >
-              <Input
-                {...register('youtubeVideoUrl')}
-                placeholder={texts.PLACEHOLDER_YOUTUBE}
-              />
+              <Input {...register('youtubeVideoUrl')} placeholder={texts.PLACEHOLDER_YOUTUBE} />
             </FormField>
 
-            {/* 10. Vitrine Editorial & Destaques da Capa */}
             <NewsEditorFeaturedSection
               featuredSlot={featuredSlot}
               setFeaturedSlot={handleSelectFeaturedSlot}
@@ -461,34 +260,6 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
               setIsPinned={(val) => setValue('isPinned', val)}
             />
 
-            {/* Distribuição & Exibição da Matéria (Categoria de Base ou Futebol Feminino) */}
-            {(isYouth || isFemale) && (
-              <LayoutContainer className="p-4 rounded-2xl bg-surface border border-border flex flex-col gap-3 animate-in fade-in duration-200">
-                <Text as="span" className="text-xs font-semibold text-text-primary uppercase tracking-wider flex items-center gap-1.5">
-                  <Globe className="w-4 h-4 text-primary" />
-                  {texts.LABEL_DISTRIBUTION_SECTION}
-                </Text>
-
-                <Controller
-                  control={control}
-                  name="showOnHomepage"
-                  render={({ field }) => (
-                    <Checkbox
-                      label={texts.LABEL_SHOW_ON_HOMEPAGE}
-                      description={texts.SHOW_ON_HOMEPAGE_HINT}
-                      checked={field.value}
-                      onChange={(e) => field.onChange(e.target.checked)}
-                    />
-                  )}
-                />
-
-                <LayoutContainer className="p-2.5 rounded-xl bg-primary/10 border border-primary/20 text-xs text-text-secondary mt-1">
-                  {isYouth ? texts.YOUTH_CATEGORY_NOTICE : texts.FEMALE_CATEGORY_NOTICE}
-                </LayoutContainer>
-              </LayoutContainer>
-            )}
-
-            {/* 11. Interatividade com a Torcida */}
             <NewsEditorInteractivitySection
               allowReactions={allowReactions}
               setAllowReactions={(val) => setValue('allowReactions', val)}
@@ -499,46 +270,13 @@ export const NewsEditorDrawer: React.FC<NewsEditorDrawerProps> = ({
               newsletterSentAt={newsletterSentAt}
             />
 
-            {/* 12. Status & Agendamento */}
-            <LayoutContainer className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-xl border border-border bg-surface">
-              <FormField
-                label={texts.LABEL_STATUS}
-                name="status"
-                control={control}
-                error={errors.status?.message}
-                render={({ field }) => (
-                  <Select
-                    value={field.value}
-                    onChange={(e) => field.onChange(e.target.value as any)}
-                    className="w-full"
-                  >
-                    <Option value="DRAFT">{STATUS_MAP.DRAFT}</Option>
-                    <Option value="PUBLISHED">{STATUS_MAP.PUBLISHED}</Option>
-                    <Option value="SCHEDULED">{STATUS_MAP.SCHEDULED}</Option>
-                    <Option value="ARCHIVED">{STATUS_MAP.ARCHIVED}</Option>
-                  </Select>
-                )}
-              />
+            <NewsScheduleSection
+              control={control}
+              register={register}
+              errors={errors}
+              status={status}
+            />
 
-              {status === 'SCHEDULED' && (
-                <FormField
-                  label={
-                    <Text as="span" className="flex items-center gap-1">
-                      <Calendar className="w-3.5 h-3.5" />
-                      {texts.LABEL_PUBLISHED_AT}
-                    </Text>
-                  }
-                  error={errors.publishedAt?.message}
-                >
-                  <Input
-                    type="datetime-local"
-                    {...register('publishedAt')}
-                  />
-                </FormField>
-              )}
-            </LayoutContainer>
-
-            {/* 13. Botoes de Acao do Footer */}
             <LayoutContainer className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-border mt-4">
               <Button type="button" variant="ghost" onClick={onClose} disabled={isSaving}>
                 {texts.BUTTON_CANCEL}

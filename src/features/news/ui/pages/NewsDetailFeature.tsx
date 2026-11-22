@@ -38,13 +38,16 @@ import { NewsPrevNextNav } from '../components/NewsPrevNextNav';
 import { PublicSponsorsStrip } from '@/features/sponsors';
 import { calculateReadingTime, getYoutubeEmbedUrl, getYoutubeWatchUrl } from '../../utils/news.utils';
 
+import { NewsArticleData } from '@/features/admin/services/admin-news.service';
+
 export interface NewsDetailFeatureProps {
   slug: string;
+  initialArticle?: NewsArticleData | null;
 }
 
-export const NewsDetailFeature: React.FC<NewsDetailFeatureProps> = ({ slug }) => {
+export const NewsDetailFeature: React.FC<NewsDetailFeatureProps> = ({ slug, initialArticle }) => {
   const router = useRouter();
-  const { article, relatedNews, isLoading, error } = useNewsArticle(slug);
+  const { article, relatedNews, isLoading, error } = useNewsArticle(slug, initialArticle);
   const [copied, setCopied] = React.useState(false);
   const [lightboxIndex, setLightboxIndex] = React.useState<number | null>(null);
 

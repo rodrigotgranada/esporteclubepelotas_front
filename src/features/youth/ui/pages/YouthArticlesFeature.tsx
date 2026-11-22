@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Newspaper, Calendar, ArrowRight, AlertCircle } from 'lucide-react';
 import {
@@ -14,64 +14,12 @@ import {
   Spinner,
   MembershipCtaCard,
 } from '@/shared/ui/components';
-import { newsService } from '@/features/news/services/news.service';
-import { NewsArticleData } from '@/features/admin/services/admin-news.service';
 import { YOUTH_CONSTANTS } from '../../constants/youth.constants';
-import { useRealtimeEvents } from '@/shared/hooks/useRealtimeEvents';
+import { useScopedArticles } from '@/features/news/hooks/useScopedArticles';
 
 export const YouthArticlesFeature: React.FC = () => {
-  const [articles, setArticles] = useState<NewsArticleData[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [search, setSearch] = useState<string>('');
-
+  const { displayedArticles, isLoading, search, setSearch } = useScopedArticles('youth');
   const texts = YOUTH_CONSTANTS.PAGE_NEWS;
-
-  const loadArticles = useCallback(async (options?: { silent?: boolean }) => {
-    try {
-      if (!options?.silent) {
-        setIsLoading(true);
-      }
-      const res = await newsService.getNews({ isYouth: true, limit: 30 });
-      const rawList = res.data || [];
-
-      const filtered = rawList.filter((art) => {
-        const catName =
-          typeof art.category === 'object' && art.category
-            ? art.category.name?.toLowerCase() || ''
-            : '';
-        const hasBaseCategory = catName.includes('base') || catName.includes('formação');
-        const hasBaseTag = (art.tags || []).some((t) => t.toLowerCase().includes('base'));
-        return art.isYouth || hasBaseCategory || hasBaseTag;
-      });
-
-      setArticles(filtered.length > 0 ? filtered : rawList);
-    } catch (err) {
-      console.warn('Erro ao carregar matérias da base:', err);
-      if (!options?.silent) {
-        setArticles([]);
-      }
-    } finally {
-      if (!options?.silent) {
-        setIsLoading(false);
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    loadArticles();
-  }, [loadArticles]);
-
-  useRealtimeEvents('news', () => {
-    loadArticles({ silent: true });
-  });
-
-  const displayedArticles = articles.filter((a) => {
-    if (!search.trim()) return true;
-    const term = search.toLowerCase();
-    const titleMatch = a.title?.toLowerCase().includes(term);
-    const summaryMatch = a.summary?.toLowerCase().includes(term);
-    return titleMatch || summaryMatch;
-  });
 
   return (
     <LayoutContainer className="min-h-screen py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">

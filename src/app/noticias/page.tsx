@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Suspense } from 'react';
 import { NewsFeedFeature } from '@/features/news/ui/pages/NewsFeedFeature';
+import { ModuleGuard } from '@/shared/ui/components';
 
 export const metadata: Metadata = {
   title: 'Notícias | Esporte Clube Pelotas',
@@ -9,9 +10,10 @@ export const metadata: Metadata = {
 
 export default function NoticiasPage() {
   return (
-    <Suspense fallback={null}>
-      <NewsFeedFeature />
-    </Suspense>
+    <ModuleGuard moduleSlug="news" moduleName="Notícias & Cobertura">
+      <Suspense fallback={null}>
+        <NewsFeedFeature />
+      </Suspense>
+    </ModuleGuard>
   );
 }
-

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect, useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import {
   LayoutContainer,
@@ -15,76 +15,19 @@ import { useSettingsStore } from '@/store/useSettingsStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useMembershipLink } from '@/features/membership/hooks/useMembershipLink';
 import { newsService } from '@/features/news/services/news.service';
-import { NewsArticleData } from '@/features/admin/services/admin-news.service';
 import { NewsBentoHero } from '@/features/news/ui/components/NewsBentoHero';
 import { NewsCard } from '@/features/news/ui/components/NewsCard';
 import { HomeSponsorsTicker, HomeSponsorsSection } from '@/features/sponsors';
-import { useRealtimeEvents } from '@/shared/hooks/useRealtimeEvents';
-import { Match, matchesService } from '@/features/matches';
 import { NextMatchCard } from '@/features/matches/ui/components/NextMatchCard';
 import { ClubPollWidget } from '@/features/poll';
 import { NewsletterSection } from '@/features/newsletter';
+import { useHomeFeature } from '../../hooks/useHomeFeature';
 
 export const HomeFeature = () => {
   const { settings } = useSettingsStore();
   const { user } = useAuthStore();
   const membershipLink = useMembershipLink();
-  const [featuredNews, setFeaturedNews] = useState<NewsArticleData[]>([]);
-  const [latestNews, setLatestNews] = useState<NewsArticleData[]>([]);
-  const [nextMatch, setNextMatch] = useState<Match | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const loadHomeData = useCallback(async () => {
-    try {
-      const [featuredResult, feedResult, nextMatchData] = await Promise.allSettled([
-        newsService.getFeaturedNews(3),
-        newsService.getNews({ limit: 6 }),
-        matchesService.publicGetNextMatch(),
-      ]);
-
-      if (nextMatchData.status === 'fulfilled') {
-        setNextMatch(nextMatchData.value);
-      }
-
-      const featuredArticles =
-        featuredResult.status === 'fulfilled' && Array.isArray(featuredResult.value)
-          ? featuredResult.value
-          : [];
-
-      const feedArticles =
-        feedResult.status === 'fulfilled' && Array.isArray(feedResult.value?.data)
-          ? feedResult.value.data
-          : [];
-
-      setFeaturedNews(featuredArticles);
-
-      const featuredSlugs = new Set(
-        featuredArticles.map((f) => f.slug).filter(Boolean),
-      );
-
-      const filteredLatest = feedArticles
-        .filter((a) => a?.slug && !featuredSlugs.has(a.slug))
-        .slice(0, 3);
-
-      setLatestNews(filteredLatest);
-    } catch (err) {
-      console.warn('Nenhuma notícia carregada para a Home:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    loadHomeData();
-  }, [loadHomeData]);
-
-  useRealtimeEvents('news', () => {
-    loadHomeData();
-  });
-
-  useRealtimeEvents('matches', () => {
-    loadHomeData();
-  });
+  const { featuredNews, latestNews, nextMatch, isLoading } = useHomeFeature();
 
   return (
     <LayoutContainer className="flex flex-col bg-transparent">

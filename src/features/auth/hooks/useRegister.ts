@@ -166,14 +166,7 @@ export const useRegister = () => {
         })),
       };
 
-      const formData = new FormData();
-      formData.append('data', JSON.stringify(payload));
-
-      if (avatarBlob) {
-        formData.append('avatar', avatarBlob, 'avatar.jpg');
-      }
-
-      await authRepository.register(formData);
+      await authRepository.register(payload, avatarBlob);
 
       if (typeof window !== 'undefined') {
         sessionStorage.removeItem('register-form-data');

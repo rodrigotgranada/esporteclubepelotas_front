@@ -1,35 +1,31 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
-import { LayoutContainer, Text, SafeImage } from '@/shared/ui/components';
+import { LayoutContainer, Text, SafeImage, Spinner } from '@/shared/ui/components';
 import { PUBLIC_NEWS_TEXTS } from '../../constants/news.constants';
-import { newsService, NewsPrevNextData } from '../../services/news.service';
+import { useNewsPrevNext } from '../../hooks/useNewsPrevNext';
 
 export interface NewsPrevNextNavProps {
   slug: string;
 }
 
 export const NewsPrevNextNav: React.FC<NewsPrevNextNavProps> = ({ slug }) => {
-  const [data, setData] = useState<NewsPrevNextData | null>(null);
+  const { data, isLoading } = useNewsPrevNext(slug);
 
-  useEffect(() => {
-    let isMounted = true;
-    newsService.getPrevNext(slug).then((res) => {
-      if (isMounted) setData(res);
-    }).catch(() => {});
-
-    return () => {
-      isMounted = false;
-    };
-  }, [slug]);
+  if (isLoading) {
+    return (
+      <LayoutContainer className="flex items-center justify-center py-6 border-t border-border">
+        <Spinner size={20} />
+      </LayoutContainer>
+    );
+  }
 
   if (!data || (!data.previous && !data.next)) return null;
 
   return (
     <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-8 border-t border-border">
-      {/* Matéria Anterior */}
       {data.previous ? (
         <Link
           href={`/noticias/${data.previous.slug}`}
@@ -60,7 +56,6 @@ export const NewsPrevNextNav: React.FC<NewsPrevNextNavProps> = ({ slug }) => {
         <LayoutContainer className="hidden sm:block" />
       )}
 
-      {/* Próxima Matéria */}
       {data.next && (
         <Link
           href={`/noticias/${data.next.slug}`}
@@ -91,4 +86,3 @@ export const NewsPrevNextNav: React.FC<NewsPrevNextNavProps> = ({ slug }) => {
     </LayoutContainer>
   );
 };
-

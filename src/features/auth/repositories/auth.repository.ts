@@ -1,5 +1,6 @@
 import { api } from '@/services/api';
-import { LoginForm, RegisterForm } from '../schemas';
+import { submitMultipartWithPayload } from '@/shared/services/media-upload.service';
+import { LoginForm } from '../schemas';
 import { fetchViaCEP } from '@/shared/utils/viacep';
 
 export const authRepository = {
@@ -7,11 +8,15 @@ export const authRepository = {
     const response = await api.post('/auth/login', data);
     return response.data;
   },
-  
-  register: async (formData: FormData) => {
-    // Agora o registro envia o FormData completo que contem 'data' (JSON) e 'avatar' (Blob)
-    const response = await api.post('/users/register', formData);
-    return response.data;
+
+  register: async (payload: Record<string, unknown>, avatarBlob?: Blob | null) => {
+    return submitMultipartWithPayload({
+      endpoint: '/users/register',
+      data: payload,
+      file: avatarBlob,
+      legacyFieldName: 'avatar',
+      prefix: 'avatar',
+    });
   },
 
   verifyEmail: async (data: { email: string; code: string }) => {
@@ -43,5 +48,5 @@ export const authRepository = {
     const data = await fetchViaCEP(zipCode);
     if (!data) throw new Error('Invalid Zip');
     return data;
-  }
+  },
 };

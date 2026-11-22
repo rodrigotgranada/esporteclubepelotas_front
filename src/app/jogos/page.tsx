@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { MatchesFeature } from '@/features/matches/ui/pages/MatchesFeature';
+import { ModuleGuard } from '@/shared/ui/components';
 
 export const metadata: Metadata = {
   title: 'Calendário de Jogos & Tabela | Esporte Clube Pelotas',
@@ -14,6 +15,10 @@ export const metadata: Metadata = {
 };
 
 export default function JogosPage() {
-  return <MatchesFeature />;
+  return (
+    <ModuleGuard moduleSlug="matches" moduleName="Campeonatos & Jogos">
+      <MatchesFeature />
+    </ModuleGuard>
+  );
 }
 

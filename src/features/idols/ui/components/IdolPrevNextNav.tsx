@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { ChevronLeft, ChevronRight, Trophy } from 'lucide-react';
 import {
@@ -13,7 +13,7 @@ import {
   Spinner,
 } from '@/shared/ui/components';
 import { IDOLS_CONSTANTS } from '../../constants/idols.constants';
-import { idolsService, IdolData } from '../../services/idols.service';
+import { useIdolPrevNext } from '../../hooks/useIdolPrevNext';
 
 export interface IdolPrevNextNavProps {
   currentSlug: string;
@@ -21,33 +21,7 @@ export interface IdolPrevNextNavProps {
 
 export const IdolPrevNextNav: React.FC<IdolPrevNextNavProps> = ({ currentSlug }) => {
   const texts = IDOLS_CONSTANTS.PREV_NEXT;
-  const [prevIdol, setPrevIdol] = useState<IdolData | null>(null);
-  const [nextIdol, setNextIdol] = useState<IdolData | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    let isMounted = true;
-    setLoading(true);
-
-    idolsService
-      .getPrevNext(currentSlug)
-      .then((res) => {
-        if (isMounted) {
-          setPrevIdol(res.previous);
-          setNextIdol(res.next);
-        }
-      })
-      .catch(() => {
-        // Silently fail if navigation isn't available
-      })
-      .finally(() => {
-        if (isMounted) setLoading(false);
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, [currentSlug]);
+  const { prevIdol, nextIdol, isLoading: loading } = useIdolPrevNext(currentSlug);
 
   if (loading) {
     return (
@@ -76,7 +50,6 @@ export const IdolPrevNextNav: React.FC<IdolPrevNextNavProps> = ({ currentSlug })
       </LayoutContainer>
 
       <LayoutContainer className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {/* Previous Idol */}
         {prevIdol ? (
           <Link
             href={`/idolos/${prevIdol.slug}`}
@@ -115,7 +88,6 @@ export const IdolPrevNextNav: React.FC<IdolPrevNextNavProps> = ({ currentSlug })
           <LayoutContainer className="hidden sm:block" />
         )}
 
-        {/* Next Idol */}
         {nextIdol ? (
           <Link
             href={`/idolos/${nextIdol.slug}`}

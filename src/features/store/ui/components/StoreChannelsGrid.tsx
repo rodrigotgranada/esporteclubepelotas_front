@@ -95,7 +95,7 @@ export const StoreChannelsGrid: React.FC<StoreChannelsGridProps> = ({
         <LayoutContainer className="bg-surface border border-border rounded-2xl p-6 sm:p-8 flex flex-col justify-between gap-6 transition-all hover:border-pink-500/50 shadow-md">
           <LayoutContainer className="flex flex-col gap-4">
             <LayoutContainer className="flex items-center justify-between gap-3">
-              <LayoutContainer className="w-12 h-12 rounded-xl bg-gradient-to-tr from-amber-500/15 via-rose-500/15 to-purple-500/15 text-pink-500 flex items-center justify-center shrink-0">
+              <LayoutContainer className="w-12 h-12 rounded-xl bg-gradient-to-tr from-amber-500/15 via-pink-500/15 to-purple-500/15 text-pink-500 flex items-center justify-center shrink-0">
                 <FaInstagram className="w-7 h-7" />
               </LayoutContainer>
 

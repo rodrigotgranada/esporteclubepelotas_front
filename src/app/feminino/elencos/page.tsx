@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { FemaleSquadsFeature } from '@/features/female/ui/pages/FemaleSquadsFeature';
+import { ModuleGuard } from '@/shared/ui/components';
 
 export const metadata: Metadata = {
   title: 'Elencos das Lobas | Futebol Feminino E.C. Pelotas',
@@ -7,6 +8,10 @@ export const metadata: Metadata = {
 };
 
 export default function FemininoElencosPage() {
-  return <FemaleSquadsFeature />;
+  return (
+    <ModuleGuard moduleSlug="female" moduleName="Futebol Feminino">
+      <FemaleSquadsFeature />
+    </ModuleGuard>
+  );
 }
 

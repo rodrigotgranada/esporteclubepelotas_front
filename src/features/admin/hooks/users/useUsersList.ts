@@ -13,7 +13,18 @@ export const useUsersList = () => {
   const [statusFilter, setStatusFilter] = useState('ACTIVE');
   const [isLoading, setIsLoading] = useState(true);
   const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<UserAdminData | null>(null);
+  const [availableRoles, setAvailableRoles] = useState<{ _id?: string; id?: string; name: string; label?: string }[]>([]);
+  const [statusModal, setStatusModal] = useState<{ isOpen: boolean; user: UserAdminData | null }>({
+    isOpen: false,
+    user: null,
+  });
   const mutatingRef = useRef(false);
+
+  useEffect(() => {
+    adminService.getRoles().then(setAvailableRoles).catch(console.error);
+  }, []);
 
   const limit = 10;
   const totalPages = Math.ceil(total / limit) || 1;
@@ -162,6 +173,41 @@ export const useUsersList = () => {
     }
   };
 
+  const handleAddUser = () => {
+    setSelectedUser(null);
+    setIsDrawerOpen(true);
+  };
+
+  const handleEditUser = (user: UserAdminData) => {
+    setSelectedUser(user);
+    setIsDrawerOpen(true);
+  };
+
+  const handleDrawerClose = () => {
+    setIsDrawerOpen(false);
+    setSelectedUser(null);
+  };
+
+  const handleSaveSuccess = () => {
+    handleDrawerClose();
+    loadUsers();
+  };
+
+  const confirmToggleStatus = (user: UserAdminData) => {
+    setStatusModal({ isOpen: true, user });
+  };
+
+  const closeStatusModal = () => {
+    setStatusModal({ isOpen: false, user: null });
+  };
+
+  const executeToggleStatus = async () => {
+    if (statusModal.user) {
+      await handleToggleStatus(statusModal.user);
+      closeStatusModal();
+    }
+  };
+
   return {
     users,
     total,
@@ -184,5 +230,16 @@ export const useUsersList = () => {
     handleToggleStatus,
     loadUsers,
     handleExportCsv,
+    availableRoles,
+    isDrawerOpen,
+    selectedUser,
+    statusModal,
+    handleAddUser,
+    handleEditUser,
+    handleDrawerClose,
+    handleSaveSuccess,
+    confirmToggleStatus,
+    closeStatusModal,
+    executeToggleStatus,
   };
 };

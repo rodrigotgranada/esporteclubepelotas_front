@@ -1,10 +1,12 @@
 // Service Worker - Esporte Clube Pelotas PWA
-const CACHE_NAME = 'ecpelotas-pwa-v2';
+const CACHE_NAME = 'ecpelotas-pwa-v3';
 const STATIC_ASSETS = [
+  '/',
   '/manifest.json',
   '/icons/icon-192x192.png',
   '/icons/icon-512x512.png',
   '/favicon.ico',
+  '/images/pelotas-logo.png',
 ];
 
 self.addEventListener('install', (event) => {
@@ -48,7 +50,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Navegação sempre Network-First para nunca servir HTML/chunks antigos
+  // Navegação sempre Network-First com fallback para shell '/' cacheadas
   if (event.request.mode === 'navigate') {
     event.respondWith(
       fetch(event.request).catch(() => caches.match('/'))
@@ -56,23 +58,23 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Apenas assets estáticos de mídia/fonte
+  // Stale-While-Revalidate para assets estáticos de mídia/fonte
   if (url.pathname.match(/\.(png|jpg|jpeg|svg|webp|ico|woff2?)$/)) {
     event.respondWith(
-      caches.match(event.request).then((cachedResponse) => {
-        if (cachedResponse) {
-          return cachedResponse;
-        }
-        return fetch(event.request).then((networkResponse) => {
-          if (networkResponse && networkResponse.status === 200) {
-            const responseToCache = networkResponse.clone();
-            caches.open(CACHE_NAME).then((cache) => {
-              cache.put(event.request, responseToCache);
-            });
-          }
-          return networkResponse;
-        });
-      })
+      caches.open(CACHE_NAME).then((cache) =>
+        cache.match(event.request).then((cachedResponse) => {
+          const networkFetch = fetch(event.request)
+            .then((networkResponse) => {
+              if (networkResponse && networkResponse.status === 200) {
+                cache.put(event.request, networkResponse.clone());
+              }
+              return networkResponse;
+            })
+            .catch(() => cachedResponse);
+
+          return cachedResponse || networkFetch;
+        })
+      )
     );
   }
 });
