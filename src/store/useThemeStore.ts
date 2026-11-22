@@ -12,7 +12,7 @@ export const useThemeStore = create<ThemeState>()(
   persist(
     (set) => ({
       mode: 'dark',
-      setMode: (mode) => set({ mode }),
+      setMode: () => set({ mode: 'dark' }),
     }),
     {
       name: 'ecp-theme-storage',

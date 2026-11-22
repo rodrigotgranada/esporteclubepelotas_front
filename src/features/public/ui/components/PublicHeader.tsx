@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
-import { LayoutContainer, Button, IconButton, SafeImage, ThemeToggle, isUnoptimizedImageUrl } from '@/shared/ui/components';
+import { LayoutContainer, Button, IconButton, SafeImage, isUnoptimizedImageUrl } from '@/shared/ui/components';
 import { Menu, User, Settings, LogOut, Search } from 'lucide-react';
 import { useSettingsStore } from '@/store/useSettingsStore';
 import { useHeaderSearch, GlobalSearchInputBar, GlobalSearchResults, GLOBAL_SEARCH_TEXTS } from '@/features/search';
@@ -128,9 +128,6 @@ export const PublicHeader = () => {
               )}
             </LayoutContainer>
 
-            {/* Toggle de Tema Claro / Escuro */}
-            <ThemeToggle variant="dropdown" />
-
             {/* Sessão do Usuário ou Botão Entrar */}
             {user ? (
               <LayoutContainer className="relative" ref={dropdownRef}>
@@ -201,7 +198,7 @@ export const PublicHeader = () => {
         <HeaderReadingProgressBar />
       </LayoutContainer>
 
-      {/* Unified Mobile & Desktop Mega Navigation Drawer (contém o alternador de temas no mobile) */}
+      {/* Unified Mobile & Desktop Mega Navigation Drawer */}
       <PublicNavigationDrawer
         isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}

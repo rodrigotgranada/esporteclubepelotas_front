@@ -7,7 +7,6 @@ import {
   LayoutContainer,
   Text,
   Button,
-  ThemeToggle,
   isUnoptimizedImageUrl,
 } from '@/shared/ui/components';
 import {
@@ -119,8 +118,6 @@ export const PublicDrawerFooter: React.FC<PublicDrawerFooterProps> = ({
           </LayoutContainer>
         </LayoutContainer>
       )}
-
-      <ThemeToggle variant="expanded" />
 
       <Text className="text-[10px] text-text-secondary text-center">
         {PUBLIC_DRAWER_TEXTS.COPYRIGHT}
