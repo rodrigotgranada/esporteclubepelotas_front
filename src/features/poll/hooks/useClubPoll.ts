@@ -7,6 +7,7 @@ import { Poll } from '../types/poll.types';
 import { POLL_TEXTS } from '../constants/poll.constants';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useRealtimeEvents } from '@/shared/hooks/useRealtimeEvents';
+import { logNonNetworkWarning } from '@/shared/utils';
 
 export function useClubPoll() {
   const { user, token } = useAuthStore();
@@ -25,7 +26,7 @@ export function useClubPoll() {
         setSelectedOptionId(activePoll.userVotedOptionId);
       }
     } catch (err) {
-      console.error('Erro ao buscar enquete ativa:', err);
+      logNonNetworkWarning('Erro ao buscar enquete ativa:', err);
     } finally {
       setIsLoading(false);
     }

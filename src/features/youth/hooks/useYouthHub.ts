@@ -8,6 +8,7 @@ import {
 } from '@/features/football/services/football.service';
 import { newsService } from '@/features/news/services/news.service';
 import { NewsArticleData } from '@/features/admin/services/admin-news.service';
+import { logNonNetworkWarning } from '@/shared/utils';
 
 const FALLBACK_YOUTH_CONFIG: YouthPortalConfig = {
   pillars: [
@@ -73,7 +74,7 @@ export const useYouthHub = () => {
 
       setNews(filtered.length > 0 ? filtered.slice(0, 4) : articles.slice(0, 4));
     } catch (err) {
-      console.warn('[useYouthHub] Falha temporária ao carregar notícias da base:', err);
+      logNonNetworkWarning('[useYouthHub] Falha temporária ao carregar notícias da base:', err);
       if (!opts?.silent) {
         setNews([]);
       }
@@ -92,7 +93,7 @@ export const useYouthHub = () => {
       const data = await footballService.getYouthPortalConfig();
       setYouthConfig(data);
     } catch (err) {
-      console.warn(
+      logNonNetworkWarning(
         '[useYouthHub] Usando configuração padrão da base enquanto o servidor sincroniza:',
         err,
       );

@@ -5,6 +5,7 @@ import { stadiumService } from '../services/stadium.service';
 import { StadiumData } from '../types/stadium.types';
 import { FALLBACK_STADIUM_DATA } from '../constants/stadium.constants';
 import { useRealtimeEvents } from '@/shared/hooks/useRealtimeEvents';
+import { logNonNetworkWarning } from '@/shared/utils';
 
 export const useStadium = () => {
   const [stadium, setStadium] = useState<StadiumData | null>(FALLBACK_STADIUM_DATA);
@@ -18,7 +19,7 @@ export const useStadium = () => {
       const data = await stadiumService.getStadiumInfo();
       setStadium(data);
     } catch (err: unknown) {
-      console.warn(
+      logNonNetworkWarning(
         '[useStadium] Usando memorial padrão da Boca do Lobo enquanto o servidor sincroniza:',
         err
       );

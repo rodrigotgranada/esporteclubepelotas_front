@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Sponsor } from '../types/sponsors.types';
 import { sponsorsService } from '../services/sponsors.service';
 import { useRealtimeEvents } from '@/shared/hooks/useRealtimeEvents';
+import { logNonNetworkWarning } from '@/shared/utils';
 
 export const useHomeSponsorsTicker = () => {
   const [sponsors, setSponsors] = useState<Sponsor[]>([]);
@@ -14,7 +15,7 @@ export const useHomeSponsorsTicker = () => {
       const data = await sponsorsService.getFeaturedSponsors();
       setSponsors(Array.isArray(data) ? data : []);
     } catch (err) {
-      console.warn('Erro ao carregar patrocinadores em destaque:', err);
+      logNonNetworkWarning('Erro ao carregar patrocinadores em destaque:', err);
       setSponsors([]);
     } finally {
       setIsLoading(false);
@@ -33,7 +34,7 @@ export const useHomeSponsorsTicker = () => {
     if (!sponsor.id) return;
     // Rastreamento não bloqueante de cliques
     sponsorsService.trackSponsorClick(sponsor.id).catch((err) => {
-      console.warn('Falha ao rastrear clique do patrocinador:', err);
+      logNonNetworkWarning('Falha ao rastrear clique do patrocinador:', err);
     });
 
     if (sponsor.websiteUrl) {

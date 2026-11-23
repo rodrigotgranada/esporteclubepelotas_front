@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { newsService } from '@/features/news/services/news.service';
 import type { NewsArticleData } from '@/features/admin/services/admin-news.service';
 import { useRealtimeEvents } from '@/shared/hooks/useRealtimeEvents';
+import { logNonNetworkWarning } from '@/shared/utils';
 
 export type NewsArticleScope = 'female' | 'youth';
 
@@ -64,7 +65,7 @@ export const useScopedArticles = (scope: NewsArticleScope) => {
 
         setArticles(filtered.length > 0 ? filtered : rawList);
       } catch (err) {
-        console.warn(config.errorLabel, err);
+        logNonNetworkWarning(config.errorLabel, err);
         if (!options?.silent) {
           setArticles([]);
         }

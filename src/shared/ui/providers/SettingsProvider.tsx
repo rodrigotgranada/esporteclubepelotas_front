@@ -4,6 +4,7 @@ import React, { useCallback, useEffect } from 'react';
 import { useSettingsStore } from '@/store/useSettingsStore';
 import { settingsApi } from '@/shared/api/settings.api';
 import { useRealtimeEvents } from '@/shared/hooks/useRealtimeEvents';
+import { logNonNetworkWarning } from '@/shared/utils';
 
 export const SettingsProvider = ({ children }: { children: React.ReactNode }) => {
   const { setSettings } = useSettingsStore();
@@ -14,10 +15,10 @@ export const SettingsProvider = ({ children }: { children: React.ReactNode }) =>
       if (settings) {
         setSettings(settings);
       }
-    } catch (error: any) {
-      console.warn(
-        'Configurações institucionais carregadas com padrões locais (servidor em inicialização):',
-        error?.message || error,
+    } catch (error: unknown) {
+      logNonNetworkWarning(
+        'Configurações institucionais carregadas com padrões locais:',
+        error,
       );
     }
   }, [setSettings]);

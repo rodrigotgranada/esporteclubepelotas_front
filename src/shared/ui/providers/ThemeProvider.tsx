@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { themeService, ThemeDocument, ThemePalette } from '@/services/theme.service';
 import { useRealtimeEvents } from '@/shared/hooks/useRealtimeEvents';
+import { logNonNetworkWarning } from '@/shared/utils';
 
 const DEFAULT_DARK_THEME: ThemePalette = {
   primary: '#fbbf24',
@@ -105,10 +106,9 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
         setActiveTheme(theme);
       }
     } catch (err: unknown) {
-      const msg = (err as { message?: string })?.message || err;
-      console.warn(
+      logNonNetworkWarning(
         'Utilizando paleta Áureo-Cerúlea oficial (servidor iniciando ou padrão offline):',
-        msg,
+        err,
       );
     }
   }, []);

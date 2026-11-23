@@ -7,6 +7,7 @@ import { SettingsProvider } from '@/shared/ui/providers/SettingsProvider';
 import { EnvironmentBadge } from '@/shared/ui/components';
 import { PwaInstallPrompt } from '@/features/pwa';
 import { CookieConsentBanner } from '@/features/privacy';
+import { fetchPublicServerJson } from '@/shared/utils/seo-fetch';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,30 +20,24 @@ const geistMono = Geist_Mono({
 });
 
 export async function generateMetadata(): Promise<Metadata> {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7998';
-  try {
-    const res = await fetch(`${apiUrl}/settings`, { next: { revalidate: 60 }, signal: AbortSignal.timeout(3000) });
-    if (res.ok) {
-      const data = await res.json();
-      const logoUrl = typeof data.clubLogoUrl === 'string' && data.clubLogoUrl.trim() ? data.clubLogoUrl.trim() : null;
-      const icons = logoUrl
-        ? logoUrl.startsWith('data:')
-          ? { icon: logoUrl }
-          : { icon: logoUrl, shortcut: logoUrl, apple: logoUrl }
-        : { icon: "/favicon.ico", shortcut: "/favicon.ico", apple: "/favicon.ico" };
+  const data = await fetchPublicServerJson<{ clubLogoUrl?: string; clubName?: string }>('/settings', 60, 3000);
+  if (data) {
+    const logoUrl = typeof data.clubLogoUrl === 'string' && data.clubLogoUrl.trim() ? data.clubLogoUrl.trim() : null;
+    const icons = logoUrl
+      ? logoUrl.startsWith('data:')
+        ? { icon: logoUrl }
+        : { icon: logoUrl, shortcut: logoUrl, apple: logoUrl }
+      : { icon: "/favicon.ico", shortcut: "/favicon.ico", apple: "/favicon.ico" };
 
-      return {
-        metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://esporteclubepelotas.com.br'),
-        title: data.clubName || "Esporte Clube Pelotas",
-        description: "Portal Oficial do Clube",
-        manifest: "/manifest.json",
-        icons,
-      };
-    }
-  } catch (error) {
-    console.error("Failed to fetch metadata settings", error);
+    return {
+      metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://esporteclubepelotas.com.br'),
+      title: data.clubName || "Esporte Clube Pelotas",
+      description: "Portal Oficial do Clube",
+      manifest: "/manifest.json",
+      icons,
+    };
   }
-  
+
   return {
     metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://esporteclubepelotas.com.br'),
     title: "Esporte Clube Pelotas",

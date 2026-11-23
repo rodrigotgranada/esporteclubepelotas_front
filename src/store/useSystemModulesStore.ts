@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { api } from '@/services/api';
+import { logNonNetworkWarning } from '@/shared/utils';
 
 export interface SystemModuleData {
   id?: string;
@@ -31,7 +32,7 @@ export const useSystemModulesStore = create<SystemModulesState>((set, get) => ({
       const list = Array.isArray(response.data) ? response.data : [];
       set({ modules: list, isLoaded: true });
     } catch (error) {
-      console.error('Failed to fetch system modules:', error);
+      logNonNetworkWarning('Failed to fetch system modules:', error);
     } finally {
       set({ isLoading: false });
     }

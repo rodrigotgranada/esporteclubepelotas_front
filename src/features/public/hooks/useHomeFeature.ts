@@ -5,6 +5,7 @@ import { newsService } from '@/features/news/services/news.service';
 import type { NewsArticleData } from '@/features/admin/services/admin-news.service';
 import { useRealtimeEvents } from '@/shared/hooks/useRealtimeEvents';
 import { Match, matchesService } from '@/features/matches';
+import { logNonNetworkWarning } from '@/shared/utils';
 
 export const useHomeFeature = () => {
   const [featuredNews, setFeaturedNews] = useState<NewsArticleData[]>([]);
@@ -43,7 +44,7 @@ export const useHomeFeature = () => {
 
       setLatestNews(filteredLatest);
     } catch (err) {
-      console.warn('Nenhuma notícia carregada para a Home:', err);
+      logNonNetworkWarning('Nenhuma notícia carregada para a Home:', err);
     } finally {
       setIsLoading(false);
     }

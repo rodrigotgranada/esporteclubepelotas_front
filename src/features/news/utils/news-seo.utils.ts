@@ -1,22 +1,12 @@
 import { cache } from 'react';
 import { NewsArticleData } from '@/features/admin/services/admin-news.service';
+import { fetchPublicServerJson } from '@/shared/utils/seo-fetch';
 
 /**
  * Busca a matéria no servidor para pré-renderização de metadados e SEO com timeout e cache por request.
  */
 export const fetchArticleServer = cache(async (slug: string): Promise<NewsArticleData | null> => {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7998';
-  try {
-    const res = await fetch(`${apiUrl}/news/${encodeURIComponent(slug)}`, {
-      next: { revalidate: 60 },
-      signal: AbortSignal.timeout(4000),
-    });
-    if (!res.ok) return null;
-    return await res.json();
-  } catch (err) {
-    console.error(`[fetchArticleServer] Erro ao buscar artigo para SEO (${slug}):`, err);
-    return null;
-  }
+  return fetchPublicServerJson<NewsArticleData>(`/news/${encodeURIComponent(slug)}`, 60, 4000);
 });
 
 /**
