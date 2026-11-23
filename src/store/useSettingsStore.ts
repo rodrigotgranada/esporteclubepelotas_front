@@ -70,6 +70,9 @@ export interface Settings {
   storeHasMemberDiscount?: boolean;
   storeMemberDiscountText?: string;
   newsletterIsActive?: boolean;
+  developerCreditEnabled?: boolean;
+  developerCreditName?: string | null;
+  developerCreditUrl?: string | null;
 }
 
 interface SettingsState {
@@ -84,6 +87,9 @@ export const useSettingsStore = create<SettingsState>((set) => ({
     clubName: DEFAULT_CLUB_NAME,
     clubLogoGallery: [],
     newsletterIsActive: true,
+    developerCreditEnabled: false,
+    developerCreditName: null,
+    developerCreditUrl: null,
   },
   setSettings: (newSettings) =>
     set((state) => ({

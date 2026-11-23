@@ -49,6 +49,7 @@ export const PUBLIC_FOOTER_TEXTS = {
     '© 2026 Esporte Clube Pelotas. Todos os direitos reservados.',
   CNPJ: 'CNPJ: 92.213.238/0001-90',
   DEVELOPED_BY: 'Portal Oficial Áureo-Cerúleo',
+  DEVELOPED_BY_PREFIX: 'Desenvolvido por',
 
   DEFAULT_NAV_LINKS: [
     { label: 'Início', url: '/', isVisible: true, isExternal: false },

@@ -19,4 +19,15 @@ export const GENERAL_SETTINGS_TEXTS = {
   GALLERY_REMOVE_TITLE: 'Remover da Galeria',
   LABEL_NEWSLETTER_ACTIVE: 'Ativar Captação de Newsletter',
   DESCRIPTION_NEWSLETTER_ACTIVE: 'Exibe a caixa de inscrição de e-mails de novidades oficiais no portal público.',
+  DEVELOPER_CREDIT_SECTION_TITLE: 'Créditos de Desenvolvimento no Rodapé',
+  DEVELOPER_CREDIT_OWNER_BADGE: 'Exclusivo OWNER',
+  LABEL_DEVELOPER_CREDIT_ENABLED: 'Exibir crédito do desenvolvedor no rodapé',
+  DESCRIPTION_DEVELOPER_CREDIT_ENABLED:
+    'Quando ativado, exibe de forma discreta no rodapé quem desenvolveu o portal com o nome e link abaixo.',
+  LABEL_DEVELOPER_CREDIT_NAME: 'Nome de Exibição',
+  PLACEHOLDER_DEVELOPER_CREDIT_NAME: 'Ex: Rodrigo Granada',
+  LABEL_DEVELOPER_CREDIT_URL: 'Link de Destino (Opcional)',
+  PLACEHOLDER_DEVELOPER_CREDIT_URL: 'Ex: https://seusite.com.br ou https://linkedin.com/in/...',
+  DEVELOPER_CREDIT_PREVIEW_LABEL: 'Pré-visualização no rodapé:',
+  DEVELOPER_CREDIT_PREFIX: 'Desenvolvido por',
 };

@@ -10,8 +10,9 @@ import {
   SafeImage,
   FormField,
   Switch,
+  Badge,
 } from '@/shared/ui/components';
-import { Pencil, Plus, X } from 'lucide-react';
+import { Pencil, Plus, X, Lock } from 'lucide-react';
 import { CropModal } from '@/shared/ui/components/molecules/CropModal';
 import { GENERAL_SETTINGS_TEXTS } from './GeneralSettingsTab.constants';
 import { useGeneralSettingsTab } from '@/features/admin/hooks/settings/useGeneralSettingsTab';
@@ -19,12 +20,17 @@ import { useGeneralSettingsTab } from '@/features/admin/hooks/settings/useGenera
 export const GeneralSettingsTab = () => {
   const {
     form,
+    isOwner,
     isSaving,
     isFetching,
     previewLogo,
     gallery,
     newsletterIsActive,
     setNewsletterIsActive,
+    developerCreditEnabled,
+    setDeveloperCreditEnabled,
+    developerCreditName,
+    developerCreditUrl,
     isCropModalOpen,
     setIsCropModalOpen,
     cropImageSrc,
@@ -178,6 +184,76 @@ export const GeneralSettingsTab = () => {
               disabled={isSaving}
             />
           </LayoutContainer>
+
+          {isOwner && (
+            <LayoutContainer className="p-4 sm:p-5 rounded-xl border border-primary/30 bg-surface/50 space-y-4 mt-4">
+              <LayoutContainer className="flex flex-wrap items-center justify-between gap-2">
+                <LayoutContainer className="flex items-center gap-2">
+                  <Lock className="w-4 h-4 text-primary shrink-0" />
+                  <Text className="text-sm font-bold text-text-primary">
+                    {GENERAL_SETTINGS_TEXTS.DEVELOPER_CREDIT_SECTION_TITLE}
+                  </Text>
+                </LayoutContainer>
+                <Badge variant="primary" size="sm">
+                  {GENERAL_SETTINGS_TEXTS.DEVELOPER_CREDIT_OWNER_BADGE}
+                </Badge>
+              </LayoutContainer>
+
+              <LayoutContainer className="flex items-center justify-between gap-4 pt-1">
+                <LayoutContainer className="flex flex-col">
+                  <Text className="text-sm font-semibold text-text-primary">
+                    {GENERAL_SETTINGS_TEXTS.LABEL_DEVELOPER_CREDIT_ENABLED}
+                  </Text>
+                  <Text className="text-xs text-text-secondary">
+                    {GENERAL_SETTINGS_TEXTS.DESCRIPTION_DEVELOPER_CREDIT_ENABLED}
+                  </Text>
+                </LayoutContainer>
+                <Switch
+                  checked={Boolean(developerCreditEnabled)}
+                  onChange={setDeveloperCreditEnabled}
+                  disabled={isSaving}
+                />
+              </LayoutContainer>
+
+              <LayoutContainer className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-border/60">
+                <FormField
+                  label={GENERAL_SETTINGS_TEXTS.LABEL_DEVELOPER_CREDIT_NAME}
+                  error={errors.developerCreditName?.message}
+                >
+                  <Input
+                    {...register('developerCreditName')}
+                    placeholder={GENERAL_SETTINGS_TEXTS.PLACEHOLDER_DEVELOPER_CREDIT_NAME}
+                    disabled={isSaving}
+                  />
+                </FormField>
+
+                <FormField
+                  label={GENERAL_SETTINGS_TEXTS.LABEL_DEVELOPER_CREDIT_URL}
+                  error={errors.developerCreditUrl?.message}
+                >
+                  <Input
+                    {...register('developerCreditUrl')}
+                    placeholder={GENERAL_SETTINGS_TEXTS.PLACEHOLDER_DEVELOPER_CREDIT_URL}
+                    disabled={isSaving}
+                  />
+                </FormField>
+              </LayoutContainer>
+
+              {developerCreditEnabled && developerCreditName.trim() && (
+                <LayoutContainer className="text-xs text-text-secondary bg-background/60 border border-border/60 rounded-lg px-3 py-2 flex flex-wrap items-center gap-1.5">
+                  <Text as="span">{GENERAL_SETTINGS_TEXTS.DEVELOPER_CREDIT_PREVIEW_LABEL}</Text>
+                  <Text as="span" className="font-semibold text-text-primary">
+                    {GENERAL_SETTINGS_TEXTS.DEVELOPER_CREDIT_PREFIX} {developerCreditName.trim()}
+                  </Text>
+                  {developerCreditUrl.trim() && (
+                    <Text as="span" className="text-primary truncate max-w-full">
+                      ({developerCreditUrl.trim()})
+                    </Text>
+                  )}
+                </LayoutContainer>
+              )}
+            </LayoutContainer>
+          )}
         </LayoutContainer>
       </LayoutContainer>
 

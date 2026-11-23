@@ -114,6 +114,14 @@ export const PublicFooter = () => {
 
   const visibleNavLinks = rawNavLinks.filter((item) => item.isVisible !== false);
 
+  const developerCreditName = settings?.developerCreditName?.trim() || '';
+  const showDeveloperCredit = Boolean(settings?.developerCreditEnabled && developerCreditName);
+  const rawDeveloperSafeUrl = settings?.developerCreditUrl
+    ? sanitizeSafeUrl(settings.developerCreditUrl)
+    : '';
+  const developerCreditSafeUrl =
+    rawDeveloperSafeUrl && rawDeveloperSafeUrl !== '#' ? rawDeveloperSafeUrl : null;
+
   return (
     <LayoutContainer
       as="footer"
@@ -376,7 +384,22 @@ export const PublicFooter = () => {
             <span>{PUBLIC_FOOTER_TEXTS.CNPJ}</span>
             <span>•</span>
             <span className="font-semibold text-text-primary">
-              {PUBLIC_FOOTER_TEXTS.DEVELOPED_BY}
+              {showDeveloperCredit ? (
+                developerCreditSafeUrl ? (
+                  <a
+                    href={developerCreditSafeUrl}
+                    target="_blank"
+                    rel="noopener noreferrer nofollow"
+                    className="hover:text-primary transition-colors underline-offset-4 hover:underline"
+                  >
+                    {PUBLIC_FOOTER_TEXTS.DEVELOPED_BY_PREFIX} {developerCreditName}
+                  </a>
+                ) : (
+                  `${PUBLIC_FOOTER_TEXTS.DEVELOPED_BY_PREFIX} ${developerCreditName}`
+                )
+              ) : (
+                PUBLIC_FOOTER_TEXTS.DEVELOPED_BY
+              )}
             </span>
           </LayoutContainer>
         </LayoutContainer>

@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { useForm, UseFormReturn } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useSettingsStore, Settings } from '@/store/useSettingsStore';
+import { useAuthStore } from '@/store/useAuthStore';
 import { settingsApi } from '@/shared/api/settings.api';
 import toast from 'react-hot-toast';
 import { GENERAL_SETTINGS_TEXTS } from '../../ui/components/settings/general/GeneralSettingsTab.constants';
@@ -19,6 +20,9 @@ import {
 
 export const useGeneralSettingsTab = () => {
   const { settings, setSettings } = useSettingsStore();
+  const { user } = useAuthStore();
+  const rawRole = typeof user?.role === 'string' ? user.role : user?.role?.name || '';
+  const isOwner = rawRole.toUpperCase() === 'OWNER';
   const isFetching = false;
   const [fileToUpload, setFileToUpload] = useState<File | null>(null);
 
@@ -38,12 +42,18 @@ export const useGeneralSettingsTab = () => {
       clubLogoUrl: null,
       clubLogoGallery: [],
       newsletterIsActive: true,
+      developerCreditEnabled: false,
+      developerCreditName: '',
+      developerCreditUrl: '',
     },
   });
 
   const previewLogo = form.watch('clubLogoUrl');
   const gallery = form.watch('clubLogoGallery') || [];
   const newsletterIsActive = form.watch('newsletterIsActive');
+  const developerCreditEnabled = form.watch('developerCreditEnabled');
+  const developerCreditName = form.watch('developerCreditName') || '';
+  const developerCreditUrl = form.watch('developerCreditUrl') || '';
 
   useEffect(() => {
     if (settings) {
@@ -52,6 +62,9 @@ export const useGeneralSettingsTab = () => {
         'newsletterIsActive',
         settings.newsletterIsActive !== undefined ? settings.newsletterIsActive : true,
       );
+      form.setValue('developerCreditEnabled', Boolean(settings.developerCreditEnabled));
+      form.setValue('developerCreditName', settings.developerCreditName || '');
+      form.setValue('developerCreditUrl', settings.developerCreditUrl || '');
       form.setValue(
         'clubLogoGallery',
         settings.clubLogoGallery?.length
@@ -132,12 +145,18 @@ export const useGeneralSettingsTab = () => {
           finalGallery = [finalUrl, ...finalGallery];
         }
 
-        const payload = {
+        const payload: Record<string, unknown> = {
           clubName: data.clubName.trim(),
           clubLogoUrl: finalUrl,
           clubLogoGallery: finalGallery,
           newsletterIsActive: data.newsletterIsActive !== undefined ? data.newsletterIsActive : true,
         };
+
+        if (isOwner) {
+          payload.developerCreditEnabled = Boolean(data.developerCreditEnabled);
+          payload.developerCreditName = (data.developerCreditName || '').trim();
+          payload.developerCreditUrl = (data.developerCreditUrl || '').trim();
+        }
 
         const res = await settingsApi.updateSettings(payload);
         return res;
@@ -158,6 +177,7 @@ export const useGeneralSettingsTab = () => {
 
   return {
     form,
+    isOwner,
     isSaving,
     savingLabel,
     isFetching,
@@ -165,6 +185,11 @@ export const useGeneralSettingsTab = () => {
     gallery,
     newsletterIsActive,
     setNewsletterIsActive: (val: boolean) => form.setValue('newsletterIsActive', val),
+    developerCreditEnabled,
+    setDeveloperCreditEnabled: (val: boolean) =>
+      form.setValue('developerCreditEnabled', val, { shouldValidate: true }),
+    developerCreditName,
+    developerCreditUrl,
     isCropModalOpen,
     setIsCropModalOpen,
     cropImageSrc,
