@@ -1,5 +1,7 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import { useSettingsStore } from '@/store/useSettingsStore';
+import { useAuthStore } from '@/store/useAuthStore';
+import { storeOrdersService } from '@/features/profile/services/storeOrders.service';
 import { STORE_TEXTS } from '../constants/store.constants';
 
 export function extractInstagramHandle(url?: string | null): string {
@@ -15,6 +17,8 @@ export function extractInstagramHandle(url?: string | null): string {
 
 export const useStorePage = () => {
   const { settings } = useSettingsStore();
+  const user = useAuthStore((s) => s.user);
+  const [isOpeningStore, setIsOpeningStore] = useState(false);
 
   const storeName = useMemo(
     () => settings?.storeName?.trim() || STORE_TEXTS.FALLBACK_STORE_NAME,
@@ -136,6 +140,25 @@ export const useStorePage = () => {
     return `https://www.google.com/maps/search/?api=1&query=${query}`;
   }, [address]);
 
+  const handleAccessOnlineStore = useCallback(async () => {
+    if (!externalUrl) return;
+    const baseStoreUrl = externalUrl.replace(/\/+$/, '');
+    if (!user) {
+      window.open(baseStoreUrl, '_blank', 'noopener,noreferrer');
+      return;
+    }
+
+    setIsOpeningStore(true);
+    try {
+      const { ssoToken } = await storeOrdersService.issueSsoToken();
+      window.open(`${baseStoreUrl}/sso?token=${encodeURIComponent(ssoToken)}`, '_blank', 'noopener,noreferrer');
+    } catch {
+      window.open(baseStoreUrl, '_blank', 'noopener,noreferrer');
+    } finally {
+      setIsOpeningStore(false);
+    }
+  }, [externalUrl, user]);
+
   return {
     storeName,
     storeDescription,
@@ -143,6 +166,8 @@ export const useStorePage = () => {
     isOnlineActive,
     externalUrl,
     hasOnlineStore,
+    isOpeningStore,
+    handleAccessOnlineStore,
     instagramUrl,
     instagramHandle,
     instagramDescription,

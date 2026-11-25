@@ -6,6 +6,7 @@ export const PROFILE_TEXTS = {
   TAB_SECURITY: 'Segurança',
   TAB_ADDRESSES: 'Endereços',
   TAB_PREFERENCES: 'Preferências',
+  TAB_STORE_ORDERS: 'Minhas Compras',
 
   // Personal Data Tab
   PERSONAL_TITLE: 'Dados Pessoais',
@@ -162,4 +163,25 @@ export const PROFILE_TEXTS = {
   TOAST_UPDATE_PASSWORD_SUCCESS: 'Senha alterada com sucesso!',
   TOAST_UPDATE_PASSWORD_ERROR: 'Falha ao alterar senha.',
   TOAST_DELETE_ACCOUNT_ERROR: 'Não foi possível excluir sua conta. Verifique sua senha.',
+
+  // Minhas Compras (Loja Alcateia)
+  STORE_ORDERS_TITLE: 'Minhas Compras na Loja Alcateia',
+  STORE_ORDERS_SUBTITLE: 'Acompanhe suas reservas via WhatsApp, compras na loja física e pedidos cancelados.',
+  STORE_ORDERS_BTN_OPEN_STORE: 'Ir para a Loja Oficial',
+  STORE_ORDERS_LOADING: 'Consultando pedidos na Loja Oficial...',
+  STORE_ORDERS_OFFLINE_TITLE: 'Loja Oficial temporariamente offline',
+  STORE_ORDERS_OFFLINE_FALLBACK:
+    'Não foi possível consultar seus pedidos da loja neste instante. O Portal continua funcionando normalmente.',
+  STORE_ORDERS_EMPTY: 'Você ainda não possui reservas ou compras registradas na Loja Alcateia.',
+  STORE_ORDERS_CANCEL_BTN: 'Cancelar Reserva',
+  STORE_ORDERS_CANCELLING: 'Cancelando...',
+  STORE_ORDERS_CANCEL_SUCCESS: 'Reserva cancelada com sucesso!',
+  STORE_ORDERS_CANCEL_ERROR: 'Não foi possível cancelar o pedido neste momento.',
+  STORE_ORDERS_TOTAL_LABEL: 'Total:',
+  STORE_ORDERS_EXPIRES_LABEL: 'Válido até:',
+  STORE_STATUS_PENDING_WHATSAPP: 'Aguardando WhatsApp',
+  STORE_STATUS_NEGOTIATING: 'Em Negociação',
+  STORE_STATUS_CONFIRMED_PAID: 'Confirmado / Pago',
+  STORE_STATUS_CANCELLED: 'Cancelado',
+  STORE_STATUS_EXPIRED: 'Expirado',
 };

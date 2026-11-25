@@ -8,11 +8,15 @@ import { STORE_TEXTS } from '../../constants/store.constants';
 interface StoreOnlineCardProps {
   externalUrl: string;
   isOnlineActive?: boolean;
+  isOpening?: boolean;
+  onAccessStore?: () => void;
 }
 
 export const StoreOnlineCard: React.FC<StoreOnlineCardProps> = ({
   externalUrl,
   isOnlineActive = true,
+  isOpening = false,
+  onAccessStore,
 }) => {
   if (!externalUrl) return null;
 
@@ -40,20 +44,32 @@ export const StoreOnlineCard: React.FC<StoreOnlineCardProps> = ({
       </LayoutContainer>
 
       <LayoutContainer className="pt-2">
-        <a
-          href={externalUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="w-full inline-block"
-        >
+        {onAccessStore ? (
           <Button
             variant="primary"
+            disabled={isOpening}
+            onClick={onAccessStore}
             className="w-full font-bold justify-center"
             rightIcon={<ExternalLink className="w-4 h-4" />}
           >
             {STORE_TEXTS.ONLINE_BTN_ACCESS}
           </Button>
-        </a>
+        ) : (
+          <a
+            href={externalUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full inline-block"
+          >
+            <Button
+              variant="primary"
+              className="w-full font-bold justify-center"
+              rightIcon={<ExternalLink className="w-4 h-4" />}
+            >
+              {STORE_TEXTS.ONLINE_BTN_ACCESS}
+            </Button>
+          </a>
+        )}
       </LayoutContainer>
     </LayoutContainer>
   );

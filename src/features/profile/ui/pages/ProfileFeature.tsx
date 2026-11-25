@@ -4,16 +4,16 @@ import React, { useState, useEffect } from 'react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { LayoutContainer, Title, Text, Button } from '@/shared/ui/components';
 import { useRouter } from 'next/navigation';
-import { User, ShieldCheck, MapPin, Settings } from 'lucide-react';
+import { User, ShieldCheck, MapPin, Settings, ShoppingBag, AlertCircle } from 'lucide-react';
 import { PROFILE_TEXTS } from '../../constants';
 import { PersonalDataTab } from '../components/tabs/PersonalDataTab';
 import { SecurityTab } from '../components/tabs/SecurityTab';
 import { AddressesTab } from '../components/tabs/AddressesTab';
 import { PreferencesTab } from '../components/tabs/PreferencesTab';
 import { ChangesTab } from '../components/tabs/ChangesTab';
-import { AlertCircle } from 'lucide-react';
+import { StoreOrdersTab } from '../components/tabs/StoreOrdersTab';
 
-type TabId = 'personal' | 'security' | 'address' | 'preferences' | 'changes';
+type TabId = 'personal' | 'security' | 'address' | 'preferences' | 'store-orders' | 'changes';
 
 export const ProfileFeature = () => {
   const { user } = useAuthStore();
@@ -43,6 +43,7 @@ export const ProfileFeature = () => {
 
   const baseTabs = [
     { id: 'personal', label: PROFILE_TEXTS.TAB_PERSONAL, icon: User },
+    { id: 'store-orders', label: PROFILE_TEXTS.TAB_STORE_ORDERS, icon: ShoppingBag },
     { id: 'security', label: PROFILE_TEXTS.TAB_SECURITY, icon: ShieldCheck },
     { id: 'address', label: PROFILE_TEXTS.TAB_ADDRESSES, icon: MapPin },
     { id: 'preferences', label: PROFILE_TEXTS.TAB_PREFERENCES, icon: Settings },
@@ -96,6 +97,7 @@ export const ProfileFeature = () => {
         {/* Tab Content */}
         <LayoutContainer className="flex-1 bg-surface border border-border rounded-2xl p-6 md:p-8 min-h-[500px]">
           {activeTab === 'personal' && <PersonalDataTab />}
+          {activeTab === 'store-orders' && <StoreOrdersTab />}
           {activeTab === 'security' && <SecurityTab />}
           {activeTab === 'address' && <AddressesTab />}
           {activeTab === 'preferences' && <PreferencesTab user={user} />}

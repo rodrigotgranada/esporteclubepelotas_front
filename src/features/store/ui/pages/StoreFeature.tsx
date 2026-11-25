@@ -17,6 +17,8 @@ export const StoreFeature = () => {
     isOnlineActive,
     externalUrl,
     hasOnlineStore,
+    isOpeningStore,
+    handleAccessOnlineStore,
     instagramUrl,
     instagramHandle,
     instagramDescription,
@@ -53,6 +55,8 @@ export const StoreFeature = () => {
         <StoreOnlineCard
           externalUrl={externalUrl}
           isOnlineActive={isOnlineActive}
+          isOpening={isOpeningStore}
+          onAccessStore={handleAccessOnlineStore}
         />
       )}
 
